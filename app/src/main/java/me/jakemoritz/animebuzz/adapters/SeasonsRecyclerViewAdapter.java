@@ -19,9 +19,9 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
     }
 
     private final ArrayList<Series> seriesList;
-    private final SeasonsFragment.OnListFragmentInteractionListener mListener;
+    private final SeasonsFragment mListener;
 
-    public SeasonsRecyclerViewAdapter(ArrayList<Series> items, SeasonsFragment.OnListFragmentInteractionListener listener) {
+    public SeasonsRecyclerViewAdapter(ArrayList<Series> items, SeasonsFragment listener) {
         seriesList = items;
         mListener = listener;
     }
@@ -44,7 +44,7 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.series);
+                    mListener.selectedItem(holder.series);
                 }
             }
         });
@@ -72,7 +72,7 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
         }
     }
 
-    public void swapList(ArrayList<Series> newList){
+    public void swapList(ArrayList<Series> newList) {
         seriesList.clear();
         seriesList.addAll(newList);
         this.notifyDataSetChanged();

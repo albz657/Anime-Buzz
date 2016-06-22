@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -26,7 +27,6 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     private static final String TAG = SeasonsFragment.class.getSimpleName();
 
-    private OnListFragmentInteractionListener mListener;
     private ArrayList<Series> seasonData = new ArrayList<>();
     private SeasonsRecyclerViewAdapter mAdapter;
 
@@ -65,27 +65,10 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new SeasonsRecyclerViewAdapter(seasonData, mListener);
+            mAdapter = new SeasonsRecyclerViewAdapter(seasonData, this);
             recyclerView.setAdapter(mAdapter);
         }
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     @Override
@@ -131,7 +114,8 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         return super.onOptionsItemSelected(item);
     }
 
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Series item);
+    public void selectedItem(Series item){
+        Log.d(TAG, item.getTitle());
     }
+
 }
