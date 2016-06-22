@@ -71,10 +71,4 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
             return super.toString() + " '" + mTitle.getText() + "'";
         }
     }
-
-    public void swapList(ArrayList<Series> newList) {
-        seriesList.clear();
-        seriesList.addAll(newList);
-        this.notifyDataSetChanged();
-    }
 }

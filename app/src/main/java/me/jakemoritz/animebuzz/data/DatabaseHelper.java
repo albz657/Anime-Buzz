@@ -27,24 +27,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MAL_ID = "id";
     private static final String KEY_SHOW_TITLE = "title";
 
-    // Table create statements
-    private static final String CREATE_TABLE_SEASONS = "CREATE TABLE " + TABLE_SEASONS +
-            "(" + KEY_MAL_ID + " INTEGER PRIMARY KEY NOT NULL, " + KEY_SHOW_TITLE + " TEXT" + ")";
-
     public DatabaseHelper(Context context){
         super(context, DATABASE_NAME, null , DATABASE_VERSION);
         TABLE_SEASONS = context.getString(R.string.table_seasons);
         TABLE_USER_LIST = context.getString(R.string.table_user_list);
     }
 
+    private String buildTableCreateQuery(String TABLE_NAME){
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
+                "(" + KEY_MAL_ID + " INTEGER PRIMARY KEY NOT NULL, " + KEY_SHOW_TITLE + " TEXT" + ")";
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(CREATE_TABLE_SEASONS);
+        db.execSQL(buildTableCreateQuery(TABLE_SEASONS));
+        db.execSQL(buildTableCreateQuery(TABLE_USER_LIST));
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEASONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_LIST);
         onCreate(db);
     }
 
@@ -93,7 +96,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void saveSeriesToDb(ArrayList<Series> seriesList, String TABLE_NAME) {
         if (seriesList != null) {
-            for (Series series : seriesList) {
+             for (Series series : seriesList) {
                 if (getSeries(series.getMal_id(), TABLE_NAME).getCount() != 0) {
                     updateSeriesInDb(series.getMal_id(), series, TABLE_NAME);
                 } else {

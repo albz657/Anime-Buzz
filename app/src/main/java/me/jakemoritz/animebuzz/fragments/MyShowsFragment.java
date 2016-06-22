@@ -13,11 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
-
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.MyShowsRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class MyShowsFragment extends Fragment {
@@ -25,7 +24,6 @@ public class MyShowsFragment extends Fragment {
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
     private OnListFragmentInteractionListener mListener;
-    private ArrayList<Series> userList = new ArrayList<>();
     private MyShowsRecyclerViewAdapter mAdapter;
 
     public MyShowsFragment() {
@@ -45,7 +43,7 @@ public class MyShowsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadFromDb();
+        mAdapter.swapList(App.getInstance().getUserList());
     }
 
     @Override
@@ -63,7 +61,7 @@ public class MyShowsFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new MyShowsRecyclerViewAdapter(userList, mListener);
+            mAdapter = new MyShowsRecyclerViewAdapter(App.getInstance().getUserList(), mListener);
             recyclerView.setAdapter(mAdapter);
         }
         return view;
@@ -88,13 +86,7 @@ public class MyShowsFragment extends Fragment {
 
     private void saveToDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.saveSeriesToDb(mAdapter.getSeriesList(), getActivity().getString(R.string.table_user_list));
-    }
-
-    private void loadFromDb(){
-        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        userList = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_user_list));
-        mAdapter.swapList(userList);
+        dbHelper.saveSeriesToDb(App.getInstance().getUserList(), getActivity().getString(R.string.table_user_list));
     }
 
     @Override
@@ -110,8 +102,6 @@ public class MyShowsFragment extends Fragment {
 
         if (id == R.id.action_cache){
             saveToDb();
-        } else if (id == R.id.action_read_cache){
-            loadFromDb();
         } else if (id == R.id.action_clear_list){
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();

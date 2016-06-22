@@ -47,7 +47,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        loadFromDb();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -73,19 +73,13 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
-        mAdapter.swapList(seriesList);
+        mAdapter.notifyDataSetChanged();
         saveToDb();
     }
 
     private void saveToDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         dbHelper.saveSeriesToDb(mAdapter.getSeriesList(), getActivity().getString(R.string.table_seasons));
-    }
-
-    private void loadFromDb(){
-        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        App.getInstance().setSeasonData(dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons)));
-        mAdapter.swapList(App.getInstance().getSeasonData());
     }
 
     @Override
@@ -104,8 +98,6 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
             helper.getData();
         } else if (id == R.id.action_cache) {
             saveToDb();
-        } else if (id == R.id.action_read_cache) {
-            loadFromDb();
         } else if (id == R.id.action_clear_list) {
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
@@ -116,10 +108,14 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     public void selectedItem(Series item){
         Log.d(TAG, item.getTitle());
+        boolean alreadyExists = false;
+        for (Series series : App.getInstance().getUserList()){
+            if (series.getMal_id() == item.getMal_id()){
+                alreadyExists = true;
+            }
+        }
+        if (!alreadyExists){
+            App.getInstance().getUserList().add(item);
+        }
     }
-
-    public interface OnSeasonItemSelectedListener{
-        public void onSeasonItemSelected(Series series);
-    }
-
 }
