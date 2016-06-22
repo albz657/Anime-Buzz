@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
@@ -27,7 +28,6 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     private static final String TAG = SeasonsFragment.class.getSimpleName();
 
-    private ArrayList<Series> seasonData = new ArrayList<>();
     private SeasonsRecyclerViewAdapter mAdapter;
 
     public SeasonsFragment() {
@@ -65,7 +65,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new SeasonsRecyclerViewAdapter(seasonData, this);
+            mAdapter = new SeasonsRecyclerViewAdapter(App.getInstance().getSeasonData(), this);
             recyclerView.setAdapter(mAdapter);
         }
         return view;
@@ -84,8 +84,8 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     private void loadFromDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        seasonData = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons));
-        mAdapter.swapList(seasonData);
+        App.getInstance().setSeasonData(dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons)));
+        mAdapter.swapList(App.getInstance().getSeasonData());
     }
 
     @Override
@@ -116,6 +116,10 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     public void selectedItem(Series item){
         Log.d(TAG, item.getTitle());
+    }
+
+    public interface OnSeasonItemSelectedListener{
+        public void onSeasonItemSelected(Series series);
     }
 
 }
