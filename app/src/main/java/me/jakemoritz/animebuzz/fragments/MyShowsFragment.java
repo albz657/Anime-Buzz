@@ -16,27 +16,26 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.adapters.MyShowsRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.helpers.CacheDataHelper;
-import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends Fragment implements ReadDataResponse{
+public class MyShowsFragment extends Fragment implements ReadDataResponse{
 
-    private static final String TAG = SeasonsFragment.class.getSimpleName();
+    private static final String TAG = MyShowsFragment.class.getSimpleName();
     private OnListFragmentInteractionListener mListener;
     private ArrayList<Series> seriesList;
-    private SeriesRecyclerViewAdapter mAdapter;
+    private MyShowsRecyclerViewAdapter mAdapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SeasonsFragment() {
+    public MyShowsFragment() {
     }
 
-    public static SeasonsFragment newInstance() {
-        SeasonsFragment fragment = new SeasonsFragment();
+    public static MyShowsFragment newInstance() {
+        MyShowsFragment fragment = new MyShowsFragment();
 /*        Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);*/
@@ -62,8 +61,8 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse{
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            PullDataHelper helper = PullDataHelper.newInstance(this);
-            helper.getData();
+//            PullDataHelper helper = PullDataHelper.newInstance(this);
+//            helper.getData();
         } else if (id == R.id.action_cache){
             CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
             helper.cacheSeasonData(seriesList);
@@ -108,7 +107,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse{
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new SeriesRecyclerViewAdapter(seriesList, mListener);
+            mAdapter = new MyShowsRecyclerViewAdapter(seriesList, mListener);
             recyclerView.setAdapter(mAdapter);
 
 
