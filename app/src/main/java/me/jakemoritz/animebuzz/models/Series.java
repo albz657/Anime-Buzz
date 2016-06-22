@@ -9,7 +9,14 @@ public class Series implements Serializable{
 
     private String title;
 
-    public Series(String title){
+    public int getMal_id() {
+        return mal_id;
+    }
+
+    private int mal_id;
+
+    public Series(String title, int mal_id){
         this.title = title;
+        this.mal_id = mal_id;
     }
 }

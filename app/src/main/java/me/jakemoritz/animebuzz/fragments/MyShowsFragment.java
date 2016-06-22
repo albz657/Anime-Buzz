@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.MyShowsRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.helpers.CacheDataHelper;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class MyShowsFragment extends Fragment {
@@ -46,12 +46,13 @@ public class MyShowsFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+        loadFromDb();
+    }
 
-        ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_user_list));
-        if (cachedList != null){
-            mAdapter.swapList(cachedList);
-        }
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveToDb();
     }
 
     @Override
@@ -86,6 +87,17 @@ public class MyShowsFragment extends Fragment {
         mListener = null;
     }
 
+    private void saveToDb(){
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        dbHelper.saveSeriesToDb(userList, getActivity().getString(R.string.table_user_list));
+    }
+
+    private void loadFromDb(){
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        userList = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_user_list));
+        mAdapter.swapList(userList);
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -98,14 +110,9 @@ public class MyShowsFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_cache){
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            helper.cacheSeasonData(userList, getActivity().getString(R.string.cache_user_list));
+            saveToDb();
         } else if (id == R.id.action_read_cache){
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_user_list));
-            if (cachedList != null){
-                mAdapter.swapList(cachedList);
-            }
+            loadFromDb();
         } else if (id == R.id.action_clear_list){
             userList.clear();
             mAdapter.notifyDataSetChanged();

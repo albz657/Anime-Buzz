@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.helpers.CacheDataHelper;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
@@ -44,16 +44,18 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         setHasOptionsMenu(true);
     }
 
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        saveToDb();
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-
-        ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_season_data));
-        if (cachedList != null) {
-            mAdapter.swapList(cachedList);
-        }
+        loadFromDb();
     }
 
     @Override
@@ -92,8 +94,18 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     public void dataRetrieved(ArrayList<Series> seriesList) {
         mAdapter.swapList(seriesList);
 
-        CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-        helper.cacheSeasonData(seriesList, getActivity().getString(R.string.cache_season_data));
+        saveToDb();
+    }
+
+    private void saveToDb(){
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        dbHelper.saveSeriesToDb(mAdapter.getSeriesList(), getActivity().getString(R.string.table_seasons));
+    }
+
+    private void loadFromDb(){
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        seriesList = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons));
+        mAdapter.swapList(seriesList);
     }
 
     @Override
@@ -112,16 +124,11 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
             PullDataHelper helper = PullDataHelper.newInstance(this);
             helper.getData();
         } else if (id == R.id.action_cache) {
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            helper.cacheSeasonData(seriesList, getActivity().getString(R.string.cache_season_data));
+            saveToDb();
         } else if (id == R.id.action_read_cache) {
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_season_data));
-            if (cachedList != null){
-                mAdapter.swapList(cachedList);
-            }
+            loadFromDb();
         } else if (id == R.id.action_clear_list) {
-            seriesList.clear();
+            mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
         }
 

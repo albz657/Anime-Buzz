@@ -46,6 +46,7 @@ public class PullDataHelper {
     }
 
     public void getData() {
+        Log.d(TAG, "grabbing data");
         // Instantiate RequestQueue
         RequestQueue queue = Volley.newRequestQueue(mContext);
         String url = "http://www.senpai.moe/export.php?type=json&src=raw";
@@ -84,11 +85,25 @@ public class PullDataHelper {
         Iterator iterator = responseSeriesList.iterator();
         JsonObject element;
 
+        int count = 0;
         while (iterator.hasNext()){
             element = (JsonObject) iterator.next();
 //            Log.d(TAG, element.toString());
-            Series series = new Series(element.get("name").getAsString());
-            seriesFromServer.add(series);
+            Log.d(TAG, count + "");
+            int MAL_ID = -1;
+            try {
+                MAL_ID = element.get("MALID").getAsInt();
+            } catch (NumberFormatException e){
+                // no MAL ID
+            }
+
+            if (MAL_ID != -1){
+                Series series = new Series(element.get("name").getAsString(),
+                        element.get("MALID").getAsInt());
+                seriesFromServer.add(series);
+            }
+
+            count++;
         }
 
         return seriesFromServer;

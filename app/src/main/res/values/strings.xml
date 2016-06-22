@@ -10,7 +10,8 @@
     <string name="fragment_myshows">My Shows</string>
     <string name="fragment_seasons">Seasons</string>
 
-    <!--Cache filenames-->
-    <string name="cache_user_list">cacheuserlist</string>
-    <string name="cache_season_data">cacheseasondata</string>
+    <!--Database table names-->
+    <string name="table_seasons">SEASONS</string>
+    <string name="table_user_list">USER_LIST</string>
+
 </resources>
