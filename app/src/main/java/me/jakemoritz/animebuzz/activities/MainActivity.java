@@ -8,16 +8,19 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SeasonsFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SeasonsFragment.OnListFragmentInteractionListener, MyShowsFragment.OnListFragmentInteractionListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,7 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.getMenu().getItem(1).setChecked(true);
@@ -49,6 +52,9 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                 .commit();
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setTitle(R.string.fragment_seasons);
+        }
     }
 
     @Override
@@ -67,14 +73,33 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_my_shows) {
+        int previousItemId = -1;
+        Menu navMenu = navigationView.getMenu();
+        for (int i = 0; i < navMenu.size(); i++){
+            if (navMenu.getItem(i).isChecked()){
+                previousItemId = navMenu.getItem(i).getItemId();
+//                navMenu.getItem(i).setChecked(false);
+            }
+        }
+
+        if (id == R.id.nav_my_shows && previousItemId != id) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
+                    .commit();
+            navigationView.getMenu().getItem(0).setChecked(true);
+
+            if (getSupportActionBar() != null){
+                getSupportActionBar().setTitle(R.string.fragment_myshows);
+            }
+        } else if (id == R.id.nav_seasons && previousItemId != id){
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                     .commit();
-        } else if (id == R.id.nav_seasons){
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
-                    .commit();
+            navigationView.getMenu().getItem(1).setChecked(true);
+
+            if (getSupportActionBar() != null){
+                getSupportActionBar().setTitle(R.string.fragment_seasons);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

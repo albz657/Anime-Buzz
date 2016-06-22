@@ -5,4 +5,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--Fragment names-->
+    <string name="fragment_myshows">My Shows</string>
+    <string name="fragment_seasons">Seasons</string>
+
+    <!--Cache filenames-->
+    <string name="cache_user_list">cacheuserlist</string>
+    <string name="cache_season_data">cacheseasondata</string>
 </resources>

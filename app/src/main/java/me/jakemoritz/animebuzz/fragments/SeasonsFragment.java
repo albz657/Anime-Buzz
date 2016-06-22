@@ -22,80 +22,38 @@ import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends Fragment implements ReadDataResponse{
+public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     private static final String TAG = SeasonsFragment.class.getSimpleName();
+
     private OnListFragmentInteractionListener mListener;
-    private ArrayList<Series> seriesList;
+    private ArrayList<Series> seriesList = new ArrayList<>();
     private SeriesRecyclerViewAdapter mAdapter;
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
+
     public SeasonsFragment() {
     }
 
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
-/*        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);*/
         return fragment;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getActivity().getMenuInflater().inflate(R.menu.debug, menu);
-
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            PullDataHelper helper = PullDataHelper.newInstance(this);
-            helper.getData();
-        } else if (id == R.id.action_cache){
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            helper.cacheSeasonData(seriesList);
-        } else if (id == R.id.action_read_cache){
-            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-            mAdapter.swapList(helper.readCache());
-        } else if (id == R.id.action_clear_list){
-            seriesList.clear();
-            mAdapter.notifyDataSetChanged();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        seriesList = new ArrayList<>();
         setHasOptionsMenu(true);
-
-//        getData();
     }
-
-
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
-        mAdapter.swapList(helper.readCache());
+
+        ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_season_data));
+        if (cachedList != null) {
+            mAdapter.swapList(cachedList);
+        }
     }
 
     @Override
@@ -103,19 +61,15 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse{
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_series_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             mAdapter = new SeriesRecyclerViewAdapter(seriesList, mListener);
             recyclerView.setAdapter(mAdapter);
-
-
         }
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -137,20 +91,44 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse{
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
         mAdapter.swapList(seriesList);
+
+        CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+        helper.cacheSeasonData(seriesList, getActivity().getString(R.string.cache_season_data));
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            PullDataHelper helper = PullDataHelper.newInstance(this);
+            helper.getData();
+        } else if (id == R.id.action_cache) {
+            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+            helper.cacheSeasonData(seriesList, getActivity().getString(R.string.cache_season_data));
+        } else if (id == R.id.action_read_cache) {
+            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+            ArrayList<Series> cachedList = helper.readCache(getActivity().getString(R.string.cache_season_data));
+            if (cachedList != null){
+                mAdapter.swapList(cachedList);
+            }
+        } else if (id == R.id.action_clear_list) {
+            seriesList.clear();
+            mAdapter.notifyDataSetChanged();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(Series item);
     }
 }

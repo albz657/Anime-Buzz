@@ -25,10 +25,9 @@ public class CacheDataHelper {
         return helper;
     }
 
-    public void cacheSeasonData(ArrayList<Series> seriesList){
-        String FILENAME = "season_data";
+    public void cacheSeasonData(ArrayList<Series> seriesList, String filename){
         try {
-            FileOutputStream fos = mActivity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            FileOutputStream fos = mActivity.openFileOutput(filename, Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(seriesList);
         } catch (Exception e){
@@ -36,10 +35,9 @@ public class CacheDataHelper {
         }
     }
 
-    public ArrayList<Series> readCache(){
-        String FILENAME = "season_data";
+    public ArrayList<Series> readCache(String filename){
         try {
-            FileInputStream fis = mActivity.openFileInput(FILENAME);
+            FileInputStream fis = mActivity.openFileInput(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Series> readData = new ArrayList<>();
             readData = (ArrayList<Series>) ois.readObject();
