@@ -117,7 +117,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
             String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
 
-            Series series = new Series(seriesTitle, MAL_ID);
+            Series series = new Series(0, seriesTitle, MAL_ID, true, true, 0);
             seriesList.add(series);
             res.moveToNext();
         }

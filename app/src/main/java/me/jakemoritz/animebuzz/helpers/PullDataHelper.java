@@ -24,21 +24,21 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class PullDataHelper {
 
-    private final static String TAG = PullDataHelper.class.getSimpleName();
+    final static String TAG = PullDataHelper.class.getSimpleName();
 
     public void setmContext(Context mContext) {
         this.mContext = mContext;
     }
 
-    private Context mContext;
+    Context mContext;
 
     public void setDelegate(ReadDataResponse delegate) {
         this.delegate = delegate;
     }
 
-    private ReadDataResponse delegate;
+    ReadDataResponse delegate;
 
-    public static PullDataHelper newInstance(SeasonsFragment seasonsFragment){
+    public static PullDataHelper newInstance(SeasonsFragment seasonsFragment) {
         PullDataHelper helper = new PullDataHelper();
         helper.setDelegate(seasonsFragment);
         helper.setmContext(seasonsFragment.getContext());
@@ -69,13 +69,13 @@ public class PullDataHelper {
         queue.add(jsonObjectRequest);
     }
 
-    private void handleResponse(JSONObject response){
+    void handleResponse(JSONObject response) {
         ArrayList<Series> seriesFromServer = parseJSON(response);
         delegate.dataRetrieved(seriesFromServer);
 //        mAdapter.swapList(seriesFromServer);
     }
 
-    private ArrayList<Series> parseJSON(JSONObject response){
+    ArrayList<Series> parseJSON(JSONObject response) {
         JsonParser parser = new JsonParser();
         JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
 
@@ -83,23 +83,34 @@ public class PullDataHelper {
 
         ArrayList<Series> seriesFromServer = new ArrayList<>();
         Iterator iterator = responseSeriesList.iterator();
-        JsonObject element;
+        JsonObject seriesAsJSON;
 
         int count = 0;
-        while (iterator.hasNext()){
-            element = (JsonObject) iterator.next();
-//            Log.d(TAG, element.toString());
+        while (iterator.hasNext()) {
+            seriesAsJSON = (JsonObject) iterator.next();
+
+            String title = "";
+            int mal_id = -1;
+            boolean isSimulcastAired = false;
+            boolean isAired = false;
+            int airdate = -1;
+            int simulcast_airdate = -1;
+
             Log.d(TAG, count + "");
-            int MAL_ID = -1;
+
             try {
-                MAL_ID = element.get("MALID").getAsInt();
-            } catch (NumberFormatException e){
+                mal_id = seriesAsJSON.get("MALID").getAsInt();
+                title = seriesAsJSON.get("name").getAsString();
+                isSimulcastAired = seriesAsJSON.get("isSimulcastAired").getAsBoolean();
+                isAired = seriesAsJSON.get("isAired").getAsBoolean();
+                airdate = seriesAsJSON.get("airdate_u").getAsInt();
+                simulcast_airdate = seriesAsJSON.get("simulcast_airdate_u").getAsInt();
+            } catch (NumberFormatException e) {
                 // no MAL ID
             }
 
-            if (MAL_ID != -1){
-                Series series = new Series(element.get("name").getAsString(),
-                        element.get("MALID").getAsInt());
+            if (mal_id != -1) {
+                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate);
                 seriesFromServer.add(series);
             }
 
