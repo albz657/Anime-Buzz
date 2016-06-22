@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="Pull Current Season Data"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_cache"
+        android:orderInCategory="100"
+        android:title="Cache Season Data"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_read_cache"
+        android:orderInCategory="100"
+        android:title="Read Cache"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear_list"
+        android:orderInCategory="100"
+        android:title="Clear List"
+        app:showAsAction="never" />
+</menu>

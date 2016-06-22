@@ -1,6 +1,8 @@
 package me.jakemoritz.animebuzz.models;
 
-public class Series {
+import java.io.Serializable;
+
+public class Series implements Serializable{
     public String getTitle() {
         return title;
     }

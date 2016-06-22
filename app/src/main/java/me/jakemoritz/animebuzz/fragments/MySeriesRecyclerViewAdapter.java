@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -65,5 +66,11 @@ public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRe
         public String toString() {
             return super.toString() + " '" + mTitle.getText() + "'";
         }
+    }
+
+    public void swapList(ArrayList<Series> newList){
+        seriesList.clear();
+        seriesList.addAll(newList);
+        this.notifyDataSetChanged();
     }
 }

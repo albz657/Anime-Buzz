@@ -7,6 +7,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,6 +25,10 @@ import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +41,7 @@ public class SeriesFragment extends Fragment {
     private static final String TAG = SeriesFragment.class.getSimpleName();
     private OnListFragmentInteractionListener mListener;
     private List<Series> seriesList;
-    private RecyclerView.Adapter mAdapter;
+    private MySeriesRecyclerViewAdapter mAdapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -51,14 +58,71 @@ public class SeriesFragment extends Fragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getActivity().getMenuInflater().inflate(R.menu.debug, menu);
+
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+                getData();
+        } else if (id == R.id.action_cache){
+            cacheSeasonData();
+        } else if (id == R.id.action_read_cache){
+            readCache();
+        } else if (id == R.id.action_clear_list){
+            seriesList.clear();
+            mAdapter.notifyDataSetChanged();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         seriesList = new ArrayList<>();
+        setHasOptionsMenu(true);
 //        getData();
     }
 
-    public void getData() {
+    private void cacheSeasonData(){
+        String FILENAME = "season_data";
+        try {
+            FileOutputStream fos = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(seriesList);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void readCache(){
+        String FILENAME = "season_data";
+        try {
+            FileInputStream fis = getActivity().openFileInput(FILENAME);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<Series> readData = new ArrayList<>();
+            readData = (ArrayList<Series>) ois.readObject();
+            mAdapter.swapList(readData);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void getData() {
         // Instantiate RequestQueue
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "http://www.senpai.moe/export.php?type=json&src=raw";
@@ -83,9 +147,7 @@ public class SeriesFragment extends Fragment {
 
     private void handleResponse(JSONObject response){
         ArrayList<Series> seriesFromServer = parseJSON(response);
-        seriesList.clear();
-        seriesList.addAll(seriesFromServer);
-        mAdapter.notifyDataSetChanged();
+        mAdapter.swapList(seriesFromServer);
     }
 
     private ArrayList<Series> parseJSON(JSONObject response){
