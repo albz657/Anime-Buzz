@@ -12,7 +12,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> {
+public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecyclerViewAdapter.ViewHolder> {
 
     public ArrayList<Series> getSeriesList() {
         return seriesList;
@@ -21,7 +21,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     private final ArrayList<Series> seriesList;
     private final SeasonsFragment.OnListFragmentInteractionListener mListener;
 
-    public SeriesRecyclerViewAdapter(ArrayList<Series> items, SeasonsFragment.OnListFragmentInteractionListener listener) {
+    public SeasonsRecyclerViewAdapter(ArrayList<Series> items, SeasonsFragment.OnListFragmentInteractionListener listener) {
         seriesList = items;
         mListener = listener;
     }

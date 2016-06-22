@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
@@ -15,10 +14,14 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Series> seriesList;
+    public ArrayList<Series> getSeriesList() {
+        return seriesList;
+    }
+
+    private final ArrayList<Series> seriesList;
     private final MyShowsFragment.OnListFragmentInteractionListener mListener;
 
-    public MyShowsRecyclerViewAdapter(List<Series> items, MyShowsFragment.OnListFragmentInteractionListener listener) {
+    public MyShowsRecyclerViewAdapter(ArrayList<Series> items, MyShowsFragment.OnListFragmentInteractionListener listener) {
         seriesList = items;
         mListener = listener;
     }

@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(Series item) {
+
         Log.d(TAG, item.getTitle());
     }
 }

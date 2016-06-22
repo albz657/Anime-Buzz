@@ -45,7 +45,6 @@ public class MyShowsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         loadFromDb();
     }
 
@@ -89,7 +88,7 @@ public class MyShowsFragment extends Fragment {
 
     private void saveToDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.saveSeriesToDb(userList, getActivity().getString(R.string.table_user_list));
+        dbHelper.saveSeriesToDb(mAdapter.getSeriesList(), getActivity().getString(R.string.table_user_list));
     }
 
     private void loadFromDb(){
@@ -114,7 +113,7 @@ public class MyShowsFragment extends Fragment {
         } else if (id == R.id.action_read_cache){
             loadFromDb();
         } else if (id == R.id.action_clear_list){
-            userList.clear();
+            mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
         }
 

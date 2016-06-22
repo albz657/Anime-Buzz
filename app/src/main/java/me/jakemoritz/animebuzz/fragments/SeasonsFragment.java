@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.adapters.SeasonsRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
@@ -27,8 +27,8 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     private static final String TAG = SeasonsFragment.class.getSimpleName();
 
     private OnListFragmentInteractionListener mListener;
-    private ArrayList<Series> seriesList = new ArrayList<>();
-    private SeriesRecyclerViewAdapter mAdapter;
+    private ArrayList<Series> seasonData = new ArrayList<>();
+    private SeasonsRecyclerViewAdapter mAdapter;
 
     public SeasonsFragment() {
     }
@@ -44,18 +44,16 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        loadFromDb();
+    }
 
     @Override
     public void onPause() {
         super.onPause();
         saveToDb();
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        loadFromDb();
     }
 
     @Override
@@ -67,7 +65,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new SeriesRecyclerViewAdapter(seriesList, mListener);
+            mAdapter = new SeasonsRecyclerViewAdapter(seasonData, mListener);
             recyclerView.setAdapter(mAdapter);
         }
         return view;
@@ -93,7 +91,6 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
         mAdapter.swapList(seriesList);
-
         saveToDb();
     }
 
@@ -104,15 +101,14 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     private void loadFromDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        seriesList = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons));
-        mAdapter.swapList(seriesList);
+        seasonData = dbHelper.getSeriesFromDb(getActivity().getString(R.string.table_seasons));
+        mAdapter.swapList(seasonData);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        // Inflate the menu; this adds items to the action bar if it is present.
         getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
     }
 
