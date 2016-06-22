@@ -5,7 +5,11 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Shows" />
+            android:title="My Shows" />
+        <item
+            android:id="@+id/nav_view"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Seasons" />
     </group>
 
 </menu>

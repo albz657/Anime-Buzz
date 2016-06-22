@@ -12,12 +12,12 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRecyclerViewAdapter.ViewHolder> {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> {
 
     private final List<Series> seriesList;
-    private final SeriesFragment.OnListFragmentInteractionListener mListener;
+    private final SeasonsFragment.OnListFragmentInteractionListener mListener;
 
-    public MySeriesRecyclerViewAdapter(List<Series> items, SeriesFragment.OnListFragmentInteractionListener listener) {
+    public SeriesRecyclerViewAdapter(List<Series> items, SeasonsFragment.OnListFragmentInteractionListener listener) {
         seriesList = items;
         mListener = listener;
     }

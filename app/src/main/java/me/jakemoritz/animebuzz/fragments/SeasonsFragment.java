@@ -2,10 +2,10 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,44 +13,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.CacheDataHelper;
+import me.jakemoritz.animebuzz.helpers.PullDataHelper;
+import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesFragment extends Fragment {
+public class SeasonsFragment extends Fragment implements ReadDataResponse{
 
-    private static final String TAG = SeriesFragment.class.getSimpleName();
+    private static final String TAG = SeasonsFragment.class.getSimpleName();
     private OnListFragmentInteractionListener mListener;
-    private List<Series> seriesList;
-    private MySeriesRecyclerViewAdapter mAdapter;
+    private ArrayList<Series> seriesList;
+    private SeriesRecyclerViewAdapter mAdapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public SeriesFragment() {
+    public SeasonsFragment() {
     }
 
-    public static SeriesFragment newInstance() {
-        SeriesFragment fragment = new SeriesFragment();
+    public static SeasonsFragment newInstance() {
+        SeasonsFragment fragment = new SeasonsFragment();
 /*        Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
         fragment.setArguments(args);*/
@@ -76,11 +61,14 @@ public class SeriesFragment extends Fragment {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-                getData();
+            PullDataHelper helper = PullDataHelper.newInstance(this);
+            helper.getData();
         } else if (id == R.id.action_cache){
-            cacheSeasonData();
+            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+            helper.cacheSeasonData(seriesList);
         } else if (id == R.id.action_read_cache){
-            readCache();
+            CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+            mAdapter.swapList(helper.readCache());
         } else if (id == R.id.action_clear_list){
             seriesList.clear();
             mAdapter.notifyDataSetChanged();
@@ -95,79 +83,18 @@ public class SeriesFragment extends Fragment {
 
         seriesList = new ArrayList<>();
         setHasOptionsMenu(true);
+
 //        getData();
     }
 
-    private void cacheSeasonData(){
-        String FILENAME = "season_data";
-        try {
-            FileOutputStream fos = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(seriesList);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
-    private void readCache(){
-        String FILENAME = "season_data";
-        try {
-            FileInputStream fis = getActivity().openFileInput(FILENAME);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<Series> readData = new ArrayList<>();
-            readData = (ArrayList<Series>) ois.readObject();
-            mAdapter.swapList(readData);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-    }
 
-    private void getData() {
-        // Instantiate RequestQueue
-        RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "http://www.senpai.moe/export.php?type=json&src=raw";
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-        // Request JSON response from URL
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-//                Log.d(TAG, response.toString());
-                handleResponse(response);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, error.getMessage());
-            }
-        });
-
-        queue.add(jsonObjectRequest);
-    }
-
-    private void handleResponse(JSONObject response){
-        ArrayList<Series> seriesFromServer = parseJSON(response);
-        mAdapter.swapList(seriesFromServer);
-    }
-
-    private ArrayList<Series> parseJSON(JSONObject response){
-        JsonParser parser = new JsonParser();
-        JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
-
-        JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
-
-        ArrayList<Series> seriesFromServer = new ArrayList<>();
-        Iterator iterator = responseSeriesList.iterator();
-        JsonObject element;
-
-        while (iterator.hasNext()){
-             element = (JsonObject) iterator.next();
-//            Log.d(TAG, element.toString());
-            Series series = new Series(element.get("name").getAsString());
-            seriesFromServer.add(series);
-        }
-
-        return seriesFromServer;
+        CacheDataHelper helper = CacheDataHelper.newInstance(getActivity());
+        mAdapter.swapList(helper.readCache());
     }
 
     @Override
@@ -180,8 +107,10 @@ public class SeriesFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new MySeriesRecyclerViewAdapter(seriesList, mListener);
+            mAdapter = new SeriesRecyclerViewAdapter(seriesList, mListener);
             recyclerView.setAdapter(mAdapter);
+
+
         }
         return view;
     }
@@ -202,6 +131,11 @@ public class SeriesFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void dataRetrieved(ArrayList<Series> seriesList) {
+        mAdapter.swapList(seriesList);
     }
 
     /**
