@@ -16,7 +16,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -35,7 +34,7 @@ public class SeriesFragment extends Fragment {
     private static final String TAG = SeriesFragment.class.getSimpleName();
     private OnListFragmentInteractionListener mListener;
     private List<Series> seriesList;
-
+    private RecyclerView.Adapter mAdapter;
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -56,10 +55,10 @@ public class SeriesFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         seriesList = new ArrayList<>();
-        getData();
+//        getData();
     }
 
-    private void getData() {
+    public void getData() {
         // Instantiate RequestQueue
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "http://www.senpai.moe/export.php?type=json&src=raw";
@@ -69,25 +68,29 @@ public class SeriesFragment extends Fragment {
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
-
-                parseJSON(response);
+//                Log.d(TAG, response.toString());
+                handleResponse(response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.d(TAG, error.getMessage());
             }
         });
 
         queue.add(jsonObjectRequest);
     }
 
-    private void parseJSON(JSONObject response){
+    private void handleResponse(JSONObject response){
+        ArrayList<Series> seriesFromServer = parseJSON(response);
+        seriesList.clear();
+        seriesList.addAll(seriesFromServer);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private ArrayList<Series> parseJSON(JSONObject response){
         JsonParser parser = new JsonParser();
         JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
-
-        Gson gson = new Gson();
 
         JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
 
@@ -97,23 +100,12 @@ public class SeriesFragment extends Fragment {
 
         while (iterator.hasNext()){
              element = (JsonObject) iterator.next();
-            Log.d(TAG, element.toString());
+//            Log.d(TAG, element.toString());
             Series series = new Series(element.get("name").getAsString());
             seriesFromServer.add(series);
         }
-        if (seriesList != null){
-/*            for (JSONObject seriesJsonObject : seriesList){
-//                String[] seriesAsStringArray = gson.fromJson(seriesJsonObject.toString(), String[].class);
-                try {
-                    Series series = new Series(seriesJsonObject.getString("name"));
-                    tempSeriesList.add(series);
-                } catch (JSONException e){
-                    e.printStackTrace();
-                }
-            }*/
-        }
-        Log.d(TAG, "");
 
+        return seriesFromServer;
     }
 
     @Override
@@ -126,7 +118,8 @@ public class SeriesFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new MySeriesRecyclerViewAdapter(seriesList, mListener));
+            mAdapter = new MySeriesRecyclerViewAdapter(seriesList, mListener);
+            recyclerView.setAdapter(mAdapter);
         }
         return view;
     }
