@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,7 +24,6 @@ public class MyShowsFragment extends Fragment {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
-    private OnListFragmentInteractionListener mListener;
     private MyShowsRecyclerViewAdapter mAdapter;
 
     public MyShowsFragment() {
@@ -43,7 +43,7 @@ public class MyShowsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mAdapter.swapList(App.getInstance().getUserList());
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -61,27 +61,10 @@ public class MyShowsFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new MyShowsRecyclerViewAdapter(App.getInstance().getUserList(), mListener);
+            mAdapter = new MyShowsRecyclerViewAdapter(App.getInstance().getUserList(), this);
             recyclerView.setAdapter(mAdapter);
         }
         return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
     }
 
     private void saveToDb(){
@@ -110,7 +93,8 @@ public class MyShowsFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(Series item);
+    public void selectedItem(Series item){
+        Log.d(TAG, item.getTitle());
+
     }
 }

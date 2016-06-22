@@ -19,9 +19,9 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
     }
 
     private final ArrayList<Series> seriesList;
-    private final MyShowsFragment.OnListFragmentInteractionListener mListener;
+    private final MyShowsFragment mListener;
 
-    public MyShowsRecyclerViewAdapter(ArrayList<Series> items, MyShowsFragment.OnListFragmentInteractionListener listener) {
+    public MyShowsRecyclerViewAdapter(ArrayList<Series> items, MyShowsFragment listener) {
         seriesList = items;
         mListener = listener;
     }
@@ -44,7 +44,7 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.series);
+                    mListener.selectedItem(holder.series);
                 }
             }
         });
@@ -70,11 +70,5 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
         public String toString() {
             return super.toString() + " '" + mTitle.getText() + "'";
         }
-    }
-
-    public void swapList(ArrayList<Series> newList){
-        seriesList.clear();
-        seriesList.addAll(newList);
-        this.notifyDataSetChanged();
     }
 }
