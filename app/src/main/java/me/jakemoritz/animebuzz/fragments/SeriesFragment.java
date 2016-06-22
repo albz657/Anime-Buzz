@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,21 +16,25 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.fragments.dummy.DummyContent;
-import me.jakemoritz.animebuzz.fragments.dummy.DummyContent.DummyItem;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SeriesFragment extends Fragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
+    private List<Series> seriesList;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -40,13 +43,11 @@ public class SeriesFragment extends Fragment {
     public SeriesFragment() {
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static SeriesFragment newInstance(int columnCount) {
+    public static SeriesFragment newInstance() {
         SeriesFragment fragment = new SeriesFragment();
-        Bundle args = new Bundle();
+/*        Bundle args = new Bundle();
         args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
+        fragment.setArguments(args);*/
         return fragment;
     }
 
@@ -54,10 +55,7 @@ public class SeriesFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-        }
-
+        seriesList = new ArrayList<>();
         getData();
     }
 
@@ -72,6 +70,8 @@ public class SeriesFragment extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
                 Log.d(TAG, response.toString());
+
+                parseJSON(response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -83,6 +83,39 @@ public class SeriesFragment extends Fragment {
         queue.add(jsonObjectRequest);
     }
 
+    private void parseJSON(JSONObject response){
+        JsonParser parser = new JsonParser();
+        JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
+
+        Gson gson = new Gson();
+
+        JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
+
+        ArrayList<Series> seriesFromServer = new ArrayList<>();
+        Iterator iterator = responseSeriesList.iterator();
+        JsonObject element;
+
+        while (iterator.hasNext()){
+             element = (JsonObject) iterator.next();
+            Log.d(TAG, element.toString());
+            Series series = new Series(element.get("name").getAsString());
+            seriesFromServer.add(series);
+        }
+        if (seriesList != null){
+/*            for (JSONObject seriesJsonObject : seriesList){
+//                String[] seriesAsStringArray = gson.fromJson(seriesJsonObject.toString(), String[].class);
+                try {
+                    Series series = new Series(seriesJsonObject.getString("name"));
+                    tempSeriesList.add(series);
+                } catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }*/
+        }
+        Log.d(TAG, "");
+
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -92,12 +125,8 @@ public class SeriesFragment extends Fragment {
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MySeriesRecyclerViewAdapter(DummyContent.ITEMS, mListener));
+            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+            recyclerView.setAdapter(new MySeriesRecyclerViewAdapter(seriesList, mListener));
         }
         return view;
     }
@@ -125,13 +154,13 @@ public class SeriesFragment extends Fragment {
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <p>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Series item);
     }
 }

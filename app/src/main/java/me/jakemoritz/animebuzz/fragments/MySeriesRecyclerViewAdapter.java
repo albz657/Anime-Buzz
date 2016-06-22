@@ -9,20 +9,15 @@ import android.widget.TextView;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.fragments.dummy.DummyContent.DummyItem;
+import me.jakemoritz.animebuzz.models.Series;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link me.jakemoritz.animebuzz.fragments.SeriesFragment.OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> mValues;
+    private final List<Series> seriesList;
     private final SeriesFragment.OnListFragmentInteractionListener mListener;
 
-    public MySeriesRecyclerViewAdapter(List<DummyItem> items, SeriesFragment.OnListFragmentInteractionListener listener) {
-        mValues = items;
+    public MySeriesRecyclerViewAdapter(List<Series> items, SeriesFragment.OnListFragmentInteractionListener listener) {
+        seriesList = items;
         mListener = listener;
     }
 
@@ -35,9 +30,8 @@ public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRe
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.mItem = mValues.get(position);
-//        holder.mIdView.setText(mValues.get(position).id);
-//        holder.mContentView.setText(mValues.get(position).content);
+        holder.series = seriesList.get(position);
+        holder.mTitle.setText(seriesList.get(position).getTitle());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -45,7 +39,7 @@ public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRe
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
+                    mListener.onListFragmentInteraction(holder.series);
                 }
             }
         });
@@ -53,25 +47,23 @@ public class MySeriesRecyclerViewAdapter extends RecyclerView.Adapter<MySeriesRe
 
     @Override
     public int getItemCount() {
-        return mValues.size();
+        return seriesList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public DummyItem mItem;
+        public final TextView mTitle;
+        public Series series;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView = (TextView) view.findViewById(R.id.id);
-            mContentView = (TextView) view.findViewById(R.id.content);
+            mTitle = (TextView) view.findViewById(R.id.series_title);
         }
 
         @Override
         public String toString() {
-            return super.toString() + " '" + mContentView.getText() + "'";
+            return super.toString() + " '" + mTitle.getText() + "'";
         }
     }
 }
