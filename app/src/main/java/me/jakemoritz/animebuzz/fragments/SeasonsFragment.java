@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,6 +28,9 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
         App.getInstance().getAllAnimeList().clear();
         App.getInstance().getAllAnimeList().addAll(seriesList);
         App.getInstance().saveToDb();
+        if (view instanceof RecyclerView){
+            ((RecyclerView) view).getRecycledViewPool().clear();
+        }
         mAdapter.notifyDataSetChanged();
     }
 
