@@ -15,6 +15,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
@@ -29,6 +33,7 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
+    Intent alarmIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         // Retrieve pending intent to perform broadcast
-        Intent alarmIntent = new Intent(this, AlarmReceiver.class);
+        alarmIntent = new Intent(this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
 /*        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -67,6 +72,23 @@ public class MainActivity extends AppCompatActivity
         if (getSupportActionBar() != null){
             getSupportActionBar().setTitle(R.string.fragment_seasons);
         }
+
+        registerAlarms();
+    }
+
+    private void registerAlarms(){
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Set<Series> set = App.getInstance().getAlarms().keySet();
+        List<Series> list = new ArrayList<>();
+        list.addAll(set);
+        for (Series series : list){
+            Intent tempIntent = App.getInstance().getAlarms().get(series);
+            PendingIntent tempPendingIntent = PendingIntent.getBroadcast(this, 0, tempIntent, 0);
+            long numTime = 1466645400000L;
+
+            alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
+        }
     }
 
     public void makeAlarm(){
@@ -78,10 +100,18 @@ public class MainActivity extends AppCompatActivity
             long numTime = 1466645400000L;
 
             alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
+            App.getInstance().addAlarm(series, alarmIntent);
+
             Log.d(TAG, "alarm set for: " + numTime);
         } else {
             Log.d(TAG, "no series");
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        App.getInstance().saveAlarms();
     }
 
     @Override
@@ -94,7 +124,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
