@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
 
     public void makeAlarm(){
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Series series = App.getInstance().getSeasonData().get(0);
+        Series series = App.getInstance().getAllAnimeList().get(0);
         if (series != null){
             String time = String.valueOf(series.getAirdate());
             //int numTime = Integer.valueOf(time + "000");

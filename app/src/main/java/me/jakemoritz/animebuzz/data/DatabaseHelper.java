@@ -20,8 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     // Table names
-    private static String TABLE_USER_LIST;
-    private static String TABLE_SEASONS;
+    private static String TABLE_ANIME;
 
     // Common columns
     private static final String KEY_AIRDATE = "airdate";
@@ -29,13 +28,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_MAL_ID = "id";
     private static final String KEY_IS_SIMULCAST_AIRED = "issimulcastaired";
     private static final String KEY_IS_AIRED = "isaired";
-    private static final String KEY_SIMULCAST_AIRDATE = "simulcastairdae";
+    private static final String KEY_SIMULCAST_AIRDATE = "simulcastairdate";
+    private static final String KEY_IS_IN_USER_LIST = "isinuserlist";
 
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        TABLE_SEASONS = context.getString(R.string.table_seasons);
-        TABLE_USER_LIST = context.getString(R.string.table_user_list);
+        TABLE_ANIME = context.getString(R.string.table_anime);
     }
 
     private String buildTableCreateQuery(String TABLE_NAME) {
@@ -45,20 +44,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_AIRDATE + " INTEGER, " +
                 KEY_IS_SIMULCAST_AIRED + " INTEGER," +
                 KEY_IS_AIRED + " INTEGER," +
-                KEY_SIMULCAST_AIRDATE + " INTEGER" +
+                KEY_SIMULCAST_AIRDATE + " INTEGER," +
+                KEY_IS_IN_USER_LIST + " INTEGER" +
                 ")";
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(buildTableCreateQuery(TABLE_SEASONS));
-        db.execSQL(buildTableCreateQuery(TABLE_USER_LIST));
+        db.execSQL(buildTableCreateQuery(TABLE_ANIME));
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEASONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_LIST);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
         onCreate(db);
     }
 
@@ -72,6 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_SIMULCAST_AIRED, series.isSimulcastAired() ? 1 : 0);
         contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
+        contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
 
         db.insert(TABLE_NAME, null, contentValues);
         return true;
@@ -87,6 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_SIMULCAST_AIRED, series.isSimulcastAired() ? 1 : 0);
         contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
+        contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
 
         db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMal_id())});
         return true;
@@ -135,9 +135,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             boolean isSimulcastAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_SIMULCAST_AIRED)) == 1);
             boolean isAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_AIRED)) == 1);
             int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
+            boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
 
 
-            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate);
+            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList);
             seriesList.add(series);
             res.moveToNext();
         }

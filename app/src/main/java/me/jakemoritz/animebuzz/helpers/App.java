@@ -25,24 +25,24 @@ public class App extends Application {
 
     private static App mInstance;
 
-    public ArrayList<Series> getSeasonData() {
-        return seasonData;
+    public ArrayList<Series> getAllAnimeList() {
+        return allAnimeList;
     }
 
-    public void setSeasonData(ArrayList<Series> seasonData) {
-        this.seasonData = seasonData;
+    public void setAllAnimeList(ArrayList<Series> allAnimeList) {
+        this.allAnimeList = allAnimeList;
     }
 
-    public ArrayList<Series> getUserList() {
-        return userList;
+    public ArrayList<Series> getUserAnimeList() {
+        return userAnimeList;
     }
 
-    public void setUserList(ArrayList<Series> userList) {
-        this.userList = userList;
+    public void setUserAnimeList(ArrayList<Series> userAnimeList) {
+        this.userAnimeList = userAnimeList;
     }
 
-    private ArrayList<Series> userList;
-    private ArrayList<Series> seasonData;
+    private ArrayList<Series> userAnimeList;
+    private ArrayList<Series> allAnimeList;
     private HashMap<Series, Intent> alarms;
     private HashMap<Series, IntentWrapper> alarmsSerialized;
 
@@ -58,11 +58,11 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        userList = new ArrayList<>();
-        seasonData = new ArrayList<>();
+        userAnimeList = new ArrayList<>();
+        allAnimeList = new ArrayList<>();
         alarms = new HashMap<>();
 
-        loadFromDb();
+        loadAnimeListFromDB();
         loadAlarms();
 
         mInstance = this;
@@ -72,17 +72,27 @@ public class App extends Application {
         return mInstance;
     }
 
-    private void loadFromDb() {
+    private void loadAnimeListFromDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());
-        userList = dbHelper.getSeriesFromDb(getString(R.string.table_user_list));
-        seasonData = dbHelper.getSeriesFromDb(getString(R.string.table_seasons));
+        allAnimeList = dbHelper.getSeriesFromDb(getString(R.string.table_anime));
+        userAnimeList = filterUserList(allAnimeList);
+    }
+
+    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList){
+        ArrayList<Series> filteredUserList = new ArrayList<>();
+        for (Series series : allAnimeList){
+            if (series.isInUserList()){
+                filteredUserList.add(series);
+            }
+        }
+        return filteredUserList;
     }
 
     public void saveToDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(seasonData, getString(R.string.table_seasons));
-        dbHelper.saveSeriesToDb(userList, getString(R.string.table_seasons));
+        dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
+        dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
     private void loadAlarms() {

@@ -11,8 +11,7 @@
     <string name="fragment_seasons">Seasons</string>
 
     <!--Database table names-->
-    <string name="table_seasons">SEASONS</string>
-    <string name="table_user_list">USER_LIST</string>
+    <string name="table_anime">ANIME</string>
 
     <!--File names-->
     <string name="file_alarms">alarms</string>

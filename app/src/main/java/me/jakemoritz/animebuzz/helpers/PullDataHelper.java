@@ -110,7 +110,7 @@ public class PullDataHelper {
             }
 
             if (mal_id != -1) {
-                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate);
+                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate, false);
                 seriesFromServer.add(series);
             }
 

@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.fragments;
 
-import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,25 +23,10 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
     }
 
     @Override
-    public void selectedItem(Series item) {
-        super.selectedItem(item);
-        boolean alreadyExists = false;
-        for (Series series : App.getInstance().getUserList()) {
-            if (series.getMal_id() == item.getMal_id()) {
-                alreadyExists = true;
-            }
-        }
-        if (!alreadyExists) {
-            App.getInstance().getUserList().add(item);
-            Snackbar.make(view, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
-        App.getInstance().setSeasonData(seriesList);
-        mAdapter.notifyDataSetChanged();
+        App.getInstance().setAllAnimeList(seriesList);
         App.getInstance().saveToDb();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

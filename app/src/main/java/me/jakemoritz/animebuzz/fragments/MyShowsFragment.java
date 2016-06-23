@@ -26,6 +26,10 @@ public class MyShowsFragment extends SeriesFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        if (id == R.id.action_clear_list){
+            mAdapter.getSeriesList().clear();
+            mAdapter.notifyDataSetChanged();
+        }
         return super.onOptionsItemSelected(item);
     }
 }

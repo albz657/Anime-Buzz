@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class SeriesFragment extends Fragment{
 
@@ -42,18 +41,13 @@ public class SeriesFragment extends Fragment{
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             if (this instanceof SeasonsFragment){
-                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getSeasonData(), this);
+                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getAllAnimeList(), this);
 
             } else if (this instanceof MyShowsFragment){
-                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserList(), this);
+                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
             }
             recyclerView.setAdapter(mAdapter);
         }
         return view;
-    }
-
-    public void selectedItem(Series item){
-        //Log.d(TAG, item.getTitle());
-
     }
 }
