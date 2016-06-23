@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.helpers;
 
-import android.app.AlarmManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
@@ -21,42 +20,21 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
+
     private final static String TAG = App.class.getSimpleName();
 
     private static App mInstance;
 
-    public ArrayList<Series> getAllAnimeList() {
-        return allAnimeList;
-    }
-
-    public void setAllAnimeList(ArrayList<Series> allAnimeList) {
-        this.allAnimeList = allAnimeList;
-    }
-
-    public ArrayList<Series> getUserAnimeList() {
-        return userAnimeList;
-    }
-
-    public void setUserAnimeList(ArrayList<Series> userAnimeList) {
-        this.userAnimeList = userAnimeList;
-    }
-
     private ArrayList<Series> userAnimeList;
     private ArrayList<Series> allAnimeList;
     private HashMap<Series, Intent> alarms;
-    private HashMap<Series, IntentWrapper> alarmsSerialized;
-
-    public HashMap<Series, Intent> getAlarms() {
-        return alarms;
-    }
-
-    public void addAlarm(Series series, Intent intent) {
-        this.alarms.put(series, intent);
-    }
+    private Series mostRecentAlarm;
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mInstance = this;
 
         userAnimeList = new ArrayList<>();
         allAnimeList = new ArrayList<>();
@@ -64,12 +42,12 @@ public class App extends Application {
 
         loadAnimeListFromDB();
         loadAlarms();
-
-        mInstance = this;
     }
 
-    public static synchronized App getInstance() {
-        return mInstance;
+    public void saveAnimeListToDB(){
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
+        dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
     private void loadAnimeListFromDB() {
@@ -89,10 +67,17 @@ public class App extends Application {
         return filteredUserList;
     }
 
-    public void saveToDb(){
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
-        dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
+    public void addAlarm(Series series, Intent intent) {
+        mostRecentAlarm = series;
+        this.alarms.put(series, intent);
+    }
+
+    public Series getMostRecentAlarm() {
+        return mostRecentAlarm;
+    }
+
+    public void saveAlarms() {
+        serializeAlarms();
     }
 
     private void loadAlarms() {
@@ -113,14 +98,7 @@ public class App extends Application {
         }
     }
 
-    public void saveAlarms() {
-        serializeAlarms();
-    }
-
     private void deserializeAlarms(HashMap<Series, IntentWrapper> serializedAlarms) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        long numTime = 1466645400000L;
-
         HashMap<Series, Intent> tempAlarms = new HashMap<>();
         Set<Series> set = serializedAlarms.keySet();
         List<Series> list = new ArrayList<>();
@@ -129,7 +107,6 @@ public class App extends Application {
             Series tempSeries = list.remove(0);
             IntentWrapper wrapper = serializedAlarms.remove(tempSeries);
             Intent tempIntent = new Intent(wrapper.getAction(), wrapper.getUri());
-//            PendingIntent tempPendingIntent = PendingIntent.getBroadcast(this, 0, tempIntent, 0);
             tempAlarms.put(tempSeries, tempIntent);
         }
         this.alarms = tempAlarms;
@@ -159,4 +136,18 @@ public class App extends Application {
         }
     }
 
+    public HashMap<Series, Intent> getAlarms() {
+        return alarms;
+    }
+
+    public static synchronized App getInstance() {
+        return mInstance;
+    }
+    public ArrayList<Series> getAllAnimeList() {
+        return allAnimeList;
+    }
+
+    public ArrayList<Series> getUserAnimeList() {
+        return userAnimeList;
+    }
 }

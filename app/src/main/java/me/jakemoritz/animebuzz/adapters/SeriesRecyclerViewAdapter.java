@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
@@ -105,6 +106,9 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
         notifyItemChanged(position);
+
+        MainActivity mainActivity = (MainActivity) mListener.getActivity();
+        mainActivity.removeAlarm(item);
         Snackbar.make(parent, "Removed '" + item.getTitle() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
@@ -119,6 +123,9 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             item.setInUserList(true);
             App.getInstance().getUserAnimeList().add(item);
             notifyItemChanged(position);
+
+            MainActivity mainActivity = (MainActivity) mListener.getActivity();
+            mainActivity.makeAlarm(item);
             Snackbar.make(parent, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
     }

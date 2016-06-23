@@ -27,7 +27,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
@@ -69,50 +69,55 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                 .commit();
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(R.string.fragment_seasons);
         }
 
-//        registerAlarms();
+        //registerAlarms();
     }
 
-    private void registerAlarms(){
+    private void registerAlarms() {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         Set<Series> set = App.getInstance().getAlarms().keySet();
         List<Series> list = new ArrayList<>();
         list.addAll(set);
-        for (Series series : list){
+        for (Series series : list) {
             Intent tempIntent = App.getInstance().getAlarms().get(series);
             PendingIntent tempPendingIntent = PendingIntent.getBroadcast(this, 0, tempIntent, 0);
-            long numTime = 1466645400000L;
+            String time = String.valueOf(series.getAirdate());
+            long numTime = Long.valueOf(time + "000");
 
             alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
         }
     }
 
-    public void makeAlarm(){
+    public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Series series = App.getInstance().getAllAnimeList().get(0);
-        if (series != null){
-            String time = String.valueOf(series.getAirdate());
-            //int numTime = Integer.valueOf(time + "000");
-            long numTime = 1466645400000L;
 
-            alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
-            App.getInstance().addAlarm(series, alarmIntent);
+        String time = String.valueOf(series.getAirdate());
+        long numTime = Long.valueOf(time + "000");
 
-            Log.d(TAG, "alarm set for: " + numTime);
-        } else {
-            Log.d(TAG, "no series");
-        }
+        alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
+        App.getInstance().addAlarm(series, alarmIntent);
+
+        Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + numTime);
+    }
+
+    public void removeAlarm(Series series){
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, App.getInstance().getAlarms().remove(series), 0);
+
+        alarmManager.cancel(pendingIntent);
+
+        Log.d(TAG, "alarm removed for: " + series.getTitle());
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         App.getInstance().saveAlarms();
-        App.getInstance().saveToDb();
+        App.getInstance().saveAnimeListToDB();
     }
 
     @Override
@@ -132,8 +137,8 @@ public class MainActivity extends AppCompatActivity
 
         int previousItemId = -1;
         Menu navMenu = navigationView.getMenu();
-        for (int i = 0; i < navMenu.size(); i++){
-            if (navMenu.getItem(i).isChecked()){
+        for (int i = 0; i < navMenu.size(); i++) {
+            if (navMenu.getItem(i).isChecked()) {
                 previousItemId = navMenu.getItem(i).getItemId();
 //                navMenu.getItem(i).setChecked(false);
             }
@@ -145,16 +150,16 @@ public class MainActivity extends AppCompatActivity
                     .commit();
             navigationView.getMenu().getItem(0).setChecked(true);
 
-            if (getSupportActionBar() != null){
+            if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle(R.string.fragment_myshows);
             }
-        } else if (id == R.id.nav_seasons && previousItemId != id){
+        } else if (id == R.id.nav_seasons && previousItemId != id) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                     .commit();
             navigationView.getMenu().getItem(1).setChecked(true);
 
-            if (getSupportActionBar() != null){
+            if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle(R.string.fragment_seasons);
             }
         }

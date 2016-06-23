@@ -27,7 +27,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
     public void dataRetrieved(ArrayList<Series> seriesList) {
         App.getInstance().getAllAnimeList().clear();
         App.getInstance().getAllAnimeList().addAll(seriesList);
-        App.getInstance().saveToDb();
+        App.getInstance().saveAnimeListToDB();
         if (view instanceof RecyclerView){
             ((RecyclerView) view).getRecycledViewPool().clear();
         }
@@ -43,7 +43,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
             helper.getData();
         } else if (id == R.id.action_notify) {
             MainActivity activity = (MainActivity) getActivity();
-            activity.makeAlarm();
+            //activity.makeAlarm();
         } else if (id == R.id.action_clear_list) {
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
