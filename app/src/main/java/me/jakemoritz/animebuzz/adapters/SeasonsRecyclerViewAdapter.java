@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.series = seriesList.get(position);
         holder.mTitle.setText(seriesList.get(position).getTitle());
+        holder.mDate.setText(String.valueOf(seriesList.get(position).getAirdate()));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,18 +59,19 @@ public class SeasonsRecyclerViewAdapter extends RecyclerView.Adapter<SeasonsRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+
         public final TextView mTitle;
+        public final ImageView mPoster;
+        public final TextView mDate;
+
         public Series series;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mTitle.getText() + "'";
+            mPoster = null;
+            mDate = (TextView) view.findViewById(R.id.series_date);
         }
     }
 }
