@@ -1,9 +1,14 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,6 +22,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -97,14 +103,32 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         if (id == R.id.action_settings) {
             PullDataHelper helper = PullDataHelper.newInstance(this);
             helper.getData();
-        } else if (id == R.id.action_cache) {
-            saveToDb();
+        } else if (id == R.id.action_notify) {
+            createNotification();
         } else if (id == R.id.action_clear_list) {
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void createNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getContext())
+                .setSmallIcon(R.drawable.ic_bookmark)
+                .setContentTitle("Content Title")
+                .setContentText("Content text");
+
+        Intent resultIntent = new Intent(getActivity(), MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(0, mBuilder.build());
     }
 
     public void selectedItem(Series item){

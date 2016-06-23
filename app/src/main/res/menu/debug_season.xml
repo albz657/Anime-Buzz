@@ -7,14 +7,9 @@
         android:title="Pull Current Season Data"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action_cache"
+        android:id="@+id/action_notify"
         android:orderInCategory="100"
-        android:title="Cache Season Data"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_read_cache"
-        android:orderInCategory="100"
-        android:title="Read Cache"
+        android:title="Test Notification"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_clear_list"
