@@ -24,18 +24,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static String TABLE_SEASONS;
 
     // Common columns
-    private static final String KEY_MAL_ID = "id";
+    private static final String KEY_AIRDATE = "airdate";
     private static final String KEY_SHOW_TITLE = "title";
+    private static final String KEY_MAL_ID = "id";
+    private static final String KEY_IS_SIMULCAST_AIRED = "issimulcastaired";
+    private static final String KEY_IS_AIRED = "isaired";
+    private static final String KEY_SIMULCAST_AIRDATE = "simulcastairdae";
 
-    public DatabaseHelper(Context context){
-        super(context, DATABASE_NAME, null , DATABASE_VERSION);
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         TABLE_SEASONS = context.getString(R.string.table_seasons);
         TABLE_USER_LIST = context.getString(R.string.table_user_list);
     }
 
-    private String buildTableCreateQuery(String TABLE_NAME){
+    private String buildTableCreateQuery(String TABLE_NAME) {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_NAME +
-                "(" + KEY_MAL_ID + " INTEGER PRIMARY KEY NOT NULL, " + KEY_SHOW_TITLE + " TEXT" + ")";
+                "(" + KEY_MAL_ID + " INTEGER PRIMARY KEY NOT NULL," +
+                KEY_SHOW_TITLE + " TEXT," +
+                KEY_AIRDATE + " INTEGER, " +
+                KEY_IS_SIMULCAST_AIRED + " INTEGER," +
+                KEY_IS_AIRED + " INTEGER," +
+                KEY_SIMULCAST_AIRDATE + " INTEGER" +
+                ")";
     }
 
     @Override
@@ -51,43 +62,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertSeries(Series series, String TABLE_NAME){
-        int MAL_ID = series.getMal_id();
-        String seriesTitle = series.getTitle();
-
+    public boolean insertSeries(Series series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_MAL_ID, MAL_ID);
-        contentValues.put(KEY_SHOW_TITLE, seriesTitle);
 
-        db.insert(TABLE_NAME , null, contentValues);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_AIRDATE, series.getAirdate());
+        contentValues.put(KEY_SHOW_TITLE, series.getTitle());
+        contentValues.put(KEY_MAL_ID, series.getMal_id());
+        contentValues.put(KEY_IS_SIMULCAST_AIRED, series.isSimulcastAired() ? 1 : 0);
+        contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
+        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
+
+        db.insert(TABLE_NAME, null, contentValues);
         return true;
     }
 
-    public boolean updateSeriesInDb(int mal_id, Series series, String TABLE_NAME){
-        int MAL_ID = series.getMal_id();
-        String seriesTitle = series.getTitle();
-
+    public boolean updateSeriesInDb(Series series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_MAL_ID, MAL_ID);
-        contentValues.put(KEY_SHOW_TITLE, seriesTitle);
 
-        db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(MAL_ID)});
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_AIRDATE, series.getAirdate());
+        contentValues.put(KEY_SHOW_TITLE, series.getTitle());
+        contentValues.put(KEY_MAL_ID, series.getMal_id());
+        contentValues.put(KEY_IS_SIMULCAST_AIRED, series.isSimulcastAired() ? 1 : 0);
+        contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
+        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
+
+        db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMal_id())});
         return true;
     }
 
-    public Cursor getSeries(int mal_id, String TABLE_NAME){
+    public Cursor getSeries(int mal_id, String TABLE_NAME) {
         SQLiteDatabase db = getReadableDatabase();
-         return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_MAL_ID + " = ?", new String[]{String.valueOf(mal_id)});
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_MAL_ID + " = ?", new String[]{String.valueOf(mal_id)});
     }
 
-    public Cursor getAllSeries(String TABLE_NAME){
+    public Cursor getAllSeries(String TABLE_NAME) {
         SQLiteDatabase db = getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
     }
 
-    public Integer deleteTask(int mal_id, String TABLE_NAME){
+    public Integer deleteTask(int mal_id, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
         return db.delete(TABLE_NAME,
                 KEY_MAL_ID + " = ? ",
@@ -96,9 +111,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public void saveSeriesToDb(ArrayList<Series> seriesList, String TABLE_NAME) {
         if (seriesList != null) {
-             for (Series series : seriesList) {
+            for (Series series : seriesList) {
                 if (getSeries(series.getMal_id(), TABLE_NAME).getCount() != 0) {
-                    updateSeriesInDb(series.getMal_id(), series, TABLE_NAME);
+                    updateSeriesInDb(series, TABLE_NAME);
                 } else {
                     insertSeries(series, TABLE_NAME);
                 }
@@ -114,10 +129,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Series> seriesList = new ArrayList<>();
 
         for (int i = res.getCount() - 1; i >= 0; i--) {
-            int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
+            int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
             String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
+            int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
+            boolean isSimulcastAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_SIMULCAST_AIRED)) == 1);
+            boolean isAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_AIRED)) == 1);
+            int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
 
-            Series series = new Series(0, seriesTitle, MAL_ID, true, true, 0);
+
+            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate);
             seriesList.add(series);
             res.moveToNext();
         }

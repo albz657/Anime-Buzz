@@ -4,11 +4,12 @@ import java.io.Serializable;
 
 public class Series implements Serializable{
 
+    private int airdate;
     private String title;
     private int mal_id;
     private boolean isSimulcastAired;
     private boolean isAired;
-    private int airdate;
+    private int simulcast_airdate;
 
     public int getSimulcast_airdate() {
         return simulcast_airdate;
@@ -34,7 +35,6 @@ public class Series implements Serializable{
         return airdate;
     }
 
-    private int simulcast_airdate;
 
 
     public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate) {

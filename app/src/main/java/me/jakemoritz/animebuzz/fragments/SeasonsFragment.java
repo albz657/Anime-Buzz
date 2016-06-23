@@ -73,13 +73,14 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
 
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
+        App.getInstance().setSeasonData(seriesList);
         mAdapter.notifyDataSetChanged();
         saveToDb();
     }
 
     private void saveToDb(){
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.saveSeriesToDb(App.getInstance().getUserList(), getActivity().getString(R.string.table_seasons));
+        dbHelper.saveSeriesToDb(App.getInstance().getSeasonData(), getActivity().getString(R.string.table_seasons));
     }
 
     @Override
