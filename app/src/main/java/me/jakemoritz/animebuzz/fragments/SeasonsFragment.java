@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +31,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     private static final String TAG = SeasonsFragment.class.getSimpleName();
 
     private SeasonsRecyclerViewAdapter mAdapter;
+    private View view;
 
     public SeasonsFragment() {
     }
@@ -60,7 +62,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_series_list, container, false);
+        view = inflater.inflate(R.layout.fragment_series_list, container, false);
 
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
@@ -121,6 +123,7 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         }
         if (!alreadyExists){
             App.getInstance().getUserList().add(item);
+            Snackbar.make(view, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
     }
 }

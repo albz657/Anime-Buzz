@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity
             getSupportActionBar().setTitle(R.string.fragment_seasons);
         }
 
-        registerAlarms();
+//        registerAlarms();
     }
 
     private void registerAlarms(){
