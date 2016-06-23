@@ -1,40 +1,22 @@
 package me.jakemoritz.animebuzz.fragments;
 
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.adapters.SeasonsRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.PullDataHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends Fragment implements ReadDataResponse {
+public class SeasonsFragment extends SeriesFragment implements ReadDataResponse {
 
-    private static final String TAG = SeasonsFragment.class.getSimpleName();
-
-    private SeasonsRecyclerViewAdapter mAdapter;
-    private View view;
-
-    public SeasonsFragment() {
-    }
+    private static final String TAG = SeriesFragment.class.getSimpleName();
 
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
@@ -42,55 +24,25 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveToDb();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_series_list, container, false);
-
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            mAdapter = new SeasonsRecyclerViewAdapter(App.getInstance().getSeasonData(), this);
-            recyclerView.setAdapter(mAdapter);
+    public void selectedItem(Series item) {
+        super.selectedItem(item);
+        boolean alreadyExists = false;
+        for (Series series : App.getInstance().getUserList()) {
+            if (series.getMal_id() == item.getMal_id()) {
+                alreadyExists = true;
+            }
         }
-        return view;
+        if (!alreadyExists) {
+            App.getInstance().getUserList().add(item);
+            Snackbar.make(view, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
         App.getInstance().setSeasonData(seriesList);
         mAdapter.notifyDataSetChanged();
-        saveToDb();
-    }
-
-    private void saveToDb(){
-        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-        dbHelper.saveSeriesToDb(App.getInstance().getSeasonData(), getActivity().getString(R.string.table_seasons));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
+        App.getInstance().saveToDb();
     }
 
     @Override
@@ -111,19 +63,9 @@ public class SeasonsFragment extends Fragment implements ReadDataResponse {
         return super.onOptionsItemSelected(item);
     }
 
-
-
-    public void selectedItem(Series item){
-        Log.d(TAG, item.getTitle());
-        boolean alreadyExists = false;
-        for (Series series : App.getInstance().getUserList()){
-            if (series.getMal_id() == item.getMal_id()){
-                alreadyExists = true;
-            }
-        }
-        if (!alreadyExists){
-            App.getInstance().getUserList().add(item);
-            Snackbar.make(view, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
-        }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
     }
 }

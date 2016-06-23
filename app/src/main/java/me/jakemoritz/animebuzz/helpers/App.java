@@ -79,6 +79,12 @@ public class App extends Application {
         seasonData = dbHelper.getSeriesFromDb(getString(R.string.table_seasons));
     }
 
+    public void saveToDb(){
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveSeriesToDb(seasonData, getString(R.string.table_seasons));
+        dbHelper.saveSeriesToDb(userList, getString(R.string.table_seasons));
+    }
+
     private void loadAlarms() {
         try {
             FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.file_alarms));

@@ -38,10 +38,10 @@ public class PullDataHelper {
 
     ReadDataResponse delegate;
 
-    public static PullDataHelper newInstance(SeasonsFragment seasonsFragment) {
+    public static PullDataHelper newInstance(SeasonsFragment fragment) {
         PullDataHelper helper = new PullDataHelper();
-        helper.setDelegate(seasonsFragment);
-        helper.setmContext(seasonsFragment.getContext());
+        helper.setDelegate(fragment);
+        helper.setmContext(fragment.getContext());
         return helper;
     }
 

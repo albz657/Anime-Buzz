@@ -1,27 +1,32 @@
 package me.jakemoritz.animebuzz.adapters;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecyclerViewAdapter.ViewHolder> {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> {
 
     public ArrayList<Series> getSeriesList() {
         return seriesList;
     }
 
-    private final ArrayList<Series> seriesList;
-    private final MyShowsFragment mListener;
+    public ArrayList<Series> seriesList = null;
+    public Fragment mListener = null;
 
-    public MyShowsRecyclerViewAdapter(ArrayList<Series> items, MyShowsFragment listener) {
+    public SeriesRecyclerViewAdapter(){
+
+    }
+
+    public SeriesRecyclerViewAdapter(ArrayList<Series> items, Fragment listener) {
         seriesList = items;
         mListener = listener;
     }
@@ -37,6 +42,7 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.series = seriesList.get(position);
         holder.mTitle.setText(seriesList.get(position).getTitle());
+        holder.mDate.setText(String.valueOf(seriesList.get(position).getAirdate()));
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,7 +50,7 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
                 if (null != mListener) {
                     // Notify the active callbacks interface (the activity, if the
                     // fragment is attached to one) that an item has been selected.
-                    mListener.selectedItem(holder.series);
+                   // mListener.selectedItem(holder.series);
                 }
             }
         });
@@ -57,18 +63,19 @@ public class MyShowsRecyclerViewAdapter extends RecyclerView.Adapter<MyShowsRecy
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
+
         public final TextView mTitle;
+        public final ImageView mPoster;
+        public final TextView mDate;
+
         public Series series;
 
         public ViewHolder(View view) {
             super(view);
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString() + " '" + mTitle.getText() + "'";
+            mPoster = null;
+            mDate = (TextView) view.findViewById(R.id.series_date);
         }
     }
 }
