@@ -24,7 +24,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
 
     @Override
     public void dataRetrieved(ArrayList<Series> seriesList) {
-        App.getInstance().setAllAnimeList(seriesList);
+        App.getInstance().getAllAnimeList().clear();
+        App.getInstance().getAllAnimeList().addAll(seriesList);
         App.getInstance().saveToDb();
         mAdapter.notifyDataSetChanged();
     }
