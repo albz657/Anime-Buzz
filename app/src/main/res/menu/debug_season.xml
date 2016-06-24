@@ -12,6 +12,11 @@
         android:title="Test Notification"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_verify"
+        android:orderInCategory="100"
+        android:title="Verify Credentials"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_clear_list"
         android:orderInCategory="100"
         android:title="Clear List"

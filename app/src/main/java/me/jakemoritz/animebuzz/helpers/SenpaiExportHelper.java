@@ -22,9 +22,9 @@ import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class PullDataHelper {
+public class SenpaiExportHelper {
 
-    final static String TAG = PullDataHelper.class.getSimpleName();
+    final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
     public void setmContext(Context mContext) {
         this.mContext = mContext;
@@ -38,8 +38,8 @@ public class PullDataHelper {
 
     ReadDataResponse delegate;
 
-    public static PullDataHelper newInstance(SeasonsFragment fragment) {
-        PullDataHelper helper = new PullDataHelper();
+    public static SenpaiExportHelper newInstance(SeasonsFragment fragment) {
+        SenpaiExportHelper helper = new SenpaiExportHelper();
         helper.setDelegate(fragment);
         helper.setmContext(fragment.getContext());
         return helper;

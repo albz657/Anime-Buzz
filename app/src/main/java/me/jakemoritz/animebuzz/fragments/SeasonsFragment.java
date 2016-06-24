@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.PullDataHelper;
+import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
+import me.jakemoritz.animebuzz.mal_api.MalApiClient;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment implements ReadDataResponse {
@@ -39,7 +40,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            PullDataHelper helper = PullDataHelper.newInstance(this);
+            SenpaiExportHelper helper = SenpaiExportHelper.newInstance(this);
             helper.getData();
         } else if (id == R.id.action_notify) {
             MainActivity activity = (MainActivity) getActivity();
@@ -47,6 +48,9 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
         } else if (id == R.id.action_clear_list) {
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
+        } else if (id == R.id.action_verify){
+            MalApiClient malApiClient = new MalApiClient(getContext());
+            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
         }
 
         return super.onOptionsItemSelected(item);
