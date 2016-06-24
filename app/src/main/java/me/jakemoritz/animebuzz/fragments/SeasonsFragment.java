@@ -49,7 +49,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
         } else if (id == R.id.action_verify){
-            MalApiClient malApiClient = new MalApiClient(getContext());
+            MalApiClient malApiClient = new MalApiClient(getActivity());
 //            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
             malApiClient.getUserList("skyrocketing");
         }

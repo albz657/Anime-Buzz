@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.mal_api;
 
-import android.content.Context;
+import android.app.Activity;
 import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
@@ -39,10 +39,10 @@ public class MalApiClient {
     private static final String VERIFY_CREDENTIALS = "http://myanimelist.net/api/account/verify_credentials.xml";
     private static final String USER_LIST_BASE = "http://myanimelist.net/malappinfo.php";
 
-    private Context context;
+    private Activity activity;
 
-    public MalApiClient(Context context) {
-        this.context = context;
+    public MalApiClient(Activity activity) {
+        this.activity = activity;
     }
 
     public void getUserList(String username) {
@@ -53,7 +53,7 @@ public class MalApiClient {
                 .appendQueryParameter("type", "anime");
         String url = builder.build().toString();
 
-        RequestQueue queue = Volley.newRequestQueue(context);
+        RequestQueue queue = Volley.newRequestQueue(activity);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
             @Override
@@ -74,8 +74,7 @@ public class MalApiClient {
     }
 
     public void verifyCredentials(final String username, final String password) {
-        Log.d(TAG, "verifying credentials");
-        RequestQueue queue = Volley.newRequestQueue(context);
+        RequestQueue queue = Volley.newRequestQueue(activity);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, VERIFY_CREDENTIALS, new Response.Listener<String>() {
 
             @Override
@@ -126,11 +125,8 @@ public class MalApiClient {
         try {
             XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
 
-            AnimeListXMLHandler handler = new AnimeListXMLHandler();
-            reader.setContentHandler(handler);
             InputSource inputSource = new InputSource();
             inputSource.setCharacterStream(new StringReader(response));
-            //reader.parse(inputSource);
 
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
 
@@ -172,8 +168,7 @@ public class MalApiClient {
                     }
                 }
             }
-            Log.d(TAG, "nu");
-            MalImportHelper helper = new MalImportHelper(currentlyWatchingSeriesIds);
+            MalImportHelper helper = new MalImportHelper(currentlyWatchingSeriesIds, activity);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {

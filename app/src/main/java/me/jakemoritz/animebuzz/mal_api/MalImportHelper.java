@@ -1,17 +1,22 @@
 package me.jakemoritz.animebuzz.mal_api;
 
+import android.app.Activity;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class MalImportHelper {
 
     private List<Integer> currentlyWatchingShowIds;
+    private MainActivity mActivity;
 
-    public MalImportHelper(List<Integer> currentlyWatchingShowIds) {
+    public MalImportHelper(List<Integer> currentlyWatchingShowIds, Activity activity) {
         this.currentlyWatchingShowIds = currentlyWatchingShowIds;
+        this.mActivity = (MainActivity) activity;
         matchSeries();
     }
 
@@ -20,9 +25,13 @@ public class MalImportHelper {
 
         for (int i = 0; i < App.getInstance().getAllAnimeList().size(); i++){
             for (int j = 0; j < currentlyWatchingShowIds.size(); j++){
-                if (currentlyWatchingShowIds.get(j) == App.getInstance().getAllAnimeList().get(i).getMal_id()){
+                Series tempSeries = App.getInstance().getAllAnimeList().get(i);
+                if (currentlyWatchingShowIds.get(j) == tempSeries.getMal_id()){
                     // found a match in current season data
-                    matchedSeries.add(App.getInstance().getAllAnimeList().get(i));
+                    tempSeries.setInUserList(true);
+                    matchedSeries.add(tempSeries);
+
+                    mActivity.makeAlarm(tempSeries);
                 }
             }
         }
