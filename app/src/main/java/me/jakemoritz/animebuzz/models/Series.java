@@ -12,6 +12,16 @@ public class Series implements Serializable{
     private int simulcast_airdate;
     private boolean isInUserList;
 
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    private String season;
+
     public void setInUserList(boolean inUserList) {
         isInUserList = inUserList;
     }
@@ -47,7 +57,7 @@ public class Series implements Serializable{
     public Series() {
     }
 
-    public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList) {
+    public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList, String season) {
         this.airdate = airdate;
         this.title = title;
         this.mal_id = mal_id;
@@ -55,5 +65,6 @@ public class Series implements Serializable{
         this.isAired = isAired;
         this.simulcast_airdate = simulcast_airdate;
         this.isInUserList = isInUserList;
+        this.season = season;
     }
 }

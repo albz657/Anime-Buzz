@@ -79,6 +79,10 @@ public class SenpaiExportHelper {
 
         JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
 
+        String season = "";
+        JsonObject metadata = gsonObject.getAsJsonObject("meta");
+        season = metadata.get("season").getAsString();
+
         ArrayList<Series> seriesFromServer = new ArrayList<>();
         Iterator iterator = responseSeriesList.iterator();
         JsonObject seriesAsJSON;
@@ -109,7 +113,7 @@ public class SenpaiExportHelper {
             }
 
             if (mal_id != -1) {
-                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate, false);
+                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate, false, season);
                 seriesFromServer.add(series);
             }
 

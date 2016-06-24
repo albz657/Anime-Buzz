@@ -1,14 +1,19 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
@@ -22,6 +27,29 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
         return fragment;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        MainActivity parentActivity = (MainActivity) getActivity();
+        if (parentActivity.getSupportActionBar() != null){
+            Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+
+            if (toolbarSpinner != null){
+                toolbarSpinner.setVisibility(View.VISIBLE);
+
+                String[] queryColumns = new String[]{"_id", "shit"};
+                String[] adapterColumns = new String[]{"shit"};
+
+                DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+//                Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT _id, SEASON FROM ANIME");
+//                CursorAdapter adapter = new SimpleCursorAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, cursor, )
+            }
+
+            parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
     }
 
     @Override

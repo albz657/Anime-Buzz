@@ -25,11 +25,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Common columns
     private static final String KEY_AIRDATE = "airdate";
     private static final String KEY_SHOW_TITLE = "title";
-    private static final String KEY_MAL_ID = "id";
+    private static final String KEY_MAL_ID = "_id";
     private static final String KEY_IS_SIMULCAST_AIRED = "issimulcastaired";
     private static final String KEY_IS_AIRED = "isaired";
     private static final String KEY_SIMULCAST_AIRDATE = "simulcastairdate";
     private static final String KEY_IS_IN_USER_LIST = "isinuserlist";
+    private static final String KEY_SEASON = "season";
+
 
 
     public DatabaseHelper(Context context) {
@@ -45,7 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_IS_SIMULCAST_AIRED + " INTEGER," +
                 KEY_IS_AIRED + " INTEGER," +
                 KEY_SIMULCAST_AIRDATE + " INTEGER," +
-                KEY_IS_IN_USER_LIST + " INTEGER" +
+                KEY_IS_IN_USER_LIST + " INTEGER," +
+                KEY_SEASON + " TEXT" +
                 ")";
     }
 
@@ -71,6 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
+        contentValues.put(KEY_SEASON, series.getSeason());
 
         db.insert(TABLE_NAME, null, contentValues);
         return true;
@@ -87,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_AIRED, series.isAired() ? 1 : 0);
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
+        contentValues.put(KEY_SEASON, series.getSeason());
 
         db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMal_id())});
         return true;
@@ -136,9 +141,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             boolean isAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_AIRED)) == 1);
             int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
             boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
+            String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
 
 
-            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList);
+            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season);
             seriesList.add(series);
             res.moveToNext();
         }
