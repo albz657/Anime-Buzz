@@ -44,7 +44,8 @@ public class Series implements Serializable{
         return airdate;
     }
 
-
+    public Series() {
+    }
 
     public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList) {
         this.airdate = airdate;

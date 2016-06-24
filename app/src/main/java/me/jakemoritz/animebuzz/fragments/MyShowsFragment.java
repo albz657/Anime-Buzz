@@ -15,6 +15,7 @@ public class MyShowsFragment extends SeriesFragment {
         return fragment;
     }
 
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);

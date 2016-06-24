@@ -50,7 +50,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
             mAdapter.notifyDataSetChanged();
         } else if (id == R.id.action_verify){
             MalApiClient malApiClient = new MalApiClient(getContext());
-            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
+//            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
+            malApiClient.getUserList("skyrocketing");
         }
 
         return super.onOptionsItemSelected(item);
