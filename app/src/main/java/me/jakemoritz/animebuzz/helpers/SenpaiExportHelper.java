@@ -56,7 +56,6 @@ public class SenpaiExportHelper {
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-//                Log.d(TAG, response.toString());
                 handleResponse(response);
             }
         }, new Response.ErrorListener() {
@@ -72,7 +71,6 @@ public class SenpaiExportHelper {
     void handleResponse(JSONObject response) {
         ArrayList<Series> seriesFromServer = parseJSON(response);
         delegate.dataRetrieved(seriesFromServer);
-//        mAdapter.swapList(seriesFromServer);
     }
 
     ArrayList<Series> parseJSON(JSONObject response) {
@@ -105,6 +103,7 @@ public class SenpaiExportHelper {
                 isAired = seriesAsJSON.get("isAired").getAsBoolean();
                 airdate = seriesAsJSON.get("airdate_u").getAsInt();
                 simulcast_airdate = seriesAsJSON.get("simulcast_airdate_u").getAsInt();
+
             } catch (NumberFormatException e) {
                 // no MAL ID
             }
