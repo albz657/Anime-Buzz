@@ -18,7 +18,9 @@ import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -133,19 +135,20 @@ public class SenpaiExportHelper {
 
                 String timestampAsDate = seasonData.get("start_timestamp").getAsString();
 
-                String formattedDate = new DateFormatHelper().getLocalFormattedDate(timestampAsDate);
+                String formattedDate = new DateFormatHelper().getLocalFormattedDateFromStringDate(timestampAsDate);
 
                 Season tempSeason = new Season(formattedDate, seasonName, seasonKey);
                 seasonsList.add(tempSeason);
             }
 
         }
-        Log.d(TAG, "s");
 
         App.getInstance().getSeasonsList().clear();
         App.getInstance().getSeasonsList().addAll(seasonsList);
         App.getInstance().saveSeasonsList();
     }
+
+
 
     private ArrayList<Series> parseSeasonData(JSONObject response) {
         JsonParser parser = new JsonParser();
@@ -170,6 +173,9 @@ public class SenpaiExportHelper {
             boolean isAired = false;
             int airdate = -1;
             int simulcast_airdate = -1;
+            boolean currentlyAiring;
+            Calendar calAirdate = null;
+            Calendar calSimulcastAidate = null;
 
             Log.d(TAG, count + "");
 
@@ -181,12 +187,19 @@ public class SenpaiExportHelper {
                 airdate = seriesAsJSON.get("airdate_u").getAsInt();
                 simulcast_airdate = seriesAsJSON.get("simulcast_airdate_u").getAsInt();
 
+                if (title.matches("Re: Zero Kara Hajimeru Isekai Seikatsu")){
+                    Log.d(TAG, "");
+                }
+
+                calAirdate = new DateFormatHelper().getCalFromSeconds(airdate);
+                calSimulcastAidate = new DateFormatHelper().getCalFromSeconds(simulcast_airdate);
             } catch (NumberFormatException e) {
                 // no MAL ID
             }
 
             if (mal_id != -1) {
-                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate, false, season);
+                Series series = new Series(airdate, title, mal_id, isSimulcastAired, isAired, simulcast_airdate, false, season, false, calAirdate, calSimulcastAidate);
+                makeAlarm(series);
                 seriesFromServer.add(series);
             }
 
@@ -194,5 +207,27 @@ public class SenpaiExportHelper {
         }
 
         return seriesFromServer;
+    }
+
+    public void makeAlarm(Series series) {
+
+        Calendar cal = series.getCalSimulcastAidate();
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        String formattedCurrent = format.format(current.getTime());
+        String formattedNext = format.format(nextEpisode.getTime());
+
+        Log.d(TAG, current.toString());
+        Log.d(TAG, nextEpisode.toString());
+        if (current.compareTo(nextEpisode) > 0){
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+//        Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + numTime);
     }
 }

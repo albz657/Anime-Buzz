@@ -82,7 +82,14 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataRes
         if (id == R.id.action_settings) {
             SenpaiExportHelper helper = SenpaiExportHelper.newInstance(this);
             helper.getSeasonList();
-            for (Season season : App.getInstance().getSeasonsList()){
+            Season season = null;
+            for (Season temp : App.getInstance().getSeasonsList()){
+                if (temp.getName().matches("Spring 2016")){
+                    season = temp;
+                }
+            }
+            helper.getSeasonData(season);
+            for (Season sseason : App.getInstance().getSeasonsList()){
 //                helper.getSeasonData(season);
             }
             Log.d(TAG, "DONE");

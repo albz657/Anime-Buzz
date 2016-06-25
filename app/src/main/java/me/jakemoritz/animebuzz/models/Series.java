@@ -1,14 +1,38 @@
 package me.jakemoritz.animebuzz.models;
 
-import java.io.Serializable;
+import java.util.Calendar;
 
-public class Series implements Serializable{
+public class Series {
 
     private int airdate;
     private String title;
     private int mal_id;
     private boolean isSimulcastAired;
     private boolean isAired;
+    private Calendar calAirdate;
+    private Calendar calSimulcastAidate;
+
+    public Calendar getCalSimulcastAidate() {
+        return calSimulcastAidate;
+    }
+
+    public void setCalSimulcastAidate(Calendar calSimulcastAidate) {
+        this.calSimulcastAidate = calSimulcastAidate;
+    }
+
+    public Calendar getCalAirdate() {
+        return calAirdate;
+    }
+
+    public void setCalAirdate(Calendar calAirdate) {
+        this.calAirdate = calAirdate;
+    }
+
+    public boolean isCurrentlyAiring() {
+        return currentlyAiring;
+    }
+
+    private boolean currentlyAiring;
     private int simulcast_airdate;
     private boolean isInUserList;
 
@@ -57,7 +81,7 @@ public class Series implements Serializable{
     public Series() {
     }
 
-    public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList, String season) {
+    public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList, String season, boolean currentlyAiring, Calendar calAirdate, Calendar calSimulcastAidate) {
         this.airdate = airdate;
         this.title = title;
         this.mal_id = mal_id;
@@ -66,5 +90,8 @@ public class Series implements Serializable{
         this.simulcast_airdate = simulcast_airdate;
         this.isInUserList = isInUserList;
         this.season = season;
+        this.currentlyAiring = currentlyAiring;
+        this.calAirdate = calAirdate;
+        this.calSimulcastAidate = calSimulcastAidate;
     }
 }

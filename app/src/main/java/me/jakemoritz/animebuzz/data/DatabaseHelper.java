@@ -144,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
 
 
-            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season);
+            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season, false, null, null);
             seriesList.add(series);
             res.moveToNext();
         }

@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -86,8 +87,17 @@ public class MainActivity extends AppCompatActivity
 
         String time = String.valueOf(series.getAirdate());
         long numTime = Long.valueOf(time + "000");
+        Calendar cal = series.getCalAirdate();
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
 
-        alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0){
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+        alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
         App.getInstance().addAlarm(series, alarmIntent);
 
         Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + numTime);
