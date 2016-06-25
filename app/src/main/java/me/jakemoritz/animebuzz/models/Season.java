@@ -5,18 +5,26 @@ import java.io.Serializable;
 public class Season implements Serializable{
 
     private String name;
-    private String startTimestamp;
+
+    public String getKey() {
+        return key;
+    }
+
+    private String key;
+
+    public Season(Long startTimestamp, String name, String key) {
+        this.startTimestamp = startTimestamp;
+        this.name = name;
+        this.key = key;
+    }
+
+    private Long startTimestamp;
 
     public String getName() {
         return name;
     }
 
-    public String getStartTimestamp() {
+    public Long getStartTimestamp() {
         return startTimestamp;
-    }
-
-    public Season(String name, String startTimestamp) {
-        this.name = name;
-        this.startTimestamp = startTimestamp;
     }
 }

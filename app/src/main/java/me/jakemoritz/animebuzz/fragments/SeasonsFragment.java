@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.mal_api.MalApiClient;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataResponse {
@@ -80,7 +82,11 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataRes
         if (id == R.id.action_settings) {
             SenpaiExportHelper helper = SenpaiExportHelper.newInstance(this);
             helper.getSeasonList();
-//            helper.getData();
+            for (Season season : App.getInstance().getSeasonsList()){
+//                helper.getSeasonData(season);
+            }
+            Log.d(TAG, "DONE");
+//            helper.getSeasonData();
         } else if (id == R.id.action_notify) {
             MainActivity activity = (MainActivity) getActivity();
             //activity.makeAlarm();

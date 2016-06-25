@@ -59,6 +59,7 @@ public class App extends Application {
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
+
     private void loadAnimeListFromDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());

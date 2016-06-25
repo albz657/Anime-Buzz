@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.helpers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -71,11 +72,16 @@ public class SenpaiExportHelper {
         queue.add(jsonObjectRequest);
     }
 
-    public void getData() {
+    public void getSeasonData(Season season) {
         Log.d(TAG, "grabbing data");
         // Instantiate RequestQueue
         RequestQueue queue = Volley.newRequestQueue(mContext);
-        String url = "http://www.senpai.moe/export.php?type=json&src=raw";
+
+        String base = "http://www.senpai.moe/export.php?type=json";
+        Uri uri = Uri.parse(base);
+        Uri.Builder builder = uri.buildUpon()
+                .appendQueryParameter("src", season.getKey());
+        String url = builder.build().toString();
 
         // Request JSON response from URL
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -113,7 +119,8 @@ public class SenpaiExportHelper {
             JsonObject seasonData = (JsonObject) seasonAsElement.getValue();
             String seasonName = seasonData.get("name").getAsString();
 
-            if (!seasonAsElement.getKey().matches("nodate")){
+            String seasonKey = seasonAsElement.getKey();
+            if (!seasonKey.matches("nodate")){
                 if (seasonAsElement.getKey().matches(latestSeasonTag)){
                     latestSeason = seasonName;
 
@@ -124,9 +131,11 @@ public class SenpaiExportHelper {
                     editor.apply();
                 }
 
-                String startTimestamp = seasonData.get("start_timestamp").getAsString();
+                String timestampAsDate = seasonData.get("start_timestamp").getAsString();
 
-                Season tempSeason = new Season(seasonName, startTimestamp);
+                Long startTimestampLocal = new DateFormatHelper().getLocalTimeFromStringDate(timestampAsDate);
+
+                Season tempSeason = new Season(startTimestampLocal, seasonName, seasonKey);
                 seasonsList.add(tempSeason);
             }
 
