@@ -23,7 +23,7 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)
-                        .setContentTitle(series.getTitle())
+                        .setContentTitle(series.getName())
                         .setContentText("New episode released");
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);

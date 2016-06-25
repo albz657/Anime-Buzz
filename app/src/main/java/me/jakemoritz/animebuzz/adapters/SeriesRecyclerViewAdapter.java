@@ -43,8 +43,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.series = seriesList.get(position);
-        holder.mTitle.setText(seriesList.get(position).getTitle());
-        holder.mDate.setText(String.valueOf(seriesList.get(position).getAirdate()));
+        holder.mTitle.setText(seriesList.get(position).getName());
+        holder.mDate.setText(String.valueOf(seriesList.get(position).getAirdate_u()));
 
         if (holder.series.isInUserList()){
             holder.mAddButton.setVisibility(View.GONE);
@@ -109,13 +109,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         MainActivity mainActivity = (MainActivity) mListener.getActivity();
         mainActivity.removeAlarm(item);
-        Snackbar.make(parent, "Removed '" + item.getTitle() + "' from your list.", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
     public void addSeries(Series item, int position){
         boolean alreadyExists = false;
         for (Series series : App.getInstance().getUserAnimeList()) {
-            if (series.getMal_id() == item.getMal_id()) {
+            if (series.getMALID() == item.getMALID()) {
                 alreadyExists = true;
             }
         }
@@ -126,7 +126,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
             MainActivity mainActivity = (MainActivity) mListener.getActivity();
             mainActivity.makeAlarm(item);
-            Snackbar.make(parent, "Added '" + item.getTitle() + "' to your list.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
     }
 }

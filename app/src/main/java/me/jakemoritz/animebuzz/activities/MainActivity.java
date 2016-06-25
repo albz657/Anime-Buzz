@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity
     public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate_u());
         Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
@@ -128,7 +128,7 @@ public class MainActivity extends AppCompatActivity
         // debug code
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         String formattedNext = format.format(nextEpisode.getTime());
-        Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + formattedNext);
+        Log.d(TAG, "alarm for '" + series.getName() + "' set for: " + formattedNext);
     }
 
     public void removeAlarm(Series series){
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
 
         alarmManager.cancel(pendingIntent);
 
-        Log.d(TAG, "alarm removed for: " + series.getTitle());
+        Log.d(TAG, "alarm removed for: " + series.getName());
     }
 
     @Override

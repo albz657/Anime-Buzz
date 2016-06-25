@@ -2,13 +2,11 @@ package me.jakemoritz.animebuzz.models;
 
 public class Series {
 
-    private int airdate;
-    private String title;
-    private int mal_id;
-    private boolean isSimulcastAired;
-    private boolean isAired;
+    private int airdate_u;
+    private String name;
+    private int MALID;
     private boolean currentlyAiring;
-    private int simulcast_airdate;
+    private int simulcast_airdate_u;
     private boolean isInUserList;
     private String season;
 
@@ -32,40 +30,31 @@ public class Series {
         return isInUserList;
     }
 
-    public int getSimulcast_airdate() {
-        return simulcast_airdate;
+    public int getSimulcast_airdate_u() {
+        return simulcast_airdate_u;
     }
 
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public int getMal_id() {
-        return mal_id;
+    public int getMALID() {
+        return MALID;
     }
 
-    public boolean isSimulcastAired() {
-        return isSimulcastAired;
-    }
-
-    public boolean isAired() {
-        return isAired;
-    }
-
-    public int getAirdate() {
-        return airdate;
+    public int getAirdate_u() {
+        return airdate_u;
     }
 
     public Series() {
+
     }
 
-    public Series(int airdate, String title, int mal_id, boolean isSimulcastAired, boolean isAired, int simulcast_airdate, boolean isInUserList, String season, boolean currentlyAiring) {
-        this.airdate = airdate;
-        this.title = title;
-        this.mal_id = mal_id;
-        this.isSimulcastAired = isSimulcastAired;
-        this.isAired = isAired;
-        this.simulcast_airdate = simulcast_airdate;
+    public Series(int airdate_u, String name, int MALID, int simulcast_airdate_u, boolean isInUserList, String season, boolean currentlyAiring) {
+        this.airdate_u = airdate_u;
+        this.name = name;
+        this.MALID = MALID;
+        this.simulcast_airdate_u = simulcast_airdate_u;
         this.isInUserList = isInUserList;
         this.season = season;
         this.currentlyAiring = currentlyAiring;

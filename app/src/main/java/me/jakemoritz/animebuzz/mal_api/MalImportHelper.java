@@ -26,7 +26,7 @@ public class MalImportHelper {
         for (int i = 0; i < App.getInstance().getAllAnimeList().size(); i++){
             for (int j = 0; j < currentlyWatchingShowIds.size(); j++){
                 Series tempSeries = App.getInstance().getAllAnimeList().get(i);
-                if (currentlyWatchingShowIds.get(j) == tempSeries.getMal_id()){
+                if (currentlyWatchingShowIds.get(j) == tempSeries.getMALID()){
                     // found a match in current season data
                     tempSeries.setInUserList(true);
                     matchedSeries.add(tempSeries);
