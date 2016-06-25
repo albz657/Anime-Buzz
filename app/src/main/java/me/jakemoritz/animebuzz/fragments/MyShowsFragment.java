@@ -1,10 +1,15 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Spinner;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 
 public class MyShowsFragment extends SeriesFragment {
 
@@ -15,6 +20,21 @@ public class MyShowsFragment extends SeriesFragment {
         return fragment;
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        MainActivity parentActivity = (MainActivity) getActivity();
+        if (parentActivity.getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+
+            if (toolbarSpinner != null) {
+                toolbarSpinner.setVisibility(View.GONE);
+            }
+
+            parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -27,7 +47,7 @@ public class MyShowsFragment extends SeriesFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_clear_list){
+        if (id == R.id.action_clear_list) {
             mAdapter.getSeriesList().clear();
             mAdapter.notifyDataSetChanged();
         }
