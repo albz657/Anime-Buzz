@@ -15,6 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.RelativeLayout;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,18 +47,23 @@ public class MainActivity extends AppCompatActivity
     private PendingIntent pendingIntent;
     Intent alarmIntent;
     boolean currentlyInitializing = false;
+    CircularProgressView progressView;
+    RelativeLayout progressViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         Intent startupIntent = getIntent();
         if (startupIntent != null){
             initializeData();
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
 
         // Retrieve pending intent to perform broadcast
         alarmIntent = new Intent(this, AlarmReceiver.class);
@@ -83,6 +92,21 @@ public class MainActivity extends AppCompatActivity
 
     private void initializeData(){
         currentlyInitializing = true;
+
+      /*  loadingDialog = new ProgressDialog(this);
+        loadingDialog.setTitle("title");
+        loadingDialog.setIndeterminate(true);
+        loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        loadingDialog.setMessage("message");
+        loadingDialog.show();*/
+
+        progressView = (CircularProgressView) findViewById(R.id.progress_view);
+        progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
+        if (progressView != null && progressViewHolder != null) {
+            progressViewHolder.setVisibility(View.VISIBLE);
+            progressView.startAnimation();
+        }
+
         SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
         senpaiExportHelper.getSeasonList();
 
@@ -222,6 +246,13 @@ public class MainActivity extends AppCompatActivity
                         getSupportActionBar().setTitle(R.string.fragment_seasons);
                     }
                     currentlyInitializing = false;
+
+                    setProgressBarIndeterminateVisibility(false);
+
+                    if (progressView != null && progressViewHolder != null){
+                        progressViewHolder.setVisibility(View.GONE);
+                        progressView.stopAnimation();
+                    }
                 }
             }
         }

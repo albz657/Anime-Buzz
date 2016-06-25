@@ -7,6 +7,8 @@
 
     <string name="action_settings">Settings</string>
 
+    <string name="initial_loading">Getting current season data, this should only take a minute.</string>
+
     <!--Fragment names-->
     <string name="fragment_myshows">My Shows</string>
     <string name="fragment_seasons">Seasons</string>

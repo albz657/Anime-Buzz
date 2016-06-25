@@ -15,11 +15,9 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.mal_api.MalApiClient;
-import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataResponse {
+public class SeasonsFragment extends SeriesFragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -69,17 +67,6 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataRes
                 parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
             }
         }
-    }
-
-    @Override
-    public void seasonDataRetrieved(ArrayList<Series> seriesList) {
-/*        App.getInstance().getAllAnimeList().clear();
-        App.getInstance().getAllAnimeList().addAll(seriesList);
-        App.getInstance().saveAnimeListToDB();
-        if (view instanceof RecyclerView) {
-            ((RecyclerView) view).getRecycledViewPool().clear();
-        }
-        mAdapter.notifyDataSetChanged();*/
     }
 
     @Override
