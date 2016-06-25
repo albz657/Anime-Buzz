@@ -133,9 +133,9 @@ public class SenpaiExportHelper {
 
                 String timestampAsDate = seasonData.get("start_timestamp").getAsString();
 
-                Long startTimestampLocal = new DateFormatHelper().getLocalTimeFromStringDate(timestampAsDate);
+                String formattedDate = new DateFormatHelper().getLocalFormattedDate(timestampAsDate);
 
-                Season tempSeason = new Season(startTimestampLocal, seasonName, seasonKey);
+                Season tempSeason = new Season(formattedDate, seasonName, seasonKey);
                 seasonsList.add(tempSeason);
             }
 

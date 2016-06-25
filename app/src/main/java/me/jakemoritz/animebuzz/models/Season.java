@@ -12,19 +12,19 @@ public class Season implements Serializable{
 
     private String key;
 
-    public Season(Long startTimestamp, String name, String key) {
+    public Season(String startTimestamp, String name, String key) {
         this.startTimestamp = startTimestamp;
         this.name = name;
         this.key = key;
     }
 
-    private Long startTimestamp;
+    private String startTimestamp;
 
     public String getName() {
         return name;
     }
 
-    public Long getStartTimestamp() {
+    public String getStartTimestamp() {
         return startTimestamp;
     }
 }
