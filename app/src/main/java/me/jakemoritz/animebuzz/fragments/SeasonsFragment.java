@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
@@ -40,12 +42,20 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
             if (toolbarSpinner != null){
                 toolbarSpinner.setVisibility(View.VISIBLE);
 
-                String[] queryColumns = new String[]{"_id", "shit"};
-                String[] adapterColumns = new String[]{"shit"};
-
                 DatabaseHelper dbHelper = new DatabaseHelper(getContext());
-//                Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT _id, SEASON FROM ANIME");
-//                CursorAdapter adapter = new SimpleCursorAdapter(getContext(), android.R.layout.simple_spinner_dropdown_item, cursor, )
+                Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT DISTINCT season FROM ANIME", null);
+
+                ArrayList<String> seasons = new ArrayList<>();
+                cursor.moveToFirst();
+                for (int i = 0; i < cursor.getCount(); i++){
+                    seasons.add(cursor.getString(cursor.getColumnIndex("season")));
+                }
+
+                cursor.close();
+                dbHelper.close();
+
+                SeasonsSpinnerAdapter seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), seasons);
+                toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
             }
 
             parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
