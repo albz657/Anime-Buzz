@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -24,6 +25,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -85,9 +87,7 @@ public class MainActivity extends AppCompatActivity
     public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        String time = String.valueOf(series.getAirdate());
-        long numTime = Long.valueOf(time + "000");
-        Calendar cal = series.getCalAirdate();
+        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
         Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
@@ -100,7 +100,10 @@ public class MainActivity extends AppCompatActivity
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
         App.getInstance().addAlarm(series, alarmIntent);
 
-        Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + numTime);
+        // debug code
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        String formattedNext = format.format(nextEpisode.getTime());
+        Log.d(TAG, "alarm for '" + series.getTitle() + "' set for: " + formattedNext);
     }
 
     public void removeAlarm(Series series){

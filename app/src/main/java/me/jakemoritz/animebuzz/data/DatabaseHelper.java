@@ -31,8 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SIMULCAST_AIRDATE = "simulcastairdate";
     private static final String KEY_IS_IN_USER_LIST = "isinuserlist";
     private static final String KEY_SEASON = "season";
-
-
+    private static final String KEY_CURRENTLY_AIRING = "iscurrentlyairing";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -48,7 +47,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_IS_AIRED + " INTEGER," +
                 KEY_SIMULCAST_AIRDATE + " INTEGER," +
                 KEY_IS_IN_USER_LIST + " INTEGER," +
-                KEY_SEASON + " TEXT" +
+                KEY_SEASON + " TEXT," +
+                KEY_CURRENTLY_AIRING + " INTEGER" +
                 ")";
     }
 
@@ -75,6 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
+        contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
 
         db.insert(TABLE_NAME, null, contentValues);
         return true;
@@ -92,6 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
+        contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
 
         db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMal_id())});
         return true;
@@ -142,9 +144,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
             boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
             String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
+            boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_CURRENTLY_AIRING)) == 1);
 
-
-            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season, false, null, null);
+            Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season, isCurrentlyAiring);
             seriesList.add(series);
             res.moveToNext();
         }
