@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity
             int latestSeasonIndex = -1;
             int oneBeforeLatestIndex = -1;
             for (Season season : App.getInstance().getSeasonsList()){
-                if (season.getName().matches(latestSeason)){
+                if (season.getKey().matches(latestSeason)){
                     latestSeasonIndex = App.getInstance().getSeasonsList().indexOf(season);
                     oneBeforeLatestIndex = latestSeasonIndex - 1;
                 }

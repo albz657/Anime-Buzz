@@ -31,16 +31,20 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
             Log.d("s", "s");
             for (int i = 0; i < testResponse.length(); i++) {
                 JSONObject seriesAsJSON = testResponse.getJSONObject(i);
-                //Series series = gson.fromJson(parser.parse(seriesAsJSON.toString()), Series.class);
-                Series series = new Series(seriesAsJSON.getInt("airdate_u"),
-                        seriesAsJSON.getString("name"),
-                        seriesAsJSON.getInt("MALID"),
-                        seriesAsJSON.getInt("simulcast_airdate_u"),
-                        false,
-                        season,
-                        false);
+                try {
+                    int MALID = seriesAsJSON.getInt("MALID");
+                    Series series = new Series(seriesAsJSON.getInt("airdate_u"),
+                            seriesAsJSON.getString("name"),
+                            MALID,
+                            seriesAsJSON.getInt("simulcast_airdate_u"),
+                            false,
+                            season,
+                            false);
 
-                seriesFromServer.add(series);
+                    seriesFromServer.add(series);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
