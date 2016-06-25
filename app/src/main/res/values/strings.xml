@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Anime Buzz</string>
+    <string name="label_activity_setup">SetupActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -20,6 +21,7 @@
     <!--SharedPreferences-->
     <string name="shared_prefs_account">sharedprefsaccount</string>
     <string name="shared_prefs_logged_in">isuserloggedin</string>
+    <string name="shared_prefs_completed_setup">hasusercompletedsetup</string>
 
     <!--SharedPrefernce keys-->
     <string name="shared_prefs_latest_season">latestseason</string>

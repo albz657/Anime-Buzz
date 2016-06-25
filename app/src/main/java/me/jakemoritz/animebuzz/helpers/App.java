@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +19,7 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
@@ -28,11 +30,7 @@ public class App extends Application {
 
     private ArrayList<Series> userAnimeList;
     private ArrayList<Series> allAnimeList;
-
-    public ArrayList<Season> getSeasonsList() {
-        return seasonsList;
-    }
-
+    private ArrayList<Series> currentlyBrowsingSeason;
     private ArrayList<Season> seasonsList;
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
@@ -45,6 +43,7 @@ public class App extends Application {
 
         userAnimeList = new ArrayList<>();
         allAnimeList = new ArrayList<>();
+        currentlyBrowsingSeason = new ArrayList<>();
         seasonsList = new ArrayList<>();
         alarms = new HashMap<>();
 
@@ -87,6 +86,7 @@ public class App extends Application {
             ObjectInputStream ois = new ObjectInputStream(fis);
             ArrayList<Season> tempSeasonsList = (ArrayList<Season>) ois.readObject();
             if (tempSeasonsList != null) {
+                Collections.sort(tempSeasonsList, new SeasonComparator());
                 seasonsList = tempSeasonsList;
             }
         } catch (FileNotFoundException e) {
@@ -188,7 +188,13 @@ public class App extends Application {
     public ArrayList<Series> getAllAnimeList() {
         return allAnimeList;
     }
+    public ArrayList<Season> getSeasonsList() {
+        return seasonsList;
+    }
 
+    public ArrayList<Series> getCurrentlyBrowsingSeason() {
+        return currentlyBrowsingSeason;
+    }
     public ArrayList<Series> getUserAnimeList() {
         return userAnimeList;
     }

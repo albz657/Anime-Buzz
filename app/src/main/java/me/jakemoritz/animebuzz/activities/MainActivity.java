@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -26,17 +27,22 @@ import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse{
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     Intent alarmIntent;
+    boolean currentlyInitializing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Intent startupIntent = getIntent();
+        if (startupIntent != null){
+            initializeData();
+        }
 
         // Retrieve pending intent to perform broadcast
         alarmIntent = new Intent(this, AlarmReceiver.class);
@@ -60,12 +71,30 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.getMenu().getItem(1).setChecked(true);
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
-                .commit();
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.fragment_seasons);
+        if (!currentlyInitializing){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                    .commit();
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.fragment_seasons);
+            }
         }
+    }
+
+    private void initializeData(){
+        currentlyInitializing = true;
+        SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+        senpaiExportHelper.getSeasonList();
+
+
+
+/*
+        if (latestSeasonIndex != -1){
+            senpaiExportHelper.getSeasonData(null, App.getInstance().getSeasonsList().get(latestSeasonIndex));
+        }
+        if (oneBeforeLatestIndex != -1){
+            senpaiExportHelper.getSeasonData(null, App.getInstance().getSeasonsList().get(oneBeforeLatestIndex));
+        }*/
     }
 
     private void registerAlarms() {
@@ -170,5 +199,49 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void seasonDataRetrieved(ArrayList<Series> seriesList) {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+
+        if (!seriesList.isEmpty()){
+            if (seriesList.get(0).getSeason().matches(latestSeason)){
+                App.getInstance().getCurrentlyBrowsingSeason().clear();
+                App.getInstance().getCurrentlyBrowsingSeason().addAll(seriesList);
+
+                if (currentlyInitializing){
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                            .commit();
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.fragment_seasons);
+                    }
+                    currentlyInitializing = false;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void seasonListReceived(ArrayList<Season> seasonList) {
+        if (currentlyInitializing){
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+            String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+
+
+
+            int latestSeasonIndex = -1;
+            int oneBeforeLatestIndex = -1;
+            for (Season season : App.getInstance().getSeasonsList()){
+                if (season.getName().matches(latestSeason)){
+                    latestSeasonIndex = App.getInstance().getSeasonsList().indexOf(season);
+                    oneBeforeLatestIndex = latestSeasonIndex - 1;
+                }
+            }
+
+            SenpaiExportHelper.newInstance(this).getSeasonData(App.getInstance().getSeasonsList().get(latestSeasonIndex));
+        }
     }
 }

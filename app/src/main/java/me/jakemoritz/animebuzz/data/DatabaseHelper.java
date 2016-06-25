@@ -135,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res.moveToFirst();
         ArrayList<Series> seriesList = new ArrayList<>();
 
-        for (int i = res.getCount() - 1; i >= 0; i--) {
+        for (int i = 0; i < res.getCount(); i++) {
             int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
             String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
             int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));

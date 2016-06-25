@@ -8,22 +8,22 @@ import android.support.v7.app.AppCompatActivity;
 
 import me.jakemoritz.animebuzz.R;
 
-public class HelperActivity extends AppCompatActivity {
+public class SetupActivity extends AppCompatActivity {
+
+    private static final String TAG = SetupActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Check sign-in state
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
-        boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
+        editor.apply();
 
-        if (completedSetup){
-            startActivity(new Intent(this, MainActivity.class));
-            finish();
-        } else {
-            startActivity(new Intent(this, SetupActivity.class));
-            finish();
-        }
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("justCompletedSetup", true);
+        startActivity(intent);
+        finish();
     }
 }

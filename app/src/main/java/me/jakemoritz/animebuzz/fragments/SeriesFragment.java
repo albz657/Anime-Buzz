@@ -41,7 +41,7 @@ public class SeriesFragment extends Fragment{
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             if (this instanceof SeasonsFragment){
-                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getAllAnimeList(), this);
+                mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getCurrentlyBrowsingSeason(), this);
 
             } else if (this instanceof MyShowsFragment){
                 mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
