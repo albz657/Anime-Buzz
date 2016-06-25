@@ -18,11 +18,11 @@ import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.mal_api.MalApiClient;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends SeriesFragment implements ReadDataResponse {
+public class SeasonsFragment extends SeriesFragment implements ReadSeasonDataResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -63,7 +63,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
     }
 
     @Override
-    public void dataRetrieved(ArrayList<Series> seriesList) {
+    public void seasonDataRetrieved(ArrayList<Series> seriesList) {
         App.getInstance().getAllAnimeList().clear();
         App.getInstance().getAllAnimeList().addAll(seriesList);
         App.getInstance().saveAnimeListToDB();
@@ -79,7 +79,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadDataResponse 
 
         if (id == R.id.action_settings) {
             SenpaiExportHelper helper = SenpaiExportHelper.newInstance(this);
-            helper.getData();
+            helper.getSeasonList();
+//            helper.getData();
         } else if (id == R.id.action_notify) {
             MainActivity activity = (MainActivity) getActivity();
             //activity.makeAlarm();

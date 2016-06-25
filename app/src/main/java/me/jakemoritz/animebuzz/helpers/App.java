@@ -17,6 +17,7 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
@@ -27,6 +28,12 @@ public class App extends Application {
 
     private ArrayList<Series> userAnimeList;
     private ArrayList<Series> allAnimeList;
+
+    public ArrayList<Season> getSeasonsList() {
+        return seasonsList;
+    }
+
+    private ArrayList<Season> seasonsList;
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
 
@@ -38,10 +45,12 @@ public class App extends Application {
 
         userAnimeList = new ArrayList<>();
         allAnimeList = new ArrayList<>();
+        seasonsList = new ArrayList<>();
         alarms = new HashMap<>();
 
         loadAnimeListFromDB();
         loadAlarms();
+        loadSeasonsList();
     }
 
     public void saveAnimeListToDB(){
@@ -55,6 +64,38 @@ public class App extends Application {
         dbHelper.onCreate(dbHelper.getWritableDatabase());
         allAnimeList = dbHelper.getSeriesFromDb(getString(R.string.table_anime));
         userAnimeList = filterUserList(allAnimeList);
+    }
+
+    public void saveSeasonsList(){
+        try {
+            FileOutputStream fos = openFileOutput(getString(R.string.season_list_file), Context.MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(seasonsList);
+            oos.close();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadSeasonsList(){
+        try {
+            FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<Season> tempSeasonsList = (ArrayList<Season>) ois.readObject();
+            if (tempSeasonsList != null) {
+                seasonsList = tempSeasonsList;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // user has no alarms
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList){

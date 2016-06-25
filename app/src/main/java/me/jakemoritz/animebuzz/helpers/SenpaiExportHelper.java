@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.helpers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.Request;
@@ -10,6 +11,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -17,9 +19,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
-import me.jakemoritz.animebuzz.interfaces.ReadDataResponse;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SenpaiExportHelper {
@@ -32,17 +38,37 @@ public class SenpaiExportHelper {
 
     Context mContext;
 
-    public void setDelegate(ReadDataResponse delegate) {
+    public void setDelegate(ReadSeasonDataResponse delegate) {
         this.delegate = delegate;
     }
 
-    ReadDataResponse delegate;
+    ReadSeasonDataResponse delegate;
 
     public static SenpaiExportHelper newInstance(SeasonsFragment fragment) {
         SenpaiExportHelper helper = new SenpaiExportHelper();
         helper.setDelegate(fragment);
         helper.setmContext(fragment.getContext());
         return helper;
+    }
+
+    public void getSeasonList() {
+        RequestQueue queue = Volley.newRequestQueue(mContext);
+        String url = "http://www.senpai.moe/export.php?type=json&src=seasonlist";
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                parseSeasonList(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d(TAG, error.getMessage());
+            }
+        });
+
+        queue.add(jsonObjectRequest);
     }
 
     public void getData() {
@@ -56,7 +82,8 @@ public class SenpaiExportHelper {
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                handleResponse(response);
+                ArrayList<Series> seriesFromServer = parseSeasonData(response);
+                delegate.seasonDataRetrieved(seriesFromServer);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -68,20 +95,57 @@ public class SenpaiExportHelper {
         queue.add(jsonObjectRequest);
     }
 
-    void handleResponse(JSONObject response) {
-        ArrayList<Series> seriesFromServer = parseJSON(response);
-        delegate.dataRetrieved(seriesFromServer);
+    private void parseSeasonList(JSONObject response){
+        JsonParser parser = new JsonParser();
+        JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
+
+        String latestSeasonTag = gsonObject.get("latest").getAsString();
+        String latestSeason;
+        JsonObject seasonsAsJSON = gsonObject.getAsJsonObject("seasons");
+
+        Set<Map.Entry<String, JsonElement>> seasonsAsSet = seasonsAsJSON.entrySet();
+        ArrayList<Map.Entry<String, JsonElement>> seasonsAsAL = new ArrayList<>(seasonsAsSet);
+
+        ArrayList<Season> seasonsList = new ArrayList<>();
+
+        for (Map.Entry<String, JsonElement> seasonAsElement : seasonsAsAL){
+
+            JsonObject seasonData = (JsonObject) seasonAsElement.getValue();
+            String seasonName = seasonData.get("name").getAsString();
+
+            if (!seasonAsElement.getKey().matches("nodate")){
+                if (seasonAsElement.getKey().matches(latestSeasonTag)){
+                    latestSeason = seasonName;
+
+                    SharedPreferences settings = mContext.getSharedPreferences(mContext.getString(R.string.shared_prefs_account), 0);
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(mContext.getString(R.string.shared_prefs_latest_season), latestSeason);
+
+                    editor.apply();
+                }
+
+                String startTimestamp = seasonData.get("start_timestamp").getAsString();
+
+                Season tempSeason = new Season(seasonName, startTimestamp);
+                seasonsList.add(tempSeason);
+            }
+
+        }
+        Log.d(TAG, "s");
+
+        App.getInstance().getSeasonsList().clear();
+        App.getInstance().getSeasonsList().addAll(seasonsList);
+        App.getInstance().saveSeasonsList();
     }
 
-    ArrayList<Series> parseJSON(JSONObject response) {
+    private ArrayList<Series> parseSeasonData(JSONObject response) {
         JsonParser parser = new JsonParser();
         JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
 
         JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
 
-        String season = "";
         JsonObject metadata = gsonObject.getAsJsonObject("meta");
-        season = metadata.get("season").getAsString();
+        String season = metadata.get("season").getAsString();
 
         ArrayList<Series> seriesFromServer = new ArrayList<>();
         Iterator iterator = responseSeriesList.iterator();

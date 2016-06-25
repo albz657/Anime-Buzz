@@ -4,6 +4,6 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.models.Series;
 
-public interface ReadDataResponse {
-    void dataRetrieved(ArrayList<Series> seriesList);
+public interface ReadSeasonDataResponse {
+    void seasonDataRetrieved(ArrayList<Series> seriesList);
 }

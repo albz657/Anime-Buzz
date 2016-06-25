@@ -15,10 +15,14 @@
 
     <!--File names-->
     <string name="file_alarms">alarms</string>
+    <string name="season_list_file">seasonslist</string>
 
     <!--SharedPreferences-->
     <string name="shared_prefs_account">sharedprefsaccount</string>
     <string name="shared_prefs_logged_in">isuserloggedin</string>
+
+    <!--SharedPrefernce keys-->
+    <string name="shared_prefs_latest_season">latestseason</string>
 
     <!--MAL API-->
     <string name="mal_api_verify_credentials">http://myanimelist.net/api/account/verify_credentials.xml</string>

@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
         App.getInstance().saveAlarms();
         App.getInstance().saveAnimeListToDB();
+        App.getInstance().saveSeasonsList();
     }
 
     @Override
