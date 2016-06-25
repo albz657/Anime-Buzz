@@ -1,0 +1,10 @@
+package me.jakemoritz.animebuzz.models;
+
+import java.util.List;
+
+public class SeriesTest {
+
+    private List<Series> items;
+
+
+}

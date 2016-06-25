@@ -11,8 +11,8 @@ public class SeasonComparator implements Comparator<Season> {
     public int compare(Season lhs, Season rhs) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
         try {
-            Date leftAsDate = dateFormat.parse(lhs.getStartTimestamp());
-            Date rightAsDate = dateFormat.parse(rhs.getStartTimestamp());
+            Date leftAsDate = dateFormat.parse(lhs.getStart_timestamp());
+            Date rightAsDate = dateFormat.parse(rhs.getStart_timestamp());
 
             return leftAsDate.compareTo(rightAsDate);
         } catch (ParseException e){

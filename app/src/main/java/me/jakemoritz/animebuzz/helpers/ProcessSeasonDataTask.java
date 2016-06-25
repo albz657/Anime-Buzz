@@ -1,16 +1,13 @@
 package me.jakemoritz.animebuzz.helpers;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.models.Series;
@@ -25,25 +22,28 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
     }
 
     private ArrayList<Series> parseSeasonData(JSONObject response) {
-        JsonParser parser = new JsonParser();
-        JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
-
-        JsonArray responseSeriesList = gsonObject.getAsJsonArray("items");
-
-        JsonObject metadata = gsonObject.getAsJsonObject("meta");
-        String season = metadata.get("season").getAsString();
-
         ArrayList<Series> seriesFromServer = new ArrayList<>();
-        Iterator iterator = responseSeriesList.iterator();
-        JsonObject seriesAsJSON;
 
-        while (iterator.hasNext()) {
-            seriesAsJSON = (JsonObject) iterator.next();
+        try {
+            JSONArray testResponse = response.getJSONArray("items");
+            JSONObject meta = response.getJSONObject("meta");
+            String season = meta.getString("season");
+            Log.d("s", "s");
+            for (int i = 0; i < testResponse.length(); i++) {
+                JSONObject seriesAsJSON = testResponse.getJSONObject(i);
+                //Series series = gson.fromJson(parser.parse(seriesAsJSON.toString()), Series.class);
+                Series series = new Series(seriesAsJSON.getInt("airdate_u"),
+                        seriesAsJSON.getString("name"),
+                        seriesAsJSON.getInt("MALID"),
+                        seriesAsJSON.getInt("simulcast_airdate_u"),
+                        false,
+                        season,
+                        false);
 
-            Series series = new Gson().fromJson(seriesAsJSON, Series.class);
-            series.setSeason(season);
-
-            seriesFromServer.add(series);
+                seriesFromServer.add(series);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
         return seriesFromServer;

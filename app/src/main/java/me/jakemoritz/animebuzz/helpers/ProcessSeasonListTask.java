@@ -4,16 +4,12 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.Iterator;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
@@ -42,50 +38,44 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
         return parseSeasonList(params[0]);
     }
 
-    private ArrayList<Season> parseSeasonList(JSONObject response){
-        JsonParser parser = new JsonParser();
-        JsonObject gsonObject = (JsonObject) parser.parse(response.toString());
+    private ArrayList<Season> parseSeasonList(JSONObject response) {
+        try {
+            String latestSeasonKey = response.getString("latest");
+            String latestSeason;
+            JSONObject seasonsAsJSON = response.getJSONObject("seasons");
 
-        String latestSeasonTag = gsonObject.get("latest").getAsString();
-        String latestSeason;
-        JsonObject seasonsAsJSON = gsonObject.getAsJsonObject("seasons");
+            ArrayList<Season> seasonsList = new ArrayList<>();
 
-        Set<Map.Entry<String, JsonElement>> seasonsAsSet = seasonsAsJSON.entrySet();
-        ArrayList<Map.Entry<String, JsonElement>> seasonsAsAL = new ArrayList<>(seasonsAsSet);
+            Iterator<String> it = seasonsAsJSON.keys();
+            while (it.hasNext()) {
+                String key = it.next();
+                if (!key.matches("nodate")) {
+                    JSONObject seasonAsJSON = seasonsAsJSON.getJSONObject(key);
+                    Season tempSeason = new Season(new DateFormatHelper().getLocalFormattedDateFromStringDate(seasonAsJSON.getString("start_timestamp")),
+                            seasonAsJSON.getString("name"),
+                            key);
 
-        ArrayList<Season> seasonsList = new ArrayList<>();
+                    seasonsList.add(tempSeason);
 
-        for (Map.Entry<String, JsonElement> seasonAsElement : seasonsAsAL){
+                    if (key.matches(latestSeasonKey)) {
+                        latestSeason = key;
 
-            JsonObject seasonData = (JsonObject) seasonAsElement.getValue();
-            String seasonName = seasonData.get("name").getAsString();
-
-            String seasonKey = seasonAsElement.getKey();
-            if (!seasonKey.matches("nodate")){
-                if (seasonAsElement.getKey().matches(latestSeasonTag)){
-                    latestSeason = seasonName;
-
-                    SharedPreferences settings = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(activity.getString(R.string.shared_prefs_latest_season), latestSeason);
-                    editor.apply();
+                        SharedPreferences settings = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(activity.getString(R.string.shared_prefs_latest_season), latestSeason);
+                        editor.apply();
+                    }
                 }
-
-                String timestampAsDate = seasonData.get("start_timestamp").getAsString();
-
-                String formattedDate = new DateFormatHelper().getLocalFormattedDateFromStringDate(timestampAsDate);
-
-                Season tempSeason = new Season(formattedDate, seasonName, seasonKey);
-                seasonsList.add(tempSeason);
             }
 
+            Collections.sort(seasonsList, new SeasonComparator());
+            App.getInstance().getSeasonsList().clear();
+            App.getInstance().getSeasonsList().addAll(seasonsList);
+            App.getInstance().saveSeasonsList();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        Collections.sort(seasonsList, new SeasonComparator());
-        App.getInstance().getSeasonsList().clear();
-        App.getInstance().getSeasonsList().addAll(seasonsList);
-        App.getInstance().saveSeasonsList();
-
-        return seasonsList;
+        return null;
     }
 
 }

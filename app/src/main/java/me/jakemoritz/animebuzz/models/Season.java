@@ -5,11 +5,11 @@ import java.io.Serializable;
 public class Season implements Serializable{
 
     private String name;
-    private String startTimestamp;
+    private String start_timestamp;
     private String key;
 
-    public Season(String startTimestamp, String name, String key) {
-        this.startTimestamp = startTimestamp;
+    public Season(String start_timestamp, String name, String key) {
+        this.start_timestamp = start_timestamp;
         this.name = name;
         this.key = key;
     }
@@ -22,7 +22,7 @@ public class Season implements Serializable{
         return key;
     }
 
-    public String getStartTimestamp() {
-        return startTimestamp;
+    public String getStart_timestamp() {
+        return start_timestamp;
     }
 }
