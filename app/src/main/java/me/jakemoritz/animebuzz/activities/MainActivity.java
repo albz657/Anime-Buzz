@@ -147,9 +147,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        App.getInstance().saveAlarms();
-        App.getInstance().saveAnimeListToDB();
-        App.getInstance().saveSeasonsList();
+        App.getInstance().saveData();
+
     }
 
     @Override
@@ -203,6 +202,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void seasonDataRetrieved(ArrayList<Series> seriesList) {
+        App.getInstance().saveNewSeasonData(seriesList);
+        App.getInstance().getAllAnimeList().clear();
+        App.getInstance().loadAnimeListFromDB();
+
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
         String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 

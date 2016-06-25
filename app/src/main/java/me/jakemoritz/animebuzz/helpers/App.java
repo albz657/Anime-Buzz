@@ -52,14 +52,29 @@ public class App extends Application {
         loadSeasonsList();
     }
 
+    public void saveData(){
+        App.getInstance().saveAlarms();
+        App.getInstance().saveAnimeListToDB();
+        App.getInstance().saveUserAnimeList(userAnimeList);
+        App.getInstance().saveSeasonsList();
+    }
+
     public void saveAnimeListToDB(){
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
+    }
+
+    public void saveUserAnimeList(ArrayList<Series> userAnimeList){
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
+    public void saveNewSeasonData(ArrayList<Series> newSeason){
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveSeriesToDb(newSeason, getString(R.string.table_anime));
+    }
 
-    private void loadAnimeListFromDB() {
+    public void loadAnimeListFromDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());
         allAnimeList = dbHelper.getSeriesFromDb(getString(R.string.table_anime));
