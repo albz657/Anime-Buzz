@@ -41,7 +41,7 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
     private ArrayList<Season> parseSeasonList(JSONObject response) {
         try {
             String latestSeasonKey = response.getString("latest");
-            String latestSeason;
+            String latestSeasonName;
             JSONObject seasonsAsJSON = response.getJSONObject("seasons");
 
             ArrayList<Season> seasonsList = new ArrayList<>();
@@ -51,20 +51,21 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
                 String key = it.next();
                 if (!key.matches("nodate")) {
                     JSONObject seasonAsJSON = seasonsAsJSON.getJSONObject(key);
+
+                    if (key.matches(latestSeasonKey)) {
+                        latestSeasonName = seasonAsJSON.getString("name");
+
+                        SharedPreferences settings = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
+                        SharedPreferences.Editor editor = settings.edit();
+                        editor.putString(activity.getString(R.string.shared_prefs_latest_season), latestSeasonName);
+                        editor.apply();
+                    }
+
                     Season tempSeason = new Season(new DateFormatHelper().getLocalFormattedDateFromStringDate(seasonAsJSON.getString("start_timestamp")),
                             seasonAsJSON.getString("name"),
                             key);
 
                     seasonsList.add(tempSeason);
-
-                    if (key.matches(latestSeasonKey)) {
-                        latestSeason = key;
-
-                        SharedPreferences settings = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
-                        SharedPreferences.Editor editor = settings.edit();
-                        editor.putString(activity.getString(R.string.shared_prefs_latest_season), latestSeason);
-                        editor.apply();
-                    }
                 }
             }
 
