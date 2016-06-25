@@ -3,6 +3,8 @@ package me.jakemoritz.animebuzz.helpers;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,13 +45,33 @@ public class App extends Application {
 
         userAnimeList = new ArrayList<>();
         allAnimeList = new ArrayList<>();
-        currentlyBrowsingSeason = new ArrayList<>();
         seasonsList = new ArrayList<>();
         alarms = new HashMap<>();
 
         loadAnimeListFromDB();
         loadAlarms();
         loadSeasonsList();
+        loadBrowsingSeason();
+    }
+
+    private void loadBrowsingSeason(){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season = '" + latestSeason + "'", null);
+
+        ArrayList<Series> tempSeries = new ArrayList<>();
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            tempSeries.add(dbHelper.getSeriesWithCursor(cursor));
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        dbHelper.close();
+
+        currentlyBrowsingSeason = tempSeries;
     }
 
     public void saveData(){

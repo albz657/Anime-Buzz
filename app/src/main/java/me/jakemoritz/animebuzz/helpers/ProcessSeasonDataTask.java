@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.helpers;
 
 import android.os.AsyncTask;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -38,6 +39,8 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
 
         while (iterator.hasNext()) {
             seriesAsJSON = (JsonObject) iterator.next();
+
+            Series test = new Gson().fromJson(seriesAsJSON, Series.class);
 
             String title = "";
             int mal_id = -1;

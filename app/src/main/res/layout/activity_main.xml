@@ -25,7 +25,8 @@
     <RelativeLayout
         android:id="@+id/progress_view_holder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone">
 
         <com.github.rahatarmanahmed.cpv.CircularProgressView
             android:id="@+id/progress_view"
@@ -34,7 +35,7 @@
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             app:cpv_animAutostart="false"
-            app:cpv_indeterminate="true" />
+            app:cpv_indeterminate="true"/>
 
         <TextView
             android:id="@+id/loading_text"
@@ -42,13 +43,13 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/progress_view"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="18dp"
             android:maxWidth="240dp"
             android:singleLine="false"
             android:text="@string/initial_loading"
             android:textColor="#D9000000"
             android:textAlignment="center"
-            android:textSize="16dp" />
+            android:textSize="16dp"/>
 
     </RelativeLayout>
 

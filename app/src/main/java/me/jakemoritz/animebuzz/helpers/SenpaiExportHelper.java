@@ -28,6 +28,12 @@ public class SenpaiExportHelper {
     MainActivity activity;
     ReadSeasonDataResponse seasonDataDelegate;
 
+    public void setQueue(RequestQueue queue) {
+        this.queue = queue;
+    }
+
+    RequestQueue queue;
+
     public void setSeasonListDelegate(ReadSeasonListResponse seasonListDelegate) {
         this.seasonListDelegate = seasonListDelegate;
     }
@@ -39,6 +45,7 @@ public class SenpaiExportHelper {
         helper.setActivity(activity);
         helper.setSeasonDataDelegate(activity);
         helper.setSeasonListDelegate(activity);
+        helper.setQueue(Volley.newRequestQueue(activity));
         return helper;
     }
 
@@ -47,7 +54,6 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonList() {
-        RequestQueue queue = Volley.newRequestQueue(activity);
         String url = "http://www.senpai.moe/export.php?type=json&src=seasonlist";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -68,8 +74,6 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonData(Season season) {
-        RequestQueue queue = Volley.newRequestQueue(activity);
-
         String base = "http://www.senpai.moe/export.php?type=json";
         Uri uri = Uri.parse(base);
         Uri.Builder builder = uri.buildUpon()

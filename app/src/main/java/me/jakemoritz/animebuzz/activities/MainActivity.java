@@ -23,8 +23,6 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
@@ -43,6 +41,7 @@ public class MainActivity extends AppCompatActivity
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
+    private DrawerLayout drawer;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     Intent alarmIntent;
@@ -63,19 +62,25 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         // Retrieve pending intent to perform broadcast
         alarmIntent = new Intent(this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                navigationView.bringToFront();
+                drawer.requestLayout();
+            }
+        };
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.getMenu().getItem(1).setChecked(true);
@@ -93,13 +98,6 @@ public class MainActivity extends AppCompatActivity
     private void initializeData(){
         currentlyInitializing = true;
 
-      /*  loadingDialog = new ProgressDialog(this);
-        loadingDialog.setTitle("title");
-        loadingDialog.setIndeterminate(true);
-        loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        loadingDialog.setMessage("message");
-        loadingDialog.show();*/
-
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
         if (progressView != null && progressViewHolder != null) {
@@ -109,32 +107,6 @@ public class MainActivity extends AppCompatActivity
 
         SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
         senpaiExportHelper.getSeasonList();
-
-
-
-/*
-        if (latestSeasonIndex != -1){
-            senpaiExportHelper.getSeasonData(null, App.getInstance().getSeasonsList().get(latestSeasonIndex));
-        }
-        if (oneBeforeLatestIndex != -1){
-            senpaiExportHelper.getSeasonData(null, App.getInstance().getSeasonsList().get(oneBeforeLatestIndex));
-        }*/
-    }
-
-    private void registerAlarms() {
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        Set<Series> set = App.getInstance().getAlarms().keySet();
-        List<Series> list = new ArrayList<>();
-        list.addAll(set);
-        for (Series series : list) {
-            Intent tempIntent = App.getInstance().getAlarms().get(series);
-            PendingIntent tempPendingIntent = PendingIntent.getBroadcast(this, 0, tempIntent, 0);
-            String time = String.valueOf(series.getAirdate());
-            long numTime = Long.valueOf(time + "000");
-
-            alarmManager.set(AlarmManager.RTC, numTime, pendingIntent);
-        }
     }
 
     public void makeAlarm(Series series) {
@@ -219,7 +191,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -263,8 +235,6 @@ public class MainActivity extends AppCompatActivity
         if (currentlyInitializing){
             SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
             String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-
-
 
             int latestSeasonIndex = -1;
             int oneBeforeLatestIndex = -1;

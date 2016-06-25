@@ -129,6 +129,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         close();
     }
 
+    public Series getSeriesWithCursor(Cursor res){
+        int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
+        String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
+        int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
+        boolean isSimulcastAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_SIMULCAST_AIRED)) == 1);
+        boolean isAired = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_AIRED)) == 1);
+        int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
+        boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
+        String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
+        boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_CURRENTLY_AIRING)) == 1);
+
+        Series series = new Series(airdate, seriesTitle, MAL_ID, isSimulcastAired, isAired, simulcastAirdate, isInUserList, season, isCurrentlyAiring);
+        return series;
+    }
+
     public ArrayList<Series> getSeriesFromDb(String TABLE_NAME) {
         Cursor res = getAllSeries(TABLE_NAME);
 
