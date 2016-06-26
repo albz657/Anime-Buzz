@@ -56,7 +56,9 @@ public class MainActivity extends AppCompatActivity
 
         Intent startupIntent = getIntent();
         if (startupIntent != null){
-            initializeData();
+            if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)){
+                initializeData();
+            }
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

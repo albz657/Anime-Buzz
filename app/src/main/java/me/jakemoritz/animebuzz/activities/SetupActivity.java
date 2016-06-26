@@ -22,7 +22,7 @@ public class SetupActivity extends AppCompatActivity {
         editor.apply();
 
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("justCompletedSetup", true);
+        intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
         startActivity(intent);
         finish();
     }
