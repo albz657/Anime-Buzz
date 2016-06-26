@@ -48,7 +48,7 @@ public class MyShowsFragment extends SeriesFragment {
         int id = item.getItemId();
 
         if (id == R.id.action_clear_list) {
-            mAdapter.getSeriesList().clear();
+            mAdapter.getVisibleSeries().clear();
             mAdapter.notifyDataSetChanged();
         }
         return super.onOptionsItemSelected(item);

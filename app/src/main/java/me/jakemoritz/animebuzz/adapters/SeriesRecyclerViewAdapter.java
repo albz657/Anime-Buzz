@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -17,19 +19,22 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable{
 
-    public ArrayList<Series> getSeriesList() {
-        return seriesList;
+    public ArrayList<Series> getVisibleSeries() {
+        return visibleSeries;
     }
 
-    public ArrayList<Series> seriesList = null;
+    public ArrayList<Series> visibleSeries = null;
+    public ArrayList<Series> allSeries = null;
     public SeriesFragment mListener = null;
     public ViewGroup parent;
+    private SeriesFilter seriesFilter;
 
     public SeriesRecyclerViewAdapter(ArrayList<Series> items, SeriesFragment listener) {
-        seriesList = items;
+        allSeries = items;
         mListener = listener;
+        visibleSeries = new ArrayList<>(items);
     }
 
     @Override
@@ -42,9 +47,9 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.series = seriesList.get(position);
-        holder.mTitle.setText(seriesList.get(position).getName());
-        holder.mDate.setText(String.valueOf(seriesList.get(position).getAirdate_u()));
+        holder.series = visibleSeries.get(position);
+        holder.mTitle.setText(visibleSeries.get(position).getName());
+        holder.mDate.setText(String.valueOf(visibleSeries.get(position).getAirdate_u()));
 
         if (holder.series.isInUserList()){
             holder.mAddButton.setVisibility(View.GONE);
@@ -76,7 +81,15 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public int getItemCount() {
-        return seriesList.size();
+        return visibleSeries.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (seriesFilter == null){
+            seriesFilter = new SeriesFilter(this, allSeries);
+        }
+        return seriesFilter;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

@@ -3,6 +3,8 @@ package me.jakemoritz.animebuzz.fragments;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -80,7 +82,7 @@ public class SeasonsFragment extends SeriesFragment {
             MainActivity activity = (MainActivity) getActivity();
             //activity.makeAlarm();
         } else if (id == R.id.action_clear_list) {
-            mAdapter.getSeriesList().clear();
+            mAdapter.getVisibleSeries().clear();
             mAdapter.notifyDataSetChanged();
         } else if (id == R.id.action_verify) {
             MalApiClient malApiClient = new MalApiClient(getActivity());
@@ -95,5 +97,21 @@ public class SeasonsFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
     }
 }
