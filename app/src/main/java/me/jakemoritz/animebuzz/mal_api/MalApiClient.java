@@ -22,6 +22,8 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,6 +40,7 @@ public class MalApiClient {
 
     private static final String VERIFY_CREDENTIALS = "http://myanimelist.net/api/account/verify_credentials.xml";
     private static final String USER_LIST_BASE = "http://myanimelist.net/malappinfo.php";
+    private static final String ANIME_SEARCH_BASE = "http://myanimelist.net/api/anime/search.xml";
 
     private Activity activity;
 
@@ -70,7 +73,43 @@ public class MalApiClient {
             }
         });
         queue.add(stringRequest);
+    }
 
+    public void getPictureUrl(final String username, final String password, String seriesName) {
+        String encodedSeriesName;
+        try {
+            encodedSeriesName = URLEncoder.encode(seriesName, "UTF-8");
+
+            Uri uri = Uri.parse(ANIME_SEARCH_BASE);
+            Uri.Builder builder = uri.buildUpon()
+                    .appendQueryParameter("q", encodedSeriesName);
+            String url = builder.build().toString();
+
+            RequestQueue queue = Volley.newRequestQueue(activity);
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+
+                @Override
+                public void onResponse(String response) {
+                    processAnimePictureURLResponse(response);
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // handle error
+                    Log.d(TAG, "error: " + error.getMessage());
+                }
+            }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    return getBasicHTTPAuthParams(username, password);
+                }
+            };
+
+            queue.add(stringRequest);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     public void verifyCredentials(final String username, final String password) {
@@ -91,15 +130,18 @@ public class MalApiClient {
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                String creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", username, password).getBytes(), Base64.DEFAULT));
-                params.put("Authorization", creds);
-
-                return params;
+                return getBasicHTTPAuthParams(username, password);
             }
         };
 
         queue.add(stringRequest);
+    }
+
+    private Map<String, String> getBasicHTTPAuthParams(String username, String password) {
+        Map<String, String> params = new HashMap<String, String>();
+        String creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", username, password).getBytes(), Base64.DEFAULT));
+        params.put("Authorization", creds);
+        return params;
     }
 
     private void processVerificationResponse(String response) {
@@ -121,10 +163,63 @@ public class MalApiClient {
         }
     }
 
+    private void processAnimePictureURLResponse(String response) {
+        try {
+            InputSource inputSource = new InputSource();
+            inputSource.setCharacterStream(new StringReader(response));
+
+            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
+
+            NodeList animeNodeList = doc.getElementsByTagName("anime");
+            NodeList animeNode;
+            Element animeStatus;
+
+            List<Integer> currentlyWatchingSeriesIds = new ArrayList<>();
+            // iterating through each anime entry
+            for (int i = 0; i < animeNodeList.getLength(); i++) {
+                animeNode = animeNodeList.item(i).getChildNodes();
+
+                boolean currentlyWatching = false;
+
+                // iterating through every anime node
+                for (int j = 0; j < animeNode.getLength(); j++) {
+                    animeStatus = (Element) animeNode.item(j);
+
+                    if (animeStatus.getNodeName().matches("my_status")) {
+                        if (animeStatus.getFirstChild().getNodeValue().matches("1")) {
+                            // user currently watching show
+                            currentlyWatching = true;
+                        }
+                    }
+                }
+
+                if (currentlyWatching) {
+                    for (int j = 0; j < animeNode.getLength(); j++) {
+                        int mal_id;
+
+                        if (animeNode.item(j).getNodeName().matches("series_animedb_id")) {
+                            try {
+                                mal_id = Integer.valueOf(animeNode.item(j).getFirstChild().getNodeValue());
+                                currentlyWatchingSeriesIds.add(mal_id);
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+            MalImportHelper helper = new MalImportHelper(currentlyWatchingSeriesIds, activity);
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void processAnimeListResponse(String response) {
         try {
-            XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-
             InputSource inputSource = new InputSource();
             inputSource.setCharacterStream(new StringReader(response));
 
