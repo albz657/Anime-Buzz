@@ -26,6 +26,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     public ArrayList<Series> visibleSeries = null;
+
+    public ArrayList<Series> getAllSeries() {
+        return allSeries;
+    }
+
     public ArrayList<Series> allSeries = null;
     public SeriesFragment mListener = null;
     public ViewGroup parent;

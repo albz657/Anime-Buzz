@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -17,11 +18,17 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.mal_api.MalApiClient;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
+    Spinner toolbarSpinner;
+    SeasonsSpinnerAdapter seasonsSpinnerAdapter;
+    MainActivity parentActivity;
+    int previousSpinnerIndex = 0;
 
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
@@ -32,10 +39,65 @@ public class SeasonsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        initializeToolbar();
+        parentActivity = (MainActivity) getActivity();
+        toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+        seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), getSpinnerItems());
+        toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
+        toolbarSpinner.setSelection(getIndexOfCurrentlyBrowsingSeason());
+        toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position != previousSpinnerIndex){
+                    loadSeason(seasonsSpinnerAdapter.getSeasons().get(position));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+        refreshToolbar();
     }
 
-    private void initializeToolbar() {
+    private void loadSeason(String seasonName){
+        DatabaseHelper dbHelper = new DatabaseHelper(getContext());
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season ='" + seasonName + "'", null);
+
+        ArrayList<Series> newBrowsingSeason = new ArrayList<>();
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            Series series = dbHelper.getSeriesWithCursor(cursor);
+            newBrowsingSeason.add(series);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        dbHelper.close();
+
+        App.getInstance().getCurrentlyBrowsingSeason().clear();
+        App.getInstance().getCurrentlyBrowsingSeason().addAll(newBrowsingSeason);
+
+        mAdapter.getAllSeries().clear();
+        mAdapter.getAllSeries().addAll(newBrowsingSeason);
+        mAdapter.getVisibleSeries().clear();
+        mAdapter.getVisibleSeries().addAll(newBrowsingSeason);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private int getIndexOfCurrentlyBrowsingSeason(){
+        if (!App.getInstance().getCurrentlyBrowsingSeason().isEmpty()){
+            String currentSeason =  App.getInstance().getCurrentlyBrowsingSeason().get(0).getSeason();
+            for (String seasonName : seasonsSpinnerAdapter.getSeasons()){
+                if (seasonName.matches(currentSeason)){
+                    return previousSpinnerIndex = seasonsSpinnerAdapter.getSeasons().indexOf(seasonName);
+                }
+            }
+        }
+        return previousSpinnerIndex = 0;
+    }
+
+    private ArrayList<String> getSpinnerItems() {
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT DISTINCT season FROM ANIME", null);
 
@@ -43,30 +105,28 @@ public class SeasonsFragment extends SeriesFragment {
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             seasons.add(cursor.getString(cursor.getColumnIndex("season")));
+            cursor.moveToNext();
         }
 
         cursor.close();
         dbHelper.close();
 
-        MainActivity parentActivity = (MainActivity) getActivity();
-        Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+        return seasons;
+    }
 
-        if (parentActivity.getSupportActionBar() != null) {
+    private void refreshToolbar() {
+        if (parentActivity.getSupportActionBar() != null && toolbarSpinner != null) {
+            ArrayList<String> seasons = getSpinnerItems();
             if (seasons.isEmpty()) {
-                if (toolbarSpinner != null) {
-                    toolbarSpinner.setVisibility(View.GONE);
-                }
-
+                toolbarSpinner.setVisibility(View.GONE);
                 parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
             } else {
-                if (toolbarSpinner != null) {
-                    toolbarSpinner.setVisibility(View.VISIBLE);
-
-                    SeasonsSpinnerAdapter seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), seasons);
-                    toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
-                }
-
+                toolbarSpinner.setVisibility(View.VISIBLE);
                 parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+
+                seasonsSpinnerAdapter.getSeasons().clear();
+                seasonsSpinnerAdapter.getSeasons().addAll(seasons);
+                seasonsSpinnerAdapter.notifyDataSetChanged();
             }
         }
     }

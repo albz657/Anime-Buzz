@@ -14,6 +14,10 @@ import me.jakemoritz.animebuzz.R;
 
 public class SeasonsSpinnerAdapter extends BaseAdapter {
 
+    public List<String> getSeasons() {
+        return seasons;
+    }
+
     private List<String> seasons = new ArrayList<>();
     private Context context;
 

@@ -114,18 +114,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void postInitializeData() {
-        SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+        if (currentInitializingIndex > 0){
+            if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+                String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
-        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-
-        if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
-            if (App.getInstance().getSeasonsList().get(currentInitializingIndex).getName().matches(latestSeason)) {
-                currentInitializingIndex--;
-                postInitializeData();
-            } else {
-                senpaiExportHelper.getSeasonData(App.getInstance().getSeasonsList().get(currentInitializingIndex));
+                if (App.getInstance().getSeasonsList().get(currentInitializingIndex).getName().matches(latestSeason)) {
+                    currentInitializingIndex--;
+                    postInitializeData();
+                } else {
+                    SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+                    senpaiExportHelper.getSeasonData(App.getInstance().getSeasonsList().get(currentInitializingIndex));
+                }
             }
+        } else {
+            postInitializing = false;
         }
     }
 
@@ -247,9 +250,6 @@ public class MainActivity extends AppCompatActivity
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                             .commit();
-                    if (getSupportActionBar() != null) {
-                        getSupportActionBar().setTitle(R.string.fragment_seasons);
-                    }
                 }
             } else if (postInitializing){
                 currentInitializingIndex--;
