@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -20,11 +21,14 @@ import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.mal_api.MalApiClient;
+import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
+
     Spinner toolbarSpinner;
     SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     MainActivity parentActivity;
@@ -101,17 +105,33 @@ public class SeasonsFragment extends SeriesFragment {
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT DISTINCT season FROM ANIME", null);
 
-        ArrayList<String> seasons = new ArrayList<>();
+        ArrayList<String> seasonNames = new ArrayList<>();
+        ArrayList<Season> seasons = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            seasons.add(cursor.getString(cursor.getColumnIndex("season")));
+            String seasonName = cursor.getString(cursor.getColumnIndex("season"));
+            seasonNames.add(seasonName);
+
+            for (Season season : App.getInstance().getSeasonsList()){
+                if (season.getName().matches(seasonName)){
+                    seasons.add(season);
+                }
+            }
             cursor.moveToNext();
         }
 
         cursor.close();
         dbHelper.close();
 
-        return seasons;
+        Collections.sort(seasons, new SeasonComparator());
+
+        seasonNames.clear();
+
+        for (Season season : seasons){
+            seasonNames.add(season.getName());
+        }
+
+        return seasonNames;
     }
 
     private void refreshToolbar() {
@@ -135,10 +155,7 @@ public class SeasonsFragment extends SeriesFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-
-//            helper.getSeasonData();
-        } else if (id == R.id.action_notify) {
+        if (id == R.id.action_notify) {
             MainActivity activity = (MainActivity) getActivity();
             //activity.makeAlarm();
         } else if (id == R.id.action_clear_list) {
