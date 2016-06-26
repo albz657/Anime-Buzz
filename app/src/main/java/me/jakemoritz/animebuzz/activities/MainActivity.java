@@ -37,7 +37,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse{
+        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
@@ -46,6 +46,8 @@ public class MainActivity extends AppCompatActivity
     private PendingIntent pendingIntent;
     Intent alarmIntent;
     boolean currentlyInitializing = false;
+    boolean postInitializing = false;
+    int currentInitializingIndex = -1;
     CircularProgressView progressView;
     RelativeLayout progressViewHolder;
 
@@ -55,8 +57,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         Intent startupIntent = getIntent();
-        if (startupIntent != null){
-            if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)){
+        if (startupIntent != null) {
+            if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
                 initializeData();
             }
         }
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.getMenu().getItem(1).setChecked(true);
 
-        if (!currentlyInitializing){
+        if (!currentlyInitializing) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                     .commit();
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void initializeData(){
+    private void initializeData() {
         currentlyInitializing = true;
 
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
@@ -111,6 +113,22 @@ public class MainActivity extends AppCompatActivity
         senpaiExportHelper.getSeasonList();
     }
 
+    private void postInitializeData() {
+        SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+
+        if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
+            if (App.getInstance().getSeasonsList().get(currentInitializingIndex).getName().matches(latestSeason)) {
+                currentInitializingIndex--;
+                postInitializeData();
+            } else {
+                senpaiExportHelper.getSeasonData(App.getInstance().getSeasonsList().get(currentInitializingIndex));
+            }
+        }
+    }
+
     public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
@@ -121,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
 
         Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0){
+        if (current.compareTo(nextEpisode) > 0) {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
         }
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
@@ -133,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "alarm for '" + series.getName() + "' set for: " + formattedNext);
     }
 
-    public void removeAlarm(Series series){
+    public void removeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, App.getInstance().getAlarms().remove(series), 0);
 
@@ -199,51 +217,59 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void seasonDataRetrieved(ArrayList<Series> seriesList) {
-        App.getInstance().saveNewSeasonData(seriesList);
+    public void seasonDataRetrieved(ArrayList<Series> pulledSeasonData) {
+        App.getInstance().saveNewSeasonData(pulledSeasonData);
         App.getInstance().getAllAnimeList().clear();
         App.getInstance().loadAnimeListFromDB();
 
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
-        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+        if (!pulledSeasonData.isEmpty()) {
+            if (currentlyInitializing) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+                String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
-        if (!seriesList.isEmpty()){
-            if (seriesList.get(0).getSeason().matches(latestSeason)){
-                App.getInstance().getCurrentlyBrowsingSeason().clear();
-                App.getInstance().getCurrentlyBrowsingSeason().addAll(seriesList);
+                if (pulledSeasonData.get(0).getSeason().matches(latestSeason)) {
+                    App.getInstance().getCurrentlyBrowsingSeason().clear();
+                    App.getInstance().getCurrentlyBrowsingSeason().addAll(pulledSeasonData);
 
-                if (currentlyInitializing){
+                    currentlyInitializing = false;
+                    postInitializing = true;
+
+                    setProgressBarIndeterminateVisibility(false);
+
+                    if (progressView != null && progressViewHolder != null) {
+                        progressViewHolder.setVisibility(View.GONE);
+                        progressView.stopAnimation();
+                    }
+
+                    currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
+                    postInitializeData();
+
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                             .commit();
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(R.string.fragment_seasons);
                     }
-                    currentlyInitializing = false;
-
-                    setProgressBarIndeterminateVisibility(false);
-
-                    if (progressView != null && progressViewHolder != null){
-                        progressViewHolder.setVisibility(View.GONE);
-                        progressView.stopAnimation();
-                    }
                 }
+            } else if (postInitializing){
+                currentInitializingIndex--;
+                postInitializeData();
             }
         }
     }
 
     @Override
     public void seasonListReceived(ArrayList<Season> seasonList) {
-        if (currentlyInitializing){
+        if (currentlyInitializing) {
             SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
             String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
             int latestSeasonIndex = -1;
-            int oneBeforeLatestIndex = -1;
-            for (Season season : App.getInstance().getSeasonsList()){
-                if (season.getName().matches(latestSeason)){
+//            int oneBeforeLatestIndex = -1;
+            for (Season season : App.getInstance().getSeasonsList()) {
+                if (season.getName().matches(latestSeason)) {
                     latestSeasonIndex = App.getInstance().getSeasonsList().indexOf(season);
-                    oneBeforeLatestIndex = latestSeasonIndex - 1;
+//                    oneBeforeLatestIndex = latestSeasonIndex - 1;
                 }
             }
 

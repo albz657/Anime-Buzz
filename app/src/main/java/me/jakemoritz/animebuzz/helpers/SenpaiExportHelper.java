@@ -80,6 +80,9 @@ public class SenpaiExportHelper {
                 .appendQueryParameter("src", season.getKey());
         String url = builder.build().toString();
 
+        NotificationHelper helper = new NotificationHelper(activity);
+        helper.createUpdatingSeasonDataNotification(season);
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override

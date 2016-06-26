@@ -12,6 +12,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationHelper helper = new NotificationHelper(context);
-        helper.createNotification(App.getInstance().getMostRecentAlarm());
+        helper.createNewEpisodeNotification(App.getInstance().getMostRecentAlarm());
     }
 }
