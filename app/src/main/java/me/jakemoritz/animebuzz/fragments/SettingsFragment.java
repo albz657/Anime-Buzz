@@ -2,24 +2,46 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.v7.preference.Preference;
-import android.support.v7.preference.PreferenceFragmentCompat;
+import android.support.annotation.Nullable;
 import android.support.v7.preference.PreferenceManager;
+import android.support.v7.preference.XpPreferenceFragment;
+import android.support.v7.widget.RecyclerView;
+import android.view.View;
+
+import net.xpece.android.support.preference.PreferenceDividerDecoration;
 
 import me.jakemoritz.animebuzz.R;
 
-public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     SharedPreferences sharedPreferences;
 
     @Override
-    public void onCreatePreferences(Bundle bundle, String s) {
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final RecyclerView listView = getListView();
+        listView.setFocusable(false);
+        listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
+        setDivider(null);
+
+
+    }
+
+    @Override
+    public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
+
 
     @Override
     public void onResume() {
@@ -33,16 +55,5 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(getString(R.string.pref_airing_or_simulcast_key))){
-            Preference airingOrSimulcastPref = findPreference(key);
-            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_time))){
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_time));
-            } else {
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_time));
 
-            }
-        }
-    }
 }

@@ -11,6 +11,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity
     private void postInitializeData() {
         if (currentInitializingIndex > 0){
             if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
                 if (App.getInstance().getSeasonsList().get(currentInitializingIndex).getName().matches(latestSeason)) {
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity
 
         if (!pulledSeasonData.isEmpty()) {
             if (currentlyInitializing) {
-                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
                 if (pulledSeasonData.get(0).getSeason().matches(latestSeason)) {
@@ -279,7 +280,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void seasonListReceived(ArrayList<Season> seasonList) {
         if (currentlyInitializing) {
-            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
             int latestSeasonIndex = -1;

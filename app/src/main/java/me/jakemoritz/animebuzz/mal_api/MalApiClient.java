@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.mal_api;
 
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -102,7 +103,7 @@ public class MalApiClient {
     private Map<String, String> getBasicHTTPAuthParams() {
         Map<String, String> params = new HashMap<>();
 
-        SharedPreferences sharedPreferences = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
         String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
         String creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", username, password).getBytes(), Base64.DEFAULT));

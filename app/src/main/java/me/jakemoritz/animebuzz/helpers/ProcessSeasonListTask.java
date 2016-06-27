@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.helpers;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.preference.PreferenceManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,7 +56,7 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
                     if (key.matches(latestSeasonKey)) {
                         latestSeasonName = seasonAsJSON.getString("name");
 
-                        SharedPreferences settings = activity.getSharedPreferences(activity.getString(R.string.shared_prefs_account), 0);
+                        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(activity);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(activity.getString(R.string.shared_prefs_latest_season), latestSeasonName);
                         editor.apply();

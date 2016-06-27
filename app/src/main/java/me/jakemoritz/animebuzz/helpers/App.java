@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.support.v7.preference.PreferenceManager;
 
 import com.squareup.picasso.LruCache;
 
@@ -78,7 +79,7 @@ public class App extends Application {
     }
 
     private void loadBrowsingSeason() {
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
         DatabaseHelper dbHelper = new DatabaseHelper(this);
