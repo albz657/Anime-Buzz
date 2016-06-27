@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.models;
 
+import android.graphics.Bitmap;
+
 public class Series {
 
     private int airdate_u;
@@ -9,6 +11,17 @@ public class Series {
     private int simulcast_airdate_u;
     private boolean isInUserList;
     private String season;
+
+    public void setPoster(Bitmap poster) {
+        this.poster = poster;
+    }
+
+    private Bitmap poster;
+
+
+    public Bitmap getPoster() {
+        return poster;
+    }
 
     public boolean isCurrentlyAiring() {
         return currentlyAiring;

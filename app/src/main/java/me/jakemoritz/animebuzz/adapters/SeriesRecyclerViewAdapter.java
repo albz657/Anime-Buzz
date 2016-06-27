@@ -56,6 +56,10 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mTitle.setText(visibleSeries.get(position).getName());
         holder.mDate.setText(String.valueOf(visibleSeries.get(position).getAirdate_u()));
 
+        if (holder.series.getPoster() != null){
+            holder.mPoster.setImageBitmap(holder.series.getPoster());
+        }
+
         if (holder.series.isInUserList()){
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.VISIBLE);
@@ -113,7 +117,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             super(view);
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);
-            mPoster = null;
+            mPoster = (ImageView) view.findViewById(R.id.series_poster);
             mDate = (TextView) view.findViewById(R.id.series_date);
             mAddButton = (ImageButton) view.findViewById(R.id.add_button);
             mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);

@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.mal_api;
 
-import android.app.Activity;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
@@ -10,11 +10,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -22,7 +24,6 @@ import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,6 +34,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
+import me.jakemoritz.animebuzz.activities.MainActivity;
+
 
 public class MalApiClient {
 
@@ -42,9 +45,9 @@ public class MalApiClient {
     private static final String USER_LIST_BASE = "http://myanimelist.net/malappinfo.php";
     private static final String ANIME_SEARCH_BASE = "http://myanimelist.net/api/anime/search.xml";
 
-    private Activity activity;
+    private MainActivity activity;
 
-    public MalApiClient(Activity activity) {
+    public MalApiClient(MainActivity activity) {
         this.activity = activity;
     }
 
@@ -76,21 +79,24 @@ public class MalApiClient {
     }
 
     public void getPictureUrl(final String username, final String password, String seriesName) {
-        String encodedSeriesName;
+        String encodedSeriesName = "";
         try {
-            encodedSeriesName = URLEncoder.encode(seriesName, "UTF-8");
+            encodedSeriesName = seriesName.replaceAll("[^\\w\\s]", " ");
+            encodedSeriesName = encodedSeriesName.trim();
+//            encodedSeriesName = encodedSeriesName.replaceAll("[\\s]{2,}", " ");
+            encodedSeriesName = URLEncoder.encode(encodedSeriesName, "UTF-8");
 
-            Uri uri = Uri.parse(ANIME_SEARCH_BASE);
-            Uri.Builder builder = uri.buildUpon()
-                    .appendQueryParameter("q", encodedSeriesName);
-            String url = builder.build().toString();
+           String url = ANIME_SEARCH_BASE + "?q=" + encodedSeriesName;
 
             RequestQueue queue = Volley.newRequestQueue(activity);
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+            final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
                 @Override
                 public void onResponse(String response) {
-                    processAnimePictureURLResponse(response);
+                    if (!response.isEmpty()){
+                        processAnimePictureURLResponse(response);
+
+                    }
                 }
             }, new Response.ErrorListener() {
 
@@ -107,7 +113,7 @@ public class MalApiClient {
             };
 
             queue.add(stringRequest);
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -163,6 +169,24 @@ public class MalApiClient {
         }
     }
 
+    private void getImageFromURL(String URL, final String MALID){
+            RequestQueue queue = Volley.newRequestQueue(activity);
+            ImageRequest imageRequest = new ImageRequest(URL, new Response.Listener<Bitmap>(){
+                @Override
+                public void onResponse(Bitmap response) {
+                    MalImportHelper helper = new MalImportHelper(activity);
+                    helper.importPoster(response, MALID);
+                }
+            }, 0, 0, null, Bitmap.Config.RGB_565, new Response.ErrorListener(){
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+
+            queue.add(imageRequest);
+    }
+
     private void processAnimePictureURLResponse(String response) {
         try {
             InputSource inputSource = new InputSource();
@@ -170,45 +194,11 @@ public class MalApiClient {
 
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
 
-            NodeList animeNodeList = doc.getElementsByTagName("anime");
-            NodeList animeNode;
-            Element animeStatus;
-
-            List<Integer> currentlyWatchingSeriesIds = new ArrayList<>();
-            // iterating through each anime entry
-            for (int i = 0; i < animeNodeList.getLength(); i++) {
-                animeNode = animeNodeList.item(i).getChildNodes();
-
-                boolean currentlyWatching = false;
-
-                // iterating through every anime node
-                for (int j = 0; j < animeNode.getLength(); j++) {
-                    animeStatus = (Element) animeNode.item(j);
-
-                    if (animeStatus.getNodeName().matches("my_status")) {
-                        if (animeStatus.getFirstChild().getNodeValue().matches("1")) {
-                            // user currently watching show
-                            currentlyWatching = true;
-                        }
-                    }
-                }
-
-                if (currentlyWatching) {
-                    for (int j = 0; j < animeNode.getLength(); j++) {
-                        int mal_id;
-
-                        if (animeNode.item(j).getNodeName().matches("series_animedb_id")) {
-                            try {
-                                mal_id = Integer.valueOf(animeNode.item(j).getFirstChild().getNodeValue());
-                                currentlyWatchingSeriesIds.add(mal_id);
-                            } catch (NumberFormatException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }
-            }
-            MalImportHelper helper = new MalImportHelper(currentlyWatchingSeriesIds, activity);
+            NodeList animeNodeList = doc.getElementsByTagName("image");
+            Node imageNode = animeNodeList.item(0);
+            String pictureURL = imageNode.getChildNodes().item(0).getNodeValue();
+            String id = doc.getElementsByTagName("id").item(0).getChildNodes().item(0).getNodeValue();
+            getImageFromURL(pictureURL, id);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -263,7 +253,8 @@ public class MalApiClient {
                     }
                 }
             }
-            MalImportHelper helper = new MalImportHelper(currentlyWatchingSeriesIds, activity);
+            MalImportHelper helper = new MalImportHelper(activity);
+            helper.matchSeries(currentlyWatchingSeriesIds);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {

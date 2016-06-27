@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
-                    postInitializeData();
+//                    postInitializeData();
 
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())

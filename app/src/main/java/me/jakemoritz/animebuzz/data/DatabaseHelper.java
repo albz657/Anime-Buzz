@@ -5,7 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
@@ -30,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_IS_IN_USER_LIST = "isinuserlist";
     private static final String KEY_SEASON = "season";
     private static final String KEY_CURRENTLY_AIRING = "iscurrentlyairing";
+    private static final String KEY_POSTER = "poster";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,7 +48,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_SIMULCAST_AIRDATE + " INTEGER," +
                 KEY_IS_IN_USER_LIST + " INTEGER," +
                 KEY_SEASON + " TEXT," +
-                KEY_CURRENTLY_AIRING + " INTEGER" +
+                KEY_CURRENTLY_AIRING + " INTEGER," +
+                KEY_POSTER + " BLOB" +
                 ")";
     }
 
@@ -70,9 +75,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
+        if (series.getPoster() != null){
+            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
+        }
 
         db.insert(TABLE_NAME, null, contentValues);
         return true;
+    }
+
+    private byte[] getBytesFromBitmap(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
+    }
+
+    private Bitmap getBitmapFromBytes(byte[] bytes){
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
     public boolean updateSeriesInDb(Series series, String TABLE_NAME) {
@@ -86,6 +104,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
+        if (series.getPoster() != null){
+            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
+        }
 
         db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
@@ -129,8 +150,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
         String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
         boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_CURRENTLY_AIRING)) == 1);
+        byte[] posterBytes = res.getBlob(res.getColumnIndex(DatabaseHelper.KEY_POSTER));
 
         Series series = new Series(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring);
+
+        if (posterBytes != null){
+            Bitmap poster = getBitmapFromBytes(posterBytes);
+            series.setPoster(poster);
+        }
         return series;
     }
 
@@ -141,16 +168,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Series> seriesList = new ArrayList<>();
 
         for (int i = 0; i < res.getCount(); i++) {
-            int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
-            String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
-            int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
-            int simulcastAirdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_AIRDATE));
-            boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
-            String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
-            boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_CURRENTLY_AIRING)) == 1);
-
-            Series series = new Series(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring);
-            seriesList.add(series);
+            getSeriesWithCursor(res);
             res.moveToNext();
         }
 

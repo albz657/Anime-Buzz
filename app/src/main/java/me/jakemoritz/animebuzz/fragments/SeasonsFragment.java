@@ -162,7 +162,7 @@ public class SeasonsFragment extends SeriesFragment {
             mAdapter.getVisibleSeries().clear();
             mAdapter.notifyDataSetChanged();
         } else if (id == R.id.action_verify) {
-            MalApiClient malApiClient = new MalApiClient(getActivity());
+            MalApiClient malApiClient = new MalApiClient((MainActivity) getActivity());
 //            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
             malApiClient.getPictureUrl("jmandroiddev", "***REMOVED******REMOVED***", App.getInstance().getCurrentlyBrowsingSeason().get(0).getName());
 //            malApiClient.getUserList("skyrocketing");
