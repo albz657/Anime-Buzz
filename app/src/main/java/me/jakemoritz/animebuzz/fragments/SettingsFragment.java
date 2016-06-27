@@ -3,14 +3,17 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.XpPreferenceFragment;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Spinner;
 
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
@@ -19,8 +22,32 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     SharedPreferences sharedPreferences;
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
+        MainActivity parentActivity = (MainActivity) getActivity();
+        if (parentActivity.getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+
+            if (toolbarSpinner != null) {
+                toolbarSpinner.setVisibility(View.GONE);
+            }
+
+            parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(getString(R.string.pref_airing_or_simulcast_key))){
+            Preference airingOrSimulcastPref = findPreference(s);
+            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_time))){
+                airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_time));
+            } else {
+                airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_time));
+
+            }
+        }
     }
 
     @Override

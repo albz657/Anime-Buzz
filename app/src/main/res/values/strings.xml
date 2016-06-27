@@ -12,6 +12,7 @@
     <!--Fragment names-->
     <string name="fragment_myshows">Currently Watching</string>
     <string name="fragment_seasons">Season Browser</string>
+    <string name="fragment_watching_queue">Watching Queue</string>
 
     <!--Database table names-->
     <string name="table_anime">ANIME</string>

@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
-        navigationView.getMenu().getItem(1).setChecked(true);
+        navigationView.getMenu().getItem(2).setChecked(true);
 
         if (!currentlyInitializing) {
             getSupportFragmentManager().beginTransaction()
@@ -216,6 +216,15 @@ public class MainActivity extends AppCompatActivity
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_seasons);
                 }
+            } else if (id == R.id.nav_watching_queue) {/*
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                        .commit();
+                navigationView.getMenu().getItem(1).setChecked(true);*/
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                }
             } else if (id == R.id.nav_settings){
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())
@@ -223,7 +232,7 @@ public class MainActivity extends AppCompatActivity
                 navigationView.getMenu().getItem(1).setChecked(true);
 
                 if (getSupportActionBar() != null) {
-                    getSupportActionBar().setTitle(R.string.fragment_seasons);
+                    getSupportActionBar().setTitle(R.string.action_settings);
                 }
             }
         }
