@@ -5,7 +5,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 
+import com.squareup.picasso.LruCache;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,6 +41,22 @@ public class App extends Application {
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
 
+    public LruCache getLruCache() {
+        return lruCache;
+    }
+
+    private LruCache lruCache;
+
+    public HashMap<String, Bitmap> getPosterQueue() {
+        return posterQueue;
+    }
+
+    public void setPosterQueue(HashMap<String, Bitmap> posterQueue) {
+        this.posterQueue = posterQueue;
+    }
+
+    private HashMap<String, Bitmap> posterQueue;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -47,6 +67,9 @@ public class App extends Application {
         allAnimeList = new ArrayList<>();
         seasonsList = new ArrayList<>();
         alarms = new HashMap<>();
+        posterQueue = new HashMap<>();
+
+        lruCache = new LruCache(this);
 
         loadAnimeListFromDB();
         loadAlarms();
@@ -54,7 +77,7 @@ public class App extends Application {
         loadBrowsingSeason();
     }
 
-    private void loadBrowsingSeason(){
+    private void loadBrowsingSeason() {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
         String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
@@ -74,24 +97,24 @@ public class App extends Application {
         currentlyBrowsingSeason = tempSeries;
     }
 
-    public void saveData(){
+    public void saveData() {
         App.getInstance().saveAlarms();
         App.getInstance().saveAnimeListToDB();
         App.getInstance().saveUserAnimeList(userAnimeList);
         App.getInstance().saveSeasonsList();
     }
 
-    public void saveAnimeListToDB(){
+    public void saveAnimeListToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveUserAnimeList(ArrayList<Series> userAnimeList){
+    public void saveUserAnimeList(ArrayList<Series> userAnimeList) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveNewSeasonData(ArrayList<Series> newSeason){
+    public void saveNewSeasonData(ArrayList<Series> newSeason) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(newSeason, getString(R.string.table_anime));
     }
@@ -103,7 +126,55 @@ public class App extends Application {
         userAnimeList = filterUserList(allAnimeList);
     }
 
-    public void saveSeasonsList(){
+    private File getCachedBitmapFile(String MALID) {
+        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+
+        if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
+            if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
+                return new File(imageCacheDirectory, MALID + ".jpg");
+
+            }
+        }
+        return null;
+    }
+
+    public void cacheBitmap(Bitmap bitmap, String MALID) {
+        try {
+            File file = getCachedBitmapFile(MALID);
+            if (file != null){
+                FileOutputStream fos = new FileOutputStream(file);
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.close();
+            }
+        } catch (FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        bitmap.recycle();
+    }
+
+/*    private Bitmap getCachedBitmap(String MALID){
+        try {
+            FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            ArrayList<Season> tempSeasonsList = (ArrayList<Season>) ois.readObject();
+            if (tempSeasonsList != null) {
+                Collections.sort(tempSeasonsList, new SeasonComparator());
+                seasonsList = tempSeasonsList;
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // user has no alarms
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public void saveSeasonsList() {
         try {
             FileOutputStream fos = openFileOutput(getString(R.string.season_list_file), Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -117,7 +188,7 @@ public class App extends Application {
         }
     }
 
-    private void loadSeasonsList(){
+    private void loadSeasonsList() {
         try {
             FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -136,10 +207,10 @@ public class App extends Application {
         }
     }
 
-    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList){
+    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList) {
         ArrayList<Series> filteredUserList = new ArrayList<>();
-        for (Series series : allAnimeList){
-            if (series.isInUserList()){
+        for (Series series : allAnimeList) {
+            if (series.isInUserList()) {
                 filteredUserList.add(series);
             }
         }
@@ -222,9 +293,11 @@ public class App extends Application {
     public static synchronized App getInstance() {
         return mInstance;
     }
+
     public ArrayList<Series> getAllAnimeList() {
         return allAnimeList;
     }
+
     public ArrayList<Season> getSeasonsList() {
         return seasonsList;
     }
@@ -232,6 +305,7 @@ public class App extends Application {
     public ArrayList<Series> getCurrentlyBrowsingSeason() {
         return currentlyBrowsingSeason;
     }
+
     public ArrayList<Series> getUserAnimeList() {
         return userAnimeList;
     }

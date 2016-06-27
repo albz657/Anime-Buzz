@@ -14,6 +14,8 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList<Series>> {
 
+    private final static String TAG = ProcessSeasonDataTask.class.getSimpleName();
+
     ReadSeasonDataResponse seasonDataDelegate;
 
     public ProcessSeasonDataTask(ReadSeasonDataResponse seasonDataDelegate) {
@@ -28,22 +30,41 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
             JSONArray testResponse = response.getJSONArray("items");
             JSONObject meta = response.getJSONObject("meta");
             String season = meta.getString("season");
-            Log.d("s", "s");
+
             for (int i = 0; i < testResponse.length(); i++) {
                 JSONObject seriesAsJSON = testResponse.getJSONObject(i);
+
+                int MALID = -1;
+                int ANNID = -1;
                 try {
-                    int MALID = seriesAsJSON.getInt("MALID");
+                    MALID = seriesAsJSON.getInt("MALID");
+                    ANNID = seriesAsJSON.getInt("ANNID");
                     Series series = new Series(seriesAsJSON.getInt("airdate_u"),
                             seriesAsJSON.getString("name"),
                             MALID,
                             seriesAsJSON.getInt("simulcast_airdate_u"),
                             false,
                             season,
-                            false);
+                            false,
+                            ANNID);
 
                     seriesFromServer.add(series);
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    if (ANNID == -1){
+                        Log.d(TAG, "No ANNID for: '" + seriesAsJSON.getString("name") + "'");
+                        Series series = new Series(seriesAsJSON.getInt("airdate_u"),
+                                seriesAsJSON.getString("name"),
+                                MALID,
+                                seriesAsJSON.getInt("simulcast_airdate_u"),
+                                false,
+                                season,
+                                false,
+                                ANNID);
+                        seriesFromServer.add(series);
+                    } else if (MALID == -1){
+                        Log.d(TAG, "No MALID for: '" + seriesAsJSON.getString("name") + "'");
+                    }
+//                    e.printStackTrace();
                 }
             }
         } catch (JSONException e) {

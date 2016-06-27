@@ -11,6 +11,11 @@ public class Series {
     private int simulcast_airdate_u;
     private boolean isInUserList;
     private String season;
+    private int ANNID;
+
+    public int getANNID() {
+        return ANNID;
+    }
 
     public void setPoster(Bitmap poster) {
         this.poster = poster;
@@ -63,7 +68,7 @@ public class Series {
 
     }
 
-    public Series(int airdate_u, String name, int MALID, int simulcast_airdate_u, boolean isInUserList, String season, boolean currentlyAiring) {
+    public Series(int airdate_u, String name, int MALID, int simulcast_airdate_u, boolean isInUserList, String season, boolean currentlyAiring, int ANNID) {
         this.airdate_u = airdate_u;
         this.name = name;
         this.MALID = MALID;
@@ -71,5 +76,6 @@ public class Series {
         this.isInUserList = isInUserList;
         this.season = season;
         this.currentlyAiring = currentlyAiring;
+        this.ANNID = ANNID;
     }
 }

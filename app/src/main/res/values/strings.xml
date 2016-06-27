@@ -24,10 +24,11 @@
     <string name="shared_prefs_account">sharedprefsaccount</string>
     <string name="shared_prefs_logged_in">isuserloggedin</string>
     <string name="shared_prefs_completed_setup">hasusercompletedsetup</string>
-
-    <!--SharedPrefernce keys-->
     <string name="shared_prefs_latest_season">latestseason</string>
+    <string name="credentials_username">credentialsusername</string>
+    <string name="credentials_password">credentialspassword</string>
 
     <!--MAL API-->
     <string name="mal_api_verify_credentials">http://myanimelist.net/api/account/verify_credentials.xml</string>
+
 </resources>

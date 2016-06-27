@@ -19,6 +19,8 @@ public class SetupActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_prefs_account), 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
+        editor.putString(getString(R.string.credentials_username), "jmandroiddev");
+        editor.putString(getString(R.string.credentials_password), "***REMOVED******REMOVED***");
         editor.apply();
 
         Intent intent = new Intent(this, MainActivity.class);

@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.adapters;
 
+import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
@@ -19,7 +23,7 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable{
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable {
 
     public ArrayList<Series> getVisibleSeries() {
         return visibleSeries;
@@ -56,11 +60,15 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mTitle.setText(visibleSeries.get(position).getName());
         holder.mDate.setText(String.valueOf(visibleSeries.get(position).getAirdate_u()));
 
-        if (holder.series.getPoster() != null){
-            holder.mPoster.setImageBitmap(holder.series.getPoster());
+        Picasso picasso = Picasso.with(mListener.getContext());
+        File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+        File bitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + ".jpg");
+        if (bitmapFile.exists()) {
+            picasso.load(bitmapFile).into(holder.mPoster);
         }
 
-        if (holder.series.isInUserList()){
+        if (holder.series.isInUserList()) {
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.VISIBLE);
 
@@ -95,7 +103,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public Filter getFilter() {
-        if (seriesFilter == null){
+        if (seriesFilter == null) {
             seriesFilter = new SeriesFilter(this, allSeries);
         }
         return seriesFilter;
@@ -124,7 +132,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
     }
 
-    public void removeSeries(Series item, int position){
+    public void removeSeries(Series item, int position) {
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
         notifyItemChanged(position);
@@ -134,7 +142,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
-    public void addSeries(Series item, int position){
+    public void addSeries(Series item, int position) {
         boolean alreadyExists = false;
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getMALID() == item.getMALID()) {

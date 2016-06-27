@@ -27,17 +27,19 @@ import java.util.Calendar;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
+import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse {
+        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse, SeasonPostersImportResponse {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
@@ -247,9 +249,15 @@ public class MainActivity extends AppCompatActivity
                     currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
 //                    postInitializeData();
 
+
+                    SeasonsFragment fragment = SeasonsFragment.newInstance();
+
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                            .replace(R.id.content_main, fragment, SeasonsFragment.class.getSimpleName())
                             .commit();
+
+                    ANNSearchHelper helper = new ANNSearchHelper(this);
+                    helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
                 }
             } else if (postInitializing){
                 currentInitializingIndex--;
@@ -275,5 +283,12 @@ public class MainActivity extends AppCompatActivity
 
             SenpaiExportHelper.newInstance(this).getSeasonData(App.getInstance().getSeasonsList().get(latestSeasonIndex));
         }
+    }
+
+    @Override
+    public void seasonPostersImported() {
+//        MalImportHelper helper = new MalImportHelper(this);
+//        helper.importPosters(response, MALID);
+//    }
     }
 }

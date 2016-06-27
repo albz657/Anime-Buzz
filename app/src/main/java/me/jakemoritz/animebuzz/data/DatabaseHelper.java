@@ -18,6 +18,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
 
+    private Context context;
+
     // Database info
     public static final String DATABASE_NAME = "buzzDB";
     private static final int DATABASE_VERSION = 1;
@@ -33,10 +35,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_IS_IN_USER_LIST = "isinuserlist";
     private static final String KEY_SEASON = "season";
     private static final String KEY_CURRENTLY_AIRING = "iscurrentlyairing";
-    private static final String KEY_POSTER = "poster";
+//    private static final String KEY_POSTER = "poster";
+    private static final String KEY_ANNID = "ANNID";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
         TABLE_ANIME = context.getString(R.string.table_anime);
     }
 
@@ -49,7 +53,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_IS_IN_USER_LIST + " INTEGER," +
                 KEY_SEASON + " TEXT," +
                 KEY_CURRENTLY_AIRING + " INTEGER," +
-                KEY_POSTER + " BLOB" +
+//                KEY_POSTER + " BLOB," +
+                KEY_ANNID + " INTEGER" +
                 ")";
     }
 
@@ -75,9 +80,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
-        if (series.getPoster() != null){
-            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
-        }
+//        if (series.getPoster() != null){
+//            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
+//        }
+        contentValues.put(KEY_ANNID, series.getANNID());
 
         db.insert(TABLE_NAME, null, contentValues);
         return true;
@@ -85,7 +91,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private byte[] getBytesFromBitmap(Bitmap bitmap){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+
         return stream.toByteArray();
     }
 
@@ -104,9 +111,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
-        if (series.getPoster() != null){
-            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
-        }
+//        if (series.getPoster() != null){
+//            contentValues.put(KEY_POSTER, getBytesFromBitmap(series.getPoster()));
+//        }
+        contentValues.put(KEY_ANNID, series.getANNID());
 
         db.update(TABLE_NAME, contentValues, KEY_MAL_ID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
@@ -150,14 +158,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         boolean isInUserList = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_IS_IN_USER_LIST)) == 1);
         String season = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON));
         boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(DatabaseHelper.KEY_CURRENTLY_AIRING)) == 1);
-        byte[] posterBytes = res.getBlob(res.getColumnIndex(DatabaseHelper.KEY_POSTER));
+//        byte[] posterBytes = res.getBlob(res.getColumnIndex(DatabaseHelper.KEY_POSTER));
+        int ANNID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ANNID));
 
-        Series series = new Series(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring);
+        Series series = new Series(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring, ANNID);
 
-        if (posterBytes != null){
+   /*     if (posterBytes != null){
             Bitmap poster = getBitmapFromBytes(posterBytes);
             series.setPoster(poster);
-        }
+        }*/
         return series;
     }
 

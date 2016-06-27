@@ -19,13 +19,14 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.mal_api.MalApiClient;
+import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeasonsFragment extends SeriesFragment {
+public class SeasonsFragment extends SeriesFragment implements SeasonPostersImportResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -62,6 +63,8 @@ public class SeasonsFragment extends SeriesFragment {
             }
         });
         refreshToolbar();
+
+        mAdapter.notifyDataSetChanged();
     }
 
     private void loadSeason(String seasonName){
@@ -162,10 +165,8 @@ public class SeasonsFragment extends SeriesFragment {
             mAdapter.getVisibleSeries().clear();
             mAdapter.notifyDataSetChanged();
         } else if (id == R.id.action_verify) {
-            MalApiClient malApiClient = new MalApiClient((MainActivity) getActivity());
-//            malApiClient.verifyCredentials("jmandroiddev", "***REMOVED******REMOVED***");
-            malApiClient.getPictureUrl("jmandroiddev", "***REMOVED******REMOVED***", App.getInstance().getCurrentlyBrowsingSeason().get(0).getName());
-//            malApiClient.getUserList("skyrocketing");
+            ANNSearchHelper helper = new ANNSearchHelper((MainActivity) getActivity());
+            helper.getImages(this, mAdapter.getAllSeries());
         }
 
         return super.onOptionsItemSelected(item);
@@ -191,5 +192,10 @@ public class SeasonsFragment extends SeriesFragment {
                 return false;
             }
         });
+    }
+
+    @Override
+    public void seasonPostersImported() {
+        mAdapter.notifyDataSetChanged();
     }
 }
