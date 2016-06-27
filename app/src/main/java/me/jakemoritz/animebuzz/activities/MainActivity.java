@@ -27,19 +27,19 @@ import java.util.Calendar;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse, SeasonPostersImportResponse {
+        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse {
 
     private final static String TAG = MainActivity.class.getSimpleName();
     private NavigationView navigationView;
@@ -196,26 +196,36 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if (id == R.id.nav_my_shows && previousItemId != id) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
-                    .commit();
-            navigationView.getMenu().getItem(0).setChecked(true);
+        if (previousItemId != id){
+            if (id == R.id.nav_my_shows) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
+                        .commit();
+                navigationView.getMenu().getItem(0).setChecked(true);
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_myshows);
-            }
-        } else if (id == R.id.nav_seasons && previousItemId != id) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
-                    .commit();
-            navigationView.getMenu().getItem(1).setChecked(true);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_myshows);
+                }
+            } else if (id == R.id.nav_seasons) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                        .commit();
+                navigationView.getMenu().getItem(1).setChecked(true);
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_seasons);
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_seasons);
+                }
+            } else if (id == R.id.nav_settings){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())
+                        .commit();
+                navigationView.getMenu().getItem(1).setChecked(true);
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_seasons);
+                }
             }
         }
-
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -285,10 +295,4 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public void seasonPostersImported() {
-//        MalImportHelper helper = new MalImportHelper(this);
-//        helper.importPosters(response, MALID);
-//    }
-    }
 }

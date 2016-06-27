@@ -15,7 +15,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
 
-public class SeriesFragment extends Fragment {
+public abstract class SeriesFragment extends Fragment {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;

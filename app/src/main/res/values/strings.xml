@@ -28,6 +28,12 @@
     <string name="credentials_username">credentialsusername</string>
     <string name="credentials_password">credentialspassword</string>
 
+    <!--Preferences-->
+    <string name="pref_airing_or_simulcast_key">airingorsimulcast</string>
+    <string name="pref_airing_or_simulcast_title">Airing or Simulcast</string>
+    <string name="pref_airing_time">You will be notified when an episode airs.</string>
+    <string name="pref_simulcast_time">You will be notified when an episode is simulcast.</string>
+
     <!--MAL API-->
     <string name="mal_api_verify_credentials">http://myanimelist.net/api/account/verify_credentials.xml</string>
 

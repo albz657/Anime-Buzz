@@ -134,7 +134,7 @@ public class ANNSearchHelper {
 
             NodeList imageNodeList = doc.getElementsByTagName("img");
             if (imageNodeList.getLength() != 0){
-                Node imageNode = imageNodeList.item(imageNodeList.getLength() - 1);
+                Node imageNode = imageNodeList.item(0);
                 String pictureURL = imageNode.getAttributes().getNamedItem("src").getNodeValue();
 
                 getImageFromURL(pictureURL, String.valueOf(MALID));
