@@ -41,10 +41,17 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_airing_or_simulcast_key))){
             Preference airingOrSimulcastPref = findPreference(s);
-            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_time))){
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_time));
+            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))){
+                airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
             } else {
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_time));
+                airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
+            }
+        } else if (s.equals(getString(R.string.pref_24hour_key))){
+            Preference pref24HourSummary = findPreference(s);
+            if (pref24HourSummary.getSummary().toString().equals(getString(R.string.pref_24hour_summary))){
+                pref24HourSummary.setSummary(getString(R.string.pref_24hour_off_summary));
+            } else {
+                pref24HourSummary.setSummary(getString(R.string.pref_24hour_summary));
             }
         }
     }

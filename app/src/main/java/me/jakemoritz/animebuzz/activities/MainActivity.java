@@ -135,6 +135,48 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public String formatAiringTime(Series series, boolean simulcast){
+        Calendar cal;
+        if (simulcast){
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate_u());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate_u());
+        }
+
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
+
+        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
+        SimpleDateFormat hourFormat= null;
+
+        String formattedTime = format.format(nextEpisode.getTime());
+
+        DateFormatHelper helper = new DateFormatHelper();
+        formattedTime += helper.getDayOfMonthSuffix(nextEpisode.get(Calendar.DAY_OF_MONTH));
+
+        if (prefers24Hour){
+            hourFormat = new SimpleDateFormat(", kk:mm");
+            formattedTime += hourFormat.format(nextEpisode.getTime());
+
+        } else {
+            hourFormat = new SimpleDateFormat(", h:mm");
+            formattedTime += hourFormat.format(nextEpisode.getTime());
+            formattedTime += new SimpleDateFormat(" a").format(nextEpisode.getTime());
+        }
+
+        return formattedTime;
+    }
+
     public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 

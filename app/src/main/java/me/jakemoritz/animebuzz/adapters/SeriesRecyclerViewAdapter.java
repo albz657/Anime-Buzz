@@ -1,7 +1,9 @@
 package me.jakemoritz.animebuzz.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -58,14 +60,18 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.series = visibleSeries.get(position);
         holder.mTitle.setText(visibleSeries.get(position).getName());
-        holder.mDate.setText(String.valueOf(visibleSeries.get(position).getAirdate_u()));
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
+        boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_airing_or_simulcast_key), false);
+
+        holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
 
         Picasso picasso = Picasso.with(mListener.getContext());
         File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
         File bitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + ".jpg");
         if (bitmapFile.exists()) {
-            picasso.load(bitmapFile).into(holder.mPoster);
+            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         }
 
         if (holder.series.isInUserList()) {
