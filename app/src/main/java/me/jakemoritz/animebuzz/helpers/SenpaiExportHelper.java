@@ -19,38 +19,18 @@ import me.jakemoritz.animebuzz.models.Season;
 
 public class SenpaiExportHelper {
 
-    final static String TAG = SenpaiExportHelper.class.getSimpleName();
+    private final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
-    public void setActivity(MainActivity activity) {
+    private MainActivity activity;
+    private ReadSeasonDataResponse seasonDataDelegate;
+    private RequestQueue queue;
+    private ReadSeasonListResponse seasonListDelegate;
+
+    public SenpaiExportHelper(MainActivity activity) {
         this.activity = activity;
-    }
-
-    MainActivity activity;
-    ReadSeasonDataResponse seasonDataDelegate;
-
-    public void setQueue(RequestQueue queue) {
-        this.queue = queue;
-    }
-
-    RequestQueue queue;
-
-    public void setSeasonListDelegate(ReadSeasonListResponse seasonListDelegate) {
-        this.seasonListDelegate = seasonListDelegate;
-    }
-
-    ReadSeasonListResponse seasonListDelegate;
-
-    public static SenpaiExportHelper newInstance(MainActivity activity) {
-        SenpaiExportHelper helper = new SenpaiExportHelper();
-        helper.setActivity(activity);
-        helper.setSeasonDataDelegate(activity);
-        helper.setSeasonListDelegate(activity);
-        helper.setQueue(Volley.newRequestQueue(activity));
-        return helper;
-    }
-
-    public void setSeasonDataDelegate(ReadSeasonDataResponse seasonDataDelegate) {
-        this.seasonDataDelegate = seasonDataDelegate;
+        this.seasonListDelegate = activity;
+        this.seasonDataDelegate = activity;
+        this.queue = Volley.newRequestQueue(activity);
     }
 
     public void getSeasonList() {

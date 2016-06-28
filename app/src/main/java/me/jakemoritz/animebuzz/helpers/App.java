@@ -127,22 +127,25 @@ public class App extends Application {
         userAnimeList = filterUserList(allAnimeList);
     }
 
-    private File getCachedBitmapFile(String MALID) {
+    private File getCachedBitmapFile(String MALID, String size) {
         File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
 
         if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
             if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                return new File(imageCacheDirectory, MALID + ".jpg");
-
+                if (size.equals("small")){
+                    return new File(imageCacheDirectory, MALID + "_small.jpg");
+                } else {
+                    return new File(imageCacheDirectory, MALID + ".jpg");
+                }
             }
         }
         return null;
     }
 
-    public void cacheBitmap(Bitmap bitmap, String MALID) {
+    public void cacheBitmap(Bitmap bitmap, String MALID, String size) {
         try {
-            File file = getCachedBitmapFile(MALID);
+            File file = getCachedBitmapFile(MALID, size);
             if (file != null){
                 FileOutputStream fos = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);

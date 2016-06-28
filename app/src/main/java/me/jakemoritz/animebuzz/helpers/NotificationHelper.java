@@ -26,6 +26,7 @@ public class NotificationHelper {
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle("Updating anime database")
                         .setContentText(season.getName())
+                        .setAutoCancel(false)
                         .setProgress(0, 0, true);
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
@@ -36,7 +37,7 @@ public class NotificationHelper {
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, mBuilder.build());
+        mNotificationManager.notify(season.getName().hashCode(), mBuilder.build());
     }
 
     public void createNewEpisodeNotification(Series series) {

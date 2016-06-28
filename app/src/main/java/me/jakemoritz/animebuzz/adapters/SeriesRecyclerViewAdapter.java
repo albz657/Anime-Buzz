@@ -69,8 +69,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         Picasso picasso = Picasso.with(mListener.getContext());
         File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
-        File bitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + ".jpg");
-        if (bitmapFile.exists()) {
+        File smallBitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + "_small.jpg");
+        if (smallBitmapFile.exists()) {
+            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        } else {
+            File bitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + ".jpg");
             picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         }
 

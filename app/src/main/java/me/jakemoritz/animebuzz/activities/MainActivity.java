@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -24,6 +25,8 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Iterator;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
@@ -112,7 +115,7 @@ public class MainActivity extends AppCompatActivity
             progressView.startAnimation();
         }
 
-        SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
         senpaiExportHelper.getSeasonList();
     }
 
@@ -126,7 +129,7 @@ public class MainActivity extends AppCompatActivity
                     currentInitializingIndex--;
                     postInitializeData();
                 } else {
-                    SenpaiExportHelper senpaiExportHelper = SenpaiExportHelper.newInstance(this);
+                    SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
                     senpaiExportHelper.getSeasonData(App.getInstance().getSeasonsList().get(currentInitializingIndex));
                 }
             }
@@ -208,6 +211,24 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "alarm removed for: " + series.getName());
     }
 
+    public void updateSeries(ArrayList<Series> seriesList){
+        HashSet<Season> seasons = new HashSet<>();
+        for (Series series : seriesList){
+            for (Season season : App.getInstance().getSeasonsList()){
+                if (series.getSeason().equals(season.getName())){
+                    seasons.add(season);
+                }
+            }
+        }
+
+        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+
+        Iterator seasonsIterator = seasons.iterator();
+        while (seasonsIterator.hasNext()){
+            senpaiExportHelper.getSeasonData((Season) seasonsIterator.next());
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -285,6 +306,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void seasonDataRetrieved(ArrayList<Series> pulledSeasonData) {
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(pulledSeasonData.get(0).getSeason().hashCode());
+
         App.getInstance().saveNewSeasonData(pulledSeasonData);
         App.getInstance().getAllAnimeList().clear();
         App.getInstance().loadAnimeListFromDB();
@@ -343,7 +367,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
 
-            SenpaiExportHelper.newInstance(this).getSeasonData(App.getInstance().getSeasonsList().get(latestSeasonIndex));
+            new SenpaiExportHelper(this).getSeasonData(App.getInstance().getSeasonsList().get(latestSeasonIndex));
         }
     }
 

@@ -5,6 +5,12 @@ import java.io.Serializable;
 public class Season implements Serializable{
 
     private String name;
+/*
+    @Override
+    public boolean equals(Object obj) {
+        return getKey().equals(((Season) obj).getKey());
+    }*/
+
     private String start_timestamp;
     private String key;
 

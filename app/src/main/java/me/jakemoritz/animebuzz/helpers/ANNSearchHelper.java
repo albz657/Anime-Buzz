@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -45,9 +46,11 @@ public class ANNSearchHelper {
     private int posterQueueIndex = -1;
     private ArrayList<Series> seriesToPullList;
     private SeasonPostersImportResponse delegate = null;
+    private RequestQueue queue;
 
     public ANNSearchHelper(MainActivity activity) {
         this.activity = activity;
+        this.queue = Volley.newRequestQueue(activity);
     }
 
     public void getImages(SeriesFragment fragment, ArrayList<Series> seriesList){
@@ -56,7 +59,6 @@ public class ANNSearchHelper {
         seriesToPullList = new ArrayList<>(seriesList);
         posterQueueIndex = seriesToPullList.size() - 1;
         getSequentialImages();
-
     }
 
     private void getSequentialImages(){
@@ -99,14 +101,13 @@ public class ANNSearchHelper {
         delegate = null;
     }
 
-    public void getPictureUrl(int ANNID, final int MALID) {
+    public void getPictureUrl(final int ANNID, final int MALID) {
         Uri uri = Uri.parse(SEARCH_BASE);
         Uri.Builder builder = uri.buildUpon()
                 .appendQueryParameter("anime", String.valueOf(ANNID));
 
         String url = builder.build().toString();
 
-        RequestQueue queue = Volley.newRequestQueue(activity);
         final StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -118,9 +119,10 @@ public class ANNSearchHelper {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.d(TAG, "error: " + error.getMessage());
+                Log.d(TAG, "error on ANNID '" + ANNID + "': " + error.getMessage());
             }
         });
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
 
         queue.add(stringRequest);
     }
@@ -133,18 +135,26 @@ public class ANNSearchHelper {
             Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputSource);
 
             NodeList imageNodeList = doc.getElementsByTagName("img");
-            if (imageNodeList.getLength() != 0){
-                Node imageNode = imageNodeList.item(0);
-                String pictureURL = imageNode.getAttributes().getNamedItem("src").getNodeValue();
+            if (imageNodeList.getLength() > 0){
+                if (imageNodeList.getLength() > 1){
+                    Node imageNode = imageNodeList.item(0);
+                    String bigPictureURL = imageNode.getAttributes().getNamedItem("src").getNodeValue();
+                    getImageFromURL(bigPictureURL, String.valueOf(MALID), "small");
 
-                getImageFromURL(pictureURL, String.valueOf(MALID));
+                    imageNode = imageNodeList.item(imageNodeList.getLength() - 1);
+                    String smallPictureURL = imageNode.getAttributes().getNamedItem("src").getNodeValue();
+                    getImageFromURL(smallPictureURL, String.valueOf(MALID), "big");
+                } else {
+                    Node imageNode = imageNodeList.item(0);
+                    String bigPictureURL = imageNode.getAttributes().getNamedItem("src").getNodeValue();
+                    getImageFromURL(bigPictureURL, String.valueOf(MALID), "big");
+                }
             } else {
                 if (pullingImages){
                     posterQueueIndex--;
                     getSequentialImages();
                 }
             }
-
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -154,13 +164,12 @@ public class ANNSearchHelper {
         }
     }
 
-    private void getImageFromURL(String URL, final String MALID){
-        RequestQueue queue = Volley.newRequestQueue(activity);
+    private void getImageFromURL(String URL, final String MALID, final String size){
         ImageRequest imageRequest = new ImageRequest(URL, new Response.Listener<Bitmap>(){
             @Override
             public void onResponse(Bitmap response) {
                 if (pullingImages){
-                    App.getInstance().cacheBitmap(response, MALID);
+                    App.getInstance().cacheBitmap(response, MALID, size);
 //                    App.getInstance().getPosterQueue().put(MALID, response);
                     posterQueueIndex--;
                     getSequentialImages();
