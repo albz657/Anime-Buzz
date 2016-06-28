@@ -122,7 +122,7 @@ public class ANNSearchHelper {
                 Log.d(TAG, "error on ANNID '" + ANNID + "': " + error.getMessage());
             }
         });
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT))
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         queue.add(stringRequest);
     }

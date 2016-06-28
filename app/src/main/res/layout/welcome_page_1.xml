@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.redbooth.WelcomePageLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/welcome_text"
+            style="@style/Base.TextAppearance.AppCompat.Display3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="60dp"
+            android:layout_marginTop="80dp"
+            android:width="300dp"
+            android:text="Welcome to Anime Buzz"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF" />
+
+
+        <TextView
+            android:id="@+id/wizard"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="50dp"
+            android:width="280dp"
+            android:text="Stay on top of the anime you're watching with:"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF" />
+
+        <RelativeLayout
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/wizard"
+            android:layout_centerHorizontal="true">
+
+            <TextView
+                android:id="@+id/bullet_1"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="&#8226;"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_notify"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_1"
+                android:text="Notifications when new episodes air"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_backlog"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/bullet_notify"
+                android:layout_toRightOf="@id/bullet_1"
+                android:text="A backlog of episodes you haven't watched yet"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_2"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/bullet_notify"
+                android:layout_toLeftOf="@id/bullet_backlog"
+
+                android:text="&#8226;"
+                android:textColor="#FFFFFF" />
+        </RelativeLayout>
+
+
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="60dp"
+            android:text="Swipe left to begin setup"
+            android:textAlignment="center"
+            android:textColor="#B3FFFFFF" />
+
+    </RelativeLayout>
+
+
+</com.redbooth.WelcomePageLayout>
