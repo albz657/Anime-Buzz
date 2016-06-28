@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
                         .commit();
-                navigationView.getMenu().getItem(0).setChecked(true);
+                navigationView.getMenu().getItem(1).setChecked(true);
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_myshows);
@@ -211,7 +211,7 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                         .commit();
-                navigationView.getMenu().getItem(1).setChecked(true);
+                navigationView.getMenu().getItem(2).setChecked(true);
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_seasons);
@@ -220,16 +220,16 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
                         .commit();
-                navigationView.getMenu().getItem(1).setChecked(true);*/
+                navigationView.getMenu().getItem(0).setChecked(true);
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_watching_queue);
-                }
+                }*/
             } else if (id == R.id.nav_settings){
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())
                         .commit();
-                navigationView.getMenu().getItem(1).setChecked(true);
+                navigationView.getMenu().getItem(3).setChecked(true);
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.action_settings);

@@ -48,7 +48,6 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), getSpinnerItems());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
-        toolbarSpinner.setSelection(getIndexOfCurrentlyBrowsingSeason());
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -63,6 +62,7 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
             }
         });
         refreshToolbar();
+        toolbarSpinner.setSelection(getIndexOfCurrentlyBrowsingSeason());
 
         mAdapter.notifyDataSetChanged();
     }

@@ -19,6 +19,7 @@
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
+
             <Spinner
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"

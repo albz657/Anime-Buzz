@@ -45,7 +45,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_time));
             } else {
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_time));
-
             }
         }
     }
@@ -58,14 +57,11 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         listView.setFocusable(false);
         listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
         setDivider(null);
-
-
     }
 
     @Override
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 

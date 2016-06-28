@@ -43,7 +43,7 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !convertView.getTag().toString().equals("NON_DROPDOWN")){
+        if (convertView == null || !convertView.getTag().toString().equals("NON_DROPDOWN")) {
             convertView = LayoutInflater.from(context).inflate(R.layout.spinner_seasons_item, parent, false);
             convertView.setTag("NON_DROPDOWN");
         }
@@ -54,11 +54,12 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !convertView.getTag().toString().equals("DROPDOWN")){
+        if (convertView == null || !convertView.getTag().toString().equals("DROPDOWN")) {
             convertView = LayoutInflater.from(context).inflate(R.layout.spinner_seasons_item_dropdown, parent, false);
             convertView.setTag("DROPDOWN");
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
         textView.setText(seasons.get(position));
-        return convertView;    }
+        return convertView;
+    }
 }
