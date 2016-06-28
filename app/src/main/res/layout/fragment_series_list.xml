@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="10dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".fragments.SeriesFragment"
         tools:listitem="@layout/fragment_series" />

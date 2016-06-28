@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.models;
 
-import android.graphics.Bitmap;
-
 public class Series {
 
     private int airdate_u;
@@ -15,17 +13,6 @@ public class Series {
 
     public int getANNID() {
         return ANNID;
-    }
-
-    public void setPoster(Bitmap poster) {
-        this.poster = poster;
-    }
-
-    private Bitmap poster;
-
-
-    public Bitmap getPoster() {
-        return poster;
     }
 
     public boolean isCurrentlyAiring() {

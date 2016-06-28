@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingEnd="8dp"
-    android:paddingStart="8dp">
+    android:paddingEnd="6dp"
+    android:paddingStart="6dp">
 
     <android.support.v7.widget.CardView xmlns:android.support.v7.cardview="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="2dp"
-        android:layout_marginTop="2dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
         android:background="?android:attr/activatedBackgroundIndicator"
         android.support.v7.cardview:contentPadding="10dp"
+        app:cardElevation="4dp"
         card_view:cardBackgroundColor="?android:attr/activatedBackgroundIndicator">
 
         <RelativeLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:paddingBottom="0dp"
@@ -26,64 +28,85 @@
             <ImageView
                 android:id="@+id/series_poster"
                 android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:layout_centerVertical="true"
-
+                android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
-                android:background="#ff0000" />
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp" />
+
+            <FrameLayout
+                android:id="@+id/button_holder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="6dp">
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/add_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_action_add"
+                    app:elevation="4dp"
+                    app:fabSize="mini" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/minus_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_action_minus"
+                    android:visibility="gone"
+                    app:elevation="4dp"
+                    app:fabSize="mini" />
+
+            </FrameLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/button_holder"
+                android:layout_toRightOf="@id/series_poster"
                 android:paddingBottom="4dp"
-                android:paddingTop="4dp"
-                android:layout_toRightOf="@id/series_poster">
+                android:paddingTop="4dp">
 
                 <TextView
                     android:id="@+id/series_title"
                     style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:singleLine="true"
                     android:textColor="#D9000000" />
 
                 <TextView
                     android:id="@+id/series_more"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"
-                    android:layout_width="fill_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/series_title"
                     android:textColor="#D9000000" />
 
-                <TextView
-                    android:id="@+id/series_date"
-                    style="@style/Base.TextAppearance.AppCompat.Body1"
-                    android:layout_width="fill_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/series_more"
-                    android:textColor="#D9000000" />
+                    android:layout_below="@+id/series_more">
 
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="4dp"
+                        android:src="@drawable/ic_watch_later" />
+
+                    <TextView
+                        android:id="@+id/series_date"
+                        style="@style/Base.TextAppearance.AppCompat.Body1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="65654"
+                        android:textColor="#D9000000" />
+                </LinearLayout>
             </RelativeLayout>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:id="@+id/add_button"
-                android:background="@color/colorAccent"
-                android:src="@drawable/ic_action_add"
-                android:layout_alignParentRight="true"
-                android:layout_marginLeft="8dp"/>
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:id="@+id/minus_button"
-                android:background="@color/colorAccent"
-                android:src="@drawable/ic_action_minus"
-                android:layout_alignParentRight="true"
-                android:visibility="gone"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </FrameLayout>
