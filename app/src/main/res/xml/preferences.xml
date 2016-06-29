@@ -4,7 +4,7 @@
         android:key="@string/pref_category_notifications_key"
         android:title="@string/pref_category_notifications_title">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_airing_or_simulcast_key"
             android:summary="@string/pref_airing_summary"
@@ -15,7 +15,7 @@
         android:key="@string/pref_category_misc_key"
         android:title="@string/pref_category_misc_title">
 
-        <CheckBoxPreference
+        <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_24hour_key"
             android:summary="@string/pref_24hour_summary"

@@ -9,8 +9,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class NotificationHelper {
 
@@ -20,12 +19,12 @@ public class NotificationHelper {
         this.mContext = context;
     }
 
-    public void createUpdatingSeasonDataNotification(Season season) {
+    public void createUpdatingSeasonDataNotification(String seasonName) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle("Updating anime database")
-                        .setContentText(season.getName())
+                        .setContentText(seasonName)
                         .setAutoCancel(false)
                         .setProgress(0, 0, true);
 
@@ -37,10 +36,10 @@ public class NotificationHelper {
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(season.getName().hashCode(), mBuilder.build());
+        mNotificationManager.notify(seasonName.hashCode(), mBuilder.build());
     }
 
-    public void createNewEpisodeNotification(Series series) {
+    public void createNewEpisodeNotification(SeriesOld series) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)

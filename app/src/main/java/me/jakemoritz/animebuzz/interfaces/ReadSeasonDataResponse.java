@@ -2,8 +2,8 @@ package me.jakemoritz.animebuzz.interfaces;
 
 import java.util.ArrayList;
 
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public interface ReadSeasonDataResponse {
-    void seasonDataRetrieved(ArrayList<Series> seriesList);
+    void seasonDataRetrieved(ArrayList<SeriesOld> seriesList);
 }

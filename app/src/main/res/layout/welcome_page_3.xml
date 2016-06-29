@@ -9,7 +9,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/mal_or_no"
+            android:id="@+id/setup_settings"
             style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,20 +19,21 @@
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:text="A couple of settings..."
+            android:text="@string/setup_settings_text"
             android:textColor="#FFFFFF" />
 
         <RelativeLayout
-            android:id="@+id/login_layout"
+            android:id="@+id/setup_settings_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/mal_or_no"
+            android:layout_below="@id/setup_settings"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="80dp"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:layout_marginBottom="20dp">
+            android:paddingRight="20dp">
 
             <RelativeLayout
-                android:id="@+id/username_container"
+                android:id="@+id/setup_settings_simulcast_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
@@ -42,63 +43,50 @@
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switch_simulcast"
                     android:layout_width="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"/>
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
 
 
                 <TextView
-                    android:id="@+id/label_username"
+                    android:id="@+id/label_switch_simulcast"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:gravity="right"
-
                     android:layout_toLeftOf="@id/switch_simulcast"
                     android:text="@string/pref_airing_or_simulcast_title"
                     android:textColor="#FFFFFF" />
             </RelativeLayout>
 
             <RelativeLayout
-                android:id="@+id/password_container"
+                android:id="@+id/setup_settings_24hour_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/username_container"
                 android:layout_alignParentRight="true"
-                >
-
-
+                android:layout_below="@id/setup_settings_simulcast_container">
 
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switch_24hour"
                     android:layout_width="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"/>
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true" />
+
                 <TextView
-                    android:id="@+id/label_password"
+                    android:id="@+id/label_switch_24hour"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:text="@string/pref_24hour_title"
                     android:layout_toLeftOf="@id/switch_24hour"
-
+                    android:text="@string/pref_24hour_title"
                     android:textColor="#FFFFFF" />
 
             </RelativeLayout>
         </RelativeLayout>
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/login_layout"
-            android:layout_centerHorizontal="true"
-            android:text="Start" />
 
         <TextView
             android:id="@+id/change_later"
@@ -108,7 +96,18 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="60dp"
-            android:text="(You can change these later)"
+            android:text="@string/change_later_text"
             android:textColor="#80FFFFFF" />
+
+        <Button
+            android:id="@+id/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/change_later"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:text="@string/start_button_text" />
+
+
     </RelativeLayout>
 </com.redbooth.WelcomePageLayout>

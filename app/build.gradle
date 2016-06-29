@@ -36,4 +36,8 @@ dependencies {
 //    compile 'net.xpece.android:support-spinner:0.9.0'
     compile 'net.xpece.android:support-preference-color:0.9.0'
     compile 'com.redbooth:WelcomeCoordinator:1.0.1'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+
 }

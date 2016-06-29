@@ -33,7 +33,7 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class ANNSearchHelper {
 
@@ -44,7 +44,7 @@ public class ANNSearchHelper {
     private MainActivity activity;
     private boolean pullingImages = false;
     private int posterQueueIndex = -1;
-    private ArrayList<Series> seriesToPullList;
+    private ArrayList<SeriesOld> seriesToPullList;
     private SeasonPostersImportResponse delegate = null;
     private RequestQueue queue;
 
@@ -53,7 +53,7 @@ public class ANNSearchHelper {
         this.queue = Volley.newRequestQueue(activity);
     }
 
-    public void getImages(SeriesFragment fragment, ArrayList<Series> seriesList){
+    public void getImages(SeriesFragment fragment, ArrayList<SeriesOld> seriesList){
         delegate = (SeasonsFragment) fragment;
         pullingImages = true;
         seriesToPullList = new ArrayList<>(seriesList);
@@ -80,11 +80,11 @@ public class ANNSearchHelper {
         DatabaseHelper helper = new DatabaseHelper(activity);
         Cursor cursor;
 
-        ArrayList<Series> seriesHolder = new ArrayList<>();
+        ArrayList<SeriesOld> seriesHolder = new ArrayList<>();
         for (Map.Entry<String, Bitmap> entry : App.getInstance().getPosterQueue().entrySet()){
             /*cursor = helper.getSeries(Integer.valueOf(entry.getKey()), activity.getString(R.string.table_anime));
             cursor.moveToFirst();
-            Series series = helper.getSeriesWithCursor(cursor);
+            SeriesOld series = helper.getSeriesWithCursor(cursor);
             series.setPoster(entry.getValue());
             seriesHolder.add(series);*/
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SeriesTest {
 
-    private List<Series> items;
+    private List<SeriesOld> items;
 
 
 }

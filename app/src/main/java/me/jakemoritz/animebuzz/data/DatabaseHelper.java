@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -69,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertSeries(Series series, String TABLE_NAME) {
+    public boolean insertSeries(SeriesOld series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -100,7 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    public boolean updateSeriesInDb(Series series, String TABLE_NAME) {
+    public boolean updateSeriesInDb(SeriesOld series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -137,9 +137,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(mal_id)});
     }
 
-    public void saveSeriesToDb(ArrayList<Series> seriesList, String TABLE_NAME) {
+    public void saveSeriesToDb(ArrayList<SeriesOld> seriesList, String TABLE_NAME) {
         if (seriesList != null) {
-            for (Series series : seriesList) {
+            for (SeriesOld series : seriesList) {
                 if (getSeries(series.getMALID(), TABLE_NAME).getCount() != 0) {
                     updateSeriesInDb(series, TABLE_NAME);
                 } else {
@@ -150,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         close();
     }
 
-    public Series getSeriesWithCursor(Cursor res){
+    public SeriesOld getSeriesWithCursor(Cursor res){
         int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
         String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
         int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
@@ -161,7 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        byte[] posterBytes = res.getBlob(res.getColumnIndex(DatabaseHelper.KEY_POSTER));
         int ANNID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ANNID));
 
-        Series series = new Series(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring, ANNID);
+        SeriesOld series = new SeriesOld(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring, ANNID);
 
    /*     if (posterBytes != null){
             Bitmap poster = getBitmapFromBytes(posterBytes);
@@ -170,11 +170,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return series;
     }
 
-    public ArrayList<Series> getSeriesFromDb(String TABLE_NAME) {
+    public ArrayList<SeriesOld> getSeriesFromDb(String TABLE_NAME) {
         Cursor res = getAllSeries(TABLE_NAME);
 
         res.moveToFirst();
-        ArrayList<Series> seriesList = new ArrayList<>();
+        ArrayList<SeriesOld> seriesList = new ArrayList<>();
 
         for (int i = 0; i < res.getCount(); i++) {
             getSeriesWithCursor(res);

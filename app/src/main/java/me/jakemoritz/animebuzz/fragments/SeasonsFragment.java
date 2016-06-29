@@ -19,12 +19,12 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class SeasonsFragment extends SeriesFragment implements SeasonPostersImportResponse {
 
@@ -71,10 +71,10 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season ='" + seasonName + "'", null);
 
-        ArrayList<Series> newBrowsingSeason = new ArrayList<>();
+        ArrayList<SeriesOld> newBrowsingSeason = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            Series series = dbHelper.getSeriesWithCursor(cursor);
+            SeriesOld series = dbHelper.getSeriesWithCursor(cursor);
             newBrowsingSeason.add(series);
             cursor.moveToNext();
         }
@@ -137,7 +137,7 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         return seasonNames;
     }
 
-    private void refreshToolbar() {
+    public void refreshToolbar() {
         if (parentActivity.getSupportActionBar() != null && toolbarSpinner != null) {
             ArrayList<String> seasons = getSpinnerItems();
             if (seasons.isEmpty()) {
@@ -159,14 +159,13 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         int id = item.getItemId();
 
         if (id == R.id.action_notify) {
-            MainActivity activity = (MainActivity) getActivity();
-            //activity.makeAlarm();
-        } else if (id == R.id.action_clear_list) {
-            mAdapter.getVisibleSeries().clear();
-            mAdapter.notifyDataSetChanged();
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());
+            senpaiExportHelper.getLatestSeasonData();
         } else if (id == R.id.action_verify) {
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());
+            senpaiExportHelper.getLatestSeasonDataRetrofit();/*
             ANNSearchHelper helper = new ANNSearchHelper((MainActivity) getActivity());
-            helper.getImages(this, mAdapter.getAllSeries());
+            helper.getImages(this, mAdapter.getAllSeries());*/
         }
 
         return super.onOptionsItemSelected(item);

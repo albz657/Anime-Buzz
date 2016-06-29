@@ -1,6 +1,8 @@
 package me.jakemoritz.animebuzz.helpers;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -9,10 +11,11 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
-public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList<Series>> {
+public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList<SeriesOld>> {
 
     private final static String TAG = ProcessSeasonDataTask.class.getSimpleName();
 
@@ -23,13 +26,20 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
         this.seasonDataDelegate = seasonDataDelegate;
     }
 
-    private ArrayList<Series> parseSeasonData(JSONObject response) {
-        ArrayList<Series> seriesFromServer = new ArrayList<>();
+    private ArrayList<SeriesOld> parseSeasonData(JSONObject response) {
+        ArrayList<SeriesOld> seriesFromServer = new ArrayList<>();
 
         try {
             JSONArray testResponse = response.getJSONArray("items");
             JSONObject meta = response.getJSONObject("meta");
             String season = meta.getString("season");
+
+            if (App.getInstance().isCurrentlyInitializing()) {
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), season);
+                editor.apply();
+            }
 
             for (int i = 0; i < testResponse.length(); i++) {
                 JSONObject seriesAsJSON = testResponse.getJSONObject(i);
@@ -39,7 +49,7 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
                 try {
                     MALID = seriesAsJSON.getInt("MALID");
                     ANNID = seriesAsJSON.getInt("ANNID");
-                    Series series = new Series(seriesAsJSON.getInt("airdate_u"),
+                    SeriesOld series = new SeriesOld(seriesAsJSON.getInt("airdate_u"),
                             seriesAsJSON.getString("name"),
                             MALID,
                             seriesAsJSON.getInt("simulcast_airdate_u"),
@@ -52,7 +62,7 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
                 } catch (JSONException e) {
                     if (ANNID == -1){
                         Log.d(TAG, "No ANNID for: '" + seriesAsJSON.getString("name") + "'");
-                        Series series = new Series(seriesAsJSON.getInt("airdate_u"),
+                        SeriesOld series = new SeriesOld(seriesAsJSON.getInt("airdate_u"),
                                 seriesAsJSON.getString("name"),
                                 MALID,
                                 seriesAsJSON.getInt("simulcast_airdate_u"),
@@ -75,13 +85,13 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Series> series) {
+    protected void onPostExecute(ArrayList<SeriesOld> series) {
         super.onPostExecute(series);
         seasonDataDelegate.seasonDataRetrieved(series);
     }
 
     @Override
-    protected ArrayList<Series> doInBackground(JSONObject... params) {
+    protected ArrayList<SeriesOld> doInBackground(JSONObject... params) {
         return parseSeasonData(params[0]);
     }
 }

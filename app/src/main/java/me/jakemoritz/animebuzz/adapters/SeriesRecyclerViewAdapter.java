@@ -23,26 +23,26 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    public ArrayList<Series> getVisibleSeries() {
+    public ArrayList<SeriesOld> getVisibleSeries() {
         return visibleSeries;
     }
 
-    public ArrayList<Series> visibleSeries = null;
+    public ArrayList<SeriesOld> visibleSeries = null;
 
-    public ArrayList<Series> getAllSeries() {
+    public ArrayList<SeriesOld> getAllSeries() {
         return allSeries;
     }
 
-    public ArrayList<Series> allSeries = null;
+    public ArrayList<SeriesOld> allSeries = null;
     public SeriesFragment mListener = null;
     public ViewGroup parent;
     private SeriesFilter seriesFilter;
 
-    public SeriesRecyclerViewAdapter(ArrayList<Series> items, SeriesFragment listener) {
+    public SeriesRecyclerViewAdapter(ArrayList<SeriesOld> items, SeriesFragment listener) {
         allSeries = items;
         mListener = listener;
         visibleSeries = new ArrayList<>(items);
@@ -128,7 +128,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         public final ImageButton mMinusButton;
 
 
-        public Series series;
+        public SeriesOld series;
 
         public ViewHolder(View view) {
             super(view);
@@ -141,7 +141,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
     }
 
-    public void removeSeries(Series item, int position) {
+    public void removeSeries(SeriesOld item, int position) {
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
         notifyItemChanged(position);
@@ -151,9 +151,9 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
-    public void addSeries(Series item, int position) {
+    public void addSeries(SeriesOld item, int position) {
         boolean alreadyExists = false;
-        for (Series series : App.getInstance().getUserAnimeList()) {
+        for (SeriesOld series : App.getInstance().getUserAnimeList()) {
             if (series.getMALID() == item.getMALID()) {
                 alreadyExists = true;
             }

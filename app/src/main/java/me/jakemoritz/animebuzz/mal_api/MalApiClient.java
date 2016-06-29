@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.mal_api;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.v7.preference.PreferenceManager;
@@ -34,7 +35,9 @@ import javax.xml.parsers.SAXParserFactory;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-
+import me.jakemoritz.animebuzz.activities.SetupActivity;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
 
 public class MalApiClient {
 
@@ -43,10 +46,12 @@ public class MalApiClient {
     private static final String VERIFY_CREDENTIALS = "http://myanimelist.net/api/account/verify_credentials.xml";
     private static final String USER_LIST_BASE = "http://myanimelist.net/malappinfo.php";
 
-    private MainActivity activity;
+    private Activity activity;
+    private RequestQueue queue;
 
-    public MalApiClient(MainActivity activity) {
+    public MalApiClient(Activity activity) {
         this.activity = activity;
+        this.queue = Volley.newRequestQueue(activity);
     }
 
     public void getUserList() {
@@ -57,7 +62,6 @@ public class MalApiClient {
                 .appendQueryParameter("type", "anime");
         String url = builder.build().toString();
 
-        RequestQueue queue = Volley.newRequestQueue(activity);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
             @Override
@@ -76,37 +80,55 @@ public class MalApiClient {
         queue.add(stringRequest);
     }
 
-    public void verifyCredentials() {
-        RequestQueue queue = Volley.newRequestQueue(activity);
+    public void verifyCredentials(final String username, final String password) {
+        final VerifyCredentialsResponse delegate = (SetupActivity) activity;
+
         StringRequest stringRequest = new StringRequest(Request.Method.GET, VERIFY_CREDENTIALS, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                processVerificationResponse(response);
+                if (delegate != null){
+                    delegate.verifyCredentialsResponseReceived(true);
+                }
+                App.getInstance().setTryingToVerify(false);
             }
         }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
                 // handle error
+                if (delegate != null){
+                    delegate.verifyCredentialsResponseReceived(false);
+                }
+                App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + error.getMessage());
             }
         }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                return getBasicHTTPAuthParams();
+                return getBasicHTTPAuthParams(username, password);
             }
         };
 
         queue.add(stringRequest);
     }
 
-    private Map<String, String> getBasicHTTPAuthParams() {
+    private Map<String, String> getBasicHTTPAuthParams(String username, String password) {
         Map<String, String> params = new HashMap<>();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
-        String creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", username, password).getBytes(), Base64.DEFAULT));
+        boolean hasCompletedSetup = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_completed_setup), false);
+
+        String creds;
+
+        if (hasCompletedSetup){
+            String savedUsername = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+            String savedPassword = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+            creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", savedUsername, savedPassword).getBytes(), Base64.DEFAULT));
+        } else {
+            creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", username, password).getBytes(), Base64.DEFAULT));
+
+        }
+
         params.put("Authorization", creds);
         return params;
     }
@@ -175,7 +197,7 @@ public class MalApiClient {
                     }
                 }
             }
-            MalImportHelper helper = new MalImportHelper(activity);
+            MalImportHelper helper = new MalImportHelper((MainActivity) activity);
             helper.matchSeries(currentlyWatchingSeriesIds);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

@@ -1,0 +1,68 @@
+package me.jakemoritz.animebuzz.models;
+
+public class SeriesOld {
+
+    private int airdate_u;
+    private String name;
+    private int MALID;
+    private boolean currentlyAiring;
+    private int simulcast_airdate_u;
+    private boolean isInUserList;
+    private String season;
+    private int ANNID;
+
+    public int getANNID() {
+        return ANNID;
+    }
+
+    public boolean isCurrentlyAiring() {
+        return currentlyAiring;
+    }
+
+    public String getSeason() {
+        return season;
+    }
+
+    public void setSeason(String season) {
+        this.season = season;
+    }
+
+    public void setInUserList(boolean inUserList) {
+        isInUserList = inUserList;
+    }
+
+    public boolean isInUserList() {
+        return isInUserList;
+    }
+
+    public int getSimulcast_airdate_u() {
+        return simulcast_airdate_u;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMALID() {
+        return MALID;
+    }
+
+    public int getAirdate_u() {
+        return airdate_u;
+    }
+
+    public SeriesOld() {
+
+    }
+
+    public SeriesOld(int airdate_u, String name, int MALID, int simulcast_airdate_u, boolean isInUserList, String season, boolean currentlyAiring, int ANNID) {
+        this.airdate_u = airdate_u;
+        this.name = name;
+        this.MALID = MALID;
+        this.simulcast_airdate_u = simulcast_airdate_u;
+        this.isInUserList = isInUserList;
+        this.season = season;
+        this.currentlyAiring = currentlyAiring;
+        this.ANNID = ANNID;
+    }
+}

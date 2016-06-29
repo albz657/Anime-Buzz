@@ -9,7 +9,7 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:id="@+id/mal_or_no"
+            android:id="@+id/mal_sign_in"
             style="@style/Base.TextAppearance.AppCompat.Headline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -19,25 +19,25 @@
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:text="Would you like to sign in to your MyAnimeList account?"
+            android:text="@string/mal_sign_in_text"
             android:textColor="#FFFFFF" />
 
         <TextView
-            android:id="@+id/mal_or_no_opt"
+            android:id="@+id/mal_sign_in_optional"
             style="@style/Base.TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="30dp"
-            android:text="(optional)"
-            android:layout_below="@id/mal_or_no"
+            android:text="@string/mal_sign_in_optional_text"
+            android:layout_below="@id/mal_sign_in"
             android:textColor="#80FFFFFF" />
 
         <RelativeLayout
-            android:id="@+id/login_layout"
+            android:id="@+id/mal_sign_in_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/mal_or_no_opt"
+            android:layout_below="@id/mal_sign_in_optional"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:layout_marginBottom="20dp">
@@ -55,12 +55,13 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-
-                    android:text="Username:"
+                    android:text="@string/label_username_text"
                     android:textColor="#FFFFFF" />
 
                 <EditText
                     android:id="@+id/edit_username"
+                    android:theme="@style/Theme.App.Base"
+
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -68,8 +69,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginBottom="10dp"
                     android:layout_toRightOf="@id/label_username"
-
-                    android:hint="username" />
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -77,8 +78,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/username_container"
-                android:layout_alignParentRight="true"
-                >
+                android:layout_alignParentRight="true">
 
                 <TextView
                     android:id="@+id/label_password"
@@ -87,31 +87,48 @@
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
-                    android:text="Password:"
-
+                    android:text="@string/label_password_text"
                     android:textColor="#FFFFFF" />
 
                 <EditText
                     android:id="@+id/edit_password"
+                    android:theme="@style/Theme.App.Base"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@id/label_password"
-                    android:hint="password"
-                    android:inputType="textPassword" />
+                    android:inputType="textPassword"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true" />
 
             </RelativeLayout>
+
+            <Button
+                android:id="@+id/sign_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/password_container"
+                android:layout_centerHorizontal="true"
+                android:text="@string/sign_in" />
+
+
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/button"
+        <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/login_layout"
+            android:id="@+id/sign_in_checkmark"
+            android:src="@drawable/ic_check_circle"
+            android:tint="@color/colorAccent"
+            android:layout_below="@id/mal_sign_in_optional"
             android:layout_centerHorizontal="true"
-            android:text="Sign in" />
+            android:layout_alignParentBottom="true"
+
+            android:layout_marginBottom="80dp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/mal_or_no_later"
@@ -121,7 +138,8 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="60dp"
-            android:text="(You can sign in later)"
+            android:text="@string/sign_in_later"
             android:textColor="#80FFFFFF" />
+
     </RelativeLayout>
 </com.redbooth.WelcomePageLayout>

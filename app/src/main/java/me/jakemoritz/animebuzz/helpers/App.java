@@ -8,8 +8,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.support.v7.preference.PreferenceManager;
 
-import com.squareup.picasso.LruCache;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +25,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesOld;
 
 public class App extends Application {
 
@@ -35,26 +33,38 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private ArrayList<Series> userAnimeList;
-    private ArrayList<Series> allAnimeList;
-    private ArrayList<Series> currentlyBrowsingSeason;
+    private ArrayList<SeriesOld> userAnimeList;
+    private ArrayList<SeriesOld> allAnimeList;
+    private ArrayList<SeriesOld> currentlyBrowsingSeason;
     private ArrayList<Season> seasonsList;
-    private HashMap<Series, Intent> alarms;
-    private Series mostRecentAlarm;
+    private HashMap<SeriesOld, Intent> alarms;
+    private SeriesOld mostRecentAlarm;
 
-    public LruCache getLruCache() {
-        return lruCache;
+    public boolean isCurrentlyInitializing() {
+        return currentlyInitializing;
     }
 
-    private LruCache lruCache;
+    public void setCurrentlyInitializing(boolean currentlyInitializing) {
+        this.currentlyInitializing = currentlyInitializing;
+    }
+
+    private boolean currentlyInitializing = false;
+
+    public boolean isTryingToVerify() {
+        return tryingToVerify;
+    }
+
+    public void setTryingToVerify(boolean tryingToVerify) {
+        this.tryingToVerify = tryingToVerify;
+    }
+
+    private boolean tryingToVerify = false;
 
     public HashMap<String, Bitmap> getPosterQueue() {
         return posterQueue;
     }
 
-    public void setPosterQueue(HashMap<String, Bitmap> posterQueue) {
-        this.posterQueue = posterQueue;
-    }
+
 
     private HashMap<String, Bitmap> posterQueue;
 
@@ -70,8 +80,6 @@ public class App extends Application {
         alarms = new HashMap<>();
         posterQueue = new HashMap<>();
 
-        lruCache = new LruCache(this);
-
         loadAnimeListFromDB();
         loadAlarms();
         loadSeasonsList();
@@ -85,7 +93,7 @@ public class App extends Application {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season = '" + latestSeason + "'", null);
 
-        ArrayList<Series> tempSeries = new ArrayList<>();
+        ArrayList<SeriesOld> tempSeries = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             tempSeries.add(dbHelper.getSeriesWithCursor(cursor));
@@ -110,12 +118,12 @@ public class App extends Application {
         dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveUserAnimeList(ArrayList<Series> userAnimeList) {
+    public void saveUserAnimeList(ArrayList<SeriesOld> userAnimeList) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveNewSeasonData(ArrayList<Series> newSeason) {
+    public void saveNewSeasonData(ArrayList<SeriesOld> newSeason) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(newSeason, getString(R.string.table_anime));
     }
@@ -159,25 +167,6 @@ public class App extends Application {
         bitmap.recycle();
     }
 
-/*    private Bitmap getCachedBitmap(String MALID){
-        try {
-            FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<Season> tempSeasonsList = (ArrayList<Season>) ois.readObject();
-            if (tempSeasonsList != null) {
-                Collections.sort(tempSeasonsList, new SeasonComparator());
-                seasonsList = tempSeasonsList;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            // user has no alarms
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }*/
-
     public void saveSeasonsList() {
         try {
             FileOutputStream fos = openFileOutput(getString(R.string.season_list_file), Context.MODE_PRIVATE);
@@ -211,9 +200,9 @@ public class App extends Application {
         }
     }
 
-    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList) {
-        ArrayList<Series> filteredUserList = new ArrayList<>();
-        for (Series series : allAnimeList) {
+    private ArrayList<SeriesOld> filterUserList(ArrayList<SeriesOld> allAnimeList) {
+        ArrayList<SeriesOld> filteredUserList = new ArrayList<>();
+        for (SeriesOld series : allAnimeList) {
             if (series.isInUserList()) {
                 filteredUserList.add(series);
             }
@@ -221,12 +210,12 @@ public class App extends Application {
         return filteredUserList;
     }
 
-    public void addAlarm(Series series, Intent intent) {
+    public void addAlarm(SeriesOld series, Intent intent) {
         mostRecentAlarm = series;
         this.alarms.put(series, intent);
     }
 
-    public Series getMostRecentAlarm() {
+    public SeriesOld getMostRecentAlarm() {
         return mostRecentAlarm;
     }
 
@@ -238,7 +227,7 @@ public class App extends Application {
         try {
             FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.file_alarms));
             ObjectInputStream ois = new ObjectInputStream(fis);
-            HashMap<Series, IntentWrapper> tempAlarms = (HashMap<Series, IntentWrapper>) ois.readObject();
+            HashMap<SeriesOld, IntentWrapper> tempAlarms = (HashMap<SeriesOld, IntentWrapper>) ois.readObject();
             if (tempAlarms != null) {
                 deserializeAlarms(tempAlarms);
             }
@@ -252,13 +241,13 @@ public class App extends Application {
         }
     }
 
-    private void deserializeAlarms(HashMap<Series, IntentWrapper> serializedAlarms) {
-        HashMap<Series, Intent> tempAlarms = new HashMap<>();
-        Set<Series> set = serializedAlarms.keySet();
-        List<Series> list = new ArrayList<>();
+    private void deserializeAlarms(HashMap<SeriesOld, IntentWrapper> serializedAlarms) {
+        HashMap<SeriesOld, Intent> tempAlarms = new HashMap<>();
+        Set<SeriesOld> set = serializedAlarms.keySet();
+        List<SeriesOld> list = new ArrayList<>();
         list.addAll(set);
         while (!serializedAlarms.isEmpty()) {
-            Series tempSeries = list.remove(0);
+            SeriesOld tempSeries = list.remove(0);
             IntentWrapper wrapper = serializedAlarms.remove(tempSeries);
             Intent tempIntent = new Intent(wrapper.getAction(), wrapper.getUri());
             tempAlarms.put(tempSeries, tempIntent);
@@ -267,12 +256,12 @@ public class App extends Application {
     }
 
     private void serializeAlarms() {
-        HashMap<Series, IntentWrapper> serializedAlarms = new HashMap<>();
-        Set<Series> set = alarms.keySet();
-        List<Series> list = new ArrayList<>();
+        HashMap<SeriesOld, IntentWrapper> serializedAlarms = new HashMap<>();
+        Set<SeriesOld> set = alarms.keySet();
+        List<SeriesOld> list = new ArrayList<>();
         list.addAll(set);
         while (!alarms.isEmpty()) {
-            Series tempSeries = list.remove(0);
+            SeriesOld tempSeries = list.remove(0);
             Intent tempIntent = alarms.remove(tempSeries);
             IntentWrapper wrapper = new IntentWrapper(tempIntent.getAction(), tempIntent.getData());
             serializedAlarms.put(tempSeries, wrapper);
@@ -290,7 +279,7 @@ public class App extends Application {
         }
     }
 
-    public HashMap<Series, Intent> getAlarms() {
+    public HashMap<SeriesOld, Intent> getAlarms() {
         return alarms;
     }
 
@@ -298,7 +287,7 @@ public class App extends Application {
         return mInstance;
     }
 
-    public ArrayList<Series> getAllAnimeList() {
+    public ArrayList<SeriesOld> getAllAnimeList() {
         return allAnimeList;
     }
 
@@ -306,11 +295,12 @@ public class App extends Application {
         return seasonsList;
     }
 
-    public ArrayList<Series> getCurrentlyBrowsingSeason() {
+    public ArrayList<SeriesOld> getCurrentlyBrowsingSeason() {
         return currentlyBrowsingSeason;
     }
 
-    public ArrayList<Series> getUserAnimeList() {
+    public ArrayList<SeriesOld> getUserAnimeList() {
         return userAnimeList;
     }
+
 }

@@ -25,6 +25,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setCorrectSummaries();
+
         MainActivity parentActivity = (MainActivity) getActivity();
         if (parentActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
@@ -34,6 +36,27 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
 
             parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+    }
+
+    private void setCorrectSummaries(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_airing_or_simulcast_key), false);
+
+        Preference airingOrSimulcastPref = findPreference(getString(R.string.pref_airing_or_simulcast_key));
+        if (prefersSimulcast){
+            airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
+        } else {
+            airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
+        }
+
+        boolean prefers24Hour = sharedPreferences.getBoolean(getString(R.string.pref_24hour_key), false);
+
+        Preference timeFormatPref = findPreference(getString(R.string.pref_24hour_key));
+        if (prefers24Hour){
+            timeFormatPref.setSummary(getString(R.string.pref_24hour_summary));
+        } else {
+            timeFormatPref.setSummary(getString(R.string.pref_24hour_off_summary));
         }
     }
 
