@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity
                         .commit();
 
                 ANNSearchHelper helper = new ANNSearchHelper(this);
-                //helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
+//                helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
             }
         } else if (postInitializing) {
             currentInitializingIndex--;

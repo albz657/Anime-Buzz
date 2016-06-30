@@ -7,12 +7,10 @@ import android.util.Log;
 
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -23,6 +21,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,36 +29,42 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.interfaces.ANNEndpointInterface;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.xml_holders.ANN.ANNXMLHolder;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class ANNSearchHelper {
 
     private final static String TAG = ANNSearchHelper.class.getSimpleName();
 
-    private static final String SEARCH_BASE = "http://cdn.animenewsnetwork.com/encyclopedia/api.xml";
+    private static final String SEARCH_BASE = "http://cdn.animenewsnetwork.com/";
 
     private MainActivity activity;
     private boolean pullingImages = false;
     private int posterQueueIndex = -1;
-    private ArrayList<Series> seriesToPullList;
+    private List<Series> seriesToPullList;
     private SeasonPostersImportResponse delegate = null;
-    private RequestQueue queue;
 
     public ANNSearchHelper(MainActivity activity) {
         this.activity = activity;
-        this.queue = Volley.newRequestQueue(activity);
     }
 
-    public void getImages(SeriesFragment fragment, ArrayList<Series> seriesList){
-        delegate = (SeasonsFragment) fragment;
+    public void getImages(SeriesFragment fragment, List<Series> seriesList){
+        delegate = fragment;
         pullingImages = true;
         seriesToPullList = new ArrayList<>(seriesList);
         posterQueueIndex = seriesToPullList.size() - 1;
         getSequentialImages();
     }
+
+
 
     private void getSequentialImages(){
         if (posterQueueIndex > 0){
@@ -124,7 +129,32 @@ public class ANNSearchHelper {
         });
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(0, -1, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
-        queue.add(stringRequest);
+        //queue.add(stringRequest);
+    }
+
+    public void getPictureUrlRetroFit(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SEARCH_BASE)
+                .client(new OkHttpClient())
+                .addConverterFactory(SimpleXmlConverterFactory.create())
+                .build();
+
+       ANNEndpointInterface annEndpointInterface = retrofit.create(ANNEndpointInterface.class);
+        Call<ANNXMLHolder> call = annEndpointInterface.getImageUrls("17700");
+        call.enqueue(new Callback<ANNXMLHolder>() {
+            @Override
+            public void onResponse(Call<ANNXMLHolder> call, retrofit2.Response<ANNXMLHolder> response) {
+                Log.d(TAG, "Success");
+            }
+
+            @Override
+            public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
+                Log.d(TAG, "Failure");
+
+            }
+        });
+
+
     }
 
     private void processPictureURLResponse(String response, int MALID) {
@@ -182,7 +212,7 @@ public class ANNSearchHelper {
             }
         });
 
-        queue.add(imageRequest);
+        //queue.add(imageRequest);
     }
 }
 

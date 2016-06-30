@@ -18,14 +18,14 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
+import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
 
-public class SeasonsFragment extends SeriesFragment implements SeasonPostersImportResponse {
+public class SeasonsFragment extends SeriesFragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -119,7 +119,11 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
 
         if (id == R.id.action_notify) {
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());
-            senpaiExportHelper.getSeasonList();
+            //senpaiExportHelper.getSeasonList();
+
+            ANNSearchHelper helper = new ANNSearchHelper(parentActivity);
+            helper.getPictureUrlRetroFit();
+            //helper.getImages(this, mAdapter.getAllSeries());
         } else if (id == R.id.action_verify) {
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());
             senpaiExportHelper.getLatestSeasonData();/*
@@ -152,8 +156,5 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         });
     }
 
-    @Override
-    public void seasonPostersImported() {
-        mAdapter.notifyDataSetChanged();
-    }
+
 }
