@@ -38,8 +38,8 @@ import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.SeasonMeta;
+import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
@@ -141,12 +141,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public String formatAiringTime(SeriesOld series, boolean simulcast){
+    public String formatAiringTime(Series series, boolean simulcast){
         Calendar cal;
         if (simulcast){
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate_u());
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
         } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate_u());
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
         }
 
         Calendar nextEpisode = Calendar.getInstance();
@@ -183,10 +183,10 @@ public class MainActivity extends AppCompatActivity
         return formattedTime;
     }
 
-    public void makeAlarm(SeriesOld series) {
+    public void makeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate_u());
+        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
         Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "alarm for '" + series.getName() + "' set for: " + formattedNext);
     }
 
-    public void removeAlarm(SeriesOld series) {
+    public void removeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, App.getInstance().getAlarms().remove(series), 0);
 
@@ -214,21 +214,21 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "alarm removed for: " + series.getName());
     }
 
-    public void updateSeries(ArrayList<SeriesOld> seriesList){
-        HashSet<Season> seasons = new HashSet<>();
-        for (SeriesOld series : seriesList){
-            for (Season season : App.getInstance().getSeasonsList()){
-                if (series.getSeason().equals(season.getName())){
-                    seasons.add(season);
+    public void updateSeries(ArrayList<Series> seriesList){
+        HashSet<SeasonMeta> seasonMetas = new HashSet<>();
+        for (Series series : seriesList){
+            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()){
+                if (series.getSeason().equals(seasonMeta.getName())){
+                    seasonMetas.add(seasonMeta);
                 }
             }
         }
 
         SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
 
-        Iterator seasonsIterator = seasons.iterator();
+        Iterator seasonsIterator = seasonMetas.iterator();
         while (seasonsIterator.hasNext()){
-            senpaiExportHelper.getSeasonData((Season) seasonsIterator.next());
+            senpaiExportHelper.getSeasonData((SeasonMeta) seasonsIterator.next());
         }
     }
 
@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void seasonDataRetrieved(ArrayList<SeriesOld> pulledSeasonData) {
+    public void seasonDataRetrieved(ArrayList<Series> pulledSeasonData) {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (App.getInstance().isCurrentlyInitializing()){
             manager.cancel("Latest season".hashCode());
@@ -359,16 +359,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void seasonListReceived(ArrayList<Season> seasonList) {
+    public void seasonListReceived(ArrayList<SeasonMeta> seasonMetaList) {
         if (App.getInstance().isCurrentlyInitializing()) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
             int latestSeasonIndex = -1;
 //            int oneBeforeLatestIndex = -1;
-            for (Season season : App.getInstance().getSeasonsList()) {
-                if (season.getName().matches(latestSeason)) {
-                    latestSeasonIndex = App.getInstance().getSeasonsList().indexOf(season);
+            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()) {
+                if (seasonMeta.getName().matches(latestSeason)) {
+                    latestSeasonIndex = App.getInstance().getSeasonsList().indexOf(seasonMeta);
 //                    oneBeforeLatestIndex = latestSeasonIndex - 1;
                 }
             }

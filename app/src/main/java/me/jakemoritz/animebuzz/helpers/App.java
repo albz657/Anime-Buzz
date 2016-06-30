@@ -23,9 +23,9 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonMeta;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
 
@@ -33,12 +33,12 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private ArrayList<SeriesOld> userAnimeList;
-    private ArrayList<SeriesOld> allAnimeList;
-    private ArrayList<SeriesOld> currentlyBrowsingSeason;
-    private ArrayList<Season> seasonsList;
-    private HashMap<SeriesOld, Intent> alarms;
-    private SeriesOld mostRecentAlarm;
+    private ArrayList<Series> userAnimeList;
+    private ArrayList<Series> allAnimeList;
+    private ArrayList<Series> currentlyBrowsingSeason;
+    private ArrayList<SeasonMeta> seasonsList;
+    private HashMap<Series, Intent> alarms;
+    private Series mostRecentAlarm;
 
     public boolean isCurrentlyInitializing() {
         return currentlyInitializing;
@@ -93,7 +93,7 @@ public class App extends Application {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season = '" + latestSeason + "'", null);
 
-        ArrayList<SeriesOld> tempSeries = new ArrayList<>();
+        ArrayList<Series> tempSeries = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             tempSeries.add(dbHelper.getSeriesWithCursor(cursor));
@@ -118,12 +118,12 @@ public class App extends Application {
         dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveUserAnimeList(ArrayList<SeriesOld> userAnimeList) {
+    public void saveUserAnimeList(ArrayList<Series> userAnimeList) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
     }
 
-    public void saveNewSeasonData(ArrayList<SeriesOld> newSeason) {
+    public void saveNewSeasonData(ArrayList<Series> newSeason) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(newSeason, getString(R.string.table_anime));
     }
@@ -185,7 +185,7 @@ public class App extends Application {
         try {
             FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
             ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<Season> tempSeasonsList = (ArrayList<Season>) ois.readObject();
+            ArrayList<SeasonMeta> tempSeasonsList = (ArrayList<SeasonMeta>) ois.readObject();
             if (tempSeasonsList != null) {
                 Collections.sort(tempSeasonsList, new SeasonComparator());
                 seasonsList = tempSeasonsList;
@@ -200,9 +200,9 @@ public class App extends Application {
         }
     }
 
-    private ArrayList<SeriesOld> filterUserList(ArrayList<SeriesOld> allAnimeList) {
-        ArrayList<SeriesOld> filteredUserList = new ArrayList<>();
-        for (SeriesOld series : allAnimeList) {
+    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList) {
+        ArrayList<Series> filteredUserList = new ArrayList<>();
+        for (Series series : allAnimeList) {
             if (series.isInUserList()) {
                 filteredUserList.add(series);
             }
@@ -210,12 +210,12 @@ public class App extends Application {
         return filteredUserList;
     }
 
-    public void addAlarm(SeriesOld series, Intent intent) {
+    public void addAlarm(Series series, Intent intent) {
         mostRecentAlarm = series;
         this.alarms.put(series, intent);
     }
 
-    public SeriesOld getMostRecentAlarm() {
+    public Series getMostRecentAlarm() {
         return mostRecentAlarm;
     }
 
@@ -227,7 +227,7 @@ public class App extends Application {
         try {
             FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.file_alarms));
             ObjectInputStream ois = new ObjectInputStream(fis);
-            HashMap<SeriesOld, IntentWrapper> tempAlarms = (HashMap<SeriesOld, IntentWrapper>) ois.readObject();
+            HashMap<Series, IntentWrapper> tempAlarms = (HashMap<Series, IntentWrapper>) ois.readObject();
             if (tempAlarms != null) {
                 deserializeAlarms(tempAlarms);
             }
@@ -241,13 +241,13 @@ public class App extends Application {
         }
     }
 
-    private void deserializeAlarms(HashMap<SeriesOld, IntentWrapper> serializedAlarms) {
-        HashMap<SeriesOld, Intent> tempAlarms = new HashMap<>();
-        Set<SeriesOld> set = serializedAlarms.keySet();
-        List<SeriesOld> list = new ArrayList<>();
+    private void deserializeAlarms(HashMap<Series, IntentWrapper> serializedAlarms) {
+        HashMap<Series, Intent> tempAlarms = new HashMap<>();
+        Set<Series> set = serializedAlarms.keySet();
+        List<Series> list = new ArrayList<>();
         list.addAll(set);
         while (!serializedAlarms.isEmpty()) {
-            SeriesOld tempSeries = list.remove(0);
+            Series tempSeries = list.remove(0);
             IntentWrapper wrapper = serializedAlarms.remove(tempSeries);
             Intent tempIntent = new Intent(wrapper.getAction(), wrapper.getUri());
             tempAlarms.put(tempSeries, tempIntent);
@@ -256,12 +256,12 @@ public class App extends Application {
     }
 
     private void serializeAlarms() {
-        HashMap<SeriesOld, IntentWrapper> serializedAlarms = new HashMap<>();
-        Set<SeriesOld> set = alarms.keySet();
-        List<SeriesOld> list = new ArrayList<>();
+        HashMap<Series, IntentWrapper> serializedAlarms = new HashMap<>();
+        Set<Series> set = alarms.keySet();
+        List<Series> list = new ArrayList<>();
         list.addAll(set);
         while (!alarms.isEmpty()) {
-            SeriesOld tempSeries = list.remove(0);
+            Series tempSeries = list.remove(0);
             Intent tempIntent = alarms.remove(tempSeries);
             IntentWrapper wrapper = new IntentWrapper(tempIntent.getAction(), tempIntent.getData());
             serializedAlarms.put(tempSeries, wrapper);
@@ -279,7 +279,7 @@ public class App extends Application {
         }
     }
 
-    public HashMap<SeriesOld, Intent> getAlarms() {
+    public HashMap<Series, Intent> getAlarms() {
         return alarms;
     }
 
@@ -287,19 +287,19 @@ public class App extends Application {
         return mInstance;
     }
 
-    public ArrayList<SeriesOld> getAllAnimeList() {
+    public ArrayList<Series> getAllAnimeList() {
         return allAnimeList;
     }
 
-    public ArrayList<Season> getSeasonsList() {
+    public ArrayList<SeasonMeta> getSeasonsList() {
         return seasonsList;
     }
 
-    public ArrayList<SeriesOld> getCurrentlyBrowsingSeason() {
+    public ArrayList<Series> getCurrentlyBrowsingSeason() {
         return currentlyBrowsingSeason;
     }
 
-    public ArrayList<SeriesOld> getUserAnimeList() {
+    public ArrayList<Series> getUserAnimeList() {
         return userAnimeList;
     }
 

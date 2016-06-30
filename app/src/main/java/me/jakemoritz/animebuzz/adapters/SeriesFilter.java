@@ -4,15 +4,15 @@ import android.widget.Filter;
 
 import java.util.ArrayList;
 
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SeriesFilter extends Filter {
 
     private SeriesRecyclerViewAdapter adapter;
-    private ArrayList<SeriesOld> originalSeriesList;
-    private ArrayList<SeriesOld> filteredSeriesList;
+    private ArrayList<Series> originalSeriesList;
+    private ArrayList<Series> filteredSeriesList;
 
-    public SeriesFilter(SeriesRecyclerViewAdapter adapter, ArrayList<SeriesOld> seriesList) {
+    public SeriesFilter(SeriesRecyclerViewAdapter adapter, ArrayList<Series> seriesList) {
         super();
         this.adapter = adapter;
         this.originalSeriesList = seriesList;
@@ -29,7 +29,7 @@ public class SeriesFilter extends Filter {
         } else {
             String filterPattern = constraint.toString().toLowerCase().trim();
 
-            for (SeriesOld series : originalSeriesList){
+            for (Series series : originalSeriesList){
                 if (series.getName().contains(filterPattern)){
                     filteredSeriesList.add(series);
                 }
@@ -43,7 +43,7 @@ public class SeriesFilter extends Filter {
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
         adapter.visibleSeries.clear();
-        adapter.visibleSeries.addAll((ArrayList<SeriesOld>) results.values);
+        adapter.visibleSeries.addAll((ArrayList<Series>) results.values);
         adapter.notifyDataSetChanged();
     }
 }

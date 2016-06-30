@@ -9,7 +9,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class NotificationHelper {
 
@@ -39,7 +39,7 @@ public class NotificationHelper {
         mNotificationManager.notify(seasonName.hashCode(), mBuilder.build());
     }
 
-    public void createNewEpisodeNotification(SeriesOld series) {
+    public void createNewEpisodeNotification(Series series) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)

@@ -1,34 +1,22 @@
 package me.jakemoritz.animebuzz.models;
 
-import java.io.Serializable;
+import java.util.List;
 
-public class Season implements Serializable{
+public class Season {
 
-    private String name;
-/*
-    @Override
-    public boolean equals(Object obj) {
-        return getKey().equals(((Season) obj).getKey());
-    }*/
+    private List<Series> seasonSeries;
+    private SeasonMetadata seasonMetadata;
 
-    private String start_timestamp;
-    private String key;
-
-    public Season(String start_timestamp, String name, String key) {
-        this.start_timestamp = start_timestamp;
-        this.name = name;
-        this.key = key;
+    public Season(List<Series> seasonSeries, SeasonMetadata seasonMetadata) {
+        this.seasonSeries = seasonSeries;
+        this.seasonMetadata = seasonMetadata;
     }
 
-    public String getName() {
-        return name;
+    public List<Series> getSeasonSeries() {
+        return seasonSeries;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public String getStart_timestamp() {
-        return start_timestamp;
+    public SeasonMetadata getSeasonMetadata() {
+        return seasonMetadata;
     }
 }

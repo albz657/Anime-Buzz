@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -69,14 +69,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertSeries(SeriesOld series, String TABLE_NAME) {
+    public boolean insertSeries(Series series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_AIRDATE, series.getAirdate_u());
+        contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_SHOW_TITLE, series.getName());
         contentValues.put(KEY_MAL_ID, series.getMALID());
-        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate_u());
+        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
@@ -100,14 +100,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
-    public boolean updateSeriesInDb(SeriesOld series, String TABLE_NAME) {
+    public boolean updateSeriesInDb(Series series, String TABLE_NAME) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_AIRDATE, series.getAirdate_u());
+        contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_SHOW_TITLE, series.getName());
         contentValues.put(KEY_MAL_ID, series.getMALID());
-        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate_u());
+        contentValues.put(KEY_SIMULCAST_AIRDATE, series.getSimulcast_airdate());
         contentValues.put(KEY_IS_IN_USER_LIST, series.isInUserList() ? 1 : 0);
         contentValues.put(KEY_SEASON, series.getSeason());
         contentValues.put(KEY_CURRENTLY_AIRING, series.isCurrentlyAiring() ? 1 : 0);
@@ -137,9 +137,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(mal_id)});
     }
 
-    public void saveSeriesToDb(ArrayList<SeriesOld> seriesList, String TABLE_NAME) {
+    public void saveSeriesToDb(ArrayList<Series> seriesList, String TABLE_NAME) {
         if (seriesList != null) {
-            for (SeriesOld series : seriesList) {
+            for (Series series : seriesList) {
                 if (getSeries(series.getMALID(), TABLE_NAME).getCount() != 0) {
                     updateSeriesInDb(series, TABLE_NAME);
                 } else {
@@ -150,7 +150,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         close();
     }
 
-    public SeriesOld getSeriesWithCursor(Cursor res){
+    public Series getSeriesWithCursor(Cursor res){
         int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
         String seriesTitle = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SHOW_TITLE));
         int MAL_ID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MAL_ID));
@@ -161,20 +161,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 //        byte[] posterBytes = res.getBlob(res.getColumnIndex(DatabaseHelper.KEY_POSTER));
         int ANNID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ANNID));
 
-        SeriesOld series = new SeriesOld(airdate, seriesTitle, MAL_ID, simulcastAirdate, isInUserList, season, isCurrentlyAiring, ANNID);
+//        Series series = new Series(ANNID, airdate, seriesTitle, MAL_ID, si);
 
    /*     if (posterBytes != null){
             Bitmap poster = getBitmapFromBytes(posterBytes);
             series.setPoster(poster);
         }*/
-        return series;
+        return null;
     }
 
-    public ArrayList<SeriesOld> getSeriesFromDb(String TABLE_NAME) {
+    public ArrayList<Series> getSeriesFromDb(String TABLE_NAME) {
         Cursor res = getAllSeries(TABLE_NAME);
 
         res.moveToFirst();
-        ArrayList<SeriesOld> seriesList = new ArrayList<>();
+        ArrayList<Series> seriesList = new ArrayList<>();
 
         for (int i = 0; i < res.getCount(); i++) {
             getSeriesWithCursor(res);

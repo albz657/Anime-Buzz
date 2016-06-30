@@ -14,10 +14,10 @@ import java.util.Iterator;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonMeta;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
 
-public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList<Season>> {
+public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList<SeasonMeta>> {
 
     ReadSeasonListResponse seasonListDelegate;
     Activity activity;
@@ -29,23 +29,23 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
     }
 
     @Override
-    protected void onPostExecute(ArrayList<Season> seasons) {
-        super.onPostExecute(seasons);
-        seasonListDelegate.seasonListReceived(seasons);
+    protected void onPostExecute(ArrayList<SeasonMeta> seasonMetas) {
+        super.onPostExecute(seasonMetas);
+        seasonListDelegate.seasonListReceived(seasonMetas);
     }
 
     @Override
-    protected ArrayList<Season> doInBackground(JSONObject... params) {
+    protected ArrayList<SeasonMeta> doInBackground(JSONObject... params) {
         return parseSeasonList(params[0]);
     }
 
-    private ArrayList<Season> parseSeasonList(JSONObject response) {
+    private ArrayList<SeasonMeta> parseSeasonList(JSONObject response) {
         try {
             String latestSeasonKey = response.getString("latest");
             String latestSeasonName;
             JSONObject seasonsAsJSON = response.getJSONObject("seasons");
 
-            ArrayList<Season> seasonsList = new ArrayList<>();
+            ArrayList<SeasonMeta> seasonsList = new ArrayList<>();
 
             Iterator<String> it = seasonsAsJSON.keys();
             while (it.hasNext()) {
@@ -62,11 +62,11 @@ public class ProcessSeasonListTask extends AsyncTask<JSONObject, Void, ArrayList
                         editor.apply();
                     }
 
-                    Season tempSeason = new Season(new DateFormatHelper().getLocalFormattedDateFromStringDate(seasonAsJSON.getString("start_timestamp")),
+                    SeasonMeta tempSeasonMeta = new SeasonMeta(new DateFormatHelper().getLocalFormattedDateFromStringDate(seasonAsJSON.getString("start_timestamp")),
                             seasonAsJSON.getString("name"),
                             key);
 
-                    seasonsList.add(tempSeason);
+                    seasonsList.add(tempSeasonMeta);
                 }
             }
 

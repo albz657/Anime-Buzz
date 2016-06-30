@@ -1,21 +1,15 @@
 package me.jakemoritz.animebuzz.helpers;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
-public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList<SeriesOld>> {
+public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList<Series>> {
 
     private final static String TAG = ProcessSeasonDataTask.class.getSimpleName();
 
@@ -26,8 +20,8 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
         this.seasonDataDelegate = seasonDataDelegate;
     }
 
-    private ArrayList<SeriesOld> parseSeasonData(JSONObject response) {
-        ArrayList<SeriesOld> seriesFromServer = new ArrayList<>();
+    private ArrayList<Series> parseSeasonData(JSONObject response) {
+        /*ArrayList<Series> seriesFromServer = new ArrayList<>();
 
         try {
             JSONArray testResponse = response.getJSONArray("items");
@@ -46,10 +40,10 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
 
                 int MALID = -1;
                 int ANNID = -1;
-                try {
+                /*try {
                     MALID = seriesAsJSON.getInt("MALID");
                     ANNID = seriesAsJSON.getInt("ANNID");
-                    SeriesOld series = new SeriesOld(seriesAsJSON.getInt("airdate_u"),
+                    Series series = new Series(seriesAsJSON.getInt("airdate_u"),
                             seriesAsJSON.getString("name"),
                             MALID,
                             seriesAsJSON.getInt("simulcast_airdate_u"),
@@ -62,7 +56,7 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
                 } catch (JSONException e) {
                     if (ANNID == -1){
                         Log.d(TAG, "No ANNID for: '" + seriesAsJSON.getString("name") + "'");
-                        SeriesOld series = new SeriesOld(seriesAsJSON.getInt("airdate_u"),
+                        Series series = new Series(seriesAsJSON.getInt("airdate_u"),
                                 seriesAsJSON.getString("name"),
                                 MALID,
                                 seriesAsJSON.getInt("simulcast_airdate_u"),
@@ -80,18 +74,18 @@ public class ProcessSeasonDataTask extends AsyncTask<JSONObject, Void, ArrayList
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        return seriesFromServer;
+*/
+        return null;
     }
 
     @Override
-    protected void onPostExecute(ArrayList<SeriesOld> series) {
+    protected void onPostExecute(ArrayList<Series> series) {
         super.onPostExecute(series);
         seasonDataDelegate.seasonDataRetrieved(series);
     }
 
     @Override
-    protected ArrayList<SeriesOld> doInBackground(JSONObject... params) {
+    protected ArrayList<Series> doInBackground(JSONObject... params) {
         return parseSeasonData(params[0]);
     }
 }

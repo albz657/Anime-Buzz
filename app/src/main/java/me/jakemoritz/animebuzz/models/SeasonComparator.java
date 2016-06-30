@@ -5,10 +5,10 @@ import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
-public class SeasonComparator implements Comparator<Season> {
+public class SeasonComparator implements Comparator<SeasonMeta> {
 
     @Override
-    public int compare(Season lhs, Season rhs) {
+    public int compare(SeasonMeta lhs, SeasonMeta rhs) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
         try {
             Date leftAsDate = dateFormat.parse(lhs.getStart_timestamp());

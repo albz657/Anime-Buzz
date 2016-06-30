@@ -1,61 +1,81 @@
-
 package me.jakemoritz.animebuzz.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.Generated;
-
-@Generated("org.jsonschema2pojo")
 public class Series {
 
-    private Meta meta;
-    private List<Item> items = new ArrayList<Item>();
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private int airdate;
+    private String name;
+    private int MALID;
+    private boolean currentlyAiring;
+    private String simulcast;
+    private int simulcast_airdate;
+    private boolean isInUserList;
+    private String season;
+    private int ANNID;
 
-    /**
-     * 
-     * @return
-     *     The meta
-     */
-    public Meta getMeta() {
-        return meta;
+    public double getSimulcast_delay() {
+        return simulcast_delay;
     }
 
-    /**
-     * 
-     * @param meta
-     *     The meta
-     */
-    public void setMeta(Meta meta) {
-        this.meta = meta;
+    public void setSimulcast_delay(double simulcast_delay) {
+        this.simulcast_delay = simulcast_delay;
     }
 
-    /**
-     * 
-     * @return
-     *     The items
-     */
-    public List<Item> getItems() {
-        return items;
+    private double simulcast_delay;
+
+    public int getANNID() {
+        return ANNID;
     }
 
-    /**
-     * 
-     * @param items
-     *     The items
-     */
-    public void setItems(List<Item> items) {
-        this.items = items;
+    public boolean isCurrentlyAiring() {
+        return currentlyAiring;
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
+    public String getSeason() {
+        return season;
     }
 
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    public void setSeason(String season) {
+        this.season = season;
     }
+
+    public void setInUserList(boolean inUserList) {
+        isInUserList = inUserList;
+    }
+
+    public boolean isInUserList() {
+        return isInUserList;
+    }
+
+    public int getSimulcast_airdate() {
+        return simulcast_airdate;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getMALID() {
+        return MALID;
+    }
+
+    public int getAirdate() {
+        return airdate;
+    }
+
+    public String getSimulcast() {
+        return simulcast;
+    }
+
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
+        this.airdate = airdate;
+        this.name = name;
+        this.MALID = MALID;
+        this.simulcast = simulcast;
+        this.simulcast_airdate = simulcast_airdate;
+        this.season = season;
+        this.ANNID = ANNID;
+        this.simulcast_delay = simulcast_delay;
+    }
+
 
 }

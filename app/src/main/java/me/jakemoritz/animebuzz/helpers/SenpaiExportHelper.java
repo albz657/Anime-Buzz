@@ -9,6 +9,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONObject;
 
@@ -17,7 +19,7 @@ import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeasonMeta;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -62,14 +64,14 @@ public class SenpaiExportHelper {
         queue.add(jsonObjectRequest);
     }
 
-    public void getSeasonData(Season season) {
+    public void getSeasonData(SeasonMeta seasonMeta) {
         Uri uri = Uri.parse(SEASON_DATA_BASE);
         Uri.Builder builder = uri.buildUpon()
-                .appendQueryParameter("src", season.getKey());
+                .appendQueryParameter("src", seasonMeta.getKey());
         String url = builder.build().toString();
 
         NotificationHelper helper = new NotificationHelper(activity);
-        helper.createUpdatingSeasonDataNotification(season.getName());
+        helper.createUpdatingSeasonDataNotification(seasonMeta.getName());
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -110,24 +112,28 @@ public class SenpaiExportHelper {
     }
 
     public void getLatestSeasonDataRetrofit(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
+        Gson gson = gsonBuilder.create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<Series> call = senpaiEndpointInterface.getLatestSeasonData("json", "raw");
-        call.enqueue(new Callback<Series>() {
+        Call<Season> call = senpaiEndpointInterface.getLatestSeasonData("json", "raw");
+        call.enqueue(new Callback<Season>() {
             @Override
-            public void onResponse(Call<Series> call, retrofit2.Response<Series> response) {
-                Log.d(TAG,  response.toString());
-
+            public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
+                Log.d(TAG, "Success");
             }
 
             @Override
-            public void onFailure(Call<Series> call, Throwable t) {
-                Log.d(TAG, t.getMessage());
+            public void onFailure(Call<Season> call, Throwable t) {
+                Log.d(TAG, "Failure");
             }
         });
+
     }
 }

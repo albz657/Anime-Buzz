@@ -5,7 +5,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class MalImportHelper {
 
@@ -16,11 +16,11 @@ public class MalImportHelper {
     }
 
     public void matchSeries(List<Integer> currentlyWatchingShowIds){
-        ArrayList<SeriesOld> matchedSeries = new ArrayList<>();
+        ArrayList<Series> matchedSeries = new ArrayList<>();
 
         for (int i = 0; i < App.getInstance().getAllAnimeList().size(); i++){
             for (int j = 0; j < currentlyWatchingShowIds.size(); j++){
-                SeriesOld tempSeries = App.getInstance().getAllAnimeList().get(i);
+                Series tempSeries = App.getInstance().getAllAnimeList().get(i);
                 if (currentlyWatchingShowIds.get(j) == tempSeries.getMALID()){
                     // found a match in current season data
                     tempSeries.setInUserList(true);

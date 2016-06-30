@@ -22,9 +22,9 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
-import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonMeta;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
-import me.jakemoritz.animebuzz.models.SeriesOld;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment implements SeasonPostersImportResponse {
 
@@ -71,10 +71,10 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         DatabaseHelper dbHelper = new DatabaseHelper(getContext());
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season ='" + seasonName + "'", null);
 
-        ArrayList<SeriesOld> newBrowsingSeason = new ArrayList<>();
+        ArrayList<Series> newBrowsingSeason = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            SeriesOld series = dbHelper.getSeriesWithCursor(cursor);
+            Series series = dbHelper.getSeriesWithCursor(cursor);
             newBrowsingSeason.add(series);
             cursor.moveToNext();
         }
@@ -109,15 +109,15 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT DISTINCT season FROM ANIME", null);
 
         ArrayList<String> seasonNames = new ArrayList<>();
-        ArrayList<Season> seasons = new ArrayList<>();
+        ArrayList<SeasonMeta> seasonMetas = new ArrayList<>();
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             String seasonName = cursor.getString(cursor.getColumnIndex("season"));
             seasonNames.add(seasonName);
 
-            for (Season season : App.getInstance().getSeasonsList()){
-                if (season.getName().matches(seasonName)){
-                    seasons.add(season);
+            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()){
+                if (seasonMeta.getName().matches(seasonName)){
+                    seasonMetas.add(seasonMeta);
                 }
             }
             cursor.moveToNext();
@@ -126,12 +126,12 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
         cursor.close();
         dbHelper.close();
 
-        Collections.sort(seasons, new SeasonComparator());
+        Collections.sort(seasonMetas, new SeasonComparator());
 
         seasonNames.clear();
 
-        for (Season season : seasons){
-            seasonNames.add(season.getName());
+        for (SeasonMeta seasonMeta : seasonMetas){
+            seasonNames.add(seasonMeta.getName());
         }
 
         return seasonNames;
