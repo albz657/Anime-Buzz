@@ -103,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean insertSeasonMetadata(SeasonMetadata metadata){
+    public boolean insertSeasonMetadata(SeasonMetadata metadata) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -112,9 +112,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
 
         db.insert(TABLE_SEASONS, null, contentValues);
+        return true;
     }
 
-    public boolean updateSeriesInDb(Series series, String TABLE_NAME) {
+    public boolean updateSeasonMetadataInDb(SeasonMetadata metadata) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_SEASON_KEY, metadata.getKey());
+        contentValues.put(KEY_SEASON_NAME, metadata.getName());
+        contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
+
+        db.update(TABLE_SEASONS, contentValues, KEY_SEASON_KEY + " =  ? ", new String[]{metadata.getKey()});
+        return true;
+    }
+
+    public boolean updateSeriesInDb(Series series) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -129,57 +142,80 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SIMULCAST, series.getSimulcast());
         contentValues.put(KEY_SIMULCAST_DELAY, series.getSimulcast_delay());
 
-        db.update(TABLE_NAME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
+        db.update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
     }
 
-    public Cursor getSeries(int mal_id, String TABLE_NAME) {
+    public Cursor getSeries(int MALID) {
         SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(mal_id)});
+        return db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
     }
 
-    public Cursor getAllSeries(String TABLE_NAME) {
+    public Cursor getSeasonMetadata(String seasonKey) {
         SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        return db.rawQuery("SELECT * FROM " + TABLE_SEASONS + " WHERE " + KEY_SEASON_KEY + " = ?", new String[]{seasonKey});
     }
 
-    public Integer deleteSeries(int mal_id, String TABLE_NAME) {
+    public Cursor getAllSeries() {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
+    }
+
+    public Cursor getAllSeasonMetadata() {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
+    }
+
+    public Integer deleteSeries(int MALID) {
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_NAME,
+        return db.delete(TABLE_ANIME,
                 KEY_MALID + " = ? ",
-                new String[]{String.valueOf(mal_id)});
+                new String[]{String.valueOf(MALID)});
     }
 
-    public List<Series> getSeriesBySeason(String TABLE_ANIME, String seasonName){
+    public Integer deleteSeasonMetadata(String seasonKey) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(TABLE_SEASONS,
+                KEY_SEASON_KEY + " = ? ",
+                new String[]{seasonKey});
+    }
+
+    public List<Series> getSeriesBySeason(String seasonKey) {
         List<Series> seriesBySeason = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonKey + "'", null);
 
         res.moveToFirst();
 
-        for (int i = 0; i < res.getCount(); i++){
+        for (int i = 0; i < res.getCount(); i++) {
             seriesBySeason.add(getSeriesWithCursor(res));
             res.moveToNext();
         }
 
+        res.close();
         return seriesBySeason;
     }
 
-    public void saveSeriesToDb(List<Series> seriesList, String TABLE_NAME) {
-        if (seriesList != null) {
-            for (Series series : seriesList) {
-                if (getSeries(series.getMALID(), TABLE_NAME).getCount() != 0) {
-                    updateSeriesInDb(series, TABLE_NAME);
-                } else {
-                    insertSeries(series, TABLE_NAME);
-                }
-            }
+    public void saveSeasonMetadataToDb(SeasonMetadata metadata) {
+        if (getSeasonMetadata(metadata.getKey()).getCount() != 0) {
+            updateSeasonMetadataInDb(metadata);
+        } else {
+            insertSeasonMetadata(metadata);
         }
-        close();
     }
 
-    public Series getSeriesWithCursor(Cursor res){
+    public void saveSeriesToDb(List<Series> seriesList) {
+        for (Series series : seriesList) {
+            if (getSeries(series.getMALID()).getCount() != 0) {
+                updateSeriesInDb(series);
+            } else {
+                insertSeries(series);
+            }
+        }
+    }
+
+    public Series getSeriesWithCursor(Cursor res) {
         int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
         String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NAME));
         int MALID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MALID));
@@ -194,7 +230,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring);
     }
 
-    public List<Series> getSeriesUserWatching(String TABLE_ANIME){
+    public SeasonMetadata getSeasonMetadataWithCursor(Cursor res){
+        String seasonName = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_NAME));
+        String seasonDate = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_DATE));
+        String seasonKey = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_KEY));
+
+        return new SeasonMetadata(seasonName, seasonDate, seasonKey);
+    }
+
+    public List<Series> getSeriesUserWatching() {
         List<Series> userList = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
@@ -202,16 +246,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         res.moveToFirst();
 
-        for (int i = 0; i < res.getCount(); i++){
+        for (int i = 0; i < res.getCount(); i++) {
             userList.add(getSeriesWithCursor(res));
             res.moveToNext();
         }
 
+        res.close();
         return userList;
     }
 
-    public List<Series> getSeriesFromDb(String TABLE_NAME) {
-        Cursor res = getAllSeries(TABLE_NAME);
+    public List<Series> getSeriesFromDb() {
+        Cursor res = getAllSeries();
 
         res.moveToFirst();
         ArrayList<Series> seriesList = new ArrayList<>();
@@ -221,7 +266,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             res.moveToNext();
         }
 
-        close();
+        res.close();
         return seriesList;
     }
 }

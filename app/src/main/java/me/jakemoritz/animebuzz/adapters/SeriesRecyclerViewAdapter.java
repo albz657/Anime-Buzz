@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -27,22 +28,15 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable {
 
-    public ArrayList<Series> getVisibleSeries() {
-        return visibleSeries;
-    }
 
-    public ArrayList<Series> visibleSeries = null;
 
-    public ArrayList<Series> getAllSeries() {
-        return allSeries;
-    }
-
-    public ArrayList<Series> allSeries = null;
-    public SeriesFragment mListener = null;
-    public ViewGroup parent;
+    private List<Series> allSeries = null;
+    private List<Series> visibleSeries = null;
+    private SeriesFragment mListener = null;
+    private ViewGroup parent;
     private SeriesFilter seriesFilter;
 
-    public SeriesRecyclerViewAdapter(ArrayList<Series> items, SeriesFragment listener) {
+    public SeriesRecyclerViewAdapter(List<Series> items, SeriesFragment listener) {
         allSeries = items;
         mListener = listener;
         visibleSeries = new ArrayList<>(items);
@@ -167,5 +161,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             mainActivity.makeAlarm(item);
             Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    public List<Series> getVisibleSeries() {
+        return visibleSeries;
+    }
+
+    public List<Series> getAllSeries() {
+        return allSeries;
     }
 }

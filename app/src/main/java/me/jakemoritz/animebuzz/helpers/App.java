@@ -24,9 +24,10 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeasonComparator;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Series;
+import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
 public class App extends Application {
 
@@ -35,43 +36,26 @@ public class App extends Application {
     private static App mInstance;
 
     private List<Series> userAnimeList;
-    private List<Series> currentlyBrowsingSeason;
     private List<Season> allAnimeSeasons;
     private List<SeasonMetadata> seasonsList;
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
-
-    public boolean isCurrentlyInitializing() {
-        return currentlyInitializing;
-    }
-
-    public void setCurrentlyInitializing(boolean currentlyInitializing) {
-        this.currentlyInitializing = currentlyInitializing;
-    }
-
     private boolean currentlyInitializing = false;
-
-    public boolean isTryingToVerify() {
-        return tryingToVerify;
-    }
-
-    public void setTryingToVerify(boolean tryingToVerify) {
-        this.tryingToVerify = tryingToVerify;
-    }
-
     private boolean tryingToVerify = false;
-
-    public HashMap<String, Bitmap> getPosterQueue() {
-        return posterQueue;
-    }
-
-
-
     private HashMap<String, Bitmap> posterQueue;
+    private String latestSeasonKey;
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        SQLiteStudioService.instance().stop();
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+
+        SQLiteStudioService.instance().start(this);
 
         mInstance = this;
         allAnimeSeasons = new ArrayList<>();
@@ -83,27 +67,18 @@ public class App extends Application {
         loadAnimeFromDB();
         loadAlarms();
         loadSeasonsList();
-        loadBrowsingSeason();
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        latestSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
     }
 
-    private void loadBrowsingSeason() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        Cursor cursor = dbHelper.getReadableDatabase().rawQuery("SELECT * FROM ANIME WHERE season = '" + latestSeason + "'", null);
-
-        ArrayList<Series> tempSeries = new ArrayList<>();
-        cursor.moveToFirst();
-        for (int i = 0; i < cursor.getCount(); i++) {
-            tempSeries.add(dbHelper.getSeriesWithCursor(cursor));
-            cursor.moveToNext();
+    public Season getSeasonFromKey(String seasonKey){
+        for (Season season : allAnimeSeasons){
+            if (season.getSeasonMetadata().getKey().equals(seasonKey)){
+                return season;
+            }
         }
-
-        cursor.close();
-        dbHelper.close();
-
-        currentlyBrowsingSeason = tempSeries;
+        return null;
     }
 
     public void saveData() {
@@ -116,32 +91,32 @@ public class App extends Application {
     public void saveAllAnimeSeasonsToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         for (Season season : allAnimeSeasons){
-            dbHelper.saveSeriesToDb(season.getSeasonSeries(), getString(R.string.table_anime));
+            dbHelper.saveSeriesToDb(season.getSeasonSeries());
         }
         dbHelper.close();
     }
 
     public void saveUserListToDB(List<Series> userAnimeList) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
+        dbHelper.saveSeriesToDb(userAnimeList);
         dbHelper.close();
     }
 
     public void saveNewSeasonData(Season season) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(season.getSeasonSeries(), getString(R.string.table_anime));
+        dbHelper.saveSeriesToDb(season.getSeasonSeries());
         dbHelper.close();
     }
 
     public void loadAnimeFromDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());
-        allAnimeSeasons.clear();
+
         for (SeasonMetadata metadata : seasonsList){
-            List<Series> tempSeason = dbHelper.getSeriesBySeason(getString(R.string.table_anime), metadata.getName());
+            List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getKey());
             allAnimeSeasons.add(new Season(tempSeason, metadata));
         }
-        userAnimeList = dbHelper.getSeriesUserWatching(getString(R.string.table_anime));
+        userAnimeList = dbHelper.getSeriesUserWatching();
         dbHelper.close();
     }
 
@@ -178,37 +153,28 @@ public class App extends Application {
     }
 
     public void saveSeasonsList() {
-        DatabaseHelper db
-        try {
-            FileOutputStream fos = openFileOutput(getString(R.string.season_list_file), Context.MODE_PRIVATE);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(seasonsList);
-            oos.close();
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        for (SeasonMetadata seasonMetadata : seasonsList){
+            dbHelper.saveSeasonMetadataToDb(seasonMetadata);
         }
+        dbHelper.close();
     }
 
     private void loadSeasonsList() {
-        try {
-            FileInputStream fis = new FileInputStream(getFilesDir().getPath() + "/" + getString(R.string.season_list_file));
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            ArrayList<SeasonMeta> tempSeasonsList = (ArrayList<SeasonMeta>) ois.readObject();
-            if (tempSeasonsList != null) {
-                Collections.sort(tempSeasonsList, new SeasonComparator());
-                seasonsList = tempSeasonsList;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            // user has no alarms
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        Cursor res = dbHelper.getAllSeasonMetadata();
+
+        res.moveToFirst();
+
+        for (int i = 0; i < res.getCount(); i++){
+            SeasonMetadata metadata = dbHelper.getSeasonMetadataWithCursor(res);
+            seasonsList.add(metadata);
         }
+
+        Collections.sort(seasonsList, new SeasonMetadataComparator());
+
+        res.close();
+        dbHelper.close();
     }
 
     public void addAlarm(Series series, Intent intent) {
@@ -292,15 +258,39 @@ public class App extends Application {
         return userAnimeList;
     }
 
-    public List<Series> getCurrentlyBrowsingSeason() {
-        return currentlyBrowsingSeason;
-    }
-
     public List<Season> getAllAnimeSeasons() {
         return allAnimeSeasons;
     }
 
     public List<SeasonMetadata> getSeasonsList() {
         return seasonsList;
+    }
+
+    public boolean isCurrentlyInitializing() {
+        return currentlyInitializing;
+    }
+
+    public void setCurrentlyInitializing(boolean currentlyInitializing) {
+        this.currentlyInitializing = currentlyInitializing;
+    }
+
+    public boolean isTryingToVerify() {
+        return tryingToVerify;
+    }
+
+    public void setTryingToVerify(boolean tryingToVerify) {
+        this.tryingToVerify = tryingToVerify;
+    }
+
+    public HashMap<String, Bitmap> getPosterQueue() {
+        return posterQueue;
+    }
+
+    public String getLatestSeasonKey() {
+        return latestSeasonKey;
+    }
+
+    public void setLatestSeasonKey(String latestSeasonKey) {
+        this.latestSeasonKey = latestSeasonKey;
     }
 }

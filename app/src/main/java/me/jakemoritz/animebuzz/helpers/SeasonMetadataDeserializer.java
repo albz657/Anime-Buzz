@@ -33,19 +33,23 @@ public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMe
         editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), latestSeasonKey);
         editor.apply();
 
+        App.getInstance().setLatestSeasonKey(latestSeasonKey);
+
         JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 
         final List<SeasonMetadata> metadataList = new ArrayList<>();
         for (Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
             String seasonKey = seasonEntry.getKey();
-            JsonObject metadata = seasonEntry.getValue().getAsJsonObject();
-            String seasonName = metadata.get("name").getAsString();
-            String startTimestamp = metadata.get("start_timestamp").getAsString();
 
-            SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
-            metadataList.add(seasonMetadata);
+            if (!seasonKey.equals("nodate")){
+                JsonObject metadata = seasonEntry.getValue().getAsJsonObject();
+                String seasonName = metadata.get("name").getAsString();
+                String startTimestamp = metadata.get("start_timestamp").getAsString();
+
+                SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
+                metadataList.add(seasonMetadata);
+            }
         }
-
         return new AllSeasonsMetadata(metadataList, latestSeasonKey);
     }
 }

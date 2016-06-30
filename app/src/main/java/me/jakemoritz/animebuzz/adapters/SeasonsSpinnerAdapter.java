@@ -14,26 +14,26 @@ import me.jakemoritz.animebuzz.R;
 
 public class SeasonsSpinnerAdapter extends BaseAdapter {
 
-    public List<String> getSeasons() {
-        return seasons;
+    public List<String> getSeasonNames() {
+        return seasonNames;
     }
 
-    private List<String> seasons = new ArrayList<>();
+    private List<String> seasonNames = new ArrayList<>();
     private Context context;
 
-    public SeasonsSpinnerAdapter(Context context, List<String> seasons) {
-        this.seasons = seasons;
+    public SeasonsSpinnerAdapter(Context context, List<String> seasonNames) {
+        this.seasonNames = seasonNames;
         this.context = context;
     }
 
     @Override
     public int getCount() {
-        return seasons.size();
+        return seasonNames.size();
     }
 
     @Override
     public String getItem(int position) {
-        return seasons.get(position);
+        return seasonNames.get(position);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
             convertView.setTag("NON_DROPDOWN");
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item);
-        textView.setText(seasons.get(position));
+        textView.setText(seasonNames.get(position));
         return convertView;
     }
 
@@ -59,7 +59,7 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
             convertView.setTag("DROPDOWN");
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
-        textView.setText(seasons.get(position));
+        textView.setText(seasonNames.get(position));
         return convertView;
     }
 }

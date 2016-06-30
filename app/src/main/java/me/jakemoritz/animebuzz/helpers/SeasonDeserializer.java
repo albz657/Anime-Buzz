@@ -45,8 +45,9 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                 seasonYear = yearMatcher.group();
             }
         }
+        String seasonKey = seasonMonth + seasonYear;
 
-        final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonMonth + seasonYear);
+        final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
@@ -94,11 +95,16 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                 simulcast_delay = seriesObject.get("simulcast_delay").getAsDouble();
             } catch (NumberFormatException e){
                 simulcast_delay = 0;
-                Log.d(TAG, "'" + seriesName + "has no simulcast delay (or may not be simulcast).");
+                if (simulcast.length() == 0){
+                    Log.d(TAG, "'" + seriesName + "' is not simulcast).");
+                }
             }
 
-            final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
-            seasonSeries.add(series);
+            if (MALID > 0){
+                final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonKey, ANNID, simulcast_delay);
+                seasonSeries.add(series);
+            }
+
         }
 
         final Season season = new Season(seasonSeries, seasonMetadata);

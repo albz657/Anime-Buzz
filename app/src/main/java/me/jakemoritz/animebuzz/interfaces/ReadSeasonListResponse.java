@@ -1,8 +1,10 @@
 package me.jakemoritz.animebuzz.interfaces;
 
-import java.util.ArrayList;
+import java.util.List;
+
+import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public interface ReadSeasonListResponse {
-    void seasonListReceived(ArrayList<SeasonMeta> seasonMetaList);
+    void seasonListReceived(List<SeasonMetadata> seasonMetaList);
 
 }

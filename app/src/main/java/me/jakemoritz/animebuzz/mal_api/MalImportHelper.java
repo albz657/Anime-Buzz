@@ -18,7 +18,7 @@ public class MalImportHelper {
     public void matchSeries(List<Integer> currentlyWatchingShowIds){
         ArrayList<Series> matchedSeries = new ArrayList<>();
 
-        for (int i = 0; i < App.getInstance().getAllAnimeList().size(); i++){
+      /*  for (int i = 0; i < App.getInstance().getAllAnimeList().size(); i++){
             for (int j = 0; j < currentlyWatchingShowIds.size(); j++){
                 Series tempSeries = App.getInstance().getAllAnimeList().get(i);
                 if (currentlyWatchingShowIds.get(j) == tempSeries.getMALID()){
@@ -29,7 +29,7 @@ public class MalImportHelper {
                     activity.makeAlarm(tempSeries);
                 }
             }
-        }
+        }*/
 
         App.getInstance().getUserAnimeList().clear();
         App.getInstance().getUserAnimeList().addAll(matchedSeries);

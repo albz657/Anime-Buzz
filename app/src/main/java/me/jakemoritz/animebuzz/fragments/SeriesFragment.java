@@ -11,9 +11,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.Series;
 
 public abstract class SeriesFragment extends Fragment {
 
@@ -51,7 +54,7 @@ public abstract class SeriesFragment extends Fragment {
         Context context = recyclerView.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         if (this instanceof SeasonsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getCurrentlyBrowsingSeason(), this);
+            mAdapter = new SeriesRecyclerViewAdapter(new ArrayList<Series>(), this);
 
         } else if (this instanceof MyShowsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
