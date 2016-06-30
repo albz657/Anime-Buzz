@@ -22,7 +22,6 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
-import me.jakemoritz.animebuzz.models.SeasonMeta;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -163,7 +162,7 @@ public class SeasonsFragment extends SeriesFragment implements SeasonPostersImpo
             senpaiExportHelper.getLatestSeasonData();
         } else if (id == R.id.action_verify) {
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());
-            senpaiExportHelper.getLatestSeasonDataRetrofit();/*
+            senpaiExportHelper.getLatestSeasonData();/*
             ANNSearchHelper helper = new ANNSearchHelper((MainActivity) getActivity());
             helper.getImages(this, mAdapter.getAllSeries());*/
         }

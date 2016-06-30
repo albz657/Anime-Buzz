@@ -38,7 +38,7 @@ import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.models.SeasonMeta;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse {
 
     private final static String TAG = MainActivity.class.getSimpleName();
+
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private AlarmManager alarmManager;
@@ -76,10 +77,11 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // Retrieve pending intent to perform broadcast
+        // Retrieve pending intent to perform alarm broadcast
         alarmIntent = new Intent(this, AlarmReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
+        // Set up drawer and nav view
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
@@ -94,11 +96,10 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
-
         navigationView.setNavigationItemSelectedListener(this);
-
         navigationView.getMenu().getItem(2).setChecked(true);
 
+        // Start initial fragment
         if (!App.getInstance().isCurrentlyInitializing()) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
@@ -114,16 +115,15 @@ public class MainActivity extends AppCompatActivity
 
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
-            progressViewHolder.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
-
+        progressViewHolder.setVisibility(View.VISIBLE);
+        progressView.startAnimation();
 
         SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
         senpaiExportHelper.getLatestSeasonData();
     }
 
     private void postInitializeData() {
-        if (currentInitializingIndex > 0){
+        if (currentInitializingIndex > 0) {
             if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -141,9 +141,9 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public String formatAiringTime(Series series, boolean simulcast){
+    public String formatAiringTime(Series series, boolean prefersSimulcast) {
         Calendar cal;
-        if (simulcast){
+        if (prefersSimulcast) {
             cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
         } else {
             cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
@@ -163,14 +163,14 @@ public class MainActivity extends AppCompatActivity
         boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
 
         SimpleDateFormat format = new SimpleDateFormat("MMMM d");
-        SimpleDateFormat hourFormat= null;
+        SimpleDateFormat hourFormat = null;
 
         String formattedTime = format.format(nextEpisode.getTime());
 
         DateFormatHelper helper = new DateFormatHelper();
         formattedTime += helper.getDayOfMonthSuffix(nextEpisode.get(Calendar.DAY_OF_MONTH));
 
-        if (prefers24Hour){
+        if (prefers24Hour) {
             hourFormat = new SimpleDateFormat(", kk:mm");
             formattedTime += hourFormat.format(nextEpisode.getTime());
 
@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity
         // debug code
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         String formattedNext = format.format(nextEpisode.getTime());
-        Log.d(TAG, "alarm for '" + series.getName() + "' set for: " + formattedNext);
+        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
     }
 
     public void removeAlarm(Series series) {
@@ -211,14 +211,14 @@ public class MainActivity extends AppCompatActivity
 
         alarmManager.cancel(pendingIntent);
 
-        Log.d(TAG, "alarm removed for: " + series.getName());
+        Log.d(TAG, "Alarm removed for: " + series.getName());
     }
 
-    public void updateSeries(ArrayList<Series> seriesList){
+    public void updateSeries(ArrayList<Series> seriesList) {
         HashSet<SeasonMeta> seasonMetas = new HashSet<>();
-        for (Series series : seriesList){
-            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()){
-                if (series.getSeason().equals(seasonMeta.getName())){
+        for (Series series : seriesList) {
+            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()) {
+                if (series.getSeason().equals(seasonMeta.getName())) {
                     seasonMetas.add(seasonMeta);
                 }
             }
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity
         SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
 
         Iterator seasonsIterator = seasonMetas.iterator();
-        while (seasonsIterator.hasNext()){
+        while (seasonsIterator.hasNext()) {
             senpaiExportHelper.getSeasonData((SeasonMeta) seasonsIterator.next());
         }
     }
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if (previousItemId != id){
+        if (previousItemId != id) {
             if (id == R.id.nav_my_shows) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_watching_queue);
                 }*/
-            } else if (id == R.id.nav_settings){
+            } else if (id == R.id.nav_settings) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())
                         .commit();
@@ -308,53 +308,52 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void seasonDataRetrieved(ArrayList<Series> pulledSeasonData) {
+    public void seasonDataRetrieved(Season season) {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        if (App.getInstance().isCurrentlyInitializing()){
+        if (App.getInstance().isCurrentlyInitializing()) {
             manager.cancel("Latest season".hashCode());
         } else {
-            manager.cancel(pulledSeasonData.get(0).getSeason().hashCode());
+            manager.cancel(season.getSeasonMetadata().getName().hashCode());
         }
 
-        App.getInstance().saveNewSeasonData(pulledSeasonData);
-        App.getInstance().getAllAnimeList().clear();
-        App.getInstance().loadAnimeListFromDB();
+        App.getInstance().saveNewSeasonData(season.getSeasonSeries());
+//        App.getInstance().getAllAnimeList().clear();
+//        App.getInstance().loadAnimeFromDB();
 
-        if (!pulledSeasonData.isEmpty()) {
-            if (App.getInstance().isCurrentlyInitializing()) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+        if (App.getInstance().isCurrentlyInitializing()) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String latestSeason = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
-                if (pulledSeasonData.get(0).getSeason().matches(latestSeason)) {
-                    App.getInstance().getCurrentlyBrowsingSeason().clear();
-                    App.getInstance().getCurrentlyBrowsingSeason().addAll(pulledSeasonData);
+            if (season.getSeasonMetadata().getName().matches(latestSeason)) {
+                App.getInstance().getCurrentlyBrowsingSeason().clear();
+                App.getInstance().getCurrentlyBrowsingSeason().addAll(season.getSeasonSeries());
 
-                    App.getInstance().setCurrentlyInitializing(false);
-                    postInitializing = true;
+                App.getInstance().setCurrentlyInitializing(false);
+                postInitializing = true;
 
-                    setProgressBarIndeterminateVisibility(false);
+                setProgressBarIndeterminateVisibility(false);
 
-                        progressViewHolder.setVisibility(View.GONE);
-                        progressView.stopAnimation();
+                progressViewHolder.setVisibility(View.GONE);
+                progressView.stopAnimation();
 
 
-                    currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
+                currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
 //                    postInitializeData();
 
 
-                    SeasonsFragment fragment = SeasonsFragment.newInstance();
+                SeasonsFragment fragment = SeasonsFragment.newInstance();
 
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, fragment, SeasonsFragment.class.getSimpleName())
-                            .commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, fragment, SeasonsFragment.class.getSimpleName())
+                        .commit();
 
-                    ANNSearchHelper helper = new ANNSearchHelper(this);
-                    helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
-                }
-            } else if (postInitializing){
-                currentInitializingIndex--;
-                postInitializeData();
+                ANNSearchHelper helper = new ANNSearchHelper(this);
+                helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
             }
+        } else if (postInitializing) {
+            currentInitializingIndex--;
+            postInitializeData();
+
         }
     }
 

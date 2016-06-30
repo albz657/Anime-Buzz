@@ -91,7 +91,7 @@ public class ANNSearchHelper {
 //            App.getInstance().cacheBitmap(entry.getValue(), entry.getKey());
         }
 
-//        App.getInstance().saveUserAnimeList(seriesHolder);
+//        App.getInstance().saveUserListToDB(seriesHolder);
 
         pullingImages = false;
         App.getInstance().getPosterQueue().clear();

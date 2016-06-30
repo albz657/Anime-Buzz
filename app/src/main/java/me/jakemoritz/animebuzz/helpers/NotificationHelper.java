@@ -23,7 +23,7 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_sync)
-                        .setContentTitle("Updating anime database")
+                        .setContentTitle(mContext.getString(R.string.notification_list_update))
                         .setContentText(seasonName)
                         .setAutoCancel(false)
                         .setProgress(0, 0, true);

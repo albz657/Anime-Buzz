@@ -44,12 +44,12 @@
     <string name="fragment_seasons">Season Browser</string>
     <string name="fragment_watching_queue">Watching Queue</string>
 
-    <!--Database table names-->
-    <string name="table_anime">ANIME</string>
-
     <!--File names-->
     <string name="file_alarms">alarms</string>
     <string name="season_list_file">seasonslist</string>
+
+    <!--Notifications-->
+    <string name="notification_list_update">Updating anime list</string>
 
     <!--SharedPreferences-->
     <string name="shared_prefs_logged_in">isuserloggedin</string>

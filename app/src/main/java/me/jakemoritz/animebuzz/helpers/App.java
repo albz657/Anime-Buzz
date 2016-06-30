@@ -23,8 +23,9 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.models.SeasonMeta;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonComparator;
+import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
@@ -33,10 +34,10 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private ArrayList<Series> userAnimeList;
-    private ArrayList<Series> allAnimeList;
-    private ArrayList<Series> currentlyBrowsingSeason;
-    private ArrayList<SeasonMeta> seasonsList;
+    private List<Series> userAnimeList;
+    private List<Series> currentlyBrowsingSeason;
+    private List<Season> allAnimeSeasons;
+    private List<SeasonMetadata> seasonsList;
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
 
@@ -73,14 +74,13 @@ public class App extends Application {
         super.onCreate();
 
         mInstance = this;
-
+        allAnimeSeasons = new ArrayList<>();
         userAnimeList = new ArrayList<>();
-        allAnimeList = new ArrayList<>();
         seasonsList = new ArrayList<>();
         alarms = new HashMap<>();
         posterQueue = new HashMap<>();
 
-        loadAnimeListFromDB();
+        loadAnimeFromDB();
         loadAlarms();
         loadSeasonsList();
         loadBrowsingSeason();
@@ -108,31 +108,41 @@ public class App extends Application {
 
     public void saveData() {
         App.getInstance().saveAlarms();
-        App.getInstance().saveAnimeListToDB();
-        App.getInstance().saveUserAnimeList(userAnimeList);
+        App.getInstance().saveAllAnimeSeasonsToDB();
+        App.getInstance().saveUserListToDB(userAnimeList);
         App.getInstance().saveSeasonsList();
     }
 
-    public void saveAnimeListToDB() {
+    public void saveAllAnimeSeasonsToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(allAnimeList, getString(R.string.table_anime));
+        for (Season season : allAnimeSeasons){
+            dbHelper.saveSeriesToDb(season.getSeasonSeries(), getString(R.string.table_anime));
+        }
+        dbHelper.close();
     }
 
-    public void saveUserAnimeList(ArrayList<Series> userAnimeList) {
+    public void saveUserListToDB(List<Series> userAnimeList) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(userAnimeList, getString(R.string.table_anime));
+        dbHelper.close();
     }
 
-    public void saveNewSeasonData(ArrayList<Series> newSeason) {
+    public void saveNewSeasonData(Season season) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(newSeason, getString(R.string.table_anime));
+        dbHelper.saveSeriesToDb(season.getSeasonSeries(), getString(R.string.table_anime));
+        dbHelper.close();
     }
 
-    public void loadAnimeListFromDB() {
+    public void loadAnimeFromDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());
-        allAnimeList = dbHelper.getSeriesFromDb(getString(R.string.table_anime));
-        userAnimeList = filterUserList(allAnimeList);
+        allAnimeSeasons.clear();
+        for (SeasonMetadata metadata : seasonsList){
+            List<Series> tempSeason = dbHelper.getSeriesBySeason(getString(R.string.table_anime), metadata.getName());
+            allAnimeSeasons.add(new Season(tempSeason, metadata));
+        }
+        userAnimeList = dbHelper.getSeriesUserWatching(getString(R.string.table_anime));
+        dbHelper.close();
     }
 
     private File getCachedBitmapFile(String MALID, String size) {
@@ -168,6 +178,7 @@ public class App extends Application {
     }
 
     public void saveSeasonsList() {
+        DatabaseHelper db
         try {
             FileOutputStream fos = openFileOutput(getString(R.string.season_list_file), Context.MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -198,16 +209,6 @@ public class App extends Application {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    private ArrayList<Series> filterUserList(ArrayList<Series> allAnimeList) {
-        ArrayList<Series> filteredUserList = new ArrayList<>();
-        for (Series series : allAnimeList) {
-            if (series.isInUserList()) {
-                filteredUserList.add(series);
-            }
-        }
-        return filteredUserList;
     }
 
     public void addAlarm(Series series, Intent intent) {
@@ -287,20 +288,19 @@ public class App extends Application {
         return mInstance;
     }
 
-    public ArrayList<Series> getAllAnimeList() {
-        return allAnimeList;
-    }
-
-    public ArrayList<SeasonMeta> getSeasonsList() {
-        return seasonsList;
-    }
-
-    public ArrayList<Series> getCurrentlyBrowsingSeason() {
-        return currentlyBrowsingSeason;
-    }
-
-    public ArrayList<Series> getUserAnimeList() {
+    public List<Series> getUserAnimeList() {
         return userAnimeList;
     }
 
+    public List<Series> getCurrentlyBrowsingSeason() {
+        return currentlyBrowsingSeason;
+    }
+
+    public List<Season> getAllAnimeSeasons() {
+        return allAnimeSeasons;
+    }
+
+    public List<SeasonMetadata> getSeasonsList() {
+        return seasonsList;
+    }
 }

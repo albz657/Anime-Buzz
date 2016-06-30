@@ -33,7 +33,7 @@ public class MalImportHelper {
 
         App.getInstance().getUserAnimeList().clear();
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
-        App.getInstance().saveAnimeListToDB();
+        App.getInstance().saveAllAnimeSeasonsToDB();
 
     }
 
