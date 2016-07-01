@@ -56,7 +56,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginRight="10dp"
                     android:layout_toLeftOf="@id/switch_simulcast"
-                    android:text="@string/pref_airing_or_simulcast_title"
+                    android:text="@string/pref_simulcast_title"
                     android:textColor="#FFFFFF" />
             </RelativeLayout>
 

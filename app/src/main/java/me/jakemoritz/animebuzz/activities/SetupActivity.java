@@ -96,7 +96,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(getString(R.string.pref_airing_or_simulcast_key), b);
+                editor.putBoolean(getString(R.string.pref_simulcast_key), b);
                 editor.apply();
             }
         });

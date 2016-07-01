@@ -56,7 +56,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mTitle.setText(visibleSeries.get(position).getName());
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
-        boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_airing_or_simulcast_key), false);
+        boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_simulcast_key), false);
 
         holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
 
@@ -74,6 +74,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         } else {
             holder.mPoster.setImageDrawable(null);
         }
+
+
 
 
         if (holder.series.isInUserList()) {

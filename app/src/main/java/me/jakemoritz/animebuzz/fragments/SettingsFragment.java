@@ -41,9 +41,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     private void setCorrectSummaries(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_airing_or_simulcast_key), false);
+        boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
 
-        Preference airingOrSimulcastPref = findPreference(getString(R.string.pref_airing_or_simulcast_key));
+        Preference airingOrSimulcastPref = findPreference(getString(R.string.pref_simulcast_key));
         if (prefersSimulcast){
             airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
         } else {
@@ -54,15 +54,15 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         Preference timeFormatPref = findPreference(getString(R.string.pref_24hour_key));
         if (prefers24Hour){
-            timeFormatPref.setSummary(getString(R.string.pref_24hour_summary));
-        } else {
             timeFormatPref.setSummary(getString(R.string.pref_24hour_off_summary));
+        } else {
+            timeFormatPref.setSummary(getString(R.string.pref_24hour_summary));
         }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(getString(R.string.pref_airing_or_simulcast_key))){
+        if (s.equals(getString(R.string.pref_simulcast_key))){
             Preference airingOrSimulcastPref = findPreference(s);
             if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))){
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
