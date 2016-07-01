@@ -84,7 +84,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertSeries(Series series) {
+    private boolean insertSeries(Series series) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -103,7 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean insertSeasonMetadata(SeasonMetadata metadata) {
+    private boolean insertSeasonMetadata(SeasonMetadata metadata) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();

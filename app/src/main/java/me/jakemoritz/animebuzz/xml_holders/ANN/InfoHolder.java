@@ -9,6 +9,9 @@ import java.util.List;
 public class InfoHolder {
 
     @ElementList(inline=true, required = false)
-    List<ImgHolder> imgList;
+    private List<ImgHolder> imgList;
 
+    public List<ImgHolder> getImgList() {
+        return imgList;
+    }
 }

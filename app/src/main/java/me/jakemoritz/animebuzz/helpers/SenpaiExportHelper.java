@@ -11,6 +11,7 @@ import com.google.gson.GsonBuilder;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
@@ -46,13 +47,14 @@ public class SenpaiExportHelper {
         call.enqueue(new Callback<AllSeasonsMetadata>() {
             @Override
             public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
-                Log.d(TAG, "Success");
-                App.getInstance().getSeasonsList().clear();
-                App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
+                if (response.isSuccessful()) {
+                    App.getInstance().getSeasonsList().clear();
+                    App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
 
-                App.getInstance().saveSeasonsList();
+                    App.getInstance().saveSeasonsList();
 
-                Log.d(TAG, "Success");
+                    Log.d(TAG, "Success");
+                }
             }
 
             @Override
@@ -112,19 +114,24 @@ public class SenpaiExportHelper {
         call.enqueue(new Callback<Season>() {
             @Override
             public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
-                NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel("Latest season".hashCode());
+                if (response.isSuccessful()) {
+                    NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.cancel("Latest season".hashCode());
 
-                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getKey());
-                editor.apply();
+                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                    SharedPreferences.Editor editor = settings.edit();
+                    editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getKey());
+                    editor.apply();
 
-                App.getInstance().setLatestSeasonKey(response.body().getSeasonMetadata().getKey());
+                    App.getInstance().setLatestSeasonKey(response.body().getSeasonMetadata().getKey());
 
-                ReadSeasonDataResponse delegate = mainActivity;
-                delegate.seasonDataRetrieved(response.body());
-                Log.d(TAG, "Success");
+                    DatabaseHelper databaseHelper = new DatabaseHelper(App.getInstance());
+                    databaseHelper.saveSeasonMetadataToDb(response.body().getSeasonMetadata());
+
+                    ReadSeasonDataResponse delegate = mainActivity;
+                    delegate.seasonDataRetrieved(response.body());
+                    Log.d(TAG, "Success");
+                }
             }
 
             @Override

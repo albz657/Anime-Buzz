@@ -60,16 +60,19 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
 
-        Picasso picasso = Picasso.with(mListener.getContext());
-        File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-        File smallBitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + "_small.jpg");
-        if (smallBitmapFile.exists()) {
-            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
-        } else {
-            File bitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + ".jpg");
-            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+        if (holder.series.getANNID() > 0){
+            Picasso picasso = Picasso.with(mListener.getContext());
+            File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
+            File imageCacheDirectory = new File(cacheDirectory, "images");
+            File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
+            if (smallBitmapFile.exists()) {
+                picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+            } else {
+                File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
+                picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+            }
         }
+
 
         if (holder.series.isInUserList()) {
             holder.mAddButton.setVisibility(View.GONE);

@@ -7,6 +7,10 @@ import org.simpleframework.xml.Root;
 public class ImgHolder {
 
     @Attribute(name="src")
-    String URL;
+    private String URL;
 
+
+    public String getURL() {
+        return URL;
+    }
 }

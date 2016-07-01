@@ -64,7 +64,7 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
         toolbarSpinner.setSelection(latestSeasonIndex);
 
-        mAdapter.notifyDataSetChanged();
+        loadSeason(App.getInstance().getLatestSeasonKey());
     }
 
     private void loadSeason(String seasonKey){
@@ -122,7 +122,7 @@ public class SeasonsFragment extends SeriesFragment {
             //senpaiExportHelper.getSeasonList();
 
             ANNSearchHelper helper = new ANNSearchHelper(parentActivity);
-            helper.getPictureUrlRetroFit();
+            helper.getImages(this, mAdapter.getAllSeries());
             //helper.getImages(this, mAdapter.getAllSeries());
         } else if (id == R.id.action_verify) {
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper((MainActivity) getActivity());

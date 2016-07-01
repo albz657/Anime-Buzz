@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent startupIntent = getIntent();
         if (startupIntent != null) {
-            if (!startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), true)) {
+            if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
@@ -304,10 +304,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void seasonDataRetrieved(Season season) {
+        App.getInstance().getAllAnimeSeasons().add(season);
         App.getInstance().saveNewSeasonData(season);
+        App.getInstance().loadAnimeFromDB();
 
         if (App.getInstance().isCurrentlyInitializing()) {
-            if (season.getSeasonMetadata().getName().matches(App.getInstance().getLatestSeasonKey())) {
+            if (season.getSeasonMetadata().getKey().matches(App.getInstance().getLatestSeasonKey())) {
 
 
                 App.getInstance().setCurrentlyInitializing(false);

@@ -10,9 +10,16 @@ import java.util.List;
 public class AnimeHolder {
 
     @Attribute(name="id")
-    String ANNID;
+    private String ANNID;
+
+    public String getANNID() {
+        return ANNID;
+    }
 
     @ElementList(inline=true)
-    List<InfoHolder> infoList;
+    private List<InfoHolder> infoList;
 
+    public List<InfoHolder> getInfoList() {
+        return infoList;
+    }
 }

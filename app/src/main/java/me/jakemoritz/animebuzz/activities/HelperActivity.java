@@ -19,7 +19,7 @@ public class HelperActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
 
-        if (true){
+        if (completedSetup){
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {

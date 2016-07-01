@@ -16,10 +16,12 @@ import java.util.ArrayList;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;
@@ -67,6 +69,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void seasonPostersImported() {
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void seasonDataRetrieved(Season season) {
         mAdapter.notifyDataSetChanged();
     }
 }

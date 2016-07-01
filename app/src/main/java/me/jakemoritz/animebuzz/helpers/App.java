@@ -64,12 +64,19 @@ public class App extends Application {
         alarms = new HashMap<>();
         posterQueue = new HashMap<>();
 
-        loadAnimeFromDB();
-        loadAlarms();
-        loadSeasonsList();
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        latestSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+        boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
+        if (completedSetup){
+
+            loadSeasonsList();
+            loadAnimeFromDB();
+            loadAlarms();
+
+            latestSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+        } else {
+            DatabaseHelper helper = new DatabaseHelper(this);
+            helper.onCreate(helper.getWritableDatabase());
+        }
     }
 
     public Season getSeasonFromKey(String seasonKey){
@@ -114,31 +121,33 @@ public class App extends Application {
 
         for (SeasonMetadata metadata : seasonsList){
             List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getKey());
-            allAnimeSeasons.add(new Season(tempSeason, metadata));
+            if (tempSeason.size() > 0){
+                allAnimeSeasons.add(new Season(tempSeason, metadata));
+            }
         }
         userAnimeList = dbHelper.getSeriesUserWatching();
         dbHelper.close();
     }
 
-    private File getCachedBitmapFile(String MALID, String size) {
+    private File getCachedBitmapFile(String ANNID, String size) {
         File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
 
         if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
             if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
                 if (size.equals("small")){
-                    return new File(imageCacheDirectory, MALID + "_small.jpg");
+                    return new File(imageCacheDirectory, ANNID + "_small.jpg");
                 } else {
-                    return new File(imageCacheDirectory, MALID + ".jpg");
+                    return new File(imageCacheDirectory, ANNID + ".jpg");
                 }
             }
         }
         return null;
     }
 
-    public void cacheBitmap(Bitmap bitmap, String MALID, String size) {
+    public void cacheBitmap(Bitmap bitmap, String ANNID, String size) {
         try {
-            File file = getCachedBitmapFile(MALID, size);
+            File file = getCachedBitmapFile(ANNID, size);
             if (file != null){
                 FileOutputStream fos = new FileOutputStream(file);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -169,6 +178,7 @@ public class App extends Application {
         for (int i = 0; i < res.getCount(); i++){
             SeasonMetadata metadata = dbHelper.getSeasonMetadataWithCursor(res);
             seasonsList.add(metadata);
+            res.moveToNext();
         }
 
         Collections.sort(seasonsList, new SeasonMetadataComparator());
