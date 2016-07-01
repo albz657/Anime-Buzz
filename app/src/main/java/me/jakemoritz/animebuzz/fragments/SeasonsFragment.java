@@ -9,10 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
-
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,8 +35,6 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
     private MainActivity parentActivity;
     private int previousSpinnerIndex = 0;
     private int currentlyBrowsingIndex = 0;
-    private CircularProgressView progressView;
-    private RelativeLayout progressViewHolder;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -64,12 +59,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
         });
         refreshToolbar();
 
-        if (App.getInstance().isInitializing()) {
-            progressView = (CircularProgressView) view.findViewById(R.id.progress_view);
-            progressViewHolder = (RelativeLayout) view.findViewById(R.id.progress_view_holder);
-            progressViewHolder.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
-        } else {
+        if (!App.getInstance().isInitializing()) {
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonKey());
         }
     }
@@ -112,11 +102,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
         if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
 
-            progressViewHolder.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
-           // recyclerView.setVisibility(View.VISIBLE);
-           // progressDialog.cancel();
+            parentActivity.progressViewHolder.setVisibility(View.GONE);
+            parentActivity.progressView.stopAnimation();
 
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonKey());
 

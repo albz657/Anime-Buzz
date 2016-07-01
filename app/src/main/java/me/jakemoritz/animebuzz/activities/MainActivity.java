@@ -19,6 +19,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,6 +47,8 @@ public class MainActivity extends AppCompatActivity
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
     private Intent alarmIntent;
+    public CircularProgressView progressView;
+    public RelativeLayout progressViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,11 @@ public class MainActivity extends AppCompatActivity
                 editor.apply();
 
                 App.getInstance().setInitializing(true);
+
+                progressView = (CircularProgressView) findViewById(R.id.progress_view);
+                progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
+                progressViewHolder.setVisibility(View.VISIBLE);
+                progressView.startAnimation();
             }
         }
 
