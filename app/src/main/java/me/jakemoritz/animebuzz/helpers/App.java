@@ -16,16 +16,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
@@ -36,14 +36,15 @@ public class App extends Application {
     private static App mInstance;
 
     private List<Series> userAnimeList;
-    private List<Season> allAnimeSeasons;
-    private List<SeasonMetadata> seasonsList;
+    private Set<Season> allAnimeSeasons;
+    private Set<SeasonMetadata> seasonsList;
     private HashMap<Series, Intent> alarms;
     private Series mostRecentAlarm;
-    private boolean currentlyInitializing = false;
+    private boolean initializing = false;
+    private boolean postInitializing = false;
     private boolean tryingToVerify = false;
-    private HashMap<String, Bitmap> posterQueue;
-    private String latestSeasonKey;
+    private String currentlyBrowsingSeasonKey = "";
+    private boolean gettingCurrentBrowsing = false;
 
     @Override
     public void onTerminate() {
@@ -58,35 +59,36 @@ public class App extends Application {
         SQLiteStudioService.instance().start(this);
 
         mInstance = this;
-        allAnimeSeasons = new ArrayList<>();
+        allAnimeSeasons = new HashSet<>();
         userAnimeList = new ArrayList<>();
-        seasonsList = new ArrayList<>();
+        seasonsList = new HashSet<>();
         alarms = new HashMap<>();
-        posterQueue = new HashMap<>();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
-        if (completedSetup){
+        if (completedSetup) {
 
             loadSeasonsList();
             loadAnimeFromDB();
             loadAlarms();
 
-            latestSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+            currentlyBrowsingSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
         } else {
             DatabaseHelper helper = new DatabaseHelper(this);
             helper.onCreate(helper.getWritableDatabase());
         }
     }
 
-    public Season getSeasonFromKey(String seasonKey){
-        for (Season season : allAnimeSeasons){
-            if (season.getSeasonMetadata().getKey().equals(seasonKey)){
+    public Season getSeasonFromKey(String seasonKey) {
+        for (Season season : allAnimeSeasons) {
+            if (season.getSeasonMetadata().getKey().equals(seasonKey)) {
                 return season;
             }
         }
         return null;
     }
+
+
 
     public void saveData() {
         App.getInstance().saveAlarms();
@@ -97,7 +99,7 @@ public class App extends Application {
 
     public void saveAllAnimeSeasonsToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        for (Season season : allAnimeSeasons){
+        for (Season season : allAnimeSeasons) {
             dbHelper.saveSeriesToDb(season.getSeasonSeries());
         }
         dbHelper.close();
@@ -119,9 +121,9 @@ public class App extends Application {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.onCreate(dbHelper.getWritableDatabase());
 
-        for (SeasonMetadata metadata : seasonsList){
+        for (SeasonMetadata metadata : seasonsList) {
             List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getKey());
-            if (tempSeason.size() > 0){
+            if (tempSeason.size() > 0) {
                 allAnimeSeasons.add(new Season(tempSeason, metadata));
             }
         }
@@ -135,7 +137,7 @@ public class App extends Application {
 
         if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
             if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                if (size.equals("small")){
+                if (size.equals("small")) {
                     return new File(imageCacheDirectory, ANNID + "_small.jpg");
                 } else {
                     return new File(imageCacheDirectory, ANNID + ".jpg");
@@ -145,43 +147,46 @@ public class App extends Application {
         return null;
     }
 
-    public void cacheBitmap(Bitmap bitmap, String ANNID, String size) {
-        try {
-            File file = getCachedBitmapFile(ANNID, size);
-            if (file != null){
-                FileOutputStream fos = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                fos.close();
+    public void cacheBitmap(List<ImageResponseHolder> imageResponses) {
+        for (ImageResponseHolder imageResponse : imageResponses) {
+            try {
+                File file = getCachedBitmapFile(imageResponse.getANNID(), imageResponse.getSize());
+                if (file != null) {
+                    FileOutputStream fos = new FileOutputStream(file);
+                    imageResponse.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.close();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            imageResponse.getBitmap().recycle();
         }
-        bitmap.recycle();
+        if (delegate != null) {
+            delegate.seasonPostersImported();
+        }
     }
 
     public void saveSeasonsList() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        for (SeasonMetadata seasonMetadata : seasonsList){
+        for (SeasonMetadata seasonMetadata : seasonsList) {
             dbHelper.saveSeasonMetadataToDb(seasonMetadata);
         }
         dbHelper.close();
     }
 
-    private void loadSeasonsList() {
+    public void loadSeasonsList() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         Cursor res = dbHelper.getAllSeasonMetadata();
 
         res.moveToFirst();
 
-        for (int i = 0; i < res.getCount(); i++){
+        for (int i = 0; i < res.getCount(); i++) {
             SeasonMetadata metadata = dbHelper.getSeasonMetadataWithCursor(res);
             seasonsList.add(metadata);
             res.moveToNext();
         }
-
-        Collections.sort(seasonsList, new SeasonMetadataComparator());
 
         res.close();
         dbHelper.close();
@@ -192,9 +197,6 @@ public class App extends Application {
         this.alarms.put(series, intent);
     }
 
-    public Series getMostRecentAlarm() {
-        return mostRecentAlarm;
-    }
 
     public void saveAlarms() {
         serializeAlarms();
@@ -256,6 +258,12 @@ public class App extends Application {
         }
     }
 
+    /* ACCESSORS */
+
+    public Series getMostRecentAlarm() {
+        return mostRecentAlarm;
+    }
+
     public HashMap<Series, Intent> getAlarms() {
         return alarms;
     }
@@ -268,20 +276,20 @@ public class App extends Application {
         return userAnimeList;
     }
 
-    public List<Season> getAllAnimeSeasons() {
+    public Set<Season> getAllAnimeSeasons() {
         return allAnimeSeasons;
     }
 
-    public List<SeasonMetadata> getSeasonsList() {
+    public Set<SeasonMetadata> getSeasonsList() {
         return seasonsList;
     }
 
-    public boolean isCurrentlyInitializing() {
-        return currentlyInitializing;
+    public boolean isInitializing() {
+        return initializing;
     }
 
-    public void setCurrentlyInitializing(boolean currentlyInitializing) {
-        this.currentlyInitializing = currentlyInitializing;
+    public void setInitializing(boolean initializing) {
+        this.initializing = initializing;
     }
 
     public boolean isTryingToVerify() {
@@ -292,15 +300,29 @@ public class App extends Application {
         this.tryingToVerify = tryingToVerify;
     }
 
-    public HashMap<String, Bitmap> getPosterQueue() {
-        return posterQueue;
+    public void setGettingCurrentBrowsing(boolean gettingCurrentBrowsing) {
+        this.gettingCurrentBrowsing = gettingCurrentBrowsing;
     }
 
-    public String getLatestSeasonKey() {
-        return latestSeasonKey;
+    public void setDelegate(SeasonPostersImportResponse delegate) {
+        this.delegate = delegate;
     }
 
-    public void setLatestSeasonKey(String latestSeasonKey) {
-        this.latestSeasonKey = latestSeasonKey;
+    private SeasonPostersImportResponse delegate = null;
+
+    public String getCurrentlyBrowsingSeasonKey() {
+        return currentlyBrowsingSeasonKey;
+    }
+
+    public void setCurrentlyBrowsingSeasonKey(String currentlyBrowsingSeasonKey) {
+        this.currentlyBrowsingSeasonKey = currentlyBrowsingSeasonKey;
+    }
+
+    public boolean isPostInitializing() {
+        return postInitializing;
+    }
+
+    public void setPostInitializing(boolean postInitializing) {
+        this.postInitializing = postInitializing;
     }
 }

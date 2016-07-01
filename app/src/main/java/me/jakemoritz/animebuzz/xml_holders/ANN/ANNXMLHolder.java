@@ -5,7 +5,7 @@ import org.simpleframework.xml.Root;
 
 import java.util.List;
 
-@Root(name = "ann")
+@Root(name = "ann", strict = false)
 public class ANNXMLHolder {
 
     @ElementList(inline=true)

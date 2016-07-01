@@ -9,7 +9,7 @@ public class SeasonMetadataComparator implements Comparator<SeasonMetadata> {
 
     @Override
     public int compare(SeasonMetadata lhs, SeasonMetadata rhs) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         try {
             Date leftAsDate = dateFormat.parse(lhs.getStart_timestamp());
             Date rightAsDate = dateFormat.parse(rhs.getStart_timestamp());

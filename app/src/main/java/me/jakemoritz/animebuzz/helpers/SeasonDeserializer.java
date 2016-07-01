@@ -48,6 +48,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         String seasonKey = seasonMonth + seasonYear;
 
         final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
+        App.getInstance().getSeasonsList().add(seasonMetadata);
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");

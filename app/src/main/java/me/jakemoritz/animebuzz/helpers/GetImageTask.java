@@ -7,34 +7,30 @@ import android.util.Log;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class GetImageTask extends AsyncTask<String, Void, Bitmap> {
+public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, List<ImageResponseHolder>> {
 
-    private String ANNID;
-    private String size;
-
-    public GetImageTask(String ANNID, String size) {
-        this.ANNID = ANNID;
-        this.size = size;
+    @Override
+    protected void onPostExecute(List<ImageResponseHolder> imageResponses) {
+        super.onPostExecute(imageResponses);
+        App.getInstance().cacheBitmap(imageResponses);
     }
 
     @Override
-    protected void onPostExecute(Bitmap bitmap) {
-        super.onPostExecute(bitmap);
-        if (bitmap != null){
-            App.getInstance().cacheBitmap(bitmap, ANNID, size);
-        } else {
-            Log.d("OOPS", "null bitmap");
+    protected List<ImageResponseHolder> doInBackground(List<ImageRequestHolder>... imageRequests) {
+        List<ImageResponseHolder> imageResponses = new ArrayList<>();
+        for (ImageRequestHolder imageRequest : imageRequests[0]){
+            try {
+                Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();
+                imageResponses.add(new ImageResponseHolder(imageRequest.getANNID(), imageRequest.getSize(), bitmap));
+            } catch (IOException e){
+                Log.d("OOPS", "null bitmap");
+
+                e.printStackTrace();
+            }
         }
-    }
-
-    @Override
-    protected Bitmap doInBackground(String... URL) {
-      try {
-          return Picasso.with(App.getInstance()).load(URL[0]).get();
-      } catch (IOException e){
-          e.printStackTrace();
-          return null;
-      }
+        return imageResponses;
     }
 }

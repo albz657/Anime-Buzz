@@ -10,9 +10,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
+import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
@@ -26,10 +26,10 @@ public class SenpaiExportHelper {
 
     private final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
-    private MainActivity mainActivity;
+    private SeriesFragment fragment;
 
-    public SenpaiExportHelper(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public SenpaiExportHelper(SeriesFragment fragment) {
+        this.fragment = fragment;
     }
 
     public void getSeasonList(){
@@ -48,25 +48,26 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
                 if (response.isSuccessful()) {
-                    App.getInstance().getSeasonsList().clear();
                     App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
-
                     App.getInstance().saveSeasonsList();
+                    if (fragment instanceof SeasonsFragment){
+                        ((SeasonsFragment) fragment).seasonListReceived(response.body().getMetadataList());
+                    }
 
-                    Log.d(TAG, "Success");
+                    Log.d(TAG, "Got season list");
                 }
             }
 
             @Override
             public void onFailure(Call<AllSeasonsMetadata> call, Throwable t) {
-                Log.d(TAG, "Failure");
+                Log.d(TAG, "Failed getting season list");
             }
         });
     }
 
     public void getSeasonData(final SeasonMetadata metadata){
         NotificationHelper helper = new NotificationHelper(App.getInstance());
-        helper.createUpdatingSeasonDataNotification(metadata.getName());
+        //helper.createUpdatingSeasonDataNotification(metadata.getName());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
@@ -86,9 +87,8 @@ public class SenpaiExportHelper {
                     NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                     manager.cancel(metadata.getName().hashCode());
 
-                    ReadSeasonDataResponse delegate = mainActivity;
-                    delegate.seasonDataRetrieved(response.body());
-                    Log.d(TAG, "Success");
+                    fragment.seasonDataRetrieved(response.body());
+                    Log.d(TAG, "Got season data for: '" + metadata.getName() + "'");
                 }
             }
 
@@ -96,14 +96,14 @@ public class SenpaiExportHelper {
             public void onFailure(Call<Season> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(metadata.getName().hashCode());
-                Log.d(TAG, "Failure");
+                Log.d(TAG, "Failed getting season data for: '" + metadata.getName() + "'");
             }
         });
     }
 
     public void getLatestSeasonData(){
         NotificationHelper helper = new NotificationHelper(App.getInstance());
-        helper.createUpdatingSeasonDataNotification("Latest season");
+        //helper.createUpdatingSeasonDataNotification("Latest season");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
@@ -128,14 +128,13 @@ public class SenpaiExportHelper {
                     editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getKey());
                     editor.apply();
 
-                    App.getInstance().setLatestSeasonKey(response.body().getSeasonMetadata().getKey());
+                    App.getInstance().setCurrentlyBrowsingSeasonKey(response.body().getSeasonMetadata().getKey());
 
                     DatabaseHelper databaseHelper = new DatabaseHelper(App.getInstance());
                     databaseHelper.saveSeasonMetadataToDb(response.body().getSeasonMetadata());
 
-                    ReadSeasonDataResponse delegate = mainActivity;
-                    delegate.seasonDataRetrieved(response.body());
-                    Log.d(TAG, "Success");
+                    fragment.seasonDataRetrieved(response.body());
+                    Log.d(TAG, "Got latest season data");
                 }
             }
 
@@ -143,7 +142,7 @@ public class SenpaiExportHelper {
             public void onFailure(Call<Season> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel("Latest season".hashCode());
-                Log.d(TAG, "Failure");
+                Log.d(TAG, "Failed getting latest season data");
             }
         });
     }

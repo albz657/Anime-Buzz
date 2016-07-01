@@ -15,22 +15,25 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse  {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;
     public SwipeRefreshLayout swipeRefreshLayout;
+    public ANNSearchHelper helper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        helper = new ANNSearchHelper();
     }
 
     @Override
@@ -45,7 +48,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             }
         });
-        mAdapter.notifyDataSetChanged();
+
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -70,10 +74,23 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void seasonPostersImported() {
         mAdapter.notifyDataSetChanged();
+
+
     }
 
     @Override
     public void seasonDataRetrieved(Season season) {
-        mAdapter.notifyDataSetChanged();
+        App.getInstance().getAllAnimeSeasons().add(season);
+        App.getInstance().saveNewSeasonData(season);
+//        App.getInstance().saveNewSeasonData(season);
+//        App.getInstance().loadAnimeFromDB();
+
+        if (season.getSeasonMetadata().getKey().equals(App.getInstance().getCurrentlyBrowsingSeasonKey())){
+            App.getInstance().setGettingCurrentBrowsing(true);
+        }
+        helper.getImages(this, season.getSeasonSeries());
+
+        //mAdapter.notifyDataSetChanged();
     }
+
 }

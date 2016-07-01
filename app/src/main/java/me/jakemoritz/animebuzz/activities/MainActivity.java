@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,9 +19,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.RelativeLayout;
-
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -29,19 +28,14 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
-import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
-import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, ReadSeasonDataResponse, ReadSeasonListResponse {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -49,11 +43,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private AlarmManager alarmManager;
     private PendingIntent pendingIntent;
-    Intent alarmIntent;
-    boolean postInitializing = false;
-    int currentInitializingIndex = -1;
-    CircularProgressView progressView;
-    RelativeLayout progressViewHolder;
+    private Intent alarmIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +58,7 @@ public class MainActivity extends AppCompatActivity
                 editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
                 editor.apply();
 
-                initializeData();
+                App.getInstance().setInitializing(true);
             }
         }
 
@@ -97,42 +87,22 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(2).setChecked(true);
 
-        // Start initial fragment
-        if (!App.getInstance().isCurrentlyInitializing()) {
+        if (App.getInstance().isInitializing()){
+            SeasonsFragment seasonsFragment = new SeasonsFragment();
+
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
+            senpaiExportHelper.getLatestSeasonData();
+
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                    .replace(R.id.content_main, seasonsFragment, SeasonsFragment.class.getSimpleName())
                     .commit();
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_seasons);
-            }
-        }
-    }
-
-    private void initializeData() {
-        App.getInstance().setCurrentlyInitializing(true);
-
-        progressView = (CircularProgressView) findViewById(R.id.progress_view);
-        progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
-        progressViewHolder.setVisibility(View.VISIBLE);
-        progressView.startAnimation();
-
-        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
-        senpaiExportHelper.getLatestSeasonData();
-    }
-
-    private void postInitializeData() {
-        if (currentInitializingIndex > 0) {
-            if (App.getInstance().getSeasonsList().get(currentInitializingIndex) != null) {
-                if (App.getInstance().getSeasonsList().get(currentInitializingIndex).getName().matches(App.getInstance().getLatestSeasonKey())) {
-                    currentInitializingIndex--;
-                    postInitializeData();
-                } else {
-                    SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
-                    senpaiExportHelper.getSeasonData(App.getInstance().getSeasonsList().get(currentInitializingIndex));
-                }
-            }
         } else {
-            postInitializing = false;
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, new SeasonsFragment(), SeasonsFragment.class.getSimpleName())
+                    .commit();
+        }
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle(R.string.fragment_seasons);
         }
     }
 
@@ -261,7 +231,7 @@ public class MainActivity extends AppCompatActivity
         if (previousItemId != id) {
             if (id == R.id.nav_my_shows) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, MyShowsFragment.newInstance(), MyShowsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, new MyShowsFragment(), MyShowsFragment.class.getSimpleName())
                         .commit();
                 navigationView.getMenu().getItem(1).setChecked(true);
 
@@ -270,7 +240,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_seasons) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, new SeasonsFragment(), SeasonsFragment.class.getSimpleName())
                         .commit();
                 navigationView.getMenu().getItem(2).setChecked(true);
 
@@ -302,47 +272,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void seasonDataRetrieved(Season season) {
-        App.getInstance().getAllAnimeSeasons().add(season);
-        App.getInstance().saveNewSeasonData(season);
-        App.getInstance().loadAnimeFromDB();
-
-        if (App.getInstance().isCurrentlyInitializing()) {
-            if (season.getSeasonMetadata().getKey().matches(App.getInstance().getLatestSeasonKey())) {
-
-
-                App.getInstance().setCurrentlyInitializing(false);
-                postInitializing = true;
-
-                setProgressBarIndeterminateVisibility(false);
-
-                progressViewHolder.setVisibility(View.GONE);
-                progressView.stopAnimation();
-
-
-                currentInitializingIndex = App.getInstance().getSeasonsList().size() - 1;
-//                    postInitializeData();
-
-
-                SeasonsFragment fragment = SeasonsFragment.newInstance();
-
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, fragment, SeasonsFragment.class.getSimpleName())
-                        .commit();
-
-                ANNSearchHelper helper = new ANNSearchHelper(this);
-//                helper.getImages(fragment, App.getInstance().getCurrentlyBrowsingSeason());
-            }
-        } else if (postInitializing) {
-            currentInitializingIndex--;
-            postInitializeData();
-
+    public Fragment getVisibleFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for (Fragment fragment : fragments) {
+            if (fragment != null && fragment.isVisible())
+                return fragment;
         }
+        return null;
     }
-
-    @Override
-    public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
-    }
-
 }

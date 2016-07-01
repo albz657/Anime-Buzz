@@ -33,7 +33,7 @@ public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMe
         editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), latestSeasonKey);
         editor.apply();
 
-        App.getInstance().setLatestSeasonKey(latestSeasonKey);
+        App.getInstance().setCurrentlyBrowsingSeasonKey(latestSeasonKey);
 
         JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 
