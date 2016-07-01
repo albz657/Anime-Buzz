@@ -71,6 +71,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                 File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
                 picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
             }
+        } else {
+            holder.mPoster.setImageDrawable(null);
         }
 
 

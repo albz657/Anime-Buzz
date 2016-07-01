@@ -82,15 +82,20 @@ public class SenpaiExportHelper {
         call.enqueue(new Callback<Season>() {
             @Override
             public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
-                NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(metadata.getKey().hashCode());
-                Log.d(TAG, "Success");
+                if (response.isSuccessful()) {
+                    NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.cancel(metadata.getName().hashCode());
+
+                    ReadSeasonDataResponse delegate = mainActivity;
+                    delegate.seasonDataRetrieved(response.body());
+                    Log.d(TAG, "Success");
+                }
             }
 
             @Override
             public void onFailure(Call<Season> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(metadata.getKey().hashCode());
+                manager.cancel(metadata.getName().hashCode());
                 Log.d(TAG, "Failure");
             }
         });
