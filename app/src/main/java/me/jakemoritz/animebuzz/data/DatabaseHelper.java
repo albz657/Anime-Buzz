@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -180,11 +182,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{seasonKey});
     }
 
-    public List<Series> getSeriesBySeason(String seasonKey) {
+    public List<Series> getSeriesBySeason(String seasonName) {
         List<Series> seriesBySeason = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonKey + "'", null);
+        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
 
         res.moveToFirst();
 
@@ -203,6 +205,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             insertSeasonMetadata(metadata);
         }
+    }
+
+    public void saveAllSeriesToDb(Set<Season> allSeries){
+        List<Series> allSeriesList = new ArrayList<>();
+        for (Season season : allSeries){
+            allSeriesList.addAll(season.getSeasonSeries());
+        }
+        saveSeriesToDb(allSeriesList);
     }
 
     public void saveSeriesToDb(List<Series> seriesList) {

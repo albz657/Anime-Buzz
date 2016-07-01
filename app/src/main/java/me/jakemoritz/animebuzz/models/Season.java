@@ -37,4 +37,9 @@ public class Season {
     public SeasonMetadata getSeasonMetadata() {
         return seasonMetadata;
     }
+
+    @Override
+    public String toString() {
+        return getSeasonMetadata().getKey();
+    }
 }

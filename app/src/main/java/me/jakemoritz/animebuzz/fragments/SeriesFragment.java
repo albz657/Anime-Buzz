@@ -85,7 +85,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 //        App.getInstance().saveNewSeasonData(season);
 //        App.getInstance().loadAnimeFromDB();
 
-        if (season.getSeasonMetadata().getKey().equals(App.getInstance().getCurrentlyBrowsingSeasonKey())){
+        if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
             App.getInstance().setGettingCurrentBrowsing(true);
         }
         helper.getImages(this, season.getSeasonSeries());

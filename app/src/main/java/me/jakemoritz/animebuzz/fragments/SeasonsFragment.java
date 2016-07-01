@@ -34,7 +34,6 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     private MainActivity parentActivity;
     private int previousSpinnerIndex = 0;
-    private int currentlyBrowsingIndex = 0;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -49,7 +48,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position != previousSpinnerIndex) {
                     loadSeason(seasonsSpinnerAdapter.getSeasonNames().get(position));
-                    currentlyBrowsingIndex = position;
+                    previousSpinnerIndex = position;
                 }
             }
 
@@ -59,19 +58,22 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
         });
         refreshToolbar();
 
-        if (!App.getInstance().isInitializing()) {
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonKey());
+        if (App.getInstance().isInitializing()) {
+
+        } else {
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
+
         }
     }
 
-    private void loadSeason(String seasonKey) {
+    private void loadSeason(String seasonName) {
         mAdapter.getAllSeries().clear();
-        mAdapter.getAllSeries().addAll(App.getInstance().getSeasonFromKey(seasonKey).getSeasonSeries());
+        mAdapter.getAllSeries().addAll(App.getInstance().getSeasonFromName(seasonName).getSeasonSeries());
         mAdapter.getVisibleSeries().clear();
         mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
         mAdapter.notifyDataSetChanged();
 
-        App.getInstance().setCurrentlyBrowsingSeasonKey(seasonKey);
+        App.getInstance().setCurrentlyBrowsingSeasonName(seasonName);
     }
 
     private List<String> getSpinnerItems() {
@@ -87,8 +89,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
         for (SeasonMetadata metadata : metadataList) {
             seasonNames.add(metadata.getName());
 
-            if (metadata.getKey().equals(App.getInstance().getCurrentlyBrowsingSeasonKey())) {
-                currentlyBrowsingIndex = previousSpinnerIndex = metadataList.indexOf(metadata);
+            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
+                 previousSpinnerIndex = metadataList.indexOf(metadata);
             }
         }
 
@@ -105,7 +107,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
             parentActivity.progressViewHolder.setVisibility(View.GONE);
             parentActivity.progressView.stopAnimation();
 
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonKey());
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
 
             App.getInstance().setPostInitializing(true);
 
@@ -130,7 +132,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
                 seasonsSpinnerAdapter.getSeasonNames().clear();
                 seasonsSpinnerAdapter.getSeasonNames().addAll(seasons);
                 seasonsSpinnerAdapter.notifyDataSetChanged();
-                toolbarSpinner.setSelection(currentlyBrowsingIndex);
+                toolbarSpinner.setSelection(previousSpinnerIndex);
             }
         }
     }
@@ -184,7 +186,7 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
         if (App.getInstance().isPostInitializing()) {
             //Collections.reverse(App.getInstance().getSeasonsList());
             for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()) {
-                if (!seasonMetadata.getKey().equals(App.getInstance().getCurrentlyBrowsingSeasonKey())) {
+                if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
                     SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
                     senpaiExportHelper.getSeasonData(seasonMetadata);
                 }

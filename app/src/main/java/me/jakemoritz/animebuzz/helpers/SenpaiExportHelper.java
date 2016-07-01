@@ -125,10 +125,10 @@ public class SenpaiExportHelper {
 
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
                     SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getKey());
+                    editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getName());
                     editor.apply();
 
-                    App.getInstance().setCurrentlyBrowsingSeasonKey(response.body().getSeasonMetadata().getKey());
+                    App.getInstance().setCurrentlyBrowsingSeasonName(response.body().getSeasonMetadata().getName());
 
                     DatabaseHelper databaseHelper = new DatabaseHelper(App.getInstance());
                     databaseHelper.saveSeasonMetadataToDb(response.body().getSeasonMetadata());

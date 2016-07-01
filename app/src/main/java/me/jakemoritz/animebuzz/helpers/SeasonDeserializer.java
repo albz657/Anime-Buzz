@@ -102,7 +102,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
             }
 
             if (MALID > 0){
-                final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonKey, ANNID, simulcast_delay);
+                final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
                 seasonSeries.add(series);
             }
 

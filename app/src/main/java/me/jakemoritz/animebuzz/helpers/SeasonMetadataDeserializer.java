@@ -1,8 +1,5 @@
 package me.jakemoritz.animebuzz.helpers;
 
-import android.content.SharedPreferences;
-import android.support.v7.preference.PreferenceManager;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -14,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
@@ -27,13 +23,6 @@ public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMe
         final JsonObject jsonObject = json.getAsJsonObject();
 
         String latestSeasonKey = jsonObject.get("latest").getAsString();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), latestSeasonKey);
-        editor.apply();
-
-        App.getInstance().setCurrentlyBrowsingSeasonKey(latestSeasonKey);
 
         JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 

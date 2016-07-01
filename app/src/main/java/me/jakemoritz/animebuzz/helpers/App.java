@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +28,7 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
@@ -43,7 +46,7 @@ public class App extends Application {
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
-    private String currentlyBrowsingSeasonKey = "";
+    private String currentlyBrowsingSeasonName = "";
     private boolean gettingCurrentBrowsing = false;
 
     @Override
@@ -72,22 +75,26 @@ public class App extends Application {
             loadAnimeFromDB();
             loadAlarms();
 
-            currentlyBrowsingSeasonKey = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+            currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
         } else {
             DatabaseHelper helper = new DatabaseHelper(this);
             helper.onCreate(helper.getWritableDatabase());
         }
     }
 
-    public Season getSeasonFromKey(String seasonKey) {
+    public Season getSeasonFromName(String seasonName) {
         for (Season season : allAnimeSeasons) {
-            if (season.getSeasonMetadata().getKey().equals(seasonKey)) {
+            if (season.getSeasonMetadata().getName().equals(seasonName)) {
                 return season;
             }
         }
         return null;
     }
 
+    public String getLatestSeasonName(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+    }
 
 
     public void saveData() {
@@ -99,10 +106,24 @@ public class App extends Application {
 
     public void saveAllAnimeSeasonsToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        for (Season season : allAnimeSeasons) {
-            dbHelper.saveSeriesToDb(season.getSeasonSeries());
-        }
+        dbHelper.saveAllSeriesToDb(allAnimeSeasons);
         dbHelper.close();
+    }
+
+    public boolean isCurrentOrNewer(String seasonName){
+        List<SeasonMetadata> metadataList = new ArrayList<>(seasonsList);
+        Collections.sort(metadataList, new SeasonMetadataComparator());
+        SeasonMetadata pendingSeason = null;
+        SeasonMetadata latestSeason = null;
+        for (SeasonMetadata metadata : metadataList){
+            if (metadata.getName().equals(seasonName)){
+                pendingSeason = metadata;
+            }
+            if (metadata.getName().equals(getLatestSeasonName())){
+                latestSeason = metadata;
+            }
+        }
+        return (metadataList.indexOf(pendingSeason) >= metadataList.indexOf(latestSeason));
     }
 
     public void saveUserListToDB(List<Series> userAnimeList) {
@@ -122,7 +143,7 @@ public class App extends Application {
         dbHelper.onCreate(dbHelper.getWritableDatabase());
 
         for (SeasonMetadata metadata : seasonsList) {
-            List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getKey());
+            List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
             if (tempSeason.size() > 0) {
                 allAnimeSeasons.add(new Season(tempSeason, metadata));
             }
@@ -155,6 +176,8 @@ public class App extends Application {
                     FileOutputStream fos = new FileOutputStream(file);
                     imageResponse.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
                     fos.close();
+                } else {
+                    Log.d(TAG, "null file");
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -310,12 +333,12 @@ public class App extends Application {
 
     private SeasonPostersImportResponse delegate = null;
 
-    public String getCurrentlyBrowsingSeasonKey() {
-        return currentlyBrowsingSeasonKey;
+    public String getCurrentlyBrowsingSeasonName() {
+        return currentlyBrowsingSeasonName;
     }
 
-    public void setCurrentlyBrowsingSeasonKey(String currentlyBrowsingSeasonKey) {
-        this.currentlyBrowsingSeasonKey = currentlyBrowsingSeasonKey;
+    public void setCurrentlyBrowsingSeasonName(String currentlyBrowsingSeasonName) {
+        this.currentlyBrowsingSeasonName = currentlyBrowsingSeasonName;
     }
 
     public boolean isPostInitializing() {

@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingEnd="6dp"
-    android:paddingStart="6dp">
+    android:paddingEnd="4dp"
+    android:paddingStart="4dp"
+    android:layout_height="wrap_content">
 
     <android.support.v7.widget.CardView xmlns:android.support.v7.cardview="http://schemas.android.com/apk/res-auto"
         android:id="@+id/card"
@@ -14,8 +14,8 @@
         android:layout_marginBottom="0dp"
         android:layout_marginTop="0dp"
         android.support.v7.cardview:cardBackgroundColor="@android:color/white"
-        android.support.v7.cardview:contentPadding="10dp"
-        android.support.v7.cardview:cardElevation="4dp"
+        android.support.v7.cardview:contentPadding="0dp"
+        android.support.v7.cardview:cardElevation="3dp"
         android.support.v7.cardview:cardUseCompatPadding="true">
 
         <RelativeLayout
@@ -31,51 +31,57 @@
                 android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="8dp" />
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginLeft="4dp"/>
 
             <FrameLayout
                 android:id="@+id/button_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="6dp">
+                android:layout_marginLeft="6dp"
 
-                <android.support.design.widget.FloatingActionButton
+                android:layout_alignParentBottom="true">
+
+                <ImageButton
                     android:id="@+id/add_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_action_add"
-                    app:elevation="4dp"
-                    app:fabSize="mini" />
+                    android:background="@color/colorAccent"/>
 
-                <android.support.design.widget.FloatingActionButton
+                <ImageButton
                     android:id="@+id/minus_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_action_minus"
                     android:visibility="gone"
-                    app:elevation="4dp"
-                    app:fabSize="mini" />
+                    android:background="@color/colorAccent" />
 
             </FrameLayout>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="fill_parent"
                 android:layout_toLeftOf="@id/button_holder"
                 android:layout_toRightOf="@id/series_poster"
                 android:paddingBottom="4dp"
-                android:paddingTop="4dp">
+                android:paddingTop="4dp"
+                android:layout_marginTop="0dp">
 
                 <TextView
                     android:id="@+id/series_title"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:singleLine="true"
-                    android:textColor="#D9000000" />
+                    android:singleLine="false"
+                    android:textColor="#D9000000"
+                    android:text="Test title"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:maxLines="2" />
 
                 <TextView
                     android:id="@+id/series_more"
@@ -88,14 +94,16 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/series_more">
+                    android:layout_below="@+id/series_more"
+                    android:gravity="bottom">
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:layout_marginRight="4dp"
-                        android:src="@drawable/ic_watch_later" />
+                        android:src="@drawable/ic_watch_later"
+                        android:id="@+id/watch_imageview" />
 
                     <TextView
                         android:id="@+id/series_date"
@@ -103,7 +111,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="65654"
                         android:textColor="#D9000000" />
                 </LinearLayout>
             </RelativeLayout>

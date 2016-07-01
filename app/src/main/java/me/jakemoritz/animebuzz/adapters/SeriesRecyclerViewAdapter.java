@@ -29,7 +29,6 @@ import me.jakemoritz.animebuzz.models.Series;
 public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable {
 
 
-
     private List<Series> allSeries = null;
     private List<Series> visibleSeries = null;
     private SeriesFragment mListener = null;
@@ -58,10 +57,36 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_simulcast_key), false);
 
-        holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
+        if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
+            if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
+                holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
+            } else {
+                holder.mDate.setText("TBA");
+            }
+            holder.mWatch.setVisibility(View.VISIBLE);
 
-        if (holder.series.getANNID() > 0){
-            Picasso picasso = Picasso.with(mListener.getContext());
+            if (holder.series.isInUserList()) {
+                holder.mAddButton.setVisibility(View.GONE);
+                holder.mMinusButton.setVisibility(View.VISIBLE);
+
+                holder.mAddButton.setClickable(false);
+                holder.mMinusButton.setClickable(true);
+            } else {
+                holder.mAddButton.setVisibility(View.VISIBLE);
+                holder.mMinusButton.setVisibility(View.GONE);
+
+                holder.mAddButton.setClickable(true);
+                holder.mMinusButton.setClickable(false);
+            }
+        } else {
+            holder.mAddButton.setVisibility(View.GONE);
+            holder.mMinusButton.setVisibility(View.GONE);
+            holder.mDate.setText("");
+            holder.mWatch.setVisibility(View.INVISIBLE);
+        }
+
+        Picasso picasso = Picasso.with(mListener.getContext());
+        if (holder.series.getANNID() > 0) {
             File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
             File imageCacheDirectory = new File(cacheDirectory, "images");
             File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
@@ -69,28 +94,16 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                 picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
             } else {
                 File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
-                picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+                if (bitmapFile.exists()) {
+                    picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+                } else {
+                    picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+                }
             }
         } else {
-            holder.mPoster.setImageDrawable(null);
+            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
-
-
-
-        if (holder.series.isInUserList()) {
-            holder.mAddButton.setVisibility(View.GONE);
-            holder.mMinusButton.setVisibility(View.VISIBLE);
-
-            holder.mAddButton.setClickable(false);
-            holder.mMinusButton.setClickable(true);
-        } else {
-            holder.mAddButton.setVisibility(View.VISIBLE);
-            holder.mMinusButton.setVisibility(View.GONE);
-
-            holder.mAddButton.setClickable(true);
-            holder.mMinusButton.setClickable(false);
-        }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,6 +140,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         public final TextView mDate;
         public final ImageButton mAddButton;
         public final ImageButton mMinusButton;
+        public final ImageView mWatch;
 
 
         public Series series;
@@ -139,6 +153,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             mDate = (TextView) view.findViewById(R.id.series_date);
             mAddButton = (ImageButton) view.findViewById(R.id.add_button);
             mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);
+            mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
         }
     }
 
