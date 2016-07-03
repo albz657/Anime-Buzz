@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,7 +23,6 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
@@ -315,13 +312,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public Fragment getVisibleFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        List<Fragment> fragments = fragmentManager.getFragments();
-        for (Fragment fragment : fragments) {
-            if (fragment != null && fragment.isVisible())
-                return fragment;
-        }
-        return null;
-    }
 }

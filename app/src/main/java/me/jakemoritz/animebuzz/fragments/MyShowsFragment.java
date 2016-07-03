@@ -19,6 +19,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.models.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesNameComparator;
 
 public class MyShowsFragment extends SeriesFragment {
 
@@ -111,6 +112,8 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     private void sortByName(){
-
+        Collections.sort(mAdapter.getAllSeries(), new SeriesNameComparator());
+        mAdapter.getVisibleSeries().clear();
+        mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
     }
 }
