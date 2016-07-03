@@ -158,11 +158,44 @@ public class MainActivity extends AppCompatActivity
         return formattedTime;
     }
 
+    private long getNextEpisodeTime(Series series, boolean simulcastTime){
+        Calendar cal;
+        if (simulcastTime) {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        }
+
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        return nextEpisode.getTimeInMillis();
+    }
+
     public void makeAlarm(Series series) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
+
+        long nextEpisodeAirtime = getNextEpisodeTime(series, false);
+        long nextEpisodeSimulcastTime = getNextEpisodeTime(series, true);
+        series.setNextEpisodeAirtime(nextEpisodeAirtime);
+        series.setNextEpisodeSimulcastTime(nextEpisodeSimulcastTime);
+
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Calendar cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        Calendar nextEpisode = Calendar.getInstance();
+        Calendar cal;
+        if (prefersSimulcast) {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        }        Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
         nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));

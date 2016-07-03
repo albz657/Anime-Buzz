@@ -12,6 +12,24 @@ public class Series {
     private String season;
     private int ANNID;
     private double simulcast_delay;
+    private long nextEpisodeAirtime;
+    private long nextEpisodeSimulcastTime;
+
+    public long getNextEpisodeAirtime() {
+        return nextEpisodeAirtime;
+    }
+
+    public void setNextEpisodeAirtime(long nextEpisodeAirtime) {
+        this.nextEpisodeAirtime = nextEpisodeAirtime;
+    }
+
+    public long getNextEpisodeSimulcastTime() {
+        return nextEpisodeSimulcastTime;
+    }
+
+    public void setNextEpisodeSimulcastTime(long nextEpisodeSimulcastTime) {
+        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
+    }
 
     public double getSimulcast_delay() {
         return simulcast_delay;
