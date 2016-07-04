@@ -105,7 +105,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
     private void attemptVerification(String username, String password) {
         if (!App.getInstance().isTryingToVerify()) {
-            malApiClient.verifyCredentials(username, password);
+            malApiClient.verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
             Snackbar.make(findViewById(R.id.coordinator), getString(R.string.trying_to_verify), Snackbar.LENGTH_SHORT).show();

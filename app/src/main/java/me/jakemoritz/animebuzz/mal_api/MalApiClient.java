@@ -7,20 +7,11 @@ import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -31,27 +22,38 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.activities.SetupActivity;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.MalEndpointInterface;
 import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.xml_holders.MAL.VerifyHolder;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 
 public class MalApiClient {
 
     private final static String TAG = MalApiClient.class.getSimpleName();
 
-    private static final String VERIFY_CREDENTIALS = "http://myanimelist.net/api/account/verify_credentials.xml";
+    private static final String BASE_URL = "http://myanimelist.net/api/";
     private static final String USER_LIST_BASE = "http://myanimelist.net/malappinfo.php";
 
     private Activity activity;
-    private RequestQueue queue;
+    private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+    private static Retrofit.Builder builder =
+            new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(SimpleXmlConverterFactory.create());
 
     public MalApiClient(Activity activity) {
         this.activity = activity;
-        this.queue = Volley.newRequestQueue(activity);
     }
 
     public void getUserList() {
@@ -62,7 +64,7 @@ public class MalApiClient {
                 .appendQueryParameter("type", "anime");
         String url = builder.build().toString();
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        /*StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
 
             @Override
             public void onResponse(String response) {
@@ -77,39 +79,69 @@ public class MalApiClient {
                 Log.d(TAG, "error: " + error.getMessage());
             }
         });
-        queue.add(stringRequest);
+        queue.add(stringRequest);*/
     }
 
-    public void verifyCredentials(final String username, final String password) {
+    public static <S> S createService(Class<S> serviceClass) {
+        return createService(serviceClass, null, null);
+    }
+
+    public static <S> S createService(Class<S> serviceClass, String username, String password) {
+        if (username != null && password != null) {
+            String credentials = username + ":" + password;
+            final String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+
+            httpClient.addInterceptor(new Interceptor() {
+                @Override
+                public okhttp3.Response intercept(Chain chain) throws IOException {
+                    Request original = chain.request();
+                    Request.Builder requestBuilder = original.newBuilder()
+                            .header("Authorization", basic)
+                            .header("Accept", "application/json")
+                            .method(original.method(), original.body());
+
+                    Request request = requestBuilder.build();
+                    return chain.proceed(request);
+                }
+            });
+        }
+
+        OkHttpClient client = httpClient.build();
+        Retrofit retrofit = builder.client(client).build();
+        return retrofit.create(serviceClass);
+    }
+
+    public void verify(String username, String password) {
         final VerifyCredentialsResponse delegate = (SetupActivity) activity;
 
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, VERIFY_CREDENTIALS, new Response.Listener<String>() {
+
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+        Call<VerifyHolder> call = malEndpointInterface.verifyCredentials();
+        call.enqueue(new Callback<VerifyHolder>() {
             @Override
-            public void onResponse(String response) {
-                if (delegate != null){
-                    delegate.verifyCredentialsResponseReceived(true);
+            public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
+                if (response.isSuccessful()) {
+                    if (delegate != null) {
+                        delegate.verifyCredentialsResponseReceived(true);
+                    }
+                } else {
+                    if (delegate != null) {
+                        delegate.verifyCredentialsResponseReceived(false);
+                    }
                 }
                 App.getInstance().setTryingToVerify(false);
+
             }
-        }, new Response.ErrorListener() {
 
             @Override
-            public void onErrorResponse(VolleyError error) {
-                // handle error
-                if (delegate != null){
+            public void onFailure(Call<VerifyHolder> call, Throwable t) {
+                if (delegate != null) {
                     delegate.verifyCredentialsResponseReceived(false);
                 }
                 App.getInstance().setTryingToVerify(false);
-                Log.d(TAG, "error: " + error.getMessage());
+                Log.d(TAG, "error: " + t.getMessage());
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                return getBasicHTTPAuthParams(username, password);
-            }
-        };
-
-        queue.add(stringRequest);
+        });
     }
 
     private Map<String, String> getBasicHTTPAuthParams(String username, String password) {
@@ -120,7 +152,7 @@ public class MalApiClient {
 
         String creds;
 
-        if (hasCompletedSetup){
+        if (hasCompletedSetup) {
             String savedUsername = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
             String savedPassword = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
             creds = String.format("Basic %s", Base64.encodeToString(String.format("%s:%s", savedUsername, savedPassword).getBytes(), Base64.DEFAULT));
@@ -133,24 +165,6 @@ public class MalApiClient {
         return params;
     }
 
-    private void processVerificationResponse(String response) {
-        try {
-            XMLReader reader = SAXParserFactory.newInstance().newSAXParser().getXMLReader();
-
-            UserXMLHandler handler = new UserXMLHandler();
-            reader.setContentHandler(handler);
-            InputSource inputSource = new InputSource();
-            inputSource.setCharacterStream(new StringReader(response));
-            reader.parse(inputSource);
-
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void processAnimeListResponse(String response) {
         try {
