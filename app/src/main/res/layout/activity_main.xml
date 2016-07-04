@@ -46,7 +46,7 @@
             android:layout_marginBottom="18dp"
             android:maxWidth="200dp"
             android:singleLine="false"
-            android:text="@string/initial_loading"
+            android:text="@string/initial_loading_season"
             android:textAlignment="center"
             android:textColor="#D9000000"
             android:textSize="16dp" />

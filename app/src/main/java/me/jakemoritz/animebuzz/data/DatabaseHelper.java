@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -248,8 +249,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new SeasonMetadata(seasonName, seasonDate, seasonKey);
     }
 
-    public List<Series> getSeriesUserWatching() {
-        List<Series> userList = new ArrayList<>();
+    public Set<Series> getSeriesUserWatching() {
+        Set<Series> userList = new HashSet<>();
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_IS_IN_USER_LIST + " ='" + 1 + "'", null);

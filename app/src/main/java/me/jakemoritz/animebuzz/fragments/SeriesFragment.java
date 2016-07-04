@@ -12,17 +12,21 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
+import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
+import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse  {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse  {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;
@@ -64,7 +68,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             mAdapter = new SeriesRecyclerViewAdapter(new ArrayList<Series>(), this);
 
         } else if (this instanceof MyShowsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
+            mAdapter = new SeriesRecyclerViewAdapter(new ArrayList<>(App.getInstance().getUserAnimeList()), this);
         }
         recyclerView.setAdapter(mAdapter);
 
@@ -93,4 +97,17 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         //mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
+        if (App.getInstance().isPostInitializing()) {
+            //Collections.reverse(App.getInstance().getSeasonsList());
+            for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()) {
+                if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
+                    SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+                    senpaiExportHelper.getSeasonData(seasonMetadata);
+                }
+            }
+            App.getInstance().setPostInitializing(false);
+        }
+    }
 }

@@ -10,13 +10,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
-import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import retrofit2.Call;
@@ -52,9 +51,7 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
                     App.getInstance().saveSeasonsList();
-                    if (fragment instanceof SeasonsFragment){
-                        ((SeasonsFragment) fragment).seasonListReceived(response.body().getMetadataList());
-                    }
+                    fragment.seasonListReceived(response.body().getMetadataList());
 
                     Log.d(TAG, "Got season list");
                 }

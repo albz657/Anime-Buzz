@@ -25,12 +25,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -86,25 +87,42 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        navigationView.getMenu().getItem(2).setChecked(true);
 
-        if (App.getInstance().isInitializing()){
-            SeasonsFragment seasonsFragment = new SeasonsFragment();
+        if (App.getInstance().isInitializing()) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
+            SeriesFragment seriesFragment;
+            if (loggedIn) {
+                navigationView.getMenu().getItem(1).setChecked(true);
+                seriesFragment = new MyShowsFragment();
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_myshows);
+                }
+            } else {
+                navigationView.getMenu().getItem(2).setChecked(true);
+                seriesFragment = new SeasonsFragment();
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_seasons);
+                }
+            }
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
             senpaiExportHelper.getLatestSeasonData();
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, seasonsFragment, SeasonsFragment.class.getSimpleName())
+                    .replace(R.id.content_main, seriesFragment, SeasonsFragment.class.getSimpleName())
                     .commit();
         } else {
+            navigationView.getMenu().getItem(1).setChecked(true);
+
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, new SeasonsFragment(), SeasonsFragment.class.getSimpleName())
+                    .replace(R.id.content_main, new MyShowsFragment(), MyShowsFragment.class.getSimpleName())
                     .commit();
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.fragment_seasons);
+            }
         }
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(R.string.fragment_seasons);
-        }
+
     }
 
     public String formatAiringTime(Series series, boolean prefersSimulcast) {
@@ -149,7 +167,7 @@ public class MainActivity extends AppCompatActivity
         return formattedTime;
     }
 
-    private long getNextEpisodeTime(Series series, boolean simulcastTime){
+    private long getNextEpisodeTime(Series series, boolean simulcastTime) {
         Calendar cal;
         if (simulcastTime) {
             cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
@@ -186,7 +204,8 @@ public class MainActivity extends AppCompatActivity
             cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
         } else {
             cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        }        Calendar nextEpisode = Calendar.getInstance();
+        }
+        Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
         nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));

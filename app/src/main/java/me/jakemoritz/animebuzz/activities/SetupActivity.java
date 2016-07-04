@@ -40,7 +40,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         setContentView(R.layout.activity_setup);
 
         final Activity activity = this;
-        malApiClient = new MalApiClient(this);
+        malApiClient = new MalApiClient(this, null);
 
         final WelcomeCoordinatorLayout coordinatorLayout = (WelcomeCoordinatorLayout) findViewById(R.id.coordinator);
         coordinatorLayout.addPage(R.layout.welcome_page_3);
@@ -126,6 +126,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(getString(R.string.credentials_username), usernameField.getText().toString().trim());
             editor.putString(getString(R.string.credentials_password), passwordField.getText().toString());
+            editor.putBoolean(getString(R.string.shared_prefs_logged_in), true);
             editor.apply();
 
             Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();

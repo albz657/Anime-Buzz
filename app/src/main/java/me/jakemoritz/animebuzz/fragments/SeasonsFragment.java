@@ -19,14 +19,13 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
-import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 
-public class SeasonsFragment extends SeriesFragment implements ReadSeasonListResponse {
+public class SeasonsFragment extends SeriesFragment {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -114,9 +113,8 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
             senpaiExportHelper.getSeasonList();
 
-            mAdapter.notifyDataSetChanged();
         }
-
+        super.seasonPostersImported();
     }
 
     public void refreshToolbar() {
@@ -178,20 +176,5 @@ public class SeasonsFragment extends SeriesFragment implements ReadSeasonListRes
                 return false;
             }
         });
-    }
-
-
-    @Override
-    public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
-        if (App.getInstance().isPostInitializing()) {
-            //Collections.reverse(App.getInstance().getSeasonsList());
-            for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()) {
-                if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
-                    SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
-                    senpaiExportHelper.getSeasonData(seasonMetadata);
-                }
-            }
-            App.getInstance().setPostInitializing(false);
-        }
     }
 }

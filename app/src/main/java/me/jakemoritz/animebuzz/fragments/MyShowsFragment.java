@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,13 +19,19 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
+import me.jakemoritz.animebuzz.interfaces.MalDataRead;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 
-public class MyShowsFragment extends SeriesFragment {
+public class MyShowsFragment extends SeriesFragment implements MalDataRead {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
+
+    private MainActivity parentActivity;
+    private MalApiClient malApiClient;
 
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
@@ -35,7 +42,9 @@ public class MyShowsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        MainActivity parentActivity = (MainActivity) getActivity();
+        parentActivity = (MainActivity) getActivity();
+        malApiClient = new MalApiClient(parentActivity, this);
+
         if (parentActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
 
@@ -68,9 +77,9 @@ public class MyShowsFragment extends SeriesFragment {
                 public boolean onMenuItemClick(MenuItem item) {
                     int id = item.getItemId();
 
-                    if (id == R.id.action_sort_date){
+                    if (id == R.id.action_sort_date) {
                         sortByDate();
-                    } else if (id == R.id.action_sort_name){
+                    } else if (id == R.id.action_sort_name) {
                         sortByName();
                     }
 
@@ -80,25 +89,25 @@ public class MyShowsFragment extends SeriesFragment {
             });
             popupMenu.show();
             return true;
-        } else if (id == R.id.action_get){
-            MalApiClient malApiClient = new MalApiClient(getActivity());
+        } else if (id == R.id.action_get) {
+            MalApiClient malApiClient = new MalApiClient(getActivity(), this);
             malApiClient.getUserList();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadUserSortingPreference(){
+    private void loadUserSortingPreference() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 
-        if (sortPref.equals("date")){
+        if (sortPref.equals("date")) {
             sortByDate();
-        } else if (sortPref.equals("name")){
+        } else if (sortPref.equals("name")) {
             sortByName();
         }
     }
 
-    private void sortByDate(){
+    private void sortByDate() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.shared_prefs_sorting), "date");
@@ -106,8 +115,8 @@ public class MyShowsFragment extends SeriesFragment {
 
         List<Series> noDateList = new ArrayList<>();
         List<Series> hasDateList = new ArrayList<>();
-        for (Series series : mAdapter.getVisibleSeries()){
-            if (series.getSimulcast_airdate() < 0 || series.getAirdate() < 0){
+        for (Series series : mAdapter.getVisibleSeries()) {
+            if (series.getSimulcast_airdate() < 0 || series.getAirdate() < 0) {
                 noDateList.add(series);
             } else {
                 hasDateList.add(series);
@@ -116,13 +125,13 @@ public class MyShowsFragment extends SeriesFragment {
 
         boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
 
-        if (prefersSimulcast){
+        if (prefersSimulcast) {
             Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
         } else {
             Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
         }
 
-        for (Series series : noDateList){
+        for (Series series : noDateList) {
             hasDateList.add(series);
         }
 
@@ -132,7 +141,7 @@ public class MyShowsFragment extends SeriesFragment {
         mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
     }
 
-    private void sortByName(){
+    private void sortByName() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.shared_prefs_sorting), "name");
@@ -141,5 +150,36 @@ public class MyShowsFragment extends SeriesFragment {
         Collections.sort(mAdapter.getAllSeries(), new SeriesNameComparator());
         mAdapter.getVisibleSeries().clear();
         mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
+    }
+
+    @Override
+    public void seasonPostersImported() {
+        if (App.getInstance().isInitializing()){
+            malApiClient.getUserList();
+
+            TextView loadingText = (TextView) parentActivity.progressViewHolder.findViewById(R.id.loading_text);
+            loadingText.setText(getString(R.string.initial_loading_myshows));
+
+
+
+        }
+
+        super.seasonPostersImported();
+    }
+
+    @Override
+    public void malDataRead() {
+        if (App.getInstance().isInitializing()){
+            App.getInstance().setInitializing(false);
+            App.getInstance().setPostInitializing(true);
+
+            parentActivity.progressViewHolder.setVisibility(View.GONE);
+            parentActivity.progressView.stopAnimation();
+
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+            senpaiExportHelper.getSeasonList();
+        }
+
+        mAdapter.notifyDataSetChanged();
     }
 }

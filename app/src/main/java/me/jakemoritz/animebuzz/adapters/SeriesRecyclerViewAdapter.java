@@ -180,6 +180,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         if (!alreadyExists) {
             item.setInUserList(true);
             App.getInstance().getUserAnimeList().add(item);
+            allSeries.clear();
+            allSeries.addAll(App.getInstance().getUserAnimeList());
+            visibleSeries.clear();
+            visibleSeries.addAll(allSeries);
+
             notifyItemChanged(position);
 
             if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0){

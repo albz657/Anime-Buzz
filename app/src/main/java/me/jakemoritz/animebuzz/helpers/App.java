@@ -34,7 +34,7 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private List<Series> userAnimeList;
+    private Set<Series> userAnimeList;
     private Set<Season> allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private boolean initializing = false;
@@ -57,7 +57,7 @@ public class App extends Application {
 
         mInstance = this;
         allAnimeSeasons = new HashSet<>();
-        userAnimeList = new ArrayList<>();
+        userAnimeList = new HashSet<>();
         seasonsList = new HashSet<>();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -91,7 +91,7 @@ public class App extends Application {
 
     public void saveData() {
         App.getInstance().saveAllAnimeSeasonsToDB();
-        App.getInstance().saveUserListToDB(userAnimeList);
+        App.getInstance().saveUserListToDB();
         App.getInstance().saveSeasonsList();
     }
 
@@ -117,9 +117,9 @@ public class App extends Application {
         return (metadataList.indexOf(pendingSeason) >= metadataList.indexOf(latestSeason));
     }
 
-    public void saveUserListToDB(List<Series> userAnimeList) {
+    public void saveUserListToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(userAnimeList);
+        dbHelper.saveSeriesToDb(new ArrayList<Series>(userAnimeList));
         dbHelper.close();
     }
 
@@ -212,7 +212,7 @@ public class App extends Application {
         return mInstance;
     }
 
-    public List<Series> getUserAnimeList() {
+    public Set<Series> getUserAnimeList() {
         return userAnimeList;
     }
 

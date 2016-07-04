@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.activities.SetupActivity;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
+import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.MalDataRead;
 import me.jakemoritz.animebuzz.interfaces.MalEndpointInterface;
 import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
 import okhttp3.Interceptor;
@@ -34,6 +36,8 @@ public class MalApiClient {
 
     private static final String BASE_URL = "http://myanimelist.net/";
 
+    private SeriesFragment seriesFragment;
+    private MalDataRead delegate;
     private Activity activity;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
@@ -41,12 +45,14 @@ public class MalApiClient {
                     .baseUrl(BASE_URL)
                     .addConverterFactory(SimpleXmlConverterFactory.create());
 
-    public MalApiClient(Activity activity) {
+    public MalApiClient(Activity activity, SeriesFragment seriesFragment) {
+        this.seriesFragment = seriesFragment;
         this.activity = activity;
+        this.delegate = (MyShowsFragment) seriesFragment;
     }
 
     public void getUserList() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
         String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
 
@@ -65,7 +71,7 @@ public class MalApiClient {
                                     idList.add(Integer.valueOf(list.getMALID()));
                                 }
                             }
-                            MalImportHelper helper = new MalImportHelper((MainActivity) activity);
+                            MalImportHelper helper = new MalImportHelper(seriesFragment, delegate);
                             helper.matchSeries(idList);
                         }
                     }
