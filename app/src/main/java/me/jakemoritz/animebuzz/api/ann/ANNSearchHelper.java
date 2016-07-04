@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.ann;
 
 import android.os.Handler;
 import android.util.Log;
@@ -6,12 +6,14 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.ANNEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.xml_holders.ANN.ANNXMLHolder;
-import me.jakemoritz.animebuzz.xml_holders.ANN.AnimeHolder;
-import me.jakemoritz.animebuzz.xml_holders.ANN.InfoHolder;
+import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
+import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
+import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;

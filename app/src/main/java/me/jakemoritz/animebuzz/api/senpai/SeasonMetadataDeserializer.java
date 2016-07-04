@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.senpai;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
+import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>{

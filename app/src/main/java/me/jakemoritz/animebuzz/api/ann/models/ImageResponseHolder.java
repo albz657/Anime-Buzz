@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.ann.models;
 
 import android.graphics.Bitmap;
 

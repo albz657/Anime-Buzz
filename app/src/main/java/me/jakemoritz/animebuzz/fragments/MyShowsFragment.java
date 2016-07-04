@@ -17,9 +17,10 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.models.NextEpisodeSimulcastTimeComparator;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesNameComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 
 public class MyShowsFragment extends SeriesFragment {
 
@@ -79,6 +80,9 @@ public class MyShowsFragment extends SeriesFragment {
             });
             popupMenu.show();
             return true;
+        } else if (id == R.id.action_get){
+            MalApiClient malApiClient = new MalApiClient(getActivity());
+            malApiClient.getUserList();
         }
         return super.onOptionsItemSelected(item);
     }

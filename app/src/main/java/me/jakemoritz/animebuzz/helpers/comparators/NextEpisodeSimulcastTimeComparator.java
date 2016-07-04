@@ -1,6 +1,8 @@
-package me.jakemoritz.animebuzz.models;
+package me.jakemoritz.animebuzz.helpers.comparators;
 
 import java.util.Comparator;
+
+import me.jakemoritz.animebuzz.models.Series;
 
 public class NextEpisodeSimulcastTimeComparator implements Comparator<Series> {
     @Override

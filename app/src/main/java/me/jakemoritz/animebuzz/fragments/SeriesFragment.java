@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
+import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;

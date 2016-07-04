@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.ann.models;
 
 public class ImageRequestHolder {
 

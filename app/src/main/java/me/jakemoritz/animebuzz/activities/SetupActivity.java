@@ -24,7 +24,7 @@ import com.redbooth.WelcomeCoordinatorLayout;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
-import me.jakemoritz.animebuzz.mal_api.MalApiClient;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 
 public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
 

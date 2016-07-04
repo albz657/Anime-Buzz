@@ -1,6 +1,8 @@
-package me.jakemoritz.animebuzz.models;
+package me.jakemoritz.animebuzz.api.senpai.models;
 
 import java.util.List;
+
+import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public class AllSeasonsMetadata {
 

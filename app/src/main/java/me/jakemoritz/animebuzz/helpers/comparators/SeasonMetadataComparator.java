@@ -1,9 +1,11 @@
-package me.jakemoritz.animebuzz.models;
+package me.jakemoritz.animebuzz.helpers.comparators;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
+
+import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public class SeasonMetadataComparator implements Comparator<SeasonMetadata> {
 

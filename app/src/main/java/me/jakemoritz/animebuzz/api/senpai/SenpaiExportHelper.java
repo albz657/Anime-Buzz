@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.senpai;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -13,8 +13,10 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
-import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
+import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import retrofit2.Call;

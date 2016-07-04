@@ -18,13 +18,13 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
-import me.jakemoritz.animebuzz.helpers.ANNSearchHelper;
+import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 
 public class SeasonsFragment extends SeriesFragment implements ReadSeasonListResponse {
 

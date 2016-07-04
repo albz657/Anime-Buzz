@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.mal_api;
+package me.jakemoritz.animebuzz.api.mal;
 
 import android.database.Cursor;
 
@@ -22,16 +22,21 @@ public class MalImportHelper {
         ArrayList<Series> matchedSeries = new ArrayList<>();
 
         DatabaseHelper dbHelper = new DatabaseHelper(App.getInstance());
-        Cursor res;
+        Cursor res = null;
         for (Integer integer : currentlyWatchingShowIds){
             res = dbHelper.getSeries(integer);
-            res.moveToFirst();
-            Series tempSeries = dbHelper.getSeriesWithCursor(res);
-            tempSeries.setInUserList(true);
-            matchedSeries.add(tempSeries);
-            activity.makeAlarm(tempSeries);
+            if (res.getCount() > 0){
+                res.moveToFirst();
+                Series tempSeries = dbHelper.getSeriesWithCursor(res);
+                tempSeries.setInUserList(true);
+                matchedSeries.add(tempSeries);
+                activity.makeAlarm(tempSeries);
+            }
         }
 
+        if (res != null){
+            res.close();
+        }
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
         App.getInstance().saveAllAnimeSeasonsToDB();
     }

@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.xml_holders.MAL;
+package me.jakemoritz.animebuzz.api.mal.models;
 
 import org.simpleframework.xml.Root;
 

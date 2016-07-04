@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.api.ann;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -9,6 +9,10 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
+import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, List<ImageResponseHolder>> {
 

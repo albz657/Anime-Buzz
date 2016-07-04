@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.interfaces;
 
-import me.jakemoritz.animebuzz.models.AllSeasonsMetadata;
+import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
 import retrofit2.Call;
 import retrofit2.http.GET;

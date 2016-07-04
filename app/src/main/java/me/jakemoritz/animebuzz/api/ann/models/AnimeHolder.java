@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.xml_holders.ANN;
+package me.jakemoritz.animebuzz.api.ann.models;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;

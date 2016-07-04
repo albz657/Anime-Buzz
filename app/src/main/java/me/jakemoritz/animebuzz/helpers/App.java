@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.models.SeasonMetadataComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
