@@ -42,8 +42,6 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private AlarmManager alarmManager;
-    private PendingIntent pendingIntent;
-    private Intent alarmIntent;
     public CircularProgressView progressView;
     public RelativeLayout progressViewHolder;
 
@@ -71,10 +69,6 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Retrieve pending intent to perform alarm broadcast
-        alarmIntent = new Intent(this, AlarmReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
 
         // Set up drawer and nav view
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -201,8 +195,11 @@ public class MainActivity extends AppCompatActivity
         if (current.compareTo(nextEpisode) > 0) {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
         }
+
+        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        notificationIntent.putExtra("name", series.getName());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
-        App.getInstance().addAlarm(series, alarmIntent);
 
         // debug code
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
@@ -212,7 +209,8 @@ public class MainActivity extends AppCompatActivity
 
     public void removeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, App.getInstance().getAlarms().remove(series), 0);
+        Intent deleteIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         alarmManager.cancel(pendingIntent);
 

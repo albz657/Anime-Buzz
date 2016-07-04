@@ -57,6 +57,8 @@
     <string name="shared_prefs_latest_season">latestseason</string>
     <string name="credentials_username">credentialsusername</string>
     <string name="credentials_password">credentialspassword</string>
+    <string name="shared_prefs_sorting">usersortingpref</string>
+
 
     <!--Preferences-->
     <string name="pref_simulcast_key">airingorsimulcast</string>

@@ -160,11 +160,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void removeSeries(Series item, int position) {
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
+        visibleSeries.remove(item);
+        allSeries.remove(item);
         notifyItemChanged(position);
 
         MainActivity mainActivity = (MainActivity) mListener.getActivity();
         mainActivity.removeAlarm(item);
         Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+//        notifyDataSetChanged();
     }
 
     public void addSeries(Series item, int position) {
@@ -179,8 +182,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             App.getInstance().getUserAnimeList().add(item);
             notifyItemChanged(position);
 
-            MainActivity mainActivity = (MainActivity) mListener.getActivity();
-            mainActivity.makeAlarm(item);
+            if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0){
+                MainActivity mainActivity = (MainActivity) mListener.getActivity();
+                mainActivity.makeAlarm(item);
+            }
+
             Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
     }

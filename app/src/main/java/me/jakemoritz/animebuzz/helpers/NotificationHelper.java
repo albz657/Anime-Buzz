@@ -9,7 +9,6 @@ import android.support.v4.app.TaskStackBuilder;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class NotificationHelper {
 
@@ -39,11 +38,11 @@ public class NotificationHelper {
         mNotificationManager.notify(seasonName.hashCode(), mBuilder.build());
     }
 
-    public void createNewEpisodeNotification(Series series) {
+    public void createNewEpisodeNotification(String seriesName) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)
-                        .setContentTitle(series.getName())
+                        .setContentTitle(seriesName)
                         .setContentText("New episode released");
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);

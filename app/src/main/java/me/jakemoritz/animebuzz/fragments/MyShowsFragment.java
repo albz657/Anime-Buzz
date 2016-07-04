@@ -44,6 +44,8 @@ public class MyShowsFragment extends SeriesFragment {
 
             parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
+
+        loadUserSortingPreference();
     }
 
     @Override
@@ -81,7 +83,23 @@ public class MyShowsFragment extends SeriesFragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void loadUserSortingPreference(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
+
+        if (sortPref.equals("date")){
+            sortByDate();
+        } else if (sortPref.equals("name")){
+            sortByName();
+        }
+    }
+
     private void sortByDate(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.shared_prefs_sorting), "date");
+        editor.apply();
+
         List<Series> noDateList = new ArrayList<>();
         List<Series> hasDateList = new ArrayList<>();
         for (Series series : mAdapter.getVisibleSeries()){
@@ -92,7 +110,6 @@ public class MyShowsFragment extends SeriesFragment {
             }
         }
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
 
         if (prefersSimulcast){
@@ -112,6 +129,11 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     private void sortByName(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.shared_prefs_sorting), "name");
+        editor.apply();
+
         Collections.sort(mAdapter.getAllSeries(), new SeriesNameComparator());
         mAdapter.getVisibleSeries().clear();
         mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
