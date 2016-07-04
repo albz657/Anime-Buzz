@@ -51,6 +51,11 @@ public class MalApiClient {
         this.delegate = (MyShowsFragment) seriesFragment;
     }
 
+    public void getUserAvatar(){
+        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(activity);
+        getUserAvatarTask.execute();
+    }
+
     public void getUserList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
@@ -73,6 +78,8 @@ public class MalApiClient {
                             }
                             MalImportHelper helper = new MalImportHelper(seriesFragment, delegate);
                             helper.matchSeries(idList);
+
+                            getUserAvatar();
                         }
                     }
                 }
@@ -125,6 +132,17 @@ public class MalApiClient {
                 if (response.isSuccessful()) {
                     if (delegate != null) {
                         delegate.verifyCredentialsResponseReceived(true);
+
+
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        if (response.body().getUsername() != null){
+                            editor.putString(activity.getString(R.string.mal_username_formatted), response.body().getUsername());
+                        }
+                        if (response.body().getUserID() != null){
+                            editor.putString(activity.getString(R.string.mal_userid), response.body().getUserID());
+                        }
+                        editor.apply();
                     }
                 } else {
                     if (delegate != null) {

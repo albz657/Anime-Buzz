@@ -159,9 +159,6 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
 
             TextView loadingText = (TextView) parentActivity.progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
-
-
-
         }
 
         super.seasonPostersImported();

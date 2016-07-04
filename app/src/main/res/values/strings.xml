@@ -12,6 +12,8 @@
     <string name="initial_loading_myshows">Getting your currently watching shows from MAL&#8230;</string>
     <string name="initial_loading_season">Downloading the current season info&#8230;</string>
 
+    <string name="mal_username_formatted">malusernameformatted</string>
+    <string name="mal_userid">maluserid</string>
 
     <!-- ===================== Welcome strings ===================== -->
 
@@ -49,6 +51,8 @@
     <!--File names-->
     <string name="file_alarms">alarms</string>
     <string name="season_list_file">seasonslist</string>
+    <string name="file_avatar">malavatar</string>
+
 
     <!--Notifications-->
     <string name="notification_list_update">Updating anime data</string>

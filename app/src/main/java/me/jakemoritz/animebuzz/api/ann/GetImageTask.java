@@ -19,7 +19,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, List
     @Override
     protected void onPostExecute(List<ImageResponseHolder> imageResponses) {
         super.onPostExecute(imageResponses);
-        App.getInstance().cacheBitmap(imageResponses);
+        App.getInstance().cachePosters(imageResponses);
     }
 
     @Override

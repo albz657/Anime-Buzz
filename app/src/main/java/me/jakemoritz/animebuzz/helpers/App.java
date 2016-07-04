@@ -21,10 +21,10 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
@@ -83,7 +83,7 @@ public class App extends Application {
         return null;
     }
 
-    public String getLatestSeasonName(){
+    public String getLatestSeasonName() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
     }
@@ -101,16 +101,16 @@ public class App extends Application {
         dbHelper.close();
     }
 
-    public boolean isCurrentOrNewer(String seasonName){
+    public boolean isCurrentOrNewer(String seasonName) {
         List<SeasonMetadata> metadataList = new ArrayList<>(seasonsList);
         Collections.sort(metadataList, new SeasonMetadataComparator());
         SeasonMetadata pendingSeason = null;
         SeasonMetadata latestSeason = null;
-        for (SeasonMetadata metadata : metadataList){
-            if (metadata.getName().equals(seasonName)){
+        for (SeasonMetadata metadata : metadataList) {
+            if (metadata.getName().equals(seasonName)) {
                 pendingSeason = metadata;
             }
-            if (metadata.getName().equals(getLatestSeasonName())){
+            if (metadata.getName().equals(getLatestSeasonName())) {
                 latestSeason = metadata;
             }
         }
@@ -143,7 +143,7 @@ public class App extends Application {
         dbHelper.close();
     }
 
-    private File getCachedBitmapFile(String ANNID, String size) {
+    private File getCachedPosterFile(String ANNID, String size) {
         File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
 
@@ -159,10 +159,10 @@ public class App extends Application {
         return null;
     }
 
-    public void cacheBitmap(List<ImageResponseHolder> imageResponses) {
+    public void cachePosters(List<ImageResponseHolder> imageResponses) {
         for (ImageResponseHolder imageResponse : imageResponses) {
             try {
-                File file = getCachedBitmapFile(imageResponse.getANNID(), imageResponse.getSize());
+                File file = getCachedPosterFile(imageResponse.getANNID(), imageResponse.getSize());
                 if (file != null) {
                     FileOutputStream fos = new FileOutputStream(file);
                     imageResponse.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -181,6 +181,8 @@ public class App extends Application {
             delegate.seasonPostersImported();
         }
     }
+
+
 
     public void saveSeasonsList() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
