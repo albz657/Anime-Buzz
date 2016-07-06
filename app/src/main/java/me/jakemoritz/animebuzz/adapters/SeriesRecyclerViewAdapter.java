@@ -23,7 +23,9 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
+import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
@@ -174,12 +176,24 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     public void removeSeries(Series item, int position) {
-        malApiClient.deleteAnime(String.valueOf(item.getMALID()));
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
+        boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
+        if (loggedIn){
+            malApiClient.deleteAnime(String.valueOf(item.getMALID()));
+        }
 
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
-        visibleSeries.remove(item);
-        allSeries.remove(item);
+
+        DatabaseHelper helper = new DatabaseHelper(mListener.getContext());
+        helper.updateSeriesInDb(item);
+        helper.close();
+
+        if (mListener instanceof MyShowsFragment){
+            visibleSeries.remove(item);
+            allSeries.remove(item);
+        }
+
         notifyDataSetChanged();
 //        notifyItemChanged(position);
 
@@ -190,13 +204,26 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     public void addSeries(Series item, int position) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
+        boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
+        if (loggedIn){
+            malApiClient.addAnime(String.valueOf(item.getMALID()));
+        }
+
         item.setInUserList(true);
         App.getInstance().getUserAnimeList().add(item);
-        App.getInstance().saveUserListToDB();
-        allSeries.clear();
-        allSeries.addAll(App.getInstance().getUserAnimeList());
-        visibleSeries.clear();
-        visibleSeries.addAll(allSeries);
+
+        DatabaseHelper helper = new DatabaseHelper(mListener.getContext());
+        helper.updateSeriesInDb(item);
+        helper.close();
+
+        if (mListener instanceof MyShowsFragment){
+            allSeries.clear();
+            allSeries.addAll(App.getInstance().getUserAnimeList());
+            visibleSeries.clear();
+            visibleSeries.addAll(allSeries);
+        }
+
 
 //        notifyItemChanged(position);
         notifyDataSetChanged();
