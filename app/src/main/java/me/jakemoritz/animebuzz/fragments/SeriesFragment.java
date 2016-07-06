@@ -19,6 +19,7 @@ import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.MalDataRead;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
@@ -26,7 +27,7 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse  {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;
@@ -109,5 +110,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             }
             App.getInstance().setPostInitializing(false);
         }
+    }
+
+    @Override
+    public void malDataRead() {
+
     }
 }

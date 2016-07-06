@@ -22,23 +22,30 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
+    private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
     private List<Series> allSeries = null;
     private List<Series> visibleSeries = null;
     private SeriesFragment mListener = null;
     private ViewGroup parent;
     private SeriesFilter seriesFilter;
+    private SeriesRecyclerViewAdapter self;
+    private MalApiClient malApiClient;
 
     public SeriesRecyclerViewAdapter(List<Series> items, SeriesFragment listener) {
         allSeries = items;
         mListener = listener;
         visibleSeries = new ArrayList<>(items);
+        self = this;
+        malApiClient = new MalApiClient(mListener.getActivity(), mListener);
     }
 
     @Override
@@ -56,6 +63,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_simulcast_key), false);
+        final boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
@@ -114,7 +122,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mMinusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                removeSeries(holder.series, position);
+                RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
+                dialogFragment.show(mListener.getActivity().getFragmentManager(), TAG);
             }
         });
     }
@@ -130,6 +139,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             seriesFilter = new SeriesFilter(this, allSeries);
         }
         return seriesFilter;
+    }
+
+    @Override
+    public void removeSeriesDialogClosed(boolean accepted, Series series, int position) {
+        if (accepted) {
+            removeSeries(series, position);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -158,11 +174,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     public void removeSeries(Series item, int position) {
+        malApiClient.deleteAnime(String.valueOf(item.getMALID()));
+
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
         visibleSeries.remove(item);
         allSeries.remove(item);
-        notifyItemChanged(position);
+        notifyDataSetChanged();
+//        notifyItemChanged(position);
 
         MainActivity mainActivity = (MainActivity) mListener.getActivity();
         mainActivity.removeAlarm(item);
@@ -173,12 +192,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void addSeries(Series item, int position) {
         item.setInUserList(true);
         App.getInstance().getUserAnimeList().add(item);
+        App.getInstance().saveUserListToDB();
         allSeries.clear();
         allSeries.addAll(App.getInstance().getUserAnimeList());
         visibleSeries.clear();
         visibleSeries.addAll(allSeries);
 
-        notifyItemChanged(position);
+//        notifyItemChanged(position);
+        notifyDataSetChanged();
 
         if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
             MainActivity mainActivity = (MainActivity) mListener.getActivity();

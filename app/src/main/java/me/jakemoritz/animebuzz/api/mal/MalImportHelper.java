@@ -36,7 +36,10 @@ public class MalImportHelper {
                 Series tempSeries = dbHelper.getSeriesWithCursor(res);
                 tempSeries.setInUserList(true);
                 matchedSeries.add(tempSeries);
-                activity.makeAlarm(tempSeries);
+
+                if (tempSeries.getAirdate() > 0 && tempSeries.getSimulcast_airdate() > 0) {
+                    activity.makeAlarm(tempSeries);
+                }
             }
         }
 
@@ -49,7 +52,7 @@ public class MalImportHelper {
         fragment.mAdapter.getAllSeries().addAll(matchedSeries);
         fragment.mAdapter.getVisibleSeries().clear();
         fragment.mAdapter.getVisibleSeries().addAll(fragment.mAdapter.getAllSeries());
-        App.getInstance().saveAllAnimeSeasonsToDB();
+        App.getInstance().saveUserListToDB();
         delegate.malDataRead();
     }
 }

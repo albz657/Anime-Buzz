@@ -15,7 +15,6 @@ import me.jakemoritz.animebuzz.activities.SetupActivity;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.MalDataRead;
@@ -48,7 +47,7 @@ public class MalApiClient {
     public MalApiClient(Activity activity, SeriesFragment seriesFragment) {
         this.seriesFragment = seriesFragment;
         this.activity = activity;
-        this.delegate = (MyShowsFragment) seriesFragment;
+        this.delegate = seriesFragment;
     }
 
     public void addAnime(String MALID) {
