@@ -27,7 +27,7 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener {
 
     public SeriesRecyclerViewAdapter mAdapter;
     public RecyclerView recyclerView;
@@ -46,15 +46,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         super.onViewCreated(view, savedInstanceState);
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(this);
 
 //        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onRefresh() {
+
     }
 
     @Override

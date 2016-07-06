@@ -22,20 +22,27 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
-import me.jakemoritz.animebuzz.interfaces.MalDataRead;
-import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
+import me.jakemoritz.animebuzz.models.Series;
 
-public class MyShowsFragment extends SeriesFragment implements MalDataRead {
+public class MyShowsFragment extends SeriesFragment {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
     private MainActivity parentActivity;
     private MalApiClient malApiClient;
+    private SenpaiExportHelper senpaiExportHelper;
+    private boolean updating = false;
 
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
         return fragment;
+    }
+
+    @Override
+    public void onRefresh() {
+        senpaiExportHelper.getLatestSeasonData();
+        updating = true;
     }
 
     @Override
@@ -44,19 +51,24 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
 
         parentActivity = (MainActivity) getActivity();
         malApiClient = new MalApiClient(parentActivity, this);
+        senpaiExportHelper = new SenpaiExportHelper(this);
 
         if (parentActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
+
             }
 
+            parentActivity.getSupportActionBar().setTitle(R.string.fragment_myshows);
             parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
         loadUserSortingPreference();
     }
+
+
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -162,6 +174,10 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
             TextView loadingText = (TextView) parentActivity.progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
+        if (updating){
+            malApiClient.getUserList();
+
+        }
 
         super.seasonPostersImported();
     }
@@ -177,6 +193,11 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
 
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
             senpaiExportHelper.getSeasonList();
+        }
+
+        if (updating){
+            swipeRefreshLayout.setRefreshing(false);
+            updating = false;
         }
 
         mAdapter.notifyDataSetChanged();
