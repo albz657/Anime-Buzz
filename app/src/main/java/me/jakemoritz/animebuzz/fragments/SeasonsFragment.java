@@ -33,6 +33,7 @@ public class SeasonsFragment extends SeriesFragment {
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     private MainActivity parentActivity;
     private int previousSpinnerIndex = 0;
+    private boolean updating = false;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -114,6 +115,11 @@ public class SeasonsFragment extends SeriesFragment {
             senpaiExportHelper.getSeasonList();
 
         }
+
+        if (updating){
+            swipeRefreshLayout.setRefreshing(false);
+            updating = false;
+        }
         super.seasonPostersImported();
     }
 
@@ -154,6 +160,18 @@ public class SeasonsFragment extends SeriesFragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+        for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
+            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
+                senpaiExportHelper.getSeasonData(metadata);
+
+            }
+        }
+        updating = true;
     }
 
     @Override
