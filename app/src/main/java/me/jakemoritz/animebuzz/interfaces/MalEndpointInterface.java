@@ -20,4 +20,8 @@ public interface MalEndpointInterface {
     @FormUrlEncoded
     @POST("api/animelist/add/{id}.xml")
     Call<Void> addAnimeURLEncoded(@Field("data") String body, @Path("id") String id);
+
+    @FormUrlEncoded
+    @POST("api/animelist/update/{id}.xml")
+    Call<Void> updateAnimeEpisodeCount(@Field("data") String body, @Path("id") String id);
 }
