@@ -43,6 +43,7 @@ public class MalImportHelper {
         if (res != null){
             res.close();
         }
+
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
         fragment.mAdapter.getAllSeries().clear();
         fragment.mAdapter.getAllSeries().addAll(matchedSeries);

@@ -171,29 +171,22 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     public void addSeries(Series item, int position) {
-        boolean alreadyExists = false;
-        for (Series series : App.getInstance().getUserAnimeList()) {
-            if (series.getMALID() == item.getMALID()) {
-                alreadyExists = true;
-            }
+        item.setInUserList(true);
+        App.getInstance().getUserAnimeList().add(item);
+        allSeries.clear();
+        allSeries.addAll(App.getInstance().getUserAnimeList());
+        visibleSeries.clear();
+        visibleSeries.addAll(allSeries);
+
+        notifyItemChanged(position);
+
+        if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
+            MainActivity mainActivity = (MainActivity) mListener.getActivity();
+            mainActivity.makeAlarm(item);
         }
-        if (!alreadyExists) {
-            item.setInUserList(true);
-            App.getInstance().getUserAnimeList().add(item);
-            allSeries.clear();
-            allSeries.addAll(App.getInstance().getUserAnimeList());
-            visibleSeries.clear();
-            visibleSeries.addAll(allSeries);
 
-            notifyItemChanged(position);
+        Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
 
-            if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0){
-                MainActivity mainActivity = (MainActivity) mListener.getActivity();
-                mainActivity.makeAlarm(item);
-            }
-
-            Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
-        }
     }
 
     public List<Series> getVisibleSeries() {

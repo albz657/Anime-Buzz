@@ -3,7 +3,11 @@ package me.jakemoritz.animebuzz.interfaces;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import retrofit2.Call;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface MalEndpointInterface {
@@ -12,4 +16,8 @@ public interface MalEndpointInterface {
 
     @GET("malappinfo.php")
     Call<UserListHolder> getUserList(@Query("u") String username, @Query("status") String status, @Query("type") String type);
+
+    @FormUrlEncoded
+    @POST("api/animelist/add/{id}.xml")
+    Call<Void> addAnimeURLEncoded(@Field("data") String body, @Path("id") String id);
 }

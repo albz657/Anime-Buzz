@@ -91,7 +91,8 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
             return true;
         } else if (id == R.id.action_get) {
             MalApiClient malApiClient = new MalApiClient(getActivity(), this);
-            malApiClient.getUserList();
+            malApiClient.addAnime("s");
+//            malApiClient.getUserList();
         }
         return super.onOptionsItemSelected(item);
     }
