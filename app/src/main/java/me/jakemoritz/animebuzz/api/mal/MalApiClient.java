@@ -99,6 +99,30 @@ public class MalApiClient {
         });
     }
 
+    public void deleteAnime(String MALID) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+        Call<Void> call = malEndpointInterface.deleteAnime(MALID);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful() && response.raw().message().equals("OK")) {
+                    Log.d(TAG, response.toString());
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.d(TAG, t.toString());
+
+            }
+        });
+    }
+
     public void getUserAvatar() {
         GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(activity);
         getUserAvatarTask.execute();

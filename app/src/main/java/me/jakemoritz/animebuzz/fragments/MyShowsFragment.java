@@ -93,7 +93,7 @@ public class MyShowsFragment extends SeriesFragment implements MalDataRead {
             MalApiClient malApiClient = new MalApiClient(getActivity(), this);
 //            malApiClient.addAnime("s");
 //            malApiClient.getUserList();
-            malApiClient.updateAnimeEpisodeCount("23", 0);
+            malApiClient.deleteAnime("23");
         }
         return super.onOptionsItemSelected(item);
     }
