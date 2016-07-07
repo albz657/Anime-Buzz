@@ -45,6 +45,7 @@ public class App extends Application {
     private Set<Series> userAnimeList;
     private Set<Season> allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
+    private List<Series> backlog;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
@@ -52,6 +53,9 @@ public class App extends Application {
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
 
+    public List<Series> getBacklog() {
+        return backlog;
+    }
 
     @Override
     public void onTerminate() {
@@ -69,6 +73,7 @@ public class App extends Application {
         allAnimeSeasons = new HashSet<>();
         userAnimeList = new HashSet<>();
         seasonsList = new HashSet<>();
+        backlog = new ArrayList<>();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
