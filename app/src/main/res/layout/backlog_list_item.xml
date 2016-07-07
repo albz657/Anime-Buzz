@@ -36,37 +36,10 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="4dp" />
 
-            <FrameLayout
-                android:id="@+id/button_holder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-
-                android:layout_marginLeft="6dp">
-
-                <ImageButton
-                    android:id="@+id/add_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorAccent"
-                    android:src="@drawable/ic_action_add" />
-
-                <ImageButton
-                    android:id="@+id/minus_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@color/colorAccent"
-                    android:src="@drawable/ic_action_minus"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:layout_marginTop="0dp"
-                android:layout_toLeftOf="@id/button_holder"
                 android:layout_toRightOf="@id/series_poster"
                 android:paddingBottom="4dp"
                 android:paddingTop="4dp">

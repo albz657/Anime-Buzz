@@ -19,7 +19,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
@@ -31,8 +30,6 @@ public class MyShowsFragment extends SeriesFragment {
 
     private MainActivity parentActivity;
     private MalApiClient malApiClient;
-    private SenpaiExportHelper senpaiExportHelper;
-    private boolean updating = false;
 
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
@@ -51,7 +48,6 @@ public class MyShowsFragment extends SeriesFragment {
 
         parentActivity = (MainActivity) getActivity();
         malApiClient = new MalApiClient(parentActivity, this);
-        senpaiExportHelper = new SenpaiExportHelper(this);
 
         if (parentActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
@@ -191,7 +187,6 @@ public class MyShowsFragment extends SeriesFragment {
             parentActivity.progressViewHolder.setVisibility(View.GONE);
             parentActivity.progressView.stopAnimation();
 
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
             senpaiExportHelper.getSeasonList();
         }
 

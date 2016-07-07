@@ -53,7 +53,6 @@
     <string name="season_list_file">seasonslist</string>
     <string name="file_avatar">malavatar</string>
 
-
     <!--Notifications-->
     <string name="notification_list_update">Updating anime data</string>
 
@@ -64,7 +63,6 @@
     <string name="credentials_username">credentialsusername</string>
     <string name="credentials_password">credentialspassword</string>
     <string name="shared_prefs_sorting">usersortingpref</string>
-
 
     <!--Preferences-->
     <string name="pref_simulcast_key">airingorsimulcast</string>
@@ -79,6 +77,15 @@
 
     <string name="pref_category_notifications_title">Notifications</string>
     <string name="pref_category_notifications_key">categorynotificationskey</string>
+
+    <string name="pref_account">prefaccount</string>
+    <string name="pref_account_title">MAL Account</string>
+    <string name="pref_account_summary_on">You are currently signed in as \'</string>
+    <string name="pref_account_summary_off">You are not signed in.</string>
+    <string name="pref_account_cancel">Cancel</string>
+    <string name="pref_account_signin">Sign In</string>
+    <string name="pref_account_signout">Sign Out</string>
+
 
     <string name="pref_category_misc_title">Miscellaneous</string>
     <string name="pref_category_misc_key">categorymisckey</string>

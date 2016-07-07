@@ -160,7 +160,6 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         public final ImageButton mMinusButton;
         public final ImageView mWatch;
 
-
         public Series series;
 
         public ViewHolder(View view) {

@@ -19,7 +19,6 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
-import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
@@ -33,7 +32,6 @@ public class SeasonsFragment extends SeriesFragment {
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     private MainActivity parentActivity;
     private int previousSpinnerIndex = 0;
-    private boolean updating = false;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -111,7 +109,6 @@ public class SeasonsFragment extends SeriesFragment {
 
             App.getInstance().setPostInitializing(true);
 
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
             senpaiExportHelper.getSeasonList();
 
         }
@@ -146,14 +143,14 @@ public class SeasonsFragment extends SeriesFragment {
         int id = item.getItemId();
 
         if (id == R.id.action_notify) {
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+
             //senpaiExportHelper.getSeasonList();
 
             ANNSearchHelper helper = new ANNSearchHelper();
             helper.getImages(this, mAdapter.getAllSeries());
             //helper.getImages(this, mAdapter.getAllSeries());
         } else if (id == R.id.action_verify) {
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
+
             senpaiExportHelper.getLatestSeasonData();/*
             ANNSearchHelper helper = new ANNSearchHelper((MainActivity) getActivity());
             helper.getImages(this, mAdapter.getAllSeries());*/
@@ -164,7 +161,6 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
         for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
             if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
                 senpaiExportHelper.getSeasonData(metadata);

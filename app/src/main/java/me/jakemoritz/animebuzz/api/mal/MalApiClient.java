@@ -52,74 +52,85 @@ public class MalApiClient {
 
     public void addAnime(String MALID) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        if (isLoggedIn){
+            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
 
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
-        Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful() && response.raw().message().equals("Created")) {
-                    Log.d(TAG, response.toString());
+            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+            Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful() && response.raw().message().equals("Created")) {
+                        Log.d(TAG, response.toString());
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.d(TAG, t.toString());
 
                 }
-            }
+            });
+        }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.d(TAG, t.toString());
-
-            }
-        });
     }
 
     public void updateAnimeEpisodeCount(String MALID, int episodeCount) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        if (isLoggedIn){
+            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
 
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
-        Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + episodeCount + "</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful() && response.raw().message().equals("OK")) {
-                    Log.d(TAG, response.toString());
+            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+            Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + episodeCount + "</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful() && response.raw().message().equals("OK")) {
+                        Log.d(TAG, response.toString());
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.d(TAG, t.toString());
 
                 }
-            }
-
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.d(TAG, t.toString());
-
-            }
-        });
+            });
+        }
     }
 
     public void deleteAnime(String MALID) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        if (isLoggedIn){
+            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
 
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
-        Call<Void> call = malEndpointInterface.deleteAnime(MALID);
-        call.enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful() && response.raw().message().equals("OK")) {
-                    Log.d(TAG, response.toString());
+            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+            Call<Void> call = malEndpointInterface.deleteAnime(MALID);
+            call.enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    if (response.isSuccessful() && response.raw().message().equals("OK")) {
+                        Log.d(TAG, response.toString());
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    Log.d(TAG, t.toString());
 
                 }
-            }
+            });
+        }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Log.d(TAG, t.toString());
-
-            }
-        });
     }
 
     public void getUserAvatar() {
@@ -129,38 +140,42 @@ public class MalApiClient {
 
     public void getUserList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        if (isLoggedIn){
+            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
 
-        if (username.length() != 0 && password.length() != 0) {
-            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
-            Call<UserListHolder> call = malEndpointInterface.getUserList(username, "all", "anime");
+            if (username.length() != 0 && password.length() != 0) {
+                MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+                Call<UserListHolder> call = malEndpointInterface.getUserList(username, "all", "anime");
 
-            call.enqueue(new Callback<UserListHolder>() {
-                @Override
-                public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {
-                    if (response.isSuccessful()) {
-                        if (response.body().getAnimeList() != null) {
-                            List<Integer> idList = new ArrayList<>();
-                            for (AnimeListHolder list : response.body().getAnimeList()) {
-                                if (list.getMALID() != null && list.getMy_status() != null && list.getMy_status().equals("1")) {
-                                    idList.add(Integer.valueOf(list.getMALID()));
+                call.enqueue(new Callback<UserListHolder>() {
+                    @Override
+                    public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {
+                        if (response.isSuccessful()) {
+                            if (response.body().getAnimeList() != null) {
+                                List<Integer> idList = new ArrayList<>();
+                                for (AnimeListHolder list : response.body().getAnimeList()) {
+                                    if (list.getMALID() != null && list.getMy_status() != null && list.getMy_status().equals("1")) {
+                                        idList.add(Integer.valueOf(list.getMALID()));
+                                    }
                                 }
-                            }
-                            MalImportHelper helper = new MalImportHelper(seriesFragment, delegate);
-                            helper.matchSeries(idList);
+                                MalImportHelper helper = new MalImportHelper(seriesFragment, delegate);
+                                helper.matchSeries(idList);
 
-                            getUserAvatar();
+                                getUserAvatar();
+                            }
                         }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<UserListHolder> call, Throwable t) {
-                    Log.d(TAG, "error: " + t.getMessage());
-                }
-            });
+                    @Override
+                    public void onFailure(Call<UserListHolder> call, Throwable t) {
+                        Log.d(TAG, "error: " + t.getMessage());
+                    }
+                });
+            }
         }
+
     }
 
     public static <S> S createService(Class<S> serviceClass) {

@@ -33,6 +33,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public RecyclerView recyclerView;
     public SwipeRefreshLayout swipeRefreshLayout;
     public ANNSearchHelper helper;
+    public boolean updating = false;
+    public SenpaiExportHelper senpaiExportHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        senpaiExportHelper = new SenpaiExportHelper(this);
+
 
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);

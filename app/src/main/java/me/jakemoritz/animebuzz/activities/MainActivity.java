@@ -34,6 +34,7 @@ import java.util.Calendar;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -273,24 +274,6 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "Alarm removed for: " + series.getName());
     }
 
-   /* public void updateSeries(ArrayList<Series> seriesList) {
-        HashSet<SeasonMeta> seasonMetas = new HashSet<>();
-        for (Series series : seriesList) {
-            for (SeasonMeta seasonMeta : App.getInstance().getSeasonsList()) {
-                if (series.getSeason().equals(seasonMeta.getName())) {
-                    seasonMetas.add(seasonMeta);
-                }
-            }
-        }
-
-        SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
-
-        Iterator seasonsIterator = seasonMetas.iterator();
-        while (seasonsIterator.hasNext()) {
-            senpaiExportHelper.getSeasonData((SeasonMeta) seasonsIterator.next());
-        }
-    }*/
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -341,15 +324,15 @@ public class MainActivity extends AppCompatActivity
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_seasons);
                 }
-            } else if (id == R.id.nav_watching_queue) {/*
+            } else if (id == R.id.nav_watching_queue) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, SeasonsFragment.newInstance(), SeasonsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, BacklogFragment.newInstance(), BacklogFragment.class.getSimpleName())
                         .commit();
                 navigationView.getMenu().getItem(0).setChecked(true);
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_watching_queue);
-                }*/
+                }
             } else if (id == R.id.nav_settings) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())

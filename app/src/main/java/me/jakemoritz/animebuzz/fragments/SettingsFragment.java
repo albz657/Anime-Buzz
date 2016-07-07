@@ -3,7 +3,9 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.preference.Preference;
+import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.preference.XpPreferenceFragment;
 import android.support.v7.widget.RecyclerView;
@@ -12,19 +14,25 @@ import android.widget.Spinner;
 
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
 
+import java.io.File;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     SharedPreferences sharedPreferences;
+    SettingsFragment self;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        self = this;
         setCorrectSummaries();
 
         MainActivity parentActivity = (MainActivity) getActivity();
@@ -60,6 +68,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
+
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))){
@@ -87,13 +97,53 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         listView.setFocusable(false);
         listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
         setDivider(null);
+
+
     }
 
     @Override
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        PreferenceCategory preferenceCategory = (PreferenceCategory)findPreference(getString(R.string.pref_category_misc_key));
+        Preference preference = preferenceCategory.getPreference(1);
+        String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
+        if (!username.isEmpty()){
+            String summary = getString(R.string.pref_account_summary_on) + username + "'.";
+            preference.setSummary(summary);
+        }
+        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SignOutFragment signOutFragment = SignOutFragment.newInstance(self, preference);
+                signOutFragment.show(getActivity().getFragmentManager(), "");
+                return false;
+            }
+        });
     }
+
+    public void signOut(Preference preference) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        SharedPreferences.Editor editr = sharedPreferences.edit();
+        editr.putBoolean(getString(R.string.shared_prefs_logged_in), false);
+        editr.putString(getString(R.string.credentials_password), "");
+        editr.putString(getString(R.string.credentials_username), "");
+        editr.putString(getString(R.string.mal_username_formatted), "");
+        editr.putString(getString(R.string.mal_userid), "");
+        editr.apply();
+
+        File avatarFile = new File(getActivity().getFilesDir(), getString(R.string.file_avatar));
+        if (avatarFile.exists()){
+            avatarFile.delete();
+        }
+        ((MainActivity) getActivity()).loadDrawerUserInfo();
+
+        Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_SHORT).show();
+
+        preference.setVisible(false);
+    }
+
 
 
     @Override
