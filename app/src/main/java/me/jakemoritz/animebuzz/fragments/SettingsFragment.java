@@ -18,6 +18,8 @@ import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
@@ -27,6 +29,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     SharedPreferences sharedPreferences;
     SettingsFragment self;
+    Preference signInPreference;
+    Preference signOutPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,14 +110,16 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         addPreferencesFromResource(R.xml.preferences);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
+        boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
+
         PreferenceCategory preferenceCategory = (PreferenceCategory)findPreference(getString(R.string.pref_category_misc_key));
-        Preference preference = preferenceCategory.getPreference(1);
+        signOutPreference = preferenceCategory.getPreference(1);
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         if (!username.isEmpty()){
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
-            preference.setSummary(summary);
+            signOutPreference.setSummary(summary);
         }
-        preference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        signOutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 SignOutFragment signOutFragment = SignOutFragment.newInstance(self, preference);
@@ -121,6 +127,24 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 return false;
             }
         });
+
+        signInPreference = preferenceCategory.getPreference(2);
+        signInPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                SignInFragment signInFragment = SignInFragment.newInstance(self, preference);
+                signInFragment.show(getActivity().getFragmentManager(), "");
+                return false;
+            }
+        });
+
+        if (signedIn){
+            signInPreference.setVisible(false);
+            signOutPreference.setVisible(true);
+        } else {
+            signInPreference.setVisible(true);
+            signOutPreference.setVisible(false);
+        }
     }
 
     public void signOut(Preference preference) {
@@ -142,6 +166,21 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_SHORT).show();
 
         preference.setVisible(false);
+        signInPreference.setVisible(true);
+    }
+
+    public void signIn(Preference preference){
+        preference.setVisible(false);
+        signOutPreference.setVisible(true);
+
+        MyShowsFragment myShowsFragment = MyShowsFragment.newInstance();
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_main, myShowsFragment, MyShowsFragment.class.getSimpleName())
+                .commit();
+        new MalApiClient(myShowsFragment).getUserList();
+        ((MainActivity) getActivity()).navigationView.setCheckedItem(1);
+        Snackbar.make(getActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+
     }
 
 

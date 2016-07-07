@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.api.mal;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -12,6 +11,7 @@ import java.io.IOException;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
@@ -20,8 +20,8 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
     private MainActivity activity;
 
-    public GetUserAvatarTask(Activity activity) {
-        this.activity = (MainActivity) activity;
+    public GetUserAvatarTask(SeriesFragment fragment) {
+        this.activity = (MainActivity) fragment.getActivity();
     }
 
     @Override

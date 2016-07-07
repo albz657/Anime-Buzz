@@ -47,7 +47,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         mListener = listener;
         visibleSeries = new ArrayList<>(items);
         self = this;
-        malApiClient = new MalApiClient(mListener.getActivity(), mListener);
+        malApiClient = new MalApiClient(mListener);
     }
 
     @Override
@@ -197,7 +197,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 //        notifyItemChanged(position);
 
         MainActivity mainActivity = (MainActivity) mListener.getActivity();
-        mainActivity.removeAlarm(item);
+        App.getInstance().removeAlarm(item);
         Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
 //        notifyDataSetChanged();
     }
@@ -229,7 +229,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
             MainActivity mainActivity = (MainActivity) mListener.getActivity();
-            mainActivity.makeAlarm(item);
+            App.getInstance().makeAlarm(item);
         }
 
         Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();

@@ -40,7 +40,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         setContentView(R.layout.activity_setup);
 
         final Activity activity = this;
-        malApiClient = new MalApiClient(this, null);
+        malApiClient = new MalApiClient(this);
 
         final WelcomeCoordinatorLayout coordinatorLayout = (WelcomeCoordinatorLayout) findViewById(R.id.coordinator);
         coordinatorLayout.addPage(R.layout.welcome_page_3);

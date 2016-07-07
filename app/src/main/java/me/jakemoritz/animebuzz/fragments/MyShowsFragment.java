@@ -47,7 +47,7 @@ public class MyShowsFragment extends SeriesFragment {
         super.onViewCreated(view, savedInstanceState);
 
         parentActivity = (MainActivity) getActivity();
-        malApiClient = new MalApiClient(parentActivity, this);
+        malApiClient = new MalApiClient(this);
 
         if (parentActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
@@ -98,7 +98,7 @@ public class MyShowsFragment extends SeriesFragment {
             popupMenu.show();
             return true;
         } else if (id == R.id.action_get) {
-            MalApiClient malApiClient = new MalApiClient(getActivity(), this);
+            MalApiClient malApiClient = new MalApiClient(this);
 //            malApiClient.addAnime("s");
             malApiClient.getUserList();
 //            malApiClient.deleteAnime("23");

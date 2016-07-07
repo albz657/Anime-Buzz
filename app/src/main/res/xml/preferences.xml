@@ -26,7 +26,9 @@
             android:title="Sign out from your MAL account"
             android:summary="You are currently signed in."/>
 
-
+        <Preference
+            android:title="Sign in to your MAL account"
+            android:summary="You are currently signed out."/>
 <!--        <me.jakemoritz.animebuzz.dialogs.AccountDialogPreference
             android:key="@+id/pref_account"
             android:title="@string/pref_account"

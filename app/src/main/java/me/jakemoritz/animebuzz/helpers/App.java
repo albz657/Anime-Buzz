@@ -1,7 +1,10 @@
 package me.jakemoritz.animebuzz.helpers;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -12,7 +15,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +31,7 @@ import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
 public class App extends Application {
@@ -42,6 +48,8 @@ public class App extends Application {
     private boolean tryingToVerify = false;
     private String currentlyBrowsingSeasonName = "";
     private boolean gettingCurrentBrowsing = false;
+    private AlarmManager alarmManager;
+
 
     @Override
     public void onTerminate() {
@@ -206,6 +214,77 @@ public class App extends Application {
 
         res.close();
         dbHelper.close();
+    }
+
+    private long getNextEpisodeTime(Series series, boolean simulcastTime) {
+        Calendar cal;
+        if (simulcastTime) {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        }
+
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        return nextEpisode.getTimeInMillis();
+    }
+
+
+
+    public void makeAlarm(Series series) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
+
+        long nextEpisodeAirtime = getNextEpisodeTime(series, false);
+        long nextEpisodeSimulcastTime = getNextEpisodeTime(series, true);
+        series.setNextEpisodeAirtime(nextEpisodeAirtime);
+        series.setNextEpisodeSimulcastTime(nextEpisodeSimulcastTime);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Calendar cal;
+        if (prefersSimulcast) {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        }
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        notificationIntent.putExtra("name", series.getName());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
+        alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
+
+        // debug code
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+        String formattedNext = format.format(nextEpisode.getTime());
+        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
+    }
+
+    public void removeAlarm(Series series) {
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent deleteIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        alarmManager.cancel(pendingIntent);
+
+        Log.d(TAG, "Alarm removed for: " + series.getName());
     }
 
     /* ACCESSORS */

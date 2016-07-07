@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.api.mal;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.SetupActivity;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
@@ -36,26 +34,29 @@ public class MalApiClient {
     private static final String BASE_URL = "http://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
+    private VerifyCredentialsResponse responseDelegate;
     private MalDataRead delegate;
-    private Activity activity;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(SimpleXmlConverterFactory.create());
 
-    public MalApiClient(Activity activity, SeriesFragment seriesFragment) {
+    public MalApiClient(SeriesFragment seriesFragment) {
         this.seriesFragment = seriesFragment;
-        this.activity = activity;
         this.delegate = seriesFragment;
+    }
+
+    public MalApiClient(VerifyCredentialsResponse responseDelegate){
+        this.responseDelegate = responseDelegate;
     }
 
     public void addAnime(String MALID) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
         if (isLoggedIn){
-            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+            String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
             Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
@@ -80,10 +81,10 @@ public class MalApiClient {
 
     public void updateAnimeEpisodeCount(String MALID, int episodeCount) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
         if (isLoggedIn){
-            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+            String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
             Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + episodeCount + "</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
@@ -107,10 +108,10 @@ public class MalApiClient {
 
     public void deleteAnime(String MALID) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
         if (isLoggedIn){
-            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+            String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
             Call<Void> call = malEndpointInterface.deleteAnime(MALID);
@@ -134,16 +135,16 @@ public class MalApiClient {
     }
 
     public void getUserAvatar() {
-        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(activity);
+        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(seriesFragment);
         getUserAvatarTask.execute();
     }
 
     public void getUserList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean isLoggedIn = sharedPreferences.getBoolean(activity.getString(R.string.shared_prefs_logged_in), false);
+        boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
         if (isLoggedIn){
-            String username = sharedPreferences.getString(activity.getString(R.string.credentials_username), "");
-            String password = sharedPreferences.getString(activity.getString(R.string.credentials_password), "");
+            String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
+            String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
             if (username.length() != 0 && password.length() != 0) {
                 MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
@@ -208,31 +209,29 @@ public class MalApiClient {
     }
 
     public void verify(String username, String password) {
-        final VerifyCredentialsResponse delegate = (SetupActivity) activity;
-
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
         Call<VerifyHolder> call = malEndpointInterface.verifyCredentials();
         call.enqueue(new Callback<VerifyHolder>() {
             @Override
             public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
                 if (response.isSuccessful()) {
-                    if (delegate != null) {
-                        delegate.verifyCredentialsResponseReceived(true);
+                    if (responseDelegate != null) {
+                        responseDelegate.verifyCredentialsResponseReceived(true);
 
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         if (response.body().getUsername() != null) {
-                            editor.putString(activity.getString(R.string.mal_username_formatted), response.body().getUsername());
+                            editor.putString(App.getInstance().getString(R.string.mal_username_formatted), response.body().getUsername());
                         }
                         if (response.body().getUserID() != null) {
-                            editor.putString(activity.getString(R.string.mal_userid), response.body().getUserID());
+                            editor.putString(App.getInstance().getString(R.string.mal_userid), response.body().getUserID());
                         }
                         editor.apply();
                     }
                 } else {
-                    if (delegate != null) {
-                        delegate.verifyCredentialsResponseReceived(false);
+                    if (responseDelegate != null) {
+                        responseDelegate.verifyCredentialsResponseReceived(false);
                     }
                 }
                 App.getInstance().setTryingToVerify(false);
@@ -241,8 +240,8 @@ public class MalApiClient {
 
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
-                if (delegate != null) {
-                    delegate.verifyCredentialsResponseReceived(false);
+                if (responseDelegate != null) {
+                    responseDelegate.verifyCredentialsResponseReceived(false);
                 }
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());
