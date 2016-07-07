@@ -16,7 +16,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())){
-            Intent bootIntent = new Intent("me.jakemoritz.animebuzz");
+            Intent bootIntent = new Intent(context, AlarmReceiver.class);
             context.startService(bootIntent);
         }
     }
