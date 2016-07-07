@@ -55,7 +55,16 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
-                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                    if (App.getInstance().isNetworkAvailable()){
+                        attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                    } else {
+                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
+                        View view = failSnackbar.getView();
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                        params.gravity = Gravity.TOP;
+                        view.setLayoutParams(params);
+                        failSnackbar.show();
+                    }
                 }
                 return false;
             }
@@ -65,7 +74,17 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                    if (App.getInstance().isNetworkAvailable()){
+                        attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                    } else {
+                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
+                        View view1 = failSnackbar.getView();
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
+                        params.gravity = Gravity.TOP;
+                        view.setLayoutParams(params);
+                        failSnackbar.show();
+                    }
+
             }
         });
 

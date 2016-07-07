@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
@@ -161,13 +162,17 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
-            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
-                senpaiExportHelper.getSeasonData(metadata);
+        if (App.getInstance().isNetworkAvailable()){
+            for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
+                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
+                    senpaiExportHelper.getSeasonData(metadata);
 
+                }
             }
+            updating = true;        } else {
+            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
-        updating = true;
+
     }
 
     @Override

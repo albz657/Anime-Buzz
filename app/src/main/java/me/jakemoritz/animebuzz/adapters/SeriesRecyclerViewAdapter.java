@@ -178,7 +178,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
         if (loggedIn){
-            malApiClient.deleteAnime(String.valueOf(item.getMALID()));
+            if (App.getInstance().isNetworkAvailable()){
+                malApiClient.deleteAnime(String.valueOf(item.getMALID()));
+            } else {
+                Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            }
         }
 
         item.setInUserList(false);
@@ -206,7 +210,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
         if (loggedIn){
-            malApiClient.addAnime(String.valueOf(item.getMALID()));
+            if (App.getInstance().isNetworkAvailable()){
+                malApiClient.addAnime(String.valueOf(item.getMALID()));
+            } else {
+                Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            }
         }
 
         item.setInUserList(true);

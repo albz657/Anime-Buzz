@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -237,7 +239,11 @@ public class App extends Application {
         return nextEpisode.getTimeInMillis();
     }
 
-
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
 
     public void makeAlarm(Series series) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);

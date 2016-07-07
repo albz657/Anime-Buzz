@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -35,6 +36,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public ANNSearchHelper helper;
     public boolean updating = false;
     public SenpaiExportHelper senpaiExportHelper;
+    public View seriesLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +66,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
+        seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
 
         Context context = recyclerView.getContext();
@@ -97,7 +99,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
             App.getInstance().setGettingCurrentBrowsing(true);
         }
-        helper.getImages(this, season.getSeasonSeries());
+        if (App.getInstance().isNetworkAvailable()){
+            helper.getImages(this, season.getSeasonSeries());
+        } else {
+            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+        }
 
         //mAdapter.notifyDataSetChanged();
     }

@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,8 +39,13 @@ public class MyShowsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        senpaiExportHelper.getLatestSeasonData();
-        updating = true;
+        if (App.getInstance().isNetworkAvailable()) {
+            senpaiExportHelper.getLatestSeasonData();
+            updating = true;
+        } else {
+            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -63,7 +69,6 @@ public class MyShowsFragment extends SeriesFragment {
 
         loadUserSortingPreference();
     }
-
 
 
     @Override
@@ -164,13 +169,13 @@ public class MyShowsFragment extends SeriesFragment {
 
     @Override
     public void seasonPostersImported() {
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             malApiClient.getUserList();
 
             TextView loadingText = (TextView) parentActivity.progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
-        if (updating){
+        if (updating) {
             malApiClient.getUserList();
 
         }
@@ -180,7 +185,7 @@ public class MyShowsFragment extends SeriesFragment {
 
     @Override
     public void malDataRead() {
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
 
@@ -190,7 +195,7 @@ public class MyShowsFragment extends SeriesFragment {
             senpaiExportHelper.getSeasonList();
         }
 
-        if (updating){
+        if (updating) {
             swipeRefreshLayout.setRefreshing(false);
             updating = false;
         }

@@ -15,6 +15,8 @@
     <string name="mal_username_formatted">malusernameformatted</string>
     <string name="mal_userid">maluserid</string>
 
+    <string name="no_network_available">No network available.</string>
+
     <!-- ===================== Welcome strings ===================== -->
 
     <!--Welcome Page 1 -->

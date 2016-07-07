@@ -23,7 +23,7 @@ import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
-public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -51,12 +51,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
-    private void setCorrectSummaries(){
+    private void setCorrectSummaries() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
 
         Preference airingOrSimulcastPref = findPreference(getString(R.string.pref_simulcast_key));
-        if (prefersSimulcast){
+        if (prefersSimulcast) {
             airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
         } else {
             airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
@@ -65,7 +65,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         boolean prefers24Hour = sharedPreferences.getBoolean(getString(R.string.pref_24hour_key), false);
 
         Preference timeFormatPref = findPreference(getString(R.string.pref_24hour_key));
-        if (prefers24Hour){
+        if (prefers24Hour) {
             timeFormatPref.setSummary(getString(R.string.pref_24hour_off_summary));
         } else {
             timeFormatPref.setSummary(getString(R.string.pref_24hour_summary));
@@ -73,19 +73,18 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
 
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(getString(R.string.pref_simulcast_key))){
+        if (s.equals(getString(R.string.pref_simulcast_key))) {
             Preference airingOrSimulcastPref = findPreference(s);
-            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))){
+            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))) {
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
             } else {
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
             }
-        } else if (s.equals(getString(R.string.pref_24hour_key))){
+        } else if (s.equals(getString(R.string.pref_24hour_key))) {
             Preference pref24HourSummary = findPreference(s);
-            if (pref24HourSummary.getSummary().toString().equals(getString(R.string.pref_24hour_summary))){
+            if (pref24HourSummary.getSummary().toString().equals(getString(R.string.pref_24hour_summary))) {
                 pref24HourSummary.setSummary(getString(R.string.pref_24hour_off_summary));
             } else {
                 pref24HourSummary.setSummary(getString(R.string.pref_24hour_summary));
@@ -112,10 +111,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
-        PreferenceCategory preferenceCategory = (PreferenceCategory)findPreference(getString(R.string.pref_category_misc_key));
+        PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_category_misc_key));
         signOutPreference = preferenceCategory.getPreference(1);
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
-        if (!username.isEmpty()){
+        if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
             signOutPreference.setSummary(summary);
         }
@@ -132,13 +131,18 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                SignInFragment signInFragment = SignInFragment.newInstance(self, preference);
-                signInFragment.show(getActivity().getFragmentManager(), "");
+                if (App.getInstance().isNetworkAvailable()) {
+                    SignInFragment signInFragment = SignInFragment.newInstance(self, preference);
+                    signInFragment.show(getActivity().getFragmentManager(), "");
+                } else {
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                }
+
                 return false;
             }
         });
 
-        if (signedIn){
+        if (signedIn) {
             signInPreference.setVisible(false);
             signOutPreference.setVisible(true);
         } else {
@@ -158,7 +162,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         editr.apply();
 
         File avatarFile = new File(getActivity().getFilesDir(), getString(R.string.file_avatar));
-        if (avatarFile.exists()){
+        if (avatarFile.exists()) {
             avatarFile.delete();
         }
         ((MainActivity) getActivity()).loadDrawerUserInfo();
@@ -169,7 +173,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setVisible(true);
     }
 
-    public void signIn(Preference preference){
+    public void signIn(Preference preference) {
         preference.setVisible(false);
         signOutPreference.setVisible(true);
 
@@ -182,7 +186,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         Snackbar.make(getActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
 
     }
-
 
 
     @Override
