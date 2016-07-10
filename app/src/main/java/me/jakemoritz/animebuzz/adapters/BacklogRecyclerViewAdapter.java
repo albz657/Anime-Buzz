@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.adapters;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,9 +70,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onItemDismiss(int position) {
-        seriesList.remove(position);
-        App.getInstance().getBacklog();
-        Log.d("TAG", position + "");
+        Series series = seriesList.get(position).getSeries();
+        series.removeFromBacklog(seriesList.remove(position).getEpisodeTime());
+
         notifyDataSetChanged();
     }
 

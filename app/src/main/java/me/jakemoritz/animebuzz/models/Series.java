@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.models;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Series {
@@ -89,6 +90,15 @@ public class Series {
 
     public List<Long> getBacklog() {
         return backlog;
+    }
+
+    public void removeFromBacklog(long time) {
+        for (Iterator backlogIterator = backlog.iterator(); backlogIterator.hasNext();) {
+            long episodeTime = (long) backlogIterator.next();
+            if (episodeTime == time) {
+                backlog.remove(episodeTime);
+            }
+        }
     }
 
     public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
