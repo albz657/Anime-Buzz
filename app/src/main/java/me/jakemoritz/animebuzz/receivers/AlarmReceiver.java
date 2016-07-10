@@ -24,20 +24,17 @@ public class AlarmReceiver extends BroadcastReceiver {
                     series.getBacklog().add(time);
                     App.getInstance().getBacklog().add(new BacklogItem(series, time));
                     App.getInstance().makeAlarm(series);
+
+                    App.getInstance().removeAlarmFromStructure(series.getMALID());
 //                    App.getInstance().getBacklog().add(series);
                 }
             }
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            rescheduleAlarms();
+            App.getInstance().rescheduleAlarms();
         }
     }
 
-    private void rescheduleAlarms() {
-/*        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        notificationIntent.putExtra("name", series.getName());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
-        alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);*/
-    }
+
 }

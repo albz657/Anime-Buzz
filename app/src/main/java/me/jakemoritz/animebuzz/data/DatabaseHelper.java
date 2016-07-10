@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -32,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Table names
     private static String TABLE_ANIME = "TABLE_ANIME";
     private static String TABLE_SEASONS = "TABLE_SEASONS";
+    private static String TABLE_ALARMS = "TABLE_ALARMS";
 
     // Anime columns
     private static final String KEY_AIRDATE = "airdate";
@@ -50,6 +52,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SEASON_NAME = "seasonnname";
     private static final String KEY_SEASON_KEY = "seasonkey";
     private static final String KEY_SEASON_DATE = "seasondate";
+
+    // Alarm columns
+    private static final String KEY_ALARM_ID = "alarmid";
+    private static final String KEY_ALARM_NAME = "alarmname";
+    private static final String KEY_ALARM_TIME = "alarmtime";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,16 +87,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ")";
     }
 
+    private String buildAlarmTable() {
+        return "CREATE TABLE IF NOT EXISTS " + TABLE_ALARMS +
+                "(" + KEY_ALARM_ID + " INTEGER PRIMARY KEY NOT NULL," +
+                KEY_ALARM_NAME + " TEXT," +
+                KEY_ALARM_TIME + " INTEGER" +
+                ")";
+    }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(buildAnimeTable());
         db.execSQL(buildSeasonTable());
+        db.execSQL(buildAlarmTable());
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEASONS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
         onCreate(db);
     }
 
@@ -110,6 +127,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_BACKLOG, new Gson().toJson(series.getBacklog()));
 
         db.insert(TABLE_ANIME, null, contentValues);
+        return true;
+    }
+
+    public boolean insertAlarm(AlarmHolder alarm) {
+        SQLiteDatabase db = getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
+        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
+        contentValues.put(KEY_ALARM_ID, alarm.getId());
+
+        db.insert(TABLE_ALARMS, null, contentValues);
         return true;
     }
 
@@ -172,6 +201,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
     }
 
+
     public Cursor getAllSeasonMetadata() {
         SQLiteDatabase db = getReadableDatabase();
         return db.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
@@ -182,6 +212,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(TABLE_ANIME,
                 KEY_MALID + " = ? ",
                 new String[]{String.valueOf(MALID)});
+    }
+
+    public Integer deleteAlarm(int id){
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
     }
 
     public Integer deleteSeasonMetadata(String seasonKey) {
@@ -209,29 +244,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void saveSeasonMetadataToDb(SeasonMetadata metadata) {
-        if (getSeasonMetadata(metadata.getKey()).getCount() != 0) {
+        Cursor cursor = getSeasonMetadata(metadata.getKey());
+        if (cursor.getCount() != 0) {
             updateSeasonMetadataInDb(metadata);
         } else {
             insertSeasonMetadata(metadata);
         }
+        cursor.close();
     }
 
-    public void saveAllSeriesToDb(Set<Season> allSeries){
+    public void saveAllSeriesToDb(Set<Season> allSeries) {
         List<Series> allSeriesList = new ArrayList<>();
-        for (Season season : allSeries){
+        for (Season season : allSeries) {
             allSeriesList.addAll(season.getSeasonSeries());
         }
         saveSeriesToDb(allSeriesList);
     }
 
     public void saveSeriesToDb(List<Series> seriesList) {
+        Cursor cursor = null;
         for (Series series : seriesList) {
-            if (getSeries(series.getMALID()).getCount() != 0) {
+            cursor = getSeries(series.getMALID());
+            if (cursor.getCount() != 0) {
                 updateSeriesInDb(series);
             } else {
                 insertSeries(series);
             }
         }
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    public List<AlarmHolder> getAllAlarms() {
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+
+        List<AlarmHolder> alarms = new ArrayList<>();
+
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++){
+            AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
+            alarms.add(tempAlarm);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+
+        return alarms;
+    }
+
+    private AlarmHolder getAlarmWithCursor(Cursor res) {
+        int id = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_ID));
+        long time = (long) res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
+        String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
+
+        return new AlarmHolder(name, time, id);
     }
 
     public Series getSeriesWithCursor(Cursor res) {
@@ -246,13 +315,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         double simulcast_delay = res.getDouble(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_DELAY));
         String simulcast = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST));
 
-        Type type = new TypeToken<ArrayList<Long>>(){}.getType();
+        Type type = new TypeToken<ArrayList<Long>>() {
+        }.getType();
         List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(DatabaseHelper.KEY_BACKLOG)), type);
 
         return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog);
     }
 
-    public SeasonMetadata getSeasonMetadataWithCursor(Cursor res){
+    public SeasonMetadata getSeasonMetadataWithCursor(Cursor res) {
         String seasonName = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_NAME));
         String seasonDate = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_DATE));
         String seasonKey = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_KEY));

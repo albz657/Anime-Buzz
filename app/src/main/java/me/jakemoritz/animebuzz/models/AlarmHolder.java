@@ -4,6 +4,7 @@ public class AlarmHolder {
 
     private String seriesName;
     private long alarmTime;
+    private int id;
 
     public String getSeriesName() {
         return seriesName;
@@ -13,8 +14,14 @@ public class AlarmHolder {
         return alarmTime;
     }
 
-    public AlarmHolder(String seriesName, long alarmTime) {
+    public int getId() {
+        return id;
+    }
+
+
+    public AlarmHolder(String seriesName, long alarmTime, int id) {
         this.seriesName = seriesName;
         this.alarmTime = alarmTime;
+        this.id = id;
     }
 }

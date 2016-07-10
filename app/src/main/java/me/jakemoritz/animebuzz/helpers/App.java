@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -66,6 +67,10 @@ public class App extends Application {
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
 
+    public List<AlarmHolder> getAlarms() {
+        return alarms;
+    }
+
     public List<BacklogItem> getBacklog() {
         return backlog;
     }
@@ -96,7 +101,10 @@ public class App extends Application {
             loadSeasonsList();
             loadAnimeFromDB();
             loadBacklog();
-            loadAlarms();
+            DatabaseHelper helper = new DatabaseHelper(this);
+            alarms = helper.getAllAlarms();
+            rescheduleAlarms();
+//            loadAlarms();
 //            backlogDummyData();
 
             currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -104,6 +112,17 @@ public class App extends Application {
             DatabaseHelper helper = new DatabaseHelper(this);
             helper.onCreate(helper.getWritableDatabase());
         }
+    }
+
+    public void rescheduleAlarms() {
+        AlarmManager alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
+        for (AlarmHolder alarm : App.getInstance().getAlarms()){
+            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+            notificationIntent.putExtra("name", alarm.getSeriesName());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
+        }
+
     }
 
     public Season getSeasonFromName(String seasonName) {
@@ -125,9 +144,8 @@ public class App extends Application {
     }
 
     private void saveAlarms() {
-        String filename = "alarmfilz";
         try {
-            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+            FileOutputStream fos = openFileOutput(getString(R.string.file_alarms), Context.MODE_PRIVATE);
             fos.write(new Gson().toJson(alarms).getBytes());
             fos.close();
         } catch (FileNotFoundException e) {
@@ -139,22 +157,20 @@ public class App extends Application {
     }
 
     private void loadAlarms() {
-        String filename = "alarmfilz";
         try {
-            File alrmfile = getDir(filename, Context.MODE_PRIVATE);
-            if (alrmfile.exists()){
-                FileInputStream fis = openFileInput(filename);
-                byte[] bytes = new byte[(int) alrmfile.length()];
+            File alarmFile = getDir(getString(R.string.file_alarms), Context.MODE_PRIVATE);
+            if (alarmFile.exists()) {
+                FileInputStream fis = openFileInput(getString(R.string.file_alarms));
+                byte[] alarmFileBytes = new byte[(int) alarmFile.length()];
                 BufferedInputStream bif = new BufferedInputStream(fis);
-                bif.read(bytes, 0, bytes.length);
-                String alarms = new String(trim(bytes));
-                JsonArray array = (JsonArray) new JsonParser().parse(alarms);
-                for (JsonElement element : array){
-                    JsonObject alarmObject = (JsonObject) element;
-                    this.alarms.add(new AlarmHolder(alarmObject.get("seriesName").getAsString(), alarmObject.get("alarmTime").getAsLong()));
+                bif.read(alarmFileBytes, 0, alarmFileBytes.length);
+                String serializedAlarms = new String(trim(alarmFileBytes));
+                JsonArray alarmsArray = (JsonArray) new JsonParser().parse(serializedAlarms);
+                for (JsonElement alarmElement : alarmsArray) {
+                    JsonObject alarmObject = (JsonObject) alarmElement;
+                    // this.alarms.add(new AlarmHolder(alarmObject.get("seriesName").getAsString(), alarmObject.get("alarmTime").getAsLong()));
                 }
             }
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -162,11 +178,9 @@ public class App extends Application {
         }
     }
 
-    static byte[] trim(byte[] bytes)
-    {
+    static byte[] trim(byte[] bytes) {
         int i = bytes.length - 1;
-        while (i >= 0 && bytes[i] == 0)
-        {
+        while (i >= 0 && bytes[i] == 0) {
             --i;
         }
 
@@ -201,7 +215,7 @@ public class App extends Application {
         saveAllAnimeSeasonsToDB();
         saveUserListToDB();
         saveSeasonsList();
-        saveAlarms();
+//        saveAlarms();
     }
 
     public void saveAllAnimeSeasonsToDB() {
@@ -374,12 +388,35 @@ public class App extends Application {
         notificationIntent.putExtra("name", series.getName());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
-        alarms.add(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis()));
+        processNewAlarm(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID()));
 
         // debug code
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         String formattedNext = format.format(nextEpisode.getTime());
         Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
+    }
+
+    private void processNewAlarm(AlarmHolder alarmHolder) {
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        databaseHelper.insertAlarm(alarmHolder);
+
+        alarms.add(alarmHolder);
+
+    }
+
+    public void removeAlarmFromStructure(int id) {
+        AlarmHolder alarm;
+        for (Iterator alarmIterator = alarms.iterator(); alarmIterator.hasNext(); ) {
+            alarm = (AlarmHolder) alarmIterator.next();
+            if (alarm.getId() == id) {
+                alarms.remove(alarm);
+
+                DatabaseHelper dbHelper = new DatabaseHelper(this);
+                dbHelper.deleteAlarm(alarm.getId());
+            }
+        }
+
+
     }
 
     public void removeAlarm(Series series) {
@@ -388,6 +425,7 @@ public class App extends Application {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
         alarmManager.cancel(pendingIntent);
+        removeAlarmFromStructure(series.getMALID());
 
         Log.d(TAG, "Alarm removed for: " + series.getName());
     }
