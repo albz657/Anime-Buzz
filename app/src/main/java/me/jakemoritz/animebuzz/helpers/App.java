@@ -31,6 +31,7 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -48,6 +49,7 @@ public class App extends Application {
     private Set<Season> allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private List<BacklogItem> backlog;
+    private List<AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
@@ -76,6 +78,7 @@ public class App extends Application {
         userAnimeList = new HashSet<>();
         seasonsList = new HashSet<>();
         backlog = new ArrayList<>();
+        alarms = new ArrayList<>();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
