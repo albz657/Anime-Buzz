@@ -13,12 +13,21 @@ import android.net.NetworkInfo;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -87,6 +96,7 @@ public class App extends Application {
             loadSeasonsList();
             loadAnimeFromDB();
             loadBacklog();
+            loadAlarms();
 //            backlogDummyData();
 
             currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -105,14 +115,64 @@ public class App extends Application {
         return null;
     }
 
-    private void backlogDummyData(){
-        for (Series series : userAnimeList){
+    private void backlogDummyData() {
+        for (Series series : userAnimeList) {
             long time = System.currentTimeMillis() - givenUsingPlainJava_whenGeneratingRandomLongBounded_thenCorrect();
             series.getBacklog().add(time);
-                backlog.add(new BacklogItem(series, time));
+            backlog.add(new BacklogItem(series, time));
 
         }
     }
+
+    private void saveAlarms() {
+        String filename = "alarmfilz";
+        try {
+            FileOutputStream fos = openFileOutput(filename, Context.MODE_PRIVATE);
+            fos.write(new Gson().toJson(alarms).getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void loadAlarms() {
+        String filename = "alarmfilz";
+        try {
+            File alrmfile = getDir(filename, Context.MODE_PRIVATE);
+            if (alrmfile.exists()){
+                FileInputStream fis = openFileInput(filename);
+                byte[] bytes = new byte[(int) alrmfile.length()];
+                BufferedInputStream bif = new BufferedInputStream(fis);
+                bif.read(bytes, 0, bytes.length);
+                String alarms = new String(trim(bytes));
+                JsonArray array = (JsonArray) new JsonParser().parse(alarms);
+                for (JsonElement element : array){
+                    JsonObject alarmObject = (JsonObject) element;
+                    this.alarms.add(new AlarmHolder(alarmObject.get("seriesName").getAsString(), alarmObject.get("alarmTime").getAsLong()));
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static byte[] trim(byte[] bytes)
+    {
+        int i = bytes.length - 1;
+        while (i >= 0 && bytes[i] == 0)
+        {
+            --i;
+        }
+
+        return Arrays.copyOf(bytes, i + 1);
+    }
+
 
     public long givenUsingPlainJava_whenGeneratingRandomLongBounded_thenCorrect() {
         long leftLimit = 300000000L;
@@ -121,9 +181,9 @@ public class App extends Application {
         return generatedLong;
     }
 
-    private void loadBacklog(){
-        for (Series series : userAnimeList){
-            for (Long episodeTime : series.getBacklog()){
+    private void loadBacklog() {
+        for (Series series : userAnimeList) {
+            for (Long episodeTime : series.getBacklog()) {
                 backlog.add(new BacklogItem(series, episodeTime));
             }
         }
@@ -138,9 +198,10 @@ public class App extends Application {
 
 
     public void saveData() {
-        App.getInstance().saveAllAnimeSeasonsToDB();
-        App.getInstance().saveUserListToDB();
-        App.getInstance().saveSeasonsList();
+        saveAllAnimeSeasonsToDB();
+        saveUserListToDB();
+        saveSeasonsList();
+        saveAlarms();
     }
 
     public void saveAllAnimeSeasonsToDB() {
@@ -231,7 +292,6 @@ public class App extends Application {
     }
 
 
-
     public void saveSeasonsList() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         for (SeasonMetadata seasonMetadata : seasonsList) {
@@ -314,6 +374,7 @@ public class App extends Application {
         notificationIntent.putExtra("name", series.getName());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
+        alarms.add(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis()));
 
         // debug code
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");

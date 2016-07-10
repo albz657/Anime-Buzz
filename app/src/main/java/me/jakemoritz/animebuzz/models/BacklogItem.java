@@ -2,19 +2,19 @@ package me.jakemoritz.animebuzz.models;
 
 public class BacklogItem {
 
-    private Series series;
-    private Long episodeTime;
+    private Series seriesName;
+    private Long alarmTime;
 
-    public Series getSeries() {
-        return series;
+    public Series getSeriesName() {
+        return seriesName;
     }
 
-    public Long getEpisodeTime() {
-        return episodeTime;
+    public Long getAlarmTime() {
+        return alarmTime;
     }
 
-    public BacklogItem(Series series, Long episodeTime) {
-        this.series = series;
-        this.episodeTime = episodeTime;
+    public BacklogItem(Series seriesName, Long alarmTime) {
+        this.seriesName = seriesName;
+        this.alarmTime = alarmTime;
     }
 }

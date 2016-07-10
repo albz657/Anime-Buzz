@@ -39,7 +39,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.series = seriesList.get(position).getSeries();
+        holder.series = seriesList.get(position).getSeriesName();
         holder.mTitle.setText(holder.series.getName());
 
 
@@ -70,8 +70,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onItemDismiss(int position) {
-        Series series = seriesList.get(position).getSeries();
-        series.removeFromBacklog(seriesList.remove(position).getEpisodeTime());
+        Series series = seriesList.get(position).getSeriesName();
+        series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
 
         notifyDataSetChanged();
     }
