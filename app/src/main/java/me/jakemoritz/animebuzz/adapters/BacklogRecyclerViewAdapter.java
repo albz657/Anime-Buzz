@@ -2,6 +2,8 @@ package me.jakemoritz.animebuzz.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +17,18 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> {
+public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter {
 
-    private final List<Series> seriesList;
+    private final List<BacklogItem> seriesList;
+    public ItemTouchHelper touchHelper;
 
-    public BacklogRecyclerViewAdapter(List<Series> seriesList) {
+    public BacklogRecyclerViewAdapter(List<BacklogItem> seriesList) {
         this.seriesList = seriesList;
+        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
+        touchHelper = new ItemTouchHelper(callback);
     }
 
     @Override
@@ -34,21 +40,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.series = seriesList.get(position);
-        holder.mTitle.setText(seriesList.get(position).getName());
+        holder.series = seriesList.get(position).getSeries();
+        holder.mTitle.setText(holder.series.getName());
 
-    /*    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
-        boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_simulcast_key), false);
-        final boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
-
-        if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
-            if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
-                holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
-            } else {
-                holder.mDate.setText("TBA");
-            }
-            holder.mWatch.setVisibility(View.VISIBLE);
-        }*/
 
         Picasso picasso = Picasso.with(App.getInstance());
         if (holder.series.getANNID() > 0) {
@@ -73,6 +67,14 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     @Override
     public int getItemCount() {
         return seriesList.size();
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        seriesList.remove(position);
+        App.getInstance().getBacklog();
+        Log.d("TAG", position + "");
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

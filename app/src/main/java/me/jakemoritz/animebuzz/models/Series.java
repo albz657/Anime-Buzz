@@ -1,5 +1,8 @@
 package me.jakemoritz.animebuzz.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Series {
 
     private int airdate;
@@ -14,6 +17,7 @@ public class Series {
     private double simulcast_delay;
     private long nextEpisodeAirtime;
     private long nextEpisodeSimulcastTime;
+    private List<Long> backlog;
 
     public long getNextEpisodeAirtime() {
         return nextEpisodeAirtime;
@@ -83,6 +87,10 @@ public class Series {
         return simulcast;
     }
 
+    public List<Long> getBacklog() {
+        return backlog;
+    }
+
     public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
         this.airdate = airdate;
         this.name = name;
@@ -94,9 +102,10 @@ public class Series {
         this.simulcast_delay = simulcast_delay;
         this.isInUserList = false;
         this.currentlyAiring = false;
+        this.backlog = new ArrayList<>();
     }
 
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring) {
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog) {
         this.airdate = airdate;
         this.name = name;
         this.MALID = MALID;
@@ -107,6 +116,7 @@ public class Series {
         this.simulcast_delay = simulcast_delay;
         this.isInUserList = isInUserList;
         this.currentlyAiring = currentlyAiring;
+        this.backlog = backlog;
     }
 
 }

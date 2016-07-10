@@ -28,8 +28,10 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -45,7 +47,7 @@ public class App extends Application {
     private Set<Series> userAnimeList;
     private Set<Season> allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
-    private List<Series> backlog;
+    private List<BacklogItem> backlog;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
@@ -53,7 +55,7 @@ public class App extends Application {
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
 
-    public List<Series> getBacklog() {
+    public List<BacklogItem> getBacklog() {
         return backlog;
     }
 
@@ -81,6 +83,8 @@ public class App extends Application {
 
             loadSeasonsList();
             loadAnimeFromDB();
+            loadBacklog();
+//            backlogDummyData();
 
             currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
         } else {
@@ -96,6 +100,32 @@ public class App extends Application {
             }
         }
         return null;
+    }
+
+    private void backlogDummyData(){
+        for (Series series : userAnimeList){
+            long time = System.currentTimeMillis() - givenUsingPlainJava_whenGeneratingRandomLongBounded_thenCorrect();
+            series.getBacklog().add(time);
+                backlog.add(new BacklogItem(series, time));
+
+        }
+    }
+
+    public long givenUsingPlainJava_whenGeneratingRandomLongBounded_thenCorrect() {
+        long leftLimit = 300000000L;
+        long rightLimit = 100000000L;
+        long generatedLong = leftLimit + (long) (Math.random() * (rightLimit - leftLimit));
+        return generatedLong;
+    }
+
+    private void loadBacklog(){
+        for (Series series : userAnimeList){
+            for (Long episodeTime : series.getBacklog()){
+                backlog.add(new BacklogItem(series, episodeTime));
+            }
+        }
+
+        Collections.sort(backlog, new BacklogItemComparator());
     }
 
     public String getLatestSeasonName() {

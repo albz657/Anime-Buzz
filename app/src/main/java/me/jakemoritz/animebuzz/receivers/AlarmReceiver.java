@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class AlarmReceiver extends BroadcastReceiver {
@@ -19,7 +20,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             for (Series series : App.getInstance().getUserAnimeList()){
                 if (series.getName().equals(intentExtra)){
-                    App.getInstance().getBacklog().add(series);
+                    long time = System.currentTimeMillis();
+                    series.getBacklog().add(time);
+                    App.getInstance().getBacklog().add(new BacklogItem(series, time));
+//                    App.getInstance().getBacklog().add(series);
                 }
             }
         }
