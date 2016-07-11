@@ -113,9 +113,11 @@ public class Series {
         this.isInUserList = false;
         this.currentlyAiring = false;
         this.backlog = new ArrayList<>();
+        this.nextEpisodeAirtime = 0;
+        this.nextEpisodeSimulcastTime = 0;
     }
 
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog) {
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime) {
         this.airdate = airdate;
         this.name = name;
         this.MALID = MALID;
@@ -127,6 +129,8 @@ public class Series {
         this.isInUserList = isInUserList;
         this.currentlyAiring = currentlyAiring;
         this.backlog = backlog;
+        this.nextEpisodeAirtime = nextEpisodeAirtime;
+        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
     }
 
 }

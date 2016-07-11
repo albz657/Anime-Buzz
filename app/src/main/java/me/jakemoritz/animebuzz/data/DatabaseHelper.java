@@ -47,6 +47,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_SIMULCAST_DELAY = "simulcastdelay";
     private static final String KEY_SIMULCAST = "simulcast";
     private static final String KEY_BACKLOG = "backlog";
+    private static final String KEY_NEXT_EPISODE_AIRTIME = "nextepisodeairtime";
+    private static final String KEY_NEXT_EPISODE_SIMULCAST_AIRTIME = "nextepisodesimulcastairtime";
+
 
     // Season metadata columns
     private static final String KEY_SEASON_NAME = "seasonnname";
@@ -75,7 +78,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_ANNID + " INTEGER," +
                 KEY_SIMULCAST_DELAY + " DOUBLE," +
                 KEY_SIMULCAST + " TEXT," +
-                KEY_BACKLOG + " TEXT" +
+                KEY_BACKLOG + " TEXT," +
+                KEY_NEXT_EPISODE_AIRTIME + " INTEGER," +
+                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME + " INTEGER" +
                 ")";
     }
 
@@ -125,6 +130,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SIMULCAST, series.getSimulcast());
         contentValues.put(KEY_SIMULCAST_DELAY, series.getSimulcast_delay());
         contentValues.put(KEY_BACKLOG, new Gson().toJson(series.getBacklog()));
+        contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
+        contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
 
         db.insert(TABLE_ANIME, null, contentValues);
         return true;
@@ -181,6 +188,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_SIMULCAST, series.getSimulcast());
         contentValues.put(KEY_SIMULCAST_DELAY, series.getSimulcast_delay());
         contentValues.put(KEY_BACKLOG, new Gson().toJson(series.getBacklog()));
+        contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
+        contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
 
         db.update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
@@ -314,12 +323,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int ANNID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ANNID));
         double simulcast_delay = res.getDouble(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST_DELAY));
         String simulcast = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SIMULCAST));
+        long nextEpisodeAirtime = res.getLong(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_AIRTIME));
+        long nextEpisodeSimulcastAirtime = res.getLong(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_SIMULCAST_AIRTIME));
 
         Type type = new TypeToken<ArrayList<Long>>() {
         }.getType();
         List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(DatabaseHelper.KEY_BACKLOG)), type);
 
-        return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog);
+        return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime);
     }
 
     public SeasonMetadata getSeasonMetadataWithCursor(Cursor res) {
