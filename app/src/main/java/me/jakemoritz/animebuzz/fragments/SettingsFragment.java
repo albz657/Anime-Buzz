@@ -19,6 +19,7 @@ import java.io.File;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -176,17 +177,42 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setVisible(true);
     }
 
+    private void importExistingSeries() {
+        ImportFragment importFragment = ImportFragment.newInstance(this);
+        importFragment.show(getActivity().getFragmentManager(), "");
+    }
+
+    public void addToMAL(boolean add) {
+        MyShowsFragment myShowsFragment = MyShowsFragment.newInstance();
+
+        MalApiClient malApiClient = new MalApiClient(myShowsFragment);
+
+        if (!add) {
+            for (Series series : App.getInstance().getUserAnimeList()){
+                series.setInUserList(false);
+            }
+            App.getInstance().getUserAnimeList().clear();
+        } else {
+            for (Series series : App.getInstance().getUserAnimeList()){
+                malApiClient.addAnime(String.valueOf(series.getMALID()));
+            }
+        }
+
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_main, myShowsFragment, MyShowsFragment.class.getSimpleName())
+                .commit();
+        malApiClient.getUserList();
+        ((MainActivity) getActivity()).navigationView.getMenu().getItem(1).setChecked(true);
+
+        Snackbar.make(getActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+    }
+
     public void signIn(Preference preference) {
         preference.setVisible(false);
         signOutPreference.setVisible(true);
 
-        MyShowsFragment myShowsFragment = MyShowsFragment.newInstance();
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, myShowsFragment, MyShowsFragment.class.getSimpleName())
-                .commit();
-        new MalApiClient(myShowsFragment).getUserList();
-        ((MainActivity) getActivity()).navigationView.setCheckedItem(1);
-        Snackbar.make(getActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+        importExistingSeries();
+
 
     }
 
