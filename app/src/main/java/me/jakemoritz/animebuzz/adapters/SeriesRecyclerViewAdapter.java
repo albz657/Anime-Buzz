@@ -2,7 +2,9 @@ package me.jakemoritz.animebuzz.adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -95,6 +97,45 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mWatch.setVisibility(View.INVISIBLE);
         }
 
+        if (!holder.series.getSimulcast().equals("false")) {
+            holder.mSimulcast.setText(holder.series.getSimulcast());
+        }
+
+        GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
+
+        int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
+        switch (holder.series.getSimulcast()) {
+            case "Crunchyroll":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
+                break;
+            case "Funimation":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
+                break;
+            case "Amazon Prime":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
+                break;
+            case "Daisuki":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
+                break;
+            case "Netflix":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
+                break;
+            case "Hulu":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
+                break;
+            case "The Anime Network":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
+                holder.mSimulcast.setText("Anime Network");
+                break;
+            case "Viewster":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
+                break;
+            case "Viz":
+                colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
+                break;
+        }
+        background.setColor(colorId);
+
         Picasso picasso = Picasso.with(mListener.getContext());
         if (holder.series.getANNID() > 0) {
             File cacheDirectory = mListener.getContext().getDir(("cache"), Context.MODE_PRIVATE);
@@ -156,6 +197,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         public final TextView mTitle;
         public final ImageView mPoster;
         public final TextView mDate;
+        public final TextView mSimulcast;
         public final ImageButton mAddButton;
         public final ImageButton mMinusButton;
         public final ImageView mWatch;
@@ -167,6 +209,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);
             mPoster = (ImageView) view.findViewById(R.id.series_poster);
+            mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
             mDate = (TextView) view.findViewById(R.id.series_date);
             mAddButton = (ImageButton) view.findViewById(R.id.add_button);
             mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);
@@ -177,8 +220,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void removeSeries(Series item, int position) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
-        if (loggedIn){
-            if (App.getInstance().isNetworkAvailable()){
+        if (loggedIn) {
+            if (App.getInstance().isNetworkAvailable()) {
                 malApiClient.deleteAnime(String.valueOf(item.getMALID()));
             } else {
                 Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -192,7 +235,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         helper.updateSeriesInDb(item);
         helper.close();
 
-        if (mListener instanceof MyShowsFragment){
+        if (mListener instanceof MyShowsFragment) {
             visibleSeries.remove(item);
             allSeries.remove(item);
         }
@@ -206,8 +249,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void addSeries(Series item, int position) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
-        if (loggedIn){
-            if (App.getInstance().isNetworkAvailable()){
+        if (loggedIn) {
+            if (App.getInstance().isNetworkAvailable()) {
                 malApiClient.addAnime(String.valueOf(item.getMALID()));
             } else {
                 Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -221,7 +264,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         helper.updateSeriesInDb(item);
         helper.close();
 
-        if (mListener instanceof MyShowsFragment){
+        if (mListener instanceof MyShowsFragment) {
             allSeries.clear();
             allSeries.addAll(App.getInstance().getUserAnimeList());
             visibleSeries.clear();

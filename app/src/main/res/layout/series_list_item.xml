@@ -84,17 +84,21 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/series_more"
-                    style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:id="@+id/series_simulcast"
                     android:layout_width="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/series_title"
-                    android:textColor="#D9000000" />
+                    android:background="@drawable/simulcast_shape"
+                    android:textColor="#FFFFFF"/>
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/series_more"
+                    android:layout_below="@+id/series_simulcast"
                     android:gravity="bottom">
 
                     <ImageView
