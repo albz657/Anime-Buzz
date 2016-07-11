@@ -20,12 +20,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             for (Series series : App.getInstance().getUserAnimeList()) {
                 if (series.getName().equals(intentExtra)) {
+                    App.getInstance().removeAlarmFromStructure(series.getMALID());
+
                     long time = System.currentTimeMillis();
                     series.getBacklog().add(time);
                     App.getInstance().getBacklog().add(new BacklogItem(series, time));
                     App.getInstance().makeAlarm(series);
 
-                    App.getInstance().removeAlarmFromStructure(series.getMALID());
 //                    App.getInstance().getBacklog().add(series);
                 }
             }

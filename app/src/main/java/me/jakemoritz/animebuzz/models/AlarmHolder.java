@@ -18,6 +18,9 @@ public class AlarmHolder {
         return id;
     }
 
+    public void setAlarmTime(long alarmTime) {
+        this.alarmTime = alarmTime;
+    }
 
     public AlarmHolder(String seriesName, long alarmTime, int id) {
         this.seriesName = seriesName;

@@ -103,6 +103,8 @@ public class App extends Application {
             loadBacklog();
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
+            dummyAlarm();
+
             rescheduleAlarms();
 //            loadAlarms();
 //            backlogDummyData();
@@ -111,6 +113,12 @@ public class App extends Application {
         } else {
             DatabaseHelper helper = new DatabaseHelper(this);
             helper.onCreate(helper.getWritableDatabase());
+        }
+    }
+
+    private void dummyAlarm(){
+        if (!alarms.isEmpty()){
+            alarms.get(0).setAlarmTime(1468249800000L);
         }
     }
 
@@ -405,18 +413,18 @@ public class App extends Application {
     }
 
     public void removeAlarmFromStructure(int id) {
+        List<AlarmHolder> newAlarms = new ArrayList<>(alarms);
         AlarmHolder alarm;
         for (Iterator alarmIterator = alarms.iterator(); alarmIterator.hasNext(); ) {
             alarm = (AlarmHolder) alarmIterator.next();
             if (alarm.getId() == id) {
-                alarms.remove(alarm);
+                newAlarms.remove(alarm);
 
                 DatabaseHelper dbHelper = new DatabaseHelper(this);
                 dbHelper.deleteAlarm(alarm.getId());
             }
         }
-
-
+        alarms = newAlarms;
     }
 
     public void removeAlarm(Series series) {
