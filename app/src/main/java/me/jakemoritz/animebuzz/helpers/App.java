@@ -13,21 +13,12 @@ import android.net.NetworkInfo;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -103,7 +94,7 @@ public class App extends Application {
             loadBacklog();
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();
@@ -150,51 +141,6 @@ public class App extends Application {
 
         }
     }
-
-    private void saveAlarms() {
-        try {
-            FileOutputStream fos = openFileOutput(getString(R.string.file_alarms), Context.MODE_PRIVATE);
-            fos.write(new Gson().toJson(alarms).getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void loadAlarms() {
-        try {
-            File alarmFile = getDir(getString(R.string.file_alarms), Context.MODE_PRIVATE);
-            if (alarmFile.exists()) {
-                FileInputStream fis = openFileInput(getString(R.string.file_alarms));
-                byte[] alarmFileBytes = new byte[(int) alarmFile.length()];
-                BufferedInputStream bif = new BufferedInputStream(fis);
-                bif.read(alarmFileBytes, 0, alarmFileBytes.length);
-                String serializedAlarms = new String(trim(alarmFileBytes));
-                JsonArray alarmsArray = (JsonArray) new JsonParser().parse(serializedAlarms);
-                for (JsonElement alarmElement : alarmsArray) {
-                    JsonObject alarmObject = (JsonObject) alarmElement;
-                    // this.alarms.add(new AlarmHolder(alarmObject.get("seriesName").getAsString(), alarmObject.get("alarmTime").getAsLong()));
-                }
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    static byte[] trim(byte[] bytes) {
-        int i = bytes.length - 1;
-        while (i >= 0 && bytes[i] == 0) {
-            --i;
-        }
-
-        return Arrays.copyOf(bytes, i + 1);
-    }
-
 
     public long givenUsingPlainJava_whenGeneratingRandomLongBounded_thenCorrect() {
         long leftLimit = 300000000L;
@@ -402,6 +348,31 @@ public class App extends Application {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         String formattedNext = format.format(nextEpisode.getTime());
         Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
+    }
+
+    public void switchAlarmTiming(boolean prefersSimulcast){
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        alarms.clear();
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.deleteAllAlarms();
+
+        for (Series series : userAnimeList){
+            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+            notificationIntent.putExtra("name", series.getName());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
+
+            long nextEpisodeTime;
+            if (prefersSimulcast){
+                nextEpisodeTime = series.getNextEpisodeSimulcastTime();
+            } else {
+                nextEpisodeTime = series.getNextEpisodeAirtime();
+            }
+
+            alarmManager.set(AlarmManager.RTC, nextEpisodeTime, pendingIntent);
+            processNewAlarm(new AlarmHolder(series.getName(), nextEpisodeTime, series.getMALID()));
+
+        }
     }
 
     private void processNewAlarm(AlarmHolder alarmHolder) {

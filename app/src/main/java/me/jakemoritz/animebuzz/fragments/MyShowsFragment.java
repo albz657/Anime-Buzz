@@ -71,7 +71,6 @@ public class MyShowsFragment extends SeriesFragment {
         loadUserSortingPreference();
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
@@ -112,7 +111,7 @@ public class MyShowsFragment extends SeriesFragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void loadUserSortingPreference() {
+    public void loadUserSortingPreference() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 

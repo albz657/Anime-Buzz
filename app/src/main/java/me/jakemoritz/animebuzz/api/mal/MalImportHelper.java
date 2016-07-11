@@ -7,6 +7,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.MalDataRead;
@@ -52,6 +53,10 @@ public class MalImportHelper {
         fragment.mAdapter.getAllSeries().addAll(matchedSeries);
         fragment.mAdapter.getVisibleSeries().clear();
         fragment.mAdapter.getVisibleSeries().addAll(fragment.mAdapter.getAllSeries());
+
+        if (fragment instanceof MyShowsFragment){
+            ((MyShowsFragment) fragment).loadUserSortingPreference();
+        }
         App.getInstance().saveUserListToDB();
         delegate.malDataRead();
     }

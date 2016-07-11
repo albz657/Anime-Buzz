@@ -101,6 +101,22 @@ public class Series {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Series series = (Series) o;
+
+        return MALID == series.MALID;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return MALID;
+    }
+
     public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
         this.airdate = airdate;
         this.name = name;

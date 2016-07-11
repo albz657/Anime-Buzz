@@ -24,7 +24,7 @@ public class NotificationHelper {
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle(mContext.getString(R.string.notification_list_update))
                         .setContentText(seasonName)
-                        .setAutoCancel(false)
+                        .setAutoCancel(true)
                         .setProgress(0, 0, true);
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
@@ -42,8 +42,8 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)
-                        .setContentTitle(seriesName)
-                        .setContentText("New episode released");
+                        .setContentText(seriesName)
+                        .setContentTitle("New episode released");
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
 

@@ -22,6 +22,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -72,15 +73,17 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
-
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))) {
             Preference airingOrSimulcastPref = findPreference(s);
             if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))) {
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
+                App.getInstance().switchAlarmTiming(true);
             } else {
                 airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
+                App.getInstance().switchAlarmTiming(false);
+
             }
         } else if (s.equals(getString(R.string.pref_24hour_key))) {
             Preference pref24HourSummary = findPreference(s);

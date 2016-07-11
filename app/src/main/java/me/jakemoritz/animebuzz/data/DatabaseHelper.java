@@ -228,6 +228,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
     }
 
+    public void deleteAllAlarms(){
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.delete(TABLE_ALARMS, null, null);
+    }
+
     public Integer deleteSeasonMetadata(String seasonKey) {
         SQLiteDatabase db = getWritableDatabase();
         return db.delete(TABLE_SEASONS,
