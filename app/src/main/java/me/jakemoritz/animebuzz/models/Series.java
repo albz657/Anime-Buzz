@@ -108,8 +108,7 @@ public class Series {
 
         Series series = (Series) o;
 
-        return MALID == series.MALID;
-
+        return (MALID == series.MALID && season.equals(series.season));
     }
 
     @Override

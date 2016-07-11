@@ -30,6 +30,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -107,15 +108,15 @@ public class App extends Application {
         }
     }
 
-    private void dummyAlarm(){
-        if (!alarms.isEmpty()){
+    private void dummyAlarm() {
+        if (!alarms.isEmpty()) {
             alarms.get(0).setAlarmTime(1468249800000L);
         }
     }
 
     public void rescheduleAlarms() {
         AlarmManager alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
-        for (AlarmHolder alarm : App.getInstance().getAlarms()){
+        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
             Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
             notificationIntent.putExtra("name", alarm.getSeriesName());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -202,8 +203,39 @@ public class App extends Application {
 
     public void saveNewSeasonData(Season season) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(season.getSeasonSeries());
+        dbHelper.saveSeriesToDb(removeOlder(season));
         dbHelper.close();
+    }
+
+    public List<Series> removeOlder(Season season) {
+        List<Season> allSeasonList = new ArrayList<>(allAnimeSeasons);
+        List<Series> allSeriesList = new ArrayList<>();
+        Collections.sort(allSeasonList, new SeasonComparator());
+
+        int indexOfThisSeason = -1;
+        for (Season eachSeason : allSeasonList) {
+            if (eachSeason.getSeasonMetadata().getName().equals(season.getSeasonMetadata().getName())) {
+                indexOfThisSeason = allSeasonList.indexOf(eachSeason);
+            }
+        }
+
+        List<Season> newerSeasonList;
+        if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
+            newerSeasonList = allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size());
+            for (Season newerSeason : newerSeasonList){
+                allSeriesList.addAll(newerSeason.getSeasonSeries());
+            }
+
+            List<Series> filteredList = new ArrayList<>(season.getSeasonSeries());
+            for (Series series : season.getSeasonSeries()) {
+                if (allSeriesList.contains(series)){
+                    filteredList.remove(series);
+                }
+            }
+            return filteredList;
+        } else {
+            return season.getSeasonSeries();
+        }
     }
 
     public void loadAnimeFromDB() {
@@ -350,20 +382,20 @@ public class App extends Application {
         Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
     }
 
-    public void switchAlarmTiming(boolean prefersSimulcast){
+    public void switchAlarmTiming(boolean prefersSimulcast) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         alarms.clear();
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.deleteAllAlarms();
 
-        for (Series series : userAnimeList){
+        for (Series series : userAnimeList) {
             Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
             notificationIntent.putExtra("name", series.getName());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
 
             long nextEpisodeTime;
-            if (prefersSimulcast){
+            if (prefersSimulcast) {
                 nextEpisodeTime = series.getNextEpisodeSimulcastTime();
             } else {
                 nextEpisodeTime = series.getNextEpisodeAirtime();
