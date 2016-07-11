@@ -21,6 +21,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 import me.jakemoritz.animebuzz.models.Series;
@@ -143,7 +144,7 @@ public class MyShowsFragment extends SeriesFragment {
         if (prefersSimulcast) {
             Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
         } else {
-            Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
+            Collections.sort(hasDateList, new NextEpisodeAiringTimeComparator());
         }
 
         for (Series series : noDateList) {
