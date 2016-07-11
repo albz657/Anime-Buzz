@@ -36,8 +36,10 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
+
 
         final Activity activity = this;
         malApiClient = new MalApiClient(this);
@@ -65,7 +67,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
-                    if (App.getInstance().isNetworkAvailable()){
+                    if (App.getInstance().isNetworkAvailable()) {
                         attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                     } else {
                         Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -79,7 +81,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (App.getInstance().isNetworkAvailable()){
+                if (App.getInstance().isNetworkAvailable()) {
                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                 } else {
                     Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -109,7 +111,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             }
         });
 
-        }
+    }
 
     private void attemptVerification(String username, String password) {
         if (!App.getInstance().isTryingToVerify()) {
