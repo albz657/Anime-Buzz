@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.models;
 
-import java.util.List;
-
 public class Season {
     @Override
     public boolean equals(Object o) {
@@ -22,15 +20,15 @@ public class Season {
         return result;
     }
 
-    private List<Series> seasonSeries;
+    private SeriesList seasonSeries;
     private SeasonMetadata seasonMetadata;
 
-    public Season(List<Series> seasonSeries, SeasonMetadata seasonMetadata) {
+    public Season(SeriesList seasonSeries, SeasonMetadata seasonMetadata) {
         this.seasonSeries = seasonSeries;
         this.seasonMetadata = seasonMetadata;
     }
 
-    public List<Series> getSeasonSeries() {
+    public SeriesList getSeasonSeries() {
         return seasonSeries;
     }
 

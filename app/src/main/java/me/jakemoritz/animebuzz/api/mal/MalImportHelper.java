@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.api.mal;
 
 import android.database.Cursor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -12,6 +11,7 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.MalDataRead;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class MalImportHelper {
 
@@ -26,7 +26,7 @@ public class MalImportHelper {
     }
 
     public void matchSeries(List<Integer> currentlyWatchingShowIds){
-        List<Series> matchedSeries = new ArrayList<>();
+        SeriesList matchedSeries = new SeriesList();
 
         DatabaseHelper dbHelper = new DatabaseHelper(App.getInstance());
         Cursor res = null;

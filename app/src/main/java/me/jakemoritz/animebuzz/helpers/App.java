@@ -38,6 +38,7 @@ import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
@@ -47,7 +48,7 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private Set<Series> userAnimeList;
+    private SeriesList userAnimeList;
     private Set<Season> allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private List<BacklogItem> backlog;
@@ -81,7 +82,7 @@ public class App extends Application {
 
         mInstance = this;
         allAnimeSeasons = new HashSet<>();
-        userAnimeList = new HashSet<>();
+        userAnimeList = new SeriesList();
         seasonsList = new HashSet<>();
         backlog = new ArrayList<>();
         alarms = new ArrayList<>();
@@ -197,7 +198,7 @@ public class App extends Application {
 
     public void saveUserListToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(new ArrayList<Series>(userAnimeList));
+        dbHelper.saveSeriesToDb(userAnimeList);
         dbHelper.close();
     }
 
@@ -207,9 +208,9 @@ public class App extends Application {
         dbHelper.close();
     }
 
-    public List<Series> removeOlder(Season season) {
+    public SeriesList removeOlder(Season season) {
         List<Season> allSeasonList = new ArrayList<>(allAnimeSeasons);
-        List<Series> allSeriesList = new ArrayList<>();
+        SeriesList allSeriesList = new SeriesList();
         Collections.sort(allSeasonList, new SeasonComparator());
 
         int indexOfThisSeason = -1;
@@ -226,7 +227,7 @@ public class App extends Application {
                 allSeriesList.addAll(newerSeason.getSeasonSeries());
             }
 
-            List<Series> filteredList = new ArrayList<>(season.getSeasonSeries());
+            SeriesList filteredList = new SeriesList(season.getSeasonSeries());
             for (Series series : season.getSeasonSeries()) {
                 if (allSeriesList.contains(series)){
                     filteredList.remove(series);
@@ -243,7 +244,7 @@ public class App extends Application {
         dbHelper.onCreate(dbHelper.getWritableDatabase());
 
         for (SeasonMetadata metadata : seasonsList) {
-            List<Series> tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
+            SeriesList tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
             if (tempSeason.size() > 0) {
                 allAnimeSeasons.add(new Season(tempSeason, metadata));
             }
@@ -447,7 +448,7 @@ public class App extends Application {
         return mInstance;
     }
 
-    public Set<Series> getUserAnimeList() {
+    public SeriesList getUserAnimeList() {
         return userAnimeList;
     }
 

@@ -14,6 +14,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
 import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
 import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
+import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -25,16 +26,16 @@ public class ANNSearchHelper {
 
     private final static String TAG = ANNSearchHelper.class.getSimpleName();
 
-    private List<List<Series>> getImageURLBatch;
+    private List<SeriesList> getImageURLBatch;
 
     public ANNSearchHelper() {
         this.getImageURLBatch = new ArrayList<>();
     }
 
-    public void getImages(SeriesFragment fragment, List<Series> seriesList) {
+    public void getImages(SeriesFragment fragment, SeriesList seriesList) {
         App.getInstance().setDelegate(fragment);
 
-        List<Series> cleanedList = new ArrayList<>();
+        SeriesList cleanedList = new SeriesList();
         for (Series series : seriesList) {
             if (series.getANNID() > 0) {
                 cleanedList.add(series);
@@ -53,7 +54,7 @@ public class ANNSearchHelper {
             int batches = (int) Math.ceil(div);
 
             for (int i = 0; i < batches; i++) {
-                List<Series> splitList = cleanedList.subList(prevStart, prevEnd);
+                SeriesList splitList = new SeriesList(cleanedList.subList(prevStart, prevEnd));
 
                 getImageURLBatch.add(splitList);
 
@@ -79,7 +80,7 @@ public class ANNSearchHelper {
         }
     }
 
-    private void getPictureUrlBatch(List<Series> seriesList) {
+    private void getPictureUrlBatch(SeriesList seriesList) {
         if (!seriesList.isEmpty()) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("http://cdn.animenewsnetwork.com/")

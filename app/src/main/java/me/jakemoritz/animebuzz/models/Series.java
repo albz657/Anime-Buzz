@@ -20,6 +20,26 @@ public class Series {
     private long nextEpisodeSimulcastTime;
     private List<Long> backlog;
 
+    public void setAirdate(int airdate) {
+        this.airdate = airdate;
+    }
+
+    public void setCurrentlyAiring(boolean currentlyAiring) {
+        this.currentlyAiring = currentlyAiring;
+    }
+
+    public void setSimulcast(String simulcast) {
+        this.simulcast = simulcast;
+    }
+
+    public void setSimulcast_airdate(int simulcast_airdate) {
+        this.simulcast_airdate = simulcast_airdate;
+    }
+
+    public void setANNID(int ANNID) {
+        this.ANNID = ANNID;
+    }
+
     public long getNextEpisodeAirtime() {
         return nextEpisodeAirtime;
     }

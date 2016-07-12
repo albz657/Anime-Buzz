@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -26,7 +25,7 @@ import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener {
 
@@ -72,10 +71,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         Context context = recyclerView.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         if (this instanceof SeasonsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(new ArrayList<Series>(), this);
+            mAdapter = new SeriesRecyclerViewAdapter(new SeriesList(), this);
 
         } else if (this instanceof MyShowsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(new ArrayList<>(App.getInstance().getUserAnimeList()), this);
+            mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
         }
         recyclerView.setAdapter(mAdapter);
 

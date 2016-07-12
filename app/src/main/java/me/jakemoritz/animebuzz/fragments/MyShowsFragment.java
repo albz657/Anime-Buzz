@@ -13,9 +13,7 @@ import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -25,6 +23,7 @@ import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparat
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class MyShowsFragment extends SeriesFragment {
 
@@ -128,8 +127,8 @@ public class MyShowsFragment extends SeriesFragment {
         editor.putString(getString(R.string.shared_prefs_sorting), "date");
         editor.apply();
 
-        List<Series> noDateList = new ArrayList<>();
-        List<Series> hasDateList = new ArrayList<>();
+        SeriesList noDateList = new SeriesList();
+        SeriesList hasDateList = new SeriesList();
         for (Series series : mAdapter.getVisibleSeries()) {
             if (series.getSimulcast_airdate() < 0 || series.getAirdate() < 0) {
                 noDateList.add(series);

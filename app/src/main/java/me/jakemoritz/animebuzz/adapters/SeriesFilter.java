@@ -2,22 +2,20 @@ package me.jakemoritz.animebuzz.adapters;
 
 import android.widget.Filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeriesFilter extends Filter {
 
     private SeriesRecyclerViewAdapter adapter;
-    private List<Series> originalSeriesList;
-    private List<Series> filteredSeriesList;
+    private SeriesList originalSeriesList;
+    private SeriesList filteredSeriesList;
 
-    public SeriesFilter(SeriesRecyclerViewAdapter adapter, List<Series> seriesList) {
+    public SeriesFilter(SeriesRecyclerViewAdapter adapter, SeriesList seriesList) {
         super();
         this.adapter = adapter;
         this.originalSeriesList = seriesList;
-        this.filteredSeriesList = new ArrayList<>();
+        this.filteredSeriesList = new SeriesList();
     }
 
     @Override
@@ -44,7 +42,7 @@ public class SeriesFilter extends Filter {
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
         adapter.getVisibleSeries().clear();
-        adapter.getVisibleSeries().addAll((ArrayList<Series>) results.values);
+        adapter.getVisibleSeries().addAll((SeriesList) results.values);
         adapter.notifyDataSetChanged();
     }
 }

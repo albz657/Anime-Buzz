@@ -10,8 +10,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +17,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeasonDeserializer implements JsonDeserializer<Season> {
 
@@ -54,7 +53,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
 
-        List<Series> seasonSeries = new ArrayList<>();
+        SeriesList seasonSeries = new SeriesList();
         for (JsonElement seriesElement : seriesArray){
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 

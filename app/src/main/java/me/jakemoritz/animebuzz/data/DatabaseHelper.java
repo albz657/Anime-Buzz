@@ -11,7 +11,6 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +18,7 @@ import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -241,8 +241,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{seasonKey});
     }
 
-    public List<Series> getSeriesBySeason(String seasonName) {
-        List<Series> seriesBySeason = new ArrayList<>();
+    public SeriesList getSeriesBySeason(String seasonName) {
+        SeriesList seriesBySeason = new SeriesList();
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
@@ -269,14 +269,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void saveAllSeriesToDb(Set<Season> allSeries) {
-        List<Series> allSeriesList = new ArrayList<>();
+        SeriesList allSeriesList = new SeriesList();
         for (Season season : allSeries) {
             allSeriesList.addAll(season.getSeasonSeries());
         }
         saveSeriesToDb(allSeriesList);
     }
 
-    public void saveSeriesToDb(List<Series> seriesList) {
+    public void saveSeriesToDb(SeriesList seriesList) {
         Cursor cursor = null;
         for (Series series : seriesList) {
             cursor = getSeries(series.getMALID());
@@ -347,8 +347,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new SeasonMetadata(seasonName, seasonDate, seasonKey);
     }
 
-    public Set<Series> getSeriesUserWatching() {
-        Set<Series> userList = new HashSet<>();
+    public SeriesList getSeriesUserWatching() {
+        SeriesList userList = new SeriesList();
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_IS_IN_USER_LIST + " ='" + 1 + "'", null);
@@ -364,11 +364,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return userList;
     }
 
-    public List<Series> getSeriesFromDb() {
+    public SeriesList getSeriesFromDb() {
         Cursor res = getAllSeries();
 
         res.moveToFirst();
-        ArrayList<Series> seriesList = new ArrayList<>();
+        SeriesList seriesList = new SeriesList();
 
         for (int i = 0; i < res.getCount(); i++) {
             getSeriesWithCursor(res);

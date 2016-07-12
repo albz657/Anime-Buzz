@@ -19,8 +19,6 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -31,23 +29,24 @@ import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
-    private List<Series> allSeries = null;
-    private List<Series> visibleSeries = null;
+    private SeriesList allSeries = null;
+    private SeriesList visibleSeries = null;
     private SeriesFragment mListener = null;
     private ViewGroup parent;
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
     private MalApiClient malApiClient;
 
-    public SeriesRecyclerViewAdapter(List<Series> items, SeriesFragment listener) {
+    public SeriesRecyclerViewAdapter(SeriesList items, SeriesFragment listener) {
         allSeries = items;
         mListener = listener;
-        visibleSeries = new ArrayList<>(items);
+        visibleSeries = new SeriesList(items);
         self = this;
         malApiClient = new MalApiClient(mListener);
     }
@@ -281,11 +280,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     }
 
-    public List<Series> getVisibleSeries() {
+    public SeriesList getVisibleSeries() {
         return visibleSeries;
     }
 
-    public List<Series> getAllSeries() {
+    public SeriesList getAllSeries() {
         return allSeries;
     }
 }
