@@ -8,8 +8,7 @@ public class Season {
 
         Season season = (Season) o;
 
-        if (!seasonSeries.equals(season.seasonSeries)) return false;
-        return seasonMetadata.equals(season.seasonMetadata);
+        return seasonMetadata.getKey().equals(season.seasonMetadata.getKey());
 
     }
 

@@ -36,6 +36,7 @@ import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonList;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -49,7 +50,7 @@ public class App extends Application {
     private static App mInstance;
 
     private SeriesList userAnimeList;
-    private Set<Season> allAnimeSeasons;
+    private SeasonList allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private List<BacklogItem> backlog;
     private List<AlarmHolder> alarms;
@@ -81,7 +82,7 @@ public class App extends Application {
         SQLiteStudioService.instance().start(this);
 
         mInstance = this;
-        allAnimeSeasons = new HashSet<>();
+        allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
         seasonsList = new HashSet<>();
         backlog = new ArrayList<>();
@@ -209,7 +210,7 @@ public class App extends Application {
     }
 
     public SeriesList removeOlder(Season season) {
-        List<Season> allSeasonList = new ArrayList<>(allAnimeSeasons);
+        SeasonList allSeasonList = new SeasonList(allAnimeSeasons);
         SeriesList allSeriesList = new SeriesList();
         Collections.sort(allSeasonList, new SeasonComparator());
 
@@ -220,9 +221,9 @@ public class App extends Application {
             }
         }
 
-        List<Season> newerSeasonList;
+        SeasonList newerSeasonList;
         if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
-            newerSeasonList = allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size());
+            newerSeasonList = new SeasonList(allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size()));
             for (Season newerSeason : newerSeasonList){
                 allSeriesList.addAll(newerSeason.getSeasonSeries());
             }
@@ -452,7 +453,7 @@ public class App extends Application {
         return userAnimeList;
     }
 
-    public Set<Season> getAllAnimeSeasons() {
+    public SeasonList getAllAnimeSeasons() {
         return allAnimeSeasons;
     }
 

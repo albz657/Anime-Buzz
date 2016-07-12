@@ -12,10 +12,10 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.SeasonList;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -268,7 +268,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
-    public void saveAllSeriesToDb(Set<Season> allSeries) {
+    public void saveAllSeriesToDb(SeasonList allSeries) {
         SeriesList allSeriesList = new SeriesList();
         for (Season season : allSeries) {
             allSeriesList.addAll(season.getSeasonSeries());
