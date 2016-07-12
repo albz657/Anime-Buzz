@@ -68,6 +68,17 @@ public class MyShowsFragment extends SeriesFragment {
         }
 
         loadUserSortingPreference();
+
+        if (App.getInstance().isJustLaunched()){
+            onRefresh();
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                }
+            });
+            App.getInstance().setJustLaunched(false);
+        }
     }
 
     @Override

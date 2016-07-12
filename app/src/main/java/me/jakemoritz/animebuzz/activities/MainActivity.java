@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        App.getInstance().setJustLaunched(true);
+
         Intent startupIntent = getIntent();
         if (startupIntent != null) {
             if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {

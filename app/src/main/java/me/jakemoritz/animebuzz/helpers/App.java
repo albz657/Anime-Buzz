@@ -60,6 +60,15 @@ public class App extends Application {
     private String currentlyBrowsingSeasonName = "";
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
+    private boolean justLaunched = false;
+
+    public boolean isJustLaunched() {
+        return justLaunched;
+    }
+
+    public void setJustLaunched(boolean justLaunched) {
+        this.justLaunched = justLaunched;
+    }
 
     public List<AlarmHolder> getAlarms() {
         return alarms;
