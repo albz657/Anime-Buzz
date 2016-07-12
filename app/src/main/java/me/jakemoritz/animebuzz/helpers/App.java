@@ -228,12 +228,15 @@ public class App extends Application {
                 allSeriesList.addAll(newerSeason.getSeasonSeries());
             }
 
-            SeriesList filteredList = new SeriesList(season.getSeasonSeries());
+            allSeasonList.get(indexOfThisSeason).getSeasonSeries().addAll(season.getSeasonSeries());
+            SeriesList filteredList = new SeriesList(allSeasonList.get(indexOfThisSeason).getSeasonSeries());
             for (Series series : season.getSeasonSeries()) {
                 if (allSeriesList.contains(series)){
                     filteredList.remove(series);
                 }
             }
+
+
             return filteredList;
         } else {
             return season.getSeasonSeries();
