@@ -26,8 +26,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
@@ -37,8 +35,6 @@ import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,7 +51,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        App.getInstance().setJustLaunched(true);
 
         Intent startupIntent = getIntent();
         if (startupIntent != null) {
@@ -71,6 +66,9 @@ public class MainActivity extends AppCompatActivity
                 progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
                 progressViewHolder.setVisibility(View.VISIBLE);
                 progressView.startAnimation();
+            } else {
+                App.getInstance().setJustLaunchedMyShows(true);
+                App.getInstance().setJustLaunchedSeasons(true);
             }
         }
 
@@ -159,50 +157,6 @@ public class MainActivity extends AppCompatActivity
         String malUsername = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         drawerUsername.setText(malUsername);
     }
-
-    public String formatAiringTime(Series series, boolean prefersSimulcast) {
-        Calendar cal;
-        if (prefersSimulcast) {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
-        } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        }
-
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
-
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
-            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-        }
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
-
-        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
-        SimpleDateFormat hourFormat = null;
-
-        String formattedTime = format.format(nextEpisode.getTime());
-
-        DateFormatHelper helper = new DateFormatHelper();
-        formattedTime += helper.getDayOfMonthSuffix(nextEpisode.get(Calendar.DAY_OF_MONTH));
-
-        if (prefers24Hour) {
-            hourFormat = new SimpleDateFormat(", kk:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
-
-        } else {
-            hourFormat = new SimpleDateFormat(", h:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
-            formattedTime += new SimpleDateFormat(" a").format(nextEpisode.getTime());
-        }
-
-        return formattedTime;
-    }
-
-
 
     @Override
     protected void onPause() {

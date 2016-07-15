@@ -63,6 +63,17 @@ public class SeasonsFragment extends SeriesFragment {
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
 
         }
+
+        if (App.getInstance().isJustLaunchedSeasons()){
+            onRefresh();
+            swipeRefreshLayout.post(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(true);
+                }
+            });
+            App.getInstance().setJustLaunchedSeasons(false);
+        }
     }
 
     private void loadSeason(String seasonName) {

@@ -69,7 +69,7 @@ public class MyShowsFragment extends SeriesFragment {
 
         loadUserSortingPreference();
 
-        if (App.getInstance().isJustLaunched()){
+        if (App.getInstance().isJustLaunchedMyShows()){
             onRefresh();
             swipeRefreshLayout.post(new Runnable() {
                 @Override
@@ -77,7 +77,7 @@ public class MyShowsFragment extends SeriesFragment {
                     swipeRefreshLayout.setRefreshing(true);
                 }
             });
-            App.getInstance().setJustLaunched(false);
+            App.getInstance().setJustLaunchedMyShows(false);
         }
     }
 
@@ -122,7 +122,7 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     public void loadUserSortingPreference() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 
         if (sortPref.equals("date")) {
@@ -132,8 +132,9 @@ public class MyShowsFragment extends SeriesFragment {
         }
     }
 
+
     private void sortByDate() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.shared_prefs_sorting), "date");
         editor.apply();
@@ -167,7 +168,7 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     private void sortByName() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(getString(R.string.shared_prefs_sorting), "name");
         editor.apply();

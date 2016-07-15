@@ -21,7 +21,6 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
@@ -70,7 +69,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
-                holder.mDate.setText(((MainActivity) mListener.getActivity()).formatAiringTime(holder.series, prefersSimulcast));
+                holder.mDate.setText(App.getInstance().formatAiringTime(holder.series, prefersSimulcast));
             } else {
                 holder.mDate.setText("TBA");
             }
@@ -96,44 +95,51 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mWatch.setVisibility(View.INVISIBLE);
         }
 
-        if (!holder.series.getSimulcast().equals("false")) {
-            holder.mSimulcast.setText(holder.series.getSimulcast());
+        if (prefersSimulcast){
+            holder.mSimulcast.setVisibility(View.VISIBLE);
+
+            if (!holder.series.getSimulcast().equals("false")) {
+                holder.mSimulcast.setText(holder.series.getSimulcast());
+            }
+
+            GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
+
+            int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
+            switch (holder.series.getSimulcast()) {
+                case "Crunchyroll":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
+                    break;
+                case "Funimation":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
+                    break;
+                case "Amazon Prime":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
+                    break;
+                case "Daisuki":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
+                    break;
+                case "Netflix":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
+                    break;
+                case "Hulu":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
+                    break;
+                case "The Anime Network":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
+                    holder.mSimulcast.setText("Anime Network");
+                    break;
+                case "Viewster":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
+                    break;
+                case "Viz":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
+                    break;
+            }
+            background.setColor(colorId);
+        } else {
+            holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
 
-        GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
-
-        int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
-        switch (holder.series.getSimulcast()) {
-            case "Crunchyroll":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
-                break;
-            case "Funimation":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
-                break;
-            case "Amazon Prime":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
-                break;
-            case "Daisuki":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
-                break;
-            case "Netflix":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
-                break;
-            case "Hulu":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
-                break;
-            case "The Anime Network":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                holder.mSimulcast.setText("Anime Network");
-                break;
-            case "Viewster":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
-                break;
-            case "Viz":
-                colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
-                break;
-        }
-        background.setColor(colorId);
 
         Picasso picasso = Picasso.with(mListener.getContext());
         if (holder.series.getANNID() > 0) {

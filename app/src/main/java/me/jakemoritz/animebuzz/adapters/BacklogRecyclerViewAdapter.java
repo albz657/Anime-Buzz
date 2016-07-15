@@ -1,6 +1,10 @@
 package me.jakemoritz.animebuzz.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.drawable.GradientDrawable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -39,19 +43,19 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.series = seriesList.get(position).getSeriesName();
-        holder.mTitle.setText(holder.series.getName());
+        holder.backlogItem = seriesList.get(position);
+        holder.mTitle.setText(holder.backlogItem.getSeries().getName());
 
 
         Picasso picasso = Picasso.with(App.getInstance());
-        if (holder.series.getANNID() > 0) {
+        if (holder.backlogItem.getSeries().getANNID() > 0) {
             File cacheDirectory = App.getInstance().getDir(("cache"), Context.MODE_PRIVATE);
             File imageCacheDirectory = new File(cacheDirectory, "images");
-            File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
+            File smallBitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
             if (smallBitmapFile.exists()) {
                 picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
             } else {
-                File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
+                File bitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + ".jpg");
                 if (bitmapFile.exists()) {
                     picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
                 } else {
@@ -61,6 +65,58 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         } else {
             picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
+
+        if (prefersSimulcast) {
+            holder.mSimulcast.setVisibility(View.VISIBLE);
+        } else {
+            holder.mSimulcast.setVisibility(View.INVISIBLE);
+
+            if (!holder.backlogItem.getSeries().getSimulcast().equals("false")) {
+                holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcast());
+            }
+
+            GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
+
+            int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
+            switch (holder.backlogItem.getSeries().getSimulcast()) {
+                case "Crunchyroll":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
+                    break;
+                case "Funimation":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
+                    break;
+                case "Amazon Prime":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
+                    break;
+                case "Daisuki":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
+                    break;
+                case "Netflix":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
+                    break;
+                case "Hulu":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
+                    break;
+                case "The Anime Network":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
+                    holder.mSimulcast.setText("Anime Network");
+                    break;
+                case "Viewster":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
+                    break;
+                case "Viz":
+                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
+                    break;
+            }
+            background.setColor(colorId);
+        }
+
+
+        holder.mDate.setText(App.getInstance().formatTime(holder.backlogItem.getAlarmTime()));
+
     }
 
     @Override
@@ -70,7 +126,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onItemDismiss(int position) {
-        Series series = seriesList.get(position).getSeriesName();
+        Series series = seriesList.get(position).getSeries();
         series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
 
         notifyDataSetChanged();
@@ -83,8 +139,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         public final ImageView mPoster;
         public final TextView mDate;
         public final ImageView mWatch;
+        public final TextView mSimulcast;
 
-        public Series series;
+        public BacklogItem backlogItem;
 
         public ViewHolder(View view) {
             super(view);
@@ -93,6 +150,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             mPoster = (ImageView) view.findViewById(R.id.series_poster);
             mDate = (TextView) view.findViewById(R.id.series_date);
             mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
+            mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
         }
     }
 }
