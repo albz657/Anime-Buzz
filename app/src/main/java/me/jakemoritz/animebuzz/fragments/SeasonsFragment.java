@@ -31,15 +31,13 @@ public class SeasonsFragment extends SeriesFragment {
 
     private Spinner toolbarSpinner;
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
-    private MainActivity parentActivity;
     private int previousSpinnerIndex = 0;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        parentActivity = (MainActivity) getActivity();
-        toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+        toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -109,13 +107,16 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void seasonPostersImported() {
-        refreshToolbar();
+        if (isVisible()){
+            refreshToolbar();
+
+        }
 
         if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
 
-            parentActivity.progressViewHolder.setVisibility(View.GONE);
-            parentActivity.progressView.stopAnimation();
+            ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
+            ((MainActivity) activity).progressView.stopAnimation();
 
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
 
@@ -133,14 +134,14 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     public void refreshToolbar() {
-        if (parentActivity.getSupportActionBar() != null && toolbarSpinner != null) {
+        if (activity.getSupportActionBar() != null && toolbarSpinner != null) {
             List<String> seasons = getSpinnerItems();
             if (seasons.isEmpty()) {
                 toolbarSpinner.setVisibility(View.GONE);
-                parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
             } else {
                 toolbarSpinner.setVisibility(View.VISIBLE);
-                parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+                activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
                 seasonsSpinnerAdapter.getSeasonNames().clear();
                 seasonsSpinnerAdapter.getSeasonNames().addAll(seasons);
@@ -189,7 +190,7 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        getActivity().getMenuInflater().inflate(R.menu.debug_season, menu);
+        activity.getMenuInflater().inflate(R.menu.debug_season, menu);
 
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);

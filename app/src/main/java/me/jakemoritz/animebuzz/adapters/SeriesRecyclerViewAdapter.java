@@ -64,8 +64,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mTitle.setText(visibleSeries.get(position).getName());
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
-        boolean prefersSimulcast = sharedPref.getBoolean(mListener.getActivity().getString(R.string.pref_simulcast_key), false);
-        final boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
+        boolean prefersSimulcast = sharedPref.getBoolean(mListener.activity.getString(R.string.pref_simulcast_key), false);
+        final boolean loggedIn = sharedPref.getBoolean(mListener.activity.getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
@@ -171,7 +171,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             @Override
             public void onClick(View v) {
                 RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
-                dialogFragment.show(mListener.getActivity().getFragmentManager(), TAG);
+                dialogFragment.show(mListener.activity.getFragmentManager(), TAG);
             }
         });
     }
@@ -253,7 +253,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     public void addSeries(Series item, int position) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
-        boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
+        boolean loggedIn = sharedPref.getBoolean(mListener.activity.getString(R.string.shared_prefs_logged_in), false);
         if (loggedIn) {
             if (App.getInstance().isNetworkAvailable()) {
                 malApiClient.addAnime(String.valueOf(item.getMALID()));

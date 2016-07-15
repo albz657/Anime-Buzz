@@ -30,6 +30,10 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.fragments.BacklogFragment;
+import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
+import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
@@ -62,6 +66,40 @@ public class App extends Application {
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
     private boolean justLaunchedMyShows = false;
+
+    private BacklogFragment backlogFragment;
+    private SettingsFragment settingsFragment;
+    private SeasonsFragment seasonsFragment;
+    private MyShowsFragment myShowsFragment;
+
+
+    public MyShowsFragment getMyShowsFragment() {
+        if (myShowsFragment == null){
+            myShowsFragment = new MyShowsFragment();
+        }
+        return myShowsFragment;
+    }
+
+    public SeasonsFragment getSeasonsFragment() {
+        if (seasonsFragment == null){
+            seasonsFragment = new SeasonsFragment();
+        }
+        return seasonsFragment;
+    }
+
+    public SettingsFragment getSettingsFragment() {
+        if (settingsFragment == null){
+            settingsFragment = new SettingsFragment();
+        }
+        return settingsFragment;
+    }
+
+    public BacklogFragment getBacklogFragment() {
+        if (backlogFragment == null){
+            backlogFragment = new BacklogFragment();
+        }
+        return backlogFragment;
+    }
 
     public boolean isJustLaunchedSeasons() {
         return justLaunchedSeasons;

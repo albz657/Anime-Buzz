@@ -26,7 +26,7 @@ public class SignOutFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(callback.activity);
         builder.setMessage("Are you sure you want to sign out from your MAL account?")
                 .setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
                     @Override

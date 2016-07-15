@@ -17,8 +17,7 @@
         android:layout_marginRight="2dp"
         android:layout_marginTop="10dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".fragments.SeriesFragment"
-        tools:listitem="@layout/fragment_series" />
+        tools:context=".fragments.SeriesFragment" />
 
 </android.support.v4.widget.SwipeRefreshLayout>
 

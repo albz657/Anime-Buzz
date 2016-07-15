@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,6 +37,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public boolean updating = false;
     public SenpaiExportHelper senpaiExportHelper;
     public View seriesLayout;
+    public AppCompatActivity activity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +65,26 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+
+        if (swipeRefreshLayout != null){
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.destroyDrawingCache();
+            swipeRefreshLayout.clearAnimation();
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (AppCompatActivity) getActivity();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        container.removeAllViews();
         seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
 
@@ -77,7 +97,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
         }
         recyclerView.setAdapter(mAdapter);
-
+        mAdapter.notifyDataSetChanged();
         return seriesLayout;
     }
 

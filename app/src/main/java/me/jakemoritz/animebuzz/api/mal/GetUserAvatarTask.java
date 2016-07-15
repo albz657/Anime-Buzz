@@ -21,7 +21,7 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
     private MainActivity activity;
 
     public GetUserAvatarTask(SeriesFragment fragment) {
-        this.activity = (MainActivity) fragment.getActivity();
+        this.activity = (MainActivity) fragment.activity;
     }
 
     @Override

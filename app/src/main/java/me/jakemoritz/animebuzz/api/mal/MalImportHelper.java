@@ -20,7 +20,7 @@ public class MalImportHelper {
     private SeriesFragment fragment;
 
     public MalImportHelper(SeriesFragment seriesFragment, MalDataRead delegate) {
-        this.activity = (MainActivity) seriesFragment.getActivity();
+        this.activity = (MainActivity) seriesFragment.activity;
         this.fragment = seriesFragment;
         this.delegate = delegate;
     }

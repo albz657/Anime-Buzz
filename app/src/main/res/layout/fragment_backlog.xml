@@ -10,4 +10,4 @@
     android:layout_marginRight="2dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="me.jakemoritz.animebuzz.fragments.BacklogFragment"
-    tools:listitem="@layout/backlog_list_item" />
+    tools:listitem="@layout/backlog_list_item"/>

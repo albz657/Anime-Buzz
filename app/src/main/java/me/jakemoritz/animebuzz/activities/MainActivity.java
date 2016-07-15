@@ -29,11 +29,6 @@ import java.io.IOException;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class MainActivity extends AppCompatActivity
@@ -98,34 +93,43 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
-            SeriesFragment seriesFragment;
             if (loggedIn) {
                 navigationView.getMenu().getItem(1).setChecked(true);
-                seriesFragment = new MyShowsFragment();
+
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(App.getInstance().getMyShowsFragment());
+                senpaiExportHelper.getLatestSeasonData();
+
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_myshows);
                 }
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                        .commit();
             } else {
                 navigationView.getMenu().getItem(2).setChecked(true);
-                seriesFragment = new SeasonsFragment();
+
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(App.getInstance().getSeasonsFragment());
+                senpaiExportHelper.getLatestSeasonData();
+
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.fragment_seasons);
                 }
-            }
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
-            senpaiExportHelper.getLatestSeasonData();
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, seriesFragment, SeasonsFragment.class.getSimpleName())
-                    .commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), null)
+                        .commit();
+            }
+
         } else {
             navigationView.getMenu().getItem(1).setChecked(true);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, new MyShowsFragment(), MyShowsFragment.class.getSimpleName())
+                    .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
                     .commit();
+
             if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_seasons);
+                getSupportActionBar().setTitle(R.string.fragment_myshows);
             }
         }
 
@@ -191,8 +195,9 @@ public class MainActivity extends AppCompatActivity
 
         if (previousItemId != id) {
             if (id == R.id.nav_my_shows) {
+
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, new MyShowsFragment(), MyShowsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
                         .commit();
                 navigationView.getMenu().getItem(1).setChecked(true);
 
@@ -201,7 +206,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_seasons) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, new SeasonsFragment(), SeasonsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), null)
                         .commit();
                 navigationView.getMenu().getItem(2).setChecked(true);
 
@@ -210,7 +215,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_watching_queue) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, BacklogFragment.newInstance(), BacklogFragment.class.getSimpleName())
+                        .replace(R.id.content_main, App.getInstance().getBacklogFragment(), null)
                         .commit();
                 navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -219,7 +224,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_settings) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, new SettingsFragment(), SettingsFragment.class.getSimpleName())
+                        .replace(R.id.content_main, App.getInstance().getSettingsFragment(), null)
                         .commit();
                 navigationView.getMenu().getItem(3).setChecked(true);
 
@@ -228,6 +233,8 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+        getSupportFragmentManager();
+        getFragmentManager();
 
         drawer.closeDrawer(GravityCompat.START);
         return true;

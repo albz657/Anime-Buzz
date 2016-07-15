@@ -44,7 +44,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(callback.activity);
         dialogView = callback.getActivity().getLayoutInflater().inflate(R.layout.fragment_sign_in, null);
         builder.setView(dialogView);
 

@@ -29,7 +29,6 @@ public class MyShowsFragment extends SeriesFragment {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
-    private MainActivity parentActivity;
     private MalApiClient malApiClient;
 
     public static MyShowsFragment newInstance() {
@@ -52,19 +51,18 @@ public class MyShowsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        parentActivity = (MainActivity) getActivity();
         malApiClient = new MalApiClient(this);
 
-        if (parentActivity.getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) parentActivity.findViewById(R.id.toolbar_spinner);
+        if (activity.getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
 
             }
 
-            parentActivity.getSupportActionBar().setTitle(R.string.fragment_myshows);
-            parentActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+            activity.getSupportActionBar().setTitle(R.string.fragment_myshows);
+            activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
         loadUserSortingPreference();
@@ -85,7 +83,7 @@ public class MyShowsFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        getActivity().getMenuInflater().inflate(R.menu.debug_myshows, menu);
+        activity.getMenuInflater().inflate(R.menu.debug_myshows, menu);
     }
 
     @Override
@@ -122,6 +120,9 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     public void loadUserSortingPreference() {
+        if (!isAdded()){
+            return;
+        }
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 
@@ -183,7 +184,7 @@ public class MyShowsFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             malApiClient.getUserList();
 
-            TextView loadingText = (TextView) parentActivity.progressViewHolder.findViewById(R.id.loading_text);
+            TextView loadingText = (TextView) ((MainActivity) activity).progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
         if (updating) {
@@ -200,8 +201,8 @@ public class MyShowsFragment extends SeriesFragment {
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
 
-            parentActivity.progressViewHolder.setVisibility(View.GONE);
-            parentActivity.progressView.stopAnimation();
+            ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
+            ((MainActivity) activity).progressView.stopAnimation();
 
             senpaiExportHelper.getSeasonList();
         }
