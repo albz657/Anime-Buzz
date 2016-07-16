@@ -9,6 +9,7 @@ import android.support.v4.app.TaskStackBuilder;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class NotificationHelper {
 
@@ -38,22 +39,24 @@ public class NotificationHelper {
         mNotificationManager.notify(seasonName.hashCode(), mBuilder.build());
     }
 
-    public void createNewEpisodeNotification(String seriesName) {
+    public void createNewEpisodeNotification(Series series) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(mContext)
                         .setSmallIcon(R.drawable.ic_bookmark)
-                        .setContentText(seriesName)
+                        .setAutoCancel(true)
+                        .setContentText(series.getName())
                         .setContentTitle("New episode released");
 
         Intent resultIntent = new Intent(mContext, MainActivity.class);
+        resultIntent.putExtra("openBacklogFragment", true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
         stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(series.getMALID(), 0);
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(0, mBuilder.build());
+        mNotificationManager.notify(series.getMALID(), mBuilder.build());
     }
 
 }

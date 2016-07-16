@@ -3,7 +3,9 @@ package me.jakemoritz.animebuzz.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -13,22 +15,25 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        String intentExtra = intent.getStringExtra("name");
-        if (intentExtra != null) {
+        int intentExtra = intent.getIntExtra("MALID", -1);
+        if (intentExtra > 0) {
+            DatabaseHelper databaseHelper = new DatabaseHelper(context);
+            Cursor cursor = databaseHelper.getSeries(intentExtra);
+            cursor.moveToFirst();
+            Series series = databaseHelper.getSeriesWithCursor(cursor);
+
             NotificationHelper helper = new NotificationHelper(context);
-            helper.createNewEpisodeNotification(intentExtra);
+            helper.createNewEpisodeNotification(series);
 
-            for (Series series : App.getInstance().getUserAnimeList()) {
-                if (series.getName().equals(intentExtra)) {
-                    App.getInstance().removeAlarmFromStructure(series.getMALID());
+            App.getInstance().removeAlarmFromStructure(series.getMALID());
 
-                    long time = System.currentTimeMillis();
-                    series.getBacklog().add(time);
-                    App.getInstance().getBacklog().add(new BacklogItem(series, time));
-                    App.getInstance().makeAlarm(series);
+            long time = System.currentTimeMillis();
+            series.getBacklog().add(time);
+            App.getInstance().getBacklog().add(new BacklogItem(series, time));
+            App.getInstance().makeAlarm(series);
+            if (App.getInstance().getBacklogFragment().getmAdapter() != null){
+                App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
 
-//                    App.getInstance().getBacklog().add(series);
-                }
             }
         }
 

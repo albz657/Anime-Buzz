@@ -122,15 +122,30 @@ public class MainActivity extends AppCompatActivity
             }
 
         } else {
-            navigationView.getMenu().getItem(1).setChecked(true);
+            if (startupIntent != null) {
+                if (startupIntent.getBooleanExtra("openBacklogFragment", false)) {
+                    navigationView.getMenu().getItem(0).setChecked(true);
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
-                    .commit();
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_main, App.getInstance().getBacklogFragment(), null)
+                            .commit();
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_myshows);
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                    }
+                } else {
+                    navigationView.getMenu().getItem(1).setChecked(true);
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                            .commit();
+
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.fragment_myshows);
+                    }
+                }
             }
+
         }
 
     }

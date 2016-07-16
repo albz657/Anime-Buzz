@@ -39,7 +39,7 @@ public class MalImportHelper {
                 matchedSeries.add(tempSeries);
 
                 if (tempSeries.getAirdate() > 0 && tempSeries.getSimulcast_airdate() > 0) {
-                    App.getInstance().makeAlarm(tempSeries);
+//                    App.getInstance().makeAlarm(tempSeries);
                 }
             }
         }

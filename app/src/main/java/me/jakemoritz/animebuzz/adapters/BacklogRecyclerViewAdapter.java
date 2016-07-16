@@ -71,8 +71,6 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         if (prefersSimulcast) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
-        } else {
-            holder.mSimulcast.setVisibility(View.INVISIBLE);
 
             if (!holder.backlogItem.getSeries().getSimulcast().equals("false")) {
                 holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcast());
@@ -112,6 +110,10 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
                     break;
             }
             background.setColor(colorId);
+        } else {
+            holder.mSimulcast.setVisibility(View.INVISIBLE);
+
+
         }
 
 

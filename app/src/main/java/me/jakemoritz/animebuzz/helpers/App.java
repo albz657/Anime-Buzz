@@ -66,74 +66,12 @@ public class App extends Application {
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
     private boolean justLaunchedMyShows = false;
+    private boolean justLaunchedSeasons = false;
 
     private BacklogFragment backlogFragment;
     private SettingsFragment settingsFragment;
     private SeasonsFragment seasonsFragment;
     private MyShowsFragment myShowsFragment;
-
-
-    public MyShowsFragment getMyShowsFragment() {
-        if (myShowsFragment == null){
-            myShowsFragment = new MyShowsFragment();
-        }
-        return myShowsFragment;
-    }
-
-    public SeasonsFragment getSeasonsFragment() {
-        if (seasonsFragment == null){
-            seasonsFragment = new SeasonsFragment();
-        }
-        return seasonsFragment;
-    }
-
-    public SettingsFragment getSettingsFragment() {
-        if (settingsFragment == null){
-            settingsFragment = new SettingsFragment();
-        }
-        return settingsFragment;
-    }
-
-    public BacklogFragment getBacklogFragment() {
-        if (backlogFragment == null){
-            backlogFragment = new BacklogFragment();
-        }
-        return backlogFragment;
-    }
-
-    public boolean isJustLaunchedSeasons() {
-        return justLaunchedSeasons;
-    }
-
-    public void setJustLaunchedSeasons(boolean justLaunchedSeasons) {
-        this.justLaunchedSeasons = justLaunchedSeasons;
-    }
-
-    private boolean justLaunchedSeasons = false;
-
-
-
-    public boolean isJustLaunchedMyShows() {
-        return justLaunchedMyShows;
-    }
-
-    public void setJustLaunchedMyShows(boolean justLaunchedMyShows) {
-        this.justLaunchedMyShows = justLaunchedMyShows;
-    }
-
-    public List<AlarmHolder> getAlarms() {
-        return alarms;
-    }
-
-    public List<BacklogItem> getBacklog() {
-        return backlog;
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        SQLiteStudioService.instance().stop();
-    }
 
     @Override
     public void onCreate() {
@@ -157,8 +95,8 @@ public class App extends Application {
             loadBacklog();
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
-            backlogDummyData();
-//            dummyAlarm();
+//            backlogDummyData();
+            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();
@@ -171,30 +109,20 @@ public class App extends Application {
         }
     }
 
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        SQLiteStudioService.instance().stop();
+    }
+
     private void dummyAlarm() {
         if (!alarms.isEmpty()) {
-            alarms.get(0).setAlarmTime(1468249800000L);
-        }
-    }
+            long time = System.currentTimeMillis();
+            time += (long) 45000L;
+            alarms.get(0).setAlarmTime(time);
+            alarms.get(1).setAlarmTime(time + (long) 10000L);
 
-    public void rescheduleAlarms() {
-        AlarmManager alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
-        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
-            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-            notificationIntent.putExtra("name", alarm.getSeriesName());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
         }
-
-    }
-
-    public Season getSeasonFromName(String seasonName) {
-        for (Season season : allAnimeSeasons) {
-            if (season.getSeasonMetadata().getName().equals(seasonName)) {
-                return season;
-            }
-        }
-        return null;
     }
 
     private void backlogDummyData() {
@@ -205,6 +133,8 @@ public class App extends Application {
 
         }
     }
+
+    /* HELPERS */
 
     public String formatTime(Long time) {
         Calendar cal = Calendar.getInstance();
@@ -293,35 +223,6 @@ public class App extends Application {
         return generatedLong;
     }
 
-    private void loadBacklog() {
-        for (Series series : userAnimeList) {
-            for (Long episodeTime : series.getBacklog()) {
-                backlog.add(new BacklogItem(series, episodeTime));
-            }
-        }
-
-        Collections.sort(backlog, new BacklogItemComparator());
-    }
-
-    public String getLatestSeasonName() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-    }
-
-
-    public void saveData() {
-        saveAllAnimeSeasonsToDB();
-        saveUserListToDB();
-        saveSeasonsList();
-//        saveAlarms();
-    }
-
-    public void saveAllAnimeSeasonsToDB() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveAllSeriesToDb(allAnimeSeasons);
-        dbHelper.close();
-    }
-
     public boolean isCurrentOrNewer(String seasonName) {
         List<SeasonMetadata> metadataList = new ArrayList<>(seasonsList);
         Collections.sort(metadataList, new SeasonMetadataComparator());
@@ -336,66 +237,6 @@ public class App extends Application {
             }
         }
         return (metadataList.indexOf(pendingSeason) >= metadataList.indexOf(latestSeason));
-    }
-
-    public void saveUserListToDB() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(userAnimeList);
-        dbHelper.close();
-    }
-
-    public void saveNewSeasonData(Season season) {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(removeOlder(season));
-        dbHelper.close();
-    }
-
-    public SeriesList removeOlder(Season season) {
-        SeasonList allSeasonList = new SeasonList(allAnimeSeasons);
-        SeriesList allSeriesList = new SeriesList();
-        Collections.sort(allSeasonList, new SeasonComparator());
-
-        int indexOfThisSeason = -1;
-        for (Season eachSeason : allSeasonList) {
-            if (eachSeason.getSeasonMetadata().getName().equals(season.getSeasonMetadata().getName())) {
-                indexOfThisSeason = allSeasonList.indexOf(eachSeason);
-            }
-        }
-
-        SeasonList newerSeasonList;
-        if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
-            newerSeasonList = new SeasonList(allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size()));
-            for (Season newerSeason : newerSeasonList){
-                allSeriesList.addAll(newerSeason.getSeasonSeries());
-            }
-
-            allSeasonList.get(indexOfThisSeason).getSeasonSeries().addAll(season.getSeasonSeries());
-            SeriesList filteredList = new SeriesList(allSeasonList.get(indexOfThisSeason).getSeasonSeries());
-            for (Series series : season.getSeasonSeries()) {
-                if (allSeriesList.contains(series)){
-                    filteredList.remove(series);
-                }
-            }
-
-
-            return filteredList;
-        } else {
-            return season.getSeasonSeries();
-        }
-    }
-
-    public void loadAnimeFromDB() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.onCreate(dbHelper.getWritableDatabase());
-
-        for (SeasonMetadata metadata : seasonsList) {
-            SeriesList tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
-            if (tempSeason.size() > 0) {
-                allAnimeSeasons.add(new Season(tempSeason, metadata));
-            }
-        }
-        userAnimeList = dbHelper.getSeriesUserWatching();
-        dbHelper.close();
     }
 
     private File getCachedPosterFile(String ANNID, String size) {
@@ -437,56 +278,23 @@ public class App extends Application {
         }
     }
 
-
-    public void saveSeasonsList() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        for (SeasonMetadata seasonMetadata : seasonsList) {
-            dbHelper.saveSeasonMetadataToDb(seasonMetadata);
-        }
-        dbHelper.close();
-    }
-
-    public void loadSeasonsList() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        Cursor res = dbHelper.getAllSeasonMetadata();
-
-        res.moveToFirst();
-
-        for (int i = 0; i < res.getCount(); i++) {
-            SeasonMetadata metadata = dbHelper.getSeasonMetadataWithCursor(res);
-            seasonsList.add(metadata);
-            res.moveToNext();
-        }
-
-        res.close();
-        dbHelper.close();
-    }
-
-    private long getNextEpisodeTime(Series series, boolean simulcastTime) {
-        Calendar cal;
-        if (simulcastTime) {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
-        } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        }
-
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
-
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
-            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-        }
-
-        return nextEpisode.getTimeInMillis();
-    }
-
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    /* ALARMS */
+
+    public void rescheduleAlarms() {
+        alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
+        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+            notificationIntent.putExtra("MALID", alarm.getId());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, 0);
+            alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
+        }
+
     }
 
     public void makeAlarm(Series series) {
@@ -517,7 +325,7 @@ public class App extends Application {
         }
 
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        notificationIntent.putExtra("name", series.getName());
+        notificationIntent.putExtra("MALID", series.getMALID());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
         processNewAlarm(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID()));
@@ -579,7 +387,7 @@ public class App extends Application {
     public void removeAlarm(Series series) {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent deleteIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, 0);
 
         alarmManager.cancel(pendingIntent);
         removeAlarmFromStructure(series.getMALID());
@@ -587,7 +395,205 @@ public class App extends Application {
         Log.d(TAG, "Alarm removed for: " + series.getName());
     }
 
+    /* SAVING */
+
+    public void saveData() {
+        saveAllAnimeSeasonsToDB();
+        saveUserListToDB();
+        saveSeasonsList();
+//        saveAlarms();
+    }
+
+    public void saveAllAnimeSeasonsToDB() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveAllSeriesToDb(allAnimeSeasons);
+        dbHelper.close();
+    }
+
+    public void saveUserListToDB() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveSeriesToDb(userAnimeList);
+        dbHelper.close();
+    }
+
+    public void saveNewSeasonData(Season season) {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.saveSeriesToDb(removeOlder(season));
+        dbHelper.close();
+    }
+
+    public void saveSeasonsList() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        for (SeasonMetadata seasonMetadata : seasonsList) {
+            dbHelper.saveSeasonMetadataToDb(seasonMetadata);
+        }
+        dbHelper.close();
+    }
+
+    public SeriesList removeOlder(Season season) {
+        SeasonList allSeasonList = new SeasonList(allAnimeSeasons);
+        SeriesList allSeriesList = new SeriesList();
+        Collections.sort(allSeasonList, new SeasonComparator());
+
+        int indexOfThisSeason = -1;
+        for (Season eachSeason : allSeasonList) {
+            if (eachSeason.getSeasonMetadata().getName().equals(season.getSeasonMetadata().getName())) {
+                indexOfThisSeason = allSeasonList.indexOf(eachSeason);
+            }
+        }
+
+        SeasonList newerSeasonList;
+        if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
+            newerSeasonList = new SeasonList(allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size()));
+            for (Season newerSeason : newerSeasonList){
+                allSeriesList.addAll(newerSeason.getSeasonSeries());
+            }
+
+            allSeasonList.get(indexOfThisSeason).getSeasonSeries().addAll(season.getSeasonSeries());
+            SeriesList filteredList = new SeriesList(allSeasonList.get(indexOfThisSeason).getSeasonSeries());
+            for (Series series : season.getSeasonSeries()) {
+                if (allSeriesList.contains(series)){
+                    filteredList.remove(series);
+                }
+            }
+
+
+            return filteredList;
+        } else {
+            return season.getSeasonSeries();
+        }
+    }
+
+    /* LOADING */
+
+    public void loadSeasonsList() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        Cursor res = dbHelper.getAllSeasonMetadata();
+
+        res.moveToFirst();
+
+        for (int i = 0; i < res.getCount(); i++) {
+            SeasonMetadata metadata = dbHelper.getSeasonMetadataWithCursor(res);
+            seasonsList.add(metadata);
+            res.moveToNext();
+        }
+
+        res.close();
+        dbHelper.close();
+    }
+
+    public void loadAnimeFromDB() {
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        dbHelper.onCreate(dbHelper.getWritableDatabase());
+
+        for (SeasonMetadata metadata : seasonsList) {
+            SeriesList tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
+            if (tempSeason.size() > 0) {
+                allAnimeSeasons.add(new Season(tempSeason, metadata));
+            }
+        }
+        userAnimeList = dbHelper.getSeriesUserWatching();
+        dbHelper.close();
+    }
+
+    private void loadBacklog() {
+        for (Series series : userAnimeList) {
+            for (Long episodeTime : series.getBacklog()) {
+                backlog.add(new BacklogItem(series, episodeTime));
+            }
+        }
+
+        Collections.sort(backlog, new BacklogItemComparator());
+    }
+
     /* ACCESSORS */
+
+    private long getNextEpisodeTime(Series series, boolean simulcastTime) {
+        Calendar cal;
+        if (simulcastTime) {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+        } else {
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+        }
+
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
+
+        Calendar current = Calendar.getInstance();
+        if (current.compareTo(nextEpisode) > 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        return nextEpisode.getTimeInMillis();
+    }
+
+    public String getLatestSeasonName() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+    }
+
+    public Season getSeasonFromName(String seasonName) {
+        for (Season season : allAnimeSeasons) {
+            if (season.getSeasonMetadata().getName().equals(seasonName)) {
+                return season;
+            }
+        }
+        return null;
+    }
+
+    public MyShowsFragment getMyShowsFragment() {
+        if (myShowsFragment == null){
+            myShowsFragment = new MyShowsFragment();
+        }
+        return myShowsFragment;
+    }
+
+    public SeasonsFragment getSeasonsFragment() {
+        if (seasonsFragment == null){
+            seasonsFragment = new SeasonsFragment();
+        }
+        return seasonsFragment;
+    }
+
+    public SettingsFragment getSettingsFragment() {
+        if (settingsFragment == null){
+            settingsFragment = new SettingsFragment();
+        }
+        return settingsFragment;
+    }
+
+    public BacklogFragment getBacklogFragment() {
+        if (backlogFragment == null){
+            backlogFragment = new BacklogFragment();
+        }
+        return backlogFragment;
+    }
+
+    public boolean isJustLaunchedSeasons() {
+        return justLaunchedSeasons;
+    }
+
+    public void setJustLaunchedSeasons(boolean justLaunchedSeasons) {
+        this.justLaunchedSeasons = justLaunchedSeasons;
+    }
+
+    public boolean isJustLaunchedMyShows() {
+        return justLaunchedMyShows;
+    }
+
+    public void setJustLaunchedMyShows(boolean justLaunchedMyShows) {
+        this.justLaunchedMyShows = justLaunchedMyShows;
+    }
+
+    public List<AlarmHolder> getAlarms() {
+        return alarms;
+    }
+
+    public List<BacklogItem> getBacklog() {
+        return backlog;
+    }
 
     public static synchronized App getInstance() {
         return mInstance;

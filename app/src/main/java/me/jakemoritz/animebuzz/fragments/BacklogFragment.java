@@ -25,7 +25,13 @@ public class BacklogFragment extends Fragment {
 
     private BacklogRecyclerViewAdapter mAdapter;
     private AppCompatActivity activity;
+
+    public BacklogRecyclerViewAdapter getmAdapter() {
+        return mAdapter;
+    }
+
     /**
+
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
