@@ -236,9 +236,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
 
-        DatabaseHelper helper = new DatabaseHelper(mListener.getContext());
+        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
         helper.updateSeriesInDb(item);
-        helper.close();
 
         if (mListener instanceof MyShowsFragment) {
             visibleSeries.remove(item);
@@ -265,9 +264,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         item.setInUserList(true);
         App.getInstance().getUserAnimeList().add(item);
 
-        DatabaseHelper helper = new DatabaseHelper(mListener.getContext());
+        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
         helper.updateSeriesInDb(item);
-        helper.close();
 
         if (mListener instanceof MyShowsFragment) {
             allSeries.clear();

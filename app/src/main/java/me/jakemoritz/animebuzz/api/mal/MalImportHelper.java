@@ -28,7 +28,7 @@ public class MalImportHelper {
     public void matchSeries(List<Integer> currentlyWatchingShowIds){
         SeriesList matchedSeries = new SeriesList();
 
-        DatabaseHelper dbHelper = new DatabaseHelper(App.getInstance());
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
         Cursor res = null;
         for (Integer integer : currentlyWatchingShowIds){
             res = dbHelper.getSeries(integer);

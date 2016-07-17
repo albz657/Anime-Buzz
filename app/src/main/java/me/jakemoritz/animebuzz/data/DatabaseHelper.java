@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonList;
@@ -60,6 +61,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ALARM_ID = "alarmid";
     private static final String KEY_ALARM_NAME = "alarmname";
     private static final String KEY_ALARM_TIME = "alarmtime";
+
+    private static DatabaseHelper mInstance;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -115,9 +118,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    private boolean insertSeries(Series series) {
-        SQLiteDatabase db = getWritableDatabase();
+    public static synchronized DatabaseHelper getInstance(Context context){
+        if (mInstance == null){
+            mInstance = new DatabaseHelper(context);
+        }
+        return mInstance;
+    }
 
+    private boolean insertSeries(Series series) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
@@ -133,49 +141,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
 
-        db.insert(TABLE_ANIME, null, contentValues);
+        App.getInstance().getDatabase().insert(TABLE_ANIME, null, contentValues);
         return true;
     }
 
     public boolean insertAlarm(AlarmHolder alarm) {
-        SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
         contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
         contentValues.put(KEY_ALARM_ID, alarm.getId());
 
-        db.insert(TABLE_ALARMS, null, contentValues);
+        App.getInstance().getDatabase().insert(TABLE_ALARMS, null, contentValues);
         return true;
     }
 
     private boolean insertSeasonMetadata(SeasonMetadata metadata) {
-        SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_SEASON_KEY, metadata.getKey());
         contentValues.put(KEY_SEASON_NAME, metadata.getName());
         contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
 
-        db.insert(TABLE_SEASONS, null, contentValues);
+        App.getInstance().getDatabase().insert(TABLE_SEASONS, null, contentValues);
         return true;
     }
 
     public boolean updateSeasonMetadataInDb(SeasonMetadata metadata) {
-        SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_SEASON_KEY, metadata.getKey());
         contentValues.put(KEY_SEASON_NAME, metadata.getName());
         contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
 
-        db.update(TABLE_SEASONS, contentValues, KEY_SEASON_KEY + " =  ? ", new String[]{metadata.getKey()});
+        App.getInstance().getDatabase().update(TABLE_SEASONS, contentValues, KEY_SEASON_KEY + " =  ? ", new String[]{metadata.getKey()});
         return true;
     }
 
     public boolean updateSeriesInDb(Series series) {
-        SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
@@ -191,52 +191,43 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
 
-        db.update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
+        App.getInstance().getDatabase().update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
     }
 
     public Cursor getSeries(int MALID) {
-        SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
     }
 
     public Cursor getSeasonMetadata(String seasonKey) {
-        SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_SEASONS + " WHERE " + KEY_SEASON_KEY + " = ?", new String[]{seasonKey});
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS + " WHERE " + KEY_SEASON_KEY + " = ?", new String[]{seasonKey});
     }
 
     public Cursor getAllSeries() {
-        SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME, null);
     }
 
 
     public Cursor getAllSeasonMetadata() {
-        SQLiteDatabase db = getReadableDatabase();
-        return db.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
     }
 
     public Integer deleteSeries(int MALID) {
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_ANIME,
+        return App.getInstance().getDatabase().delete(TABLE_ANIME,
                 KEY_MALID + " = ? ",
                 new String[]{String.valueOf(MALID)});
     }
 
     public Integer deleteAlarm(int id){
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
+        return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
     }
 
     public void deleteAllAlarms(){
-        SQLiteDatabase db = getWritableDatabase();
-
-        db.delete(TABLE_ALARMS, null, null);
+        App.getInstance().getDatabase().delete(TABLE_ALARMS, null, null);
     }
 
     public Integer deleteSeasonMetadata(String seasonKey) {
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_SEASONS,
+        return App.getInstance().getDatabase().delete(TABLE_SEASONS,
                 KEY_SEASON_KEY + " = ? ",
                 new String[]{seasonKey});
     }
@@ -244,8 +235,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public SeriesList getSeriesBySeason(String seasonName) {
         SeriesList seriesBySeason = new SeriesList();
 
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
+        Cursor res = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
 
         res.moveToFirst();
 
@@ -292,9 +282,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<AlarmHolder> getAllAlarms() {
-        SQLiteDatabase db = getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+        Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
 
         List<AlarmHolder> alarms = new ArrayList<>();
 
@@ -350,8 +338,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public SeriesList getSeriesUserWatching() {
         SeriesList userList = new SeriesList();
 
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_IS_IN_USER_LIST + " ='" + 1 + "'", null);
+        Cursor res = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_IS_IN_USER_LIST + " ='" + 1 + "'", null);
 
         res.moveToFirst();
 

@@ -17,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         int intentExtra = intent.getIntExtra("MALID", -1);
         if (intentExtra > 0) {
-            DatabaseHelper databaseHelper = new DatabaseHelper(context);
+            DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
             Cursor cursor = databaseHelper.getSeries(intentExtra);
             cursor.moveToFirst();
             Series series = databaseHelper.getSeriesWithCursor(cursor);
@@ -35,6 +35,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                 App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
 
             }
+
+            databaseHelper.updateSeriesInDb(series);
+            cursor.close();
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {

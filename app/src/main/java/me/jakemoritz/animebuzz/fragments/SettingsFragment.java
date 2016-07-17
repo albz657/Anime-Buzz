@@ -221,7 +221,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
 
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
                 .commit();
         malApiClient.getUserList();
         ((MainActivity) activity).navigationView.getMenu().getItem(1).setChecked(true);

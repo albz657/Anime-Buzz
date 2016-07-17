@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -67,6 +68,7 @@ public class App extends Application {
     private AlarmManager alarmManager;
     private boolean justLaunchedMyShows = false;
     private boolean justLaunchedSeasons = false;
+    private SQLiteDatabase database;
 
     private BacklogFragment backlogFragment;
     private SettingsFragment settingsFragment;
@@ -86,6 +88,8 @@ public class App extends Application {
         backlog = new ArrayList<>();
         alarms = new ArrayList<>();
 
+        database = DatabaseHelper.getInstance(this).getWritableDatabase();
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
         if (completedSetup) {
@@ -103,9 +107,6 @@ public class App extends Application {
 //            backlogDummyData();
 
             currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-        } else {
-            DatabaseHelper helper = new DatabaseHelper(this);
-            helper.onCreate(helper.getWritableDatabase());
         }
     }
 
@@ -115,10 +116,12 @@ public class App extends Application {
         SQLiteStudioService.instance().stop();
     }
 
+
+
     private void dummyAlarm() {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
-            time += (long) 45000L;
+            time += (long) 10000L;
             alarms.get(0).setAlarmTime(time);
             alarms.get(1).setAlarmTime(time + (long) 10000L);
 
@@ -340,7 +343,7 @@ public class App extends Application {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         alarms.clear();
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         dbHelper.deleteAllAlarms();
 
         for (Series series : userAnimeList) {
@@ -377,7 +380,7 @@ public class App extends Application {
             if (alarm.getId() == id) {
                 newAlarms.remove(alarm);
 
-                DatabaseHelper dbHelper = new DatabaseHelper(this);
+                DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
                 dbHelper.deleteAlarm(alarm.getId());
             }
         }
@@ -407,27 +410,23 @@ public class App extends Application {
     public void saveAllAnimeSeasonsToDB() {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveAllSeriesToDb(allAnimeSeasons);
-        dbHelper.close();
     }
 
     public void saveUserListToDB() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         dbHelper.saveSeriesToDb(userAnimeList);
-        dbHelper.close();
     }
 
     public void saveNewSeasonData(Season season) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
         dbHelper.saveSeriesToDb(removeOlder(season));
-        dbHelper.close();
     }
 
     public void saveSeasonsList() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         for (SeasonMetadata seasonMetadata : seasonsList) {
             dbHelper.saveSeasonMetadataToDb(seasonMetadata);
         }
-        dbHelper.close();
     }
 
     public SeriesList removeOlder(Season season) {
@@ -479,12 +478,11 @@ public class App extends Application {
         }
 
         res.close();
-        dbHelper.close();
     }
 
     public void loadAnimeFromDB() {
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.onCreate(dbHelper.getWritableDatabase());
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
+//        dbHelper.onCreate(dbHelper.getWritableDatabase());
 
         for (SeasonMetadata metadata : seasonsList) {
             SeriesList tempSeason = dbHelper.getSeriesBySeason(metadata.getName());
@@ -493,7 +491,6 @@ public class App extends Application {
             }
         }
         userAnimeList = dbHelper.getSeriesUserWatching();
-        dbHelper.close();
     }
 
     private void loadBacklog() {
@@ -507,6 +504,14 @@ public class App extends Application {
     }
 
     /* ACCESSORS */
+
+    public SQLiteDatabase getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(SQLiteDatabase database) {
+        this.database = database;
+    }
 
     private long getNextEpisodeTime(Series series, boolean simulcastTime) {
         Calendar cal;

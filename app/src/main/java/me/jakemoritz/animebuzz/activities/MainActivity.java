@@ -6,12 +6,15 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +32,7 @@ import java.io.IOException;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class MainActivity extends AppCompatActivity
@@ -104,7 +108,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
                         .commit();
             } else {
                 navigationView.getMenu().getItem(2).setChecked(true);
@@ -117,7 +121,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), getString(R.string.fragment_seasons))
                         .commit();
             }
 
@@ -126,8 +130,23 @@ public class MainActivity extends AppCompatActivity
                 if (startupIntent.getBooleanExtra("openBacklogFragment", false)) {
                     navigationView.getMenu().getItem(0).setChecked(true);
 
+                    if (App.getInstance().getBacklogFragment().isVisible() && App.getInstance().getBacklogFragment().getmAdapter() != null){
+                        App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
+                    }
+
+                    Fragment visibleFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_watching_queue));
+                    if (visibleFragment != null){
+                        Log.d(TAG, "s");
+                    }
+                    if (getSupportFragmentManager().getBackStackEntryCount() > 0){
+                        FragmentManager.BackStackEntry backStackEntry = getSupportFragmentManager().getBackStackEntryAt(0);
+                        Fragment backStackFragment = (Fragment) backStackEntry;
+                        Log.d(TAG, "s");
+                    }
+
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, App.getInstance().getBacklogFragment(), null)
+                            .replace(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
+                            .addToBackStack(getString(R.string.fragment_watching_queue))
                             .commit();
 
                     if (getSupportActionBar() != null) {
@@ -137,7 +156,7 @@ public class MainActivity extends AppCompatActivity
                     navigationView.getMenu().getItem(1).setChecked(true);
 
                     getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                            .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
                             .commit();
 
                     if (getSupportActionBar() != null) {
@@ -181,7 +200,21 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         App.getInstance().saveData();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!App.getInstance().getDatabase().isOpen()){
+            App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
+        }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        App.getInstance().getDatabase().close();
     }
 
     @Override
@@ -212,7 +245,7 @@ public class MainActivity extends AppCompatActivity
             if (id == R.id.nav_my_shows) {
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
                         .commit();
                 navigationView.getMenu().getItem(1).setChecked(true);
 
@@ -221,7 +254,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_seasons) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), getString(R.string.fragment_seasons))
                         .commit();
                 navigationView.getMenu().getItem(2).setChecked(true);
 
@@ -230,7 +263,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_watching_queue) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getBacklogFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
                         .commit();
                 navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -239,7 +272,7 @@ public class MainActivity extends AppCompatActivity
                 }
             } else if (id == R.id.nav_settings) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, App.getInstance().getSettingsFragment(), null)
+                        .replace(R.id.content_main, App.getInstance().getSettingsFragment(), getString(R.string.action_settings))
                         .commit();
                 navigationView.getMenu().getItem(3).setChecked(true);
 

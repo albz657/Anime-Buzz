@@ -129,7 +129,7 @@ public class SenpaiExportHelper {
 
                     App.getInstance().setCurrentlyBrowsingSeasonName(response.body().getSeasonMetadata().getName());
 
-                    DatabaseHelper databaseHelper = new DatabaseHelper(App.getInstance());
+                    DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
                     databaseHelper.saveSeasonMetadataToDb(response.body().getSeasonMetadata());
 
                     fragment.seasonDataRetrieved(response.body());
