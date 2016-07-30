@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class SeasonsSpinnerAdapter extends BaseAdapter {
 
@@ -60,6 +61,15 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
         textView.setText(seasonNames.get(position));
+
+        if (seasonNames.get(position).equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
+            textView.setBackgroundColor(0xFFECEFF1);
+        } else {
+            textView.setBackgroundResource(0);
+//            textView.setBackgroundColor(App.getInstance().getResources().getColor(android.R.color.white));
+
+        }
+
         return convertView;
     }
 }
