@@ -85,6 +85,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         container.removeAllViews();
+        container.clearDisappearingChildren();
         seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
 
@@ -143,6 +144,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void malDataRead() {
-
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -39,7 +39,7 @@ public class MalImportHelper {
                 matchedSeries.add(tempSeries);
 
                 if (tempSeries.getAirdate() > 0 && tempSeries.getSimulcast_airdate() > 0) {
-//                    App.getInstance().makeAlarm(tempSeries);
+                    App.getInstance().makeAlarm(tempSeries);
                 }
             }
         }
@@ -50,12 +50,13 @@ public class MalImportHelper {
 
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
 
+        fragment.mAdapter.getVisibleSeries().clear();
+        fragment.mAdapter.getVisibleSeries().addAll(App.getInstance().getUserAnimeList());
+
         if (fragment instanceof MyShowsFragment){
             ((MyShowsFragment) fragment).loadUserSortingPreference();
-        } else {
-            fragment.mAdapter.getVisibleSeries().clear();
-            fragment.mAdapter.getVisibleSeries().addAll(fragment.mAdapter.getAllSeries());
         }
+
         App.getInstance().saveUserListToDB();
         delegate.malDataRead();
     }

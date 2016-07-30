@@ -75,6 +75,7 @@ public class BacklogFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         container.removeAllViews();
+        container.clearDisappearingChildren();
 
         View view = inflater.inflate(R.layout.fragment_backlog, container, false);
 

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -177,10 +176,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean updateSeriesInDb(Series series) {
-        if (series.getName().equals("Momokuri")){
-            Log.d(TAG, "s");
-        }
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
