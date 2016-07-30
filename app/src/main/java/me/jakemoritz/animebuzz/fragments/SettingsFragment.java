@@ -201,14 +201,14 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         container.removeAllViews();
-
+        container.clearDisappearingChildren();
         return super.onCreateView(inflater, container, savedInstanceState);
 
     }
 
     public void addToMAL(boolean add) {
 
-        MalApiClient malApiClient = new MalApiClient(App.getInstance().getMyShowsFragment());
+        MalApiClient malApiClient = new MalApiClient(new MyShowsFragment());
 
         if (!add) {
             for (Series series : App.getInstance().getUserAnimeList()){
@@ -222,7 +222,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
 
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
+                .replace(R.id.content_main, new MyShowsFragment(), getString(R.string.fragment_myshows))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         malApiClient.getUserList();

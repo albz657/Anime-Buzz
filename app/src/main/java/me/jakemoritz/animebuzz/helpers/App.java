@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
@@ -29,12 +30,10 @@ import java.util.List;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
-import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
@@ -70,10 +69,7 @@ public class App extends Application {
     private boolean justLaunchedSeasons = false;
     private SQLiteDatabase database;
 
-    private BacklogFragment backlogFragment;
-    private SettingsFragment settingsFragment;
-    private SeasonsFragment seasonsFragment;
-    private MyShowsFragment myShowsFragment;
+    private MainActivity mainActivity;
 
     @Override
     public void onCreate() {
@@ -100,7 +96,7 @@ public class App extends Application {
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
 //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();
@@ -119,10 +115,12 @@ public class App extends Application {
     private void dummyAlarm() {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
-            time += (long) 10000L;
+            time += 5000L;
             alarms.get(0).setAlarmTime(time);
-            alarms.get(1).setAlarmTime(time + (long) 10000L);
-
+            time += 5000L;
+            alarms.get(1).setAlarmTime(time);
+            time += 5000L;
+            alarms.get(2).setAlarmTime(time);
         }
     }
 
@@ -285,6 +283,20 @@ public class App extends Application {
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
+    public void refreshBacklog(){
+        if (mainActivity != null){
+            if (mainActivity.getSupportFragmentManager().getFragments() != null){
+                for (Fragment fragment : mainActivity.getSupportFragmentManager().getFragments()){
+                    if (fragment instanceof BacklogFragment){
+                        if (((BacklogFragment) fragment).getmAdapter() != null){
+                            ((BacklogFragment) fragment).getmAdapter().notifyDataSetChanged();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /* ALARMS */
 
     public void rescheduleAlarms() {
@@ -335,6 +347,7 @@ public class App extends Application {
         SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
         String formattedNext = format.format(nextEpisode.getTime());
         Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
+
     }
 
     public void switchAlarmTiming(boolean prefersSimulcast) {
@@ -558,34 +571,6 @@ public class App extends Application {
         return null;
     }
 
-    public MyShowsFragment getMyShowsFragment() {
-        if (myShowsFragment == null){
-            myShowsFragment = new MyShowsFragment();
-        }
-        return myShowsFragment;
-    }
-
-    public SeasonsFragment getSeasonsFragment() {
-        if (seasonsFragment == null){
-            seasonsFragment = new SeasonsFragment();
-        }
-        return seasonsFragment;
-    }
-
-    public SettingsFragment getSettingsFragment() {
-        if (settingsFragment == null){
-            settingsFragment = new SettingsFragment();
-        }
-        return settingsFragment;
-    }
-
-    public BacklogFragment getBacklogFragment() {
-        if (backlogFragment == null){
-            backlogFragment = new BacklogFragment();
-        }
-        return backlogFragment;
-    }
-
     public boolean isJustLaunchedSeasons() {
         return justLaunchedSeasons;
     }
@@ -666,5 +651,13 @@ public class App extends Application {
 
     public void setPostInitializing(boolean postInitializing) {
         this.postInitializing = postInitializing;
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 }

@@ -40,10 +40,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             series.getBacklog().add(time);
             App.getInstance().getBacklog().add(new BacklogItem(series, time));
             App.getInstance().makeAlarm(series);
-            if (App.getInstance().getBacklogFragment().getmAdapter() != null){
+
+            App.getInstance().refreshBacklog();
+            /*if (App.getInstance().getBacklogFragment().getmAdapter() != null){
                 App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
 
-            }
+            }*/
 
 //            databaseHelper.updateSeriesInDb(series);
 //            cursor.close();

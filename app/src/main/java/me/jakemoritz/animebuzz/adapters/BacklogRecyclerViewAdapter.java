@@ -7,7 +7,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,9 +126,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     @Override
     public void onItemDismiss(int position) {
         Series series = seriesList.get(position).getSeries();
-        if (series.getName().equals("Momokuri")){
-            Log.d("TAG", "s");
-        }
+
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
 //        series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
         DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
