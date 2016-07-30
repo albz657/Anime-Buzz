@@ -68,6 +68,7 @@ public class App extends Application {
     private boolean justLaunchedMyShows = false;
     private boolean justLaunchedSeasons = false;
     private SQLiteDatabase database;
+    private List<SeasonMetadata> syncingSeasons;
 
     private MainActivity mainActivity;
 
@@ -659,5 +660,13 @@ public class App extends Application {
 
     public void setMainActivity(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
+    }
+
+    public List<SeasonMetadata> getSyncingSeasons() {
+        return syncingSeasons;
+    }
+
+    public void setSyncingSeasons(List<SeasonMetadata> syncingSeasons) {
+        this.syncingSeasons = syncingSeasons;
     }
 }

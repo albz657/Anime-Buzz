@@ -15,6 +15,7 @@ import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -46,6 +47,15 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     public CircularProgressView progressView;
     public RelativeLayout progressViewHolder;
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (App.getInstance().isInitializing()){
+            return true;
+        } else {
+            return super.dispatchTouchEvent(ev);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +113,8 @@ public class MainActivity extends AppCompatActivity
             if (loggedIn) {
                 navigationView.getMenu().getItem(1).setChecked(true);
 
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(new MyShowsFragment());
+                MyShowsFragment myShowsFragment = new MyShowsFragment();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(myShowsFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
                 if (getSupportActionBar() != null) {
@@ -111,13 +122,14 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, new MyShowsFragment(), getString(R.string.fragment_myshows))
+                        .replace(R.id.content_main, myShowsFragment, getString(R.string.fragment_myshows))
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
             } else {
                 navigationView.getMenu().getItem(2).setChecked(true);
 
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(new SeasonsFragment());
+                SeasonsFragment seasonsFragment = new SeasonsFragment();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
                 if (getSupportActionBar() != null) {
@@ -125,7 +137,7 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.content_main, new SeasonsFragment(), getString(R.string.fragment_seasons))
+                        .replace(R.id.content_main, seasonsFragment, getString(R.string.fragment_seasons))
                         .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
             }

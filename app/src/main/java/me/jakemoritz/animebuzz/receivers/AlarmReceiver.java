@@ -31,7 +31,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 }
             }
 
-            NotificationHelper helper = new NotificationHelper(context);
+            NotificationHelper helper = new NotificationHelper();
             helper.createNewEpisodeNotification(series);
 
             App.getInstance().removeAlarmFromStructure(series.getMALID());

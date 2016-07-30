@@ -178,9 +178,10 @@ public class MyShowsFragment extends SeriesFragment {
     @Override
     public void seasonPostersImported() {
         if (App.getInstance().isInitializing()) {
-            malApiClient.getUserList();
+            new MalApiClient(this).getUserList();
 
-            TextView loadingText = (TextView) ((MainActivity) activity).progressViewHolder.findViewById(R.id.loading_text);
+
+            TextView loadingText = (TextView) App.getInstance().getMainActivity().progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
         if (updating) {

@@ -56,7 +56,7 @@
     <string name="file_avatar">malavatar</string>
 
     <!--Notifications-->
-    <string name="notification_list_update">Updating anime data</string>
+    <string name="notification_list_update">Downloading other season data</string>
 
     <!--SharedPreferences-->
     <string name="shared_prefs_logged_in">isuserloggedin</string>

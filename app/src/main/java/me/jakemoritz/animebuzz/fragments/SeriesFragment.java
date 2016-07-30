@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -20,6 +22,7 @@ import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.MalDataRead;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.ReadSeasonListResponse;
@@ -120,6 +123,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().setGettingCurrentBrowsing(true);
         }
         if (App.getInstance().isNetworkAvailable()){
+            if (helper == null){
+                helper = new ANNSearchHelper();
+            }
             helper.getImages(this, season.getSeasonSeries());
         } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -131,14 +137,17 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
         if (App.getInstance().isPostInitializing()) {
-            //Collections.reverse(App.getInstance().getSeasonsList());
+
+            App.getInstance().setSyncingSeasons(new ArrayList<SeasonMetadata>());
+
             for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()) {
                 if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
-                    SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(this);
-                    senpaiExportHelper.getSeasonData(seasonMetadata);
+                    App.getInstance().getSyncingSeasons().add(seasonMetadata);
                 }
             }
-            App.getInstance().setPostInitializing(false);
+
+            Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonMetadataComparator());
+            senpaiExportHelper.getSeasonData(App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1));
         }
     }
 
