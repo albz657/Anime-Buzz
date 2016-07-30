@@ -7,6 +7,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import java.io.File;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -45,7 +47,6 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.backlogItem = seriesList.get(position);
         holder.mTitle.setText(holder.backlogItem.getSeries().getName());
-
 
         Picasso picasso = Picasso.with(App.getInstance());
         if (holder.backlogItem.getSeries().getANNID() > 0) {
@@ -113,12 +114,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);
 
-
         }
 
-
         holder.mDate.setText(App.getInstance().formatTime(holder.backlogItem.getAlarmTime()));
-
     }
 
     @Override
@@ -129,7 +127,12 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     @Override
     public void onItemDismiss(int position) {
         Series series = seriesList.get(position).getSeries();
-        series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
+        if (series.getName().equals("Momokuri")){
+            Log.d("TAG", "s");
+        }
+        series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
+//        series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
+        DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
 
         notifyDataSetChanged();
     }

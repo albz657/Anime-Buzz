@@ -49,13 +49,12 @@ public class MalImportHelper {
         }
 
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
-        fragment.mAdapter.getAllSeries().clear();
-        fragment.mAdapter.getAllSeries().addAll(matchedSeries);
-        fragment.mAdapter.getVisibleSeries().clear();
-        fragment.mAdapter.getVisibleSeries().addAll(fragment.mAdapter.getAllSeries());
 
         if (fragment instanceof MyShowsFragment){
             ((MyShowsFragment) fragment).loadUserSortingPreference();
+        } else {
+            fragment.mAdapter.getVisibleSeries().clear();
+            fragment.mAdapter.getVisibleSeries().addAll(fragment.mAdapter.getAllSeries());
         }
         App.getInstance().saveUserListToDB();
         delegate.malDataRead();

@@ -116,8 +116,6 @@ public class App extends Application {
         SQLiteStudioService.instance().stop();
     }
 
-
-
     private void dummyAlarm() {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
@@ -414,12 +412,12 @@ public class App extends Application {
 
     public void saveUserListToDB() {
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-        dbHelper.saveSeriesToDb(userAnimeList);
+        dbHelper.saveSeriesListToDb(userAnimeList);
     }
 
     public void saveNewSeasonData(Season season) {
         DatabaseHelper dbHelper = new DatabaseHelper(this);
-        dbHelper.saveSeriesToDb(removeOlder(season));
+        dbHelper.saveSeriesListToDb(removeOlder(season));
     }
 
     public void saveSeasonsList() {
@@ -490,7 +488,19 @@ public class App extends Application {
                 allAnimeSeasons.add(new Season(tempSeason, metadata));
             }
         }
-        userAnimeList = dbHelper.getSeriesUserWatching();
+        userAnimeList = loadUserList();
+    }
+
+    public SeriesList loadUserList(){
+        SeriesList userList = new SeriesList();
+        for (Season season : allAnimeSeasons){
+            for (Series series : season.getSeasonSeries()){
+                if (series.isInUserList()){
+                    userList.add(series);
+                }
+            }
+        }
+        return userList;
     }
 
     private void loadBacklog() {

@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.models;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -15,6 +17,9 @@ public class SeriesList extends ArrayList<Series> {
 
     @Override
     public boolean add(Series series) {
+        if (series.getName().equals("Momokuri")){
+            Log.d("TAG", "s");
+        }
         if (contains(series)) {
             int index = indexOf(series);
             Series currentEntry = get(index);

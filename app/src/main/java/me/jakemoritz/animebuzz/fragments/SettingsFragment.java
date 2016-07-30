@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
@@ -222,6 +223,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         activity.getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         malApiClient.getUserList();
         ((MainActivity) activity).navigationView.getMenu().getItem(1).setChecked(true);

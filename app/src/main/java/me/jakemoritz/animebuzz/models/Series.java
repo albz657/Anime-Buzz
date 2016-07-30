@@ -1,8 +1,10 @@
 package me.jakemoritz.animebuzz.models;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class Series {
 
@@ -113,12 +115,14 @@ public class Series {
     }
 
     public void removeFromBacklog(long time) {
-        for (Iterator backlogIterator = backlog.iterator(); backlogIterator.hasNext();) {
+        backlog.remove(time);
+        DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(this);
+/*        for (Iterator backlogIterator = backlog.iterator(); backlogIterator.hasNext();) {
             long episodeTime = (long) backlogIterator.next();
             if (episodeTime == time) {
                 backlog.remove(episodeTime);
             }
-        }
+        }*/
     }
 
     @Override

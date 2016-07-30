@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -176,6 +177,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean updateSeriesInDb(Series series) {
+        if (series.getName().equals("Momokuri")){
+            Log.d(TAG, "s");
+        }
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
@@ -263,10 +268,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         for (Season season : allSeries) {
             allSeriesList.addAll(season.getSeasonSeries());
         }
-        saveSeriesToDb(allSeriesList);
+        saveSeriesListToDb(allSeriesList);
     }
 
-    public void saveSeriesToDb(SeriesList seriesList) {
+    public void saveSeriesListToDb(SeriesList seriesList) {
         Cursor cursor = null;
         for (Series series : seriesList) {
             cursor = getSeries(series.getMALID());
@@ -278,6 +283,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (cursor != null) {
             cursor.close();
+        }
+    }
+
+    public void saveSeriesToDb(Series series){
+        Cursor cursor = getSeries(series.getMALID());
+        if (cursor.getCount() != 0) {
+            updateSeriesInDb(series);
+        } else {
+            insertSeries(series);
         }
     }
 

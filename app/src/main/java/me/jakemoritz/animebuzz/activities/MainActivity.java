@@ -6,15 +6,13 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,7 +47,6 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         Intent startupIntent = getIntent();
         if (startupIntent != null) {
@@ -109,6 +106,7 @@ public class MainActivity extends AppCompatActivity
 
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
             } else {
                 navigationView.getMenu().getItem(2).setChecked(true);
@@ -122,6 +120,7 @@ public class MainActivity extends AppCompatActivity
 
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), getString(R.string.fragment_seasons))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
             }
 
@@ -130,33 +129,35 @@ public class MainActivity extends AppCompatActivity
                 if (startupIntent.getBooleanExtra("openBacklogFragment", false)) {
                     navigationView.getMenu().getItem(0).setChecked(true);
 
-                    if (App.getInstance().getBacklogFragment().isVisible() && App.getInstance().getBacklogFragment().getmAdapter() != null){
-                        App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
-                    }
+                    /*if (App.getInstance().getBacklogFragment().isVisible()){
+                        for (Fragment fragment : getSupportFragmentManager().getFragments()){
+                            getSupportFragmentManager().beginTransaction()
+                                    .remove(fragment)
+                                    .commit();
+                        }
 
-                    Fragment visibleFragment = getSupportFragmentManager().findFragmentByTag(getString(R.string.fragment_watching_queue));
-                    if (visibleFragment != null){
-                        Log.d(TAG, "s");
-                    }
-                    if (getSupportFragmentManager().getBackStackEntryCount() > 0){
-                        FragmentManager.BackStackEntry backStackEntry = getSupportFragmentManager().getBackStackEntryAt(0);
-                        Fragment backStackFragment = (Fragment) backStackEntry;
-                        Log.d(TAG, "s");
-                    }
+                        /*getSupportFragmentManager().beginTransaction()
+                                .add(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                .commit();
+                    } else {*/
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
+                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                                .commit();
 
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
-                            .addToBackStack(getString(R.string.fragment_watching_queue))
-                            .commit();
+                        if (getSupportActionBar() != null) {
+                            getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                        }
+                  //  }
 
-                    if (getSupportActionBar() != null) {
-                        getSupportActionBar().setTitle(R.string.fragment_watching_queue);
-                    }
+
                 } else {
                     navigationView.getMenu().getItem(1).setChecked(true);
 
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
+                            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                             .commit();
 
                     if (getSupportActionBar() != null) {
@@ -205,7 +206,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (!App.getInstance().getDatabase().isOpen()){
+        if (!App.getInstance().getDatabase().isOpen()) {
             App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
         }
 
@@ -214,7 +215,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        App.getInstance().getDatabase().close();
+//        App.getInstance().getDatabase().close();
     }
 
     @Override
@@ -246,6 +247,7 @@ public class MainActivity extends AppCompatActivity
 
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getMyShowsFragment(), getString(R.string.fragment_myshows))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
                 navigationView.getMenu().getItem(1).setChecked(true);
 
@@ -255,6 +257,7 @@ public class MainActivity extends AppCompatActivity
             } else if (id == R.id.nav_seasons) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getSeasonsFragment(), getString(R.string.fragment_seasons))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
                 navigationView.getMenu().getItem(2).setChecked(true);
 
@@ -264,6 +267,7 @@ public class MainActivity extends AppCompatActivity
             } else if (id == R.id.nav_watching_queue) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
                 navigationView.getMenu().getItem(0).setChecked(true);
 
@@ -273,6 +277,7 @@ public class MainActivity extends AppCompatActivity
             } else if (id == R.id.nav_settings) {
                 getSupportFragmentManager().beginTransaction()
                         .replace(R.id.content_main, App.getInstance().getSettingsFragment(), getString(R.string.action_settings))
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                         .commit();
                 navigationView.getMenu().getItem(3).setChecked(true);
 

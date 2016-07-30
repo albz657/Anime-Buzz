@@ -90,6 +90,7 @@ public class MyShowsFragment extends SeriesFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        activity.getSupportFragmentManager().getFragments().size();
         if (id == R.id.action_sort) {
             PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_sort));
             popupMenu.inflate(R.menu.sort_menu);
@@ -110,11 +111,6 @@ public class MyShowsFragment extends SeriesFragment {
             });
             popupMenu.show();
             return true;
-        } else if (id == R.id.action_get) {
-            MalApiClient malApiClient = new MalApiClient(this);
-//            malApiClient.addAnime("s");
-            malApiClient.getUserList();
-//            malApiClient.deleteAnime("23");
         }
         return super.onOptionsItemSelected(item);
     }
