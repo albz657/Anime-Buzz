@@ -97,7 +97,7 @@ public class App extends Application {
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
 //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();
@@ -116,7 +116,7 @@ public class App extends Application {
     private void dummyAlarm() {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
-            time += 5000L;
+            time -= 5000L;
             alarms.get(0).setAlarmTime(time);
             time += 5000L;
             alarms.get(1).setAlarmTime(time);

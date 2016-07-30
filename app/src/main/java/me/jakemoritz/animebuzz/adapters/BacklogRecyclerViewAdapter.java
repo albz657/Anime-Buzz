@@ -20,11 +20,12 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter {
+public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
     private final List<BacklogItem> seriesList;
     public ItemTouchHelper touchHelper;
@@ -127,8 +128,27 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     public void onItemDismiss(int position) {
         Series series = seriesList.get(position).getSeries();
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean loggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
+
+        if (loggedIn){
+            IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
+            dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
+        } else {
+            series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
+            DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
+
+            notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void incrementDialogClosed(boolean accepted, Series series, int position) {
+        if (accepted){
+
+        }
+
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-//        series.removeFromBacklog(seriesList.remove(position).getAlarmTime());
         DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
 
         notifyDataSetChanged();
