@@ -176,11 +176,11 @@ public class App extends Application {
     }
 
     public String formatAiringTime(Series series, boolean prefersSimulcast) {
-        Calendar cal = Calendar.getInstance();
+        Calendar cal;
         if (prefersSimulcast) {
-            cal.setTimeInMillis(series.getNextEpisodeSimulcastTime());
+            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
         } else {
-            cal.setTimeInMillis(series.getNextEpisodeAirtime());
+            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
         }
 
         Calendar nextEpisode = Calendar.getInstance();
