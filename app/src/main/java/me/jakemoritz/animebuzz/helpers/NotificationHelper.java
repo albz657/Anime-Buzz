@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.helpers;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -45,6 +46,8 @@ public class NotificationHelper {
                         .setContentText(series.getName())
                         .setContentTitle("New episode released");
 
+
+
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         resultIntent.putExtra("openBacklogFragment", true);
 
@@ -55,7 +58,11 @@ public class NotificationHelper {
 
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(series.getMALID(), mBuilder.build());
+
+        Notification notification = mBuilder.build();
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+
+        mNotificationManager.notify(series.getMALID(), notification);
     }
 
 }

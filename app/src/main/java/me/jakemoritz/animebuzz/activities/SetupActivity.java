@@ -22,9 +22,9 @@ import android.widget.TextView;
 import com.redbooth.WelcomeCoordinatorLayout;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
-import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 
 public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
 
@@ -40,6 +40,8 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
 
+//        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+        getSupportActionBar().hide();
 
         final Activity activity = this;
         malApiClient = new MalApiClient(this);
