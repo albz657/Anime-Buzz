@@ -31,6 +31,7 @@ public class SeriesList extends ArrayList<Series> {
             currentEntry.setANNID(series.getANNID());
             currentEntry.setSimulcast_delay(series.getSimulcast_delay());
             currentEntry.setSeason(series.getSeason());
+            currentEntry.setEpisodesWatched(series.getEpisodesWatched());
 
             return true;
         } else {

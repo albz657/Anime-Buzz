@@ -5,6 +5,7 @@ import android.database.Cursor;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -25,17 +26,18 @@ public class MalImportHelper {
         this.delegate = delegate;
     }
 
-    public void matchSeries(List<Integer> currentlyWatchingShowIds){
+    public void matchSeries(List<MatchHolder> matchList){
         SeriesList matchedSeries = new SeriesList();
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
         Cursor res = null;
-        for (Integer integer : currentlyWatchingShowIds){
-            res = dbHelper.getSeries(integer);
+        for (MatchHolder match : matchList){
+            res = dbHelper.getSeries(match.getMALID());
             if (res.getCount() > 0){
                 res.moveToFirst();
                 Series tempSeries = dbHelper.getSeriesWithCursor(res);
                 tempSeries.setInUserList(true);
+                tempSeries.setEpisodesWatched(match.getEpisodesWatched());
                 matchedSeries.add(tempSeries);
 
                 if (tempSeries.getAirdate() > 0 && tempSeries.getSimulcast_airdate() > 0) {

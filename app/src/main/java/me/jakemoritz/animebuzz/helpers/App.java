@@ -120,8 +120,8 @@ public class App extends Application {
             alarms.get(0).setAlarmTime(time);
             time += 5000L;
             alarms.get(1).setAlarmTime(time);
-            time += 5000L;
-            alarms.get(2).setAlarmTime(time);
+            /*time += 5000L;
+            alarms.get(2).setAlarmTime(time);*/
         }
     }
 

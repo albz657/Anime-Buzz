@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -145,7 +146,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     @Override
     public void incrementDialogClosed(boolean accepted, Series series, int position) {
         if (accepted){
-
+            new MalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
         }
 
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());

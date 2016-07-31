@@ -12,6 +12,14 @@ public class AnimeListHolder {
     @Element(name="my_status")
     private String my_status;
 
+    @Element(name="my_watched_episodes")
+    private String my_watched_episodes;
+
+
+    public String getMy_watched_episodes() {
+        return my_watched_episodes;
+    }
+
     public String getMALID() {
         return MALID;
     }

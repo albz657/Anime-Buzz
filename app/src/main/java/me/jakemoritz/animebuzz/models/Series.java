@@ -21,6 +21,7 @@ public class Series {
     private long nextEpisodeAirtime;
     private long nextEpisodeSimulcastTime;
     private List<Long> backlog;
+    private int episodesWatched;
 
     public void setAirdate(int airdate) {
         this.airdate = airdate;
@@ -114,6 +115,14 @@ public class Series {
         return backlog;
     }
 
+    public int getEpisodesWatched() {
+        return episodesWatched;
+    }
+
+    public void setEpisodesWatched(int episodesWatched) {
+        this.episodesWatched = episodesWatched;
+    }
+
     public void removeFromBacklog(long time) {
         backlog.remove(time);
         DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(this);
@@ -154,9 +163,10 @@ public class Series {
         this.backlog = new ArrayList<>();
         this.nextEpisodeAirtime = 0;
         this.nextEpisodeSimulcastTime = 0;
+        this.episodesWatched = 0;
     }
 
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime) {
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched) {
         this.airdate = airdate;
         this.name = name;
         this.MALID = MALID;
@@ -170,6 +180,7 @@ public class Series {
         this.backlog = backlog;
         this.nextEpisodeAirtime = nextEpisodeAirtime;
         this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
+        this.episodesWatched = episodesWatched;
     }
 
 }
