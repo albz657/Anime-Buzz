@@ -15,7 +15,8 @@
             android:title="@string/pref_ringtone_title"
             android:showSilent="true"
             android:showDefault="true"
-            android:ringtoneType="notification" />
+            android:ringtoneType="notification"
+            android:defaultValue="content://settings/system/notification_sound"/>
 
         <SwitchPreference
             android:defaultValue="true"

@@ -154,6 +154,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
 
         ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
+
         setRingtoneSummary();
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
