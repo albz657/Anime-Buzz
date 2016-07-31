@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -82,9 +83,14 @@ public class ANNSearchHelper {
 
     private void getPictureUrlBatch(SeriesList seriesList) {
         if (!seriesList.isEmpty()) {
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(1, TimeUnit.MINUTES)
+                    .readTimeout(1, TimeUnit.MINUTES)
+                    .build();
+
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("http://cdn.animenewsnetwork.com/")
-                    .client(new OkHttpClient())
+                    .client(client)
                     .addConverterFactory(SimpleXmlConverterFactory.create())
                     .build();
 

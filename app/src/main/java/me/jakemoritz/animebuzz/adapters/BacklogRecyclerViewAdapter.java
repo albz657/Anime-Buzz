@@ -130,9 +130,10 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         Series series = seriesList.get(position).getSeries();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean displayPrompt = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_increment_key), true);
         boolean loggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
 
-        if (loggedIn){
+        if (displayPrompt && loggedIn) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
@@ -145,7 +146,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void incrementDialogClosed(boolean accepted, Series series, int position) {
-        if (accepted){
+        if (accepted) {
             new MalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
         }
 

@@ -7,7 +7,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_simulcast_key"
-            android:summary="@string/pref_airing_summary"
+            android:summary="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
     </PreferenceCategory>
 
@@ -21,21 +21,24 @@
             android:summary="@string/pref_24hour_summary"
             android:title="@string/pref_24hour_title" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_increment_key"
+            android:summary="@string/pref_increment_summary"
+            android:title="@string/pref_increment_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="@string/pref_category_account_key"
+        android:title="@string/pref_category_account_title">
 
         <Preference
-            android:title="Sign out from your MAL account"
-            android:summary="You are currently signed in."/>
+            android:summary="You are currently signed in."
+            android:title="Sign out from your MAL account" />
 
         <Preference
-            android:title="Sign in to your MAL account"
-            android:summary="You are currently signed out."/>
-<!--        <me.jakemoritz.animebuzz.dialogs.AccountDialogPreference
-            android:key="@+id/pref_account"
-            android:title="@string/pref_account"
-            android:summary="@string/pref_account_summary_off"
-            android:dialogTitle="@string/pref_account"
-            android:positiveButtonText="@string/pref_account_signout"
-            android:negativeButtonText="@string/pref_account_cancel"
-            android:dialogMessage="Dial" />-->
+            android:summary="You are currently signed out."
+            android:title="Sign in to your MAL account" />
     </PreferenceCategory>
 </PreferenceScreen>

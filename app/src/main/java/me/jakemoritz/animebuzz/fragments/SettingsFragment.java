@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
+import net.xpece.android.support.preference.SwitchPreference;
 
 import java.io.File;
 
@@ -40,6 +41,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     Preference signOutPreference;
     public AppCompatActivity activity;
 
+    SwitchPreference simulcastPreference;
+    SwitchPreference format24hourPreference;
+    SwitchPreference incrementPreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,41 +67,42 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
 
-        Preference airingOrSimulcastPref = findPreference(getString(R.string.pref_simulcast_key));
         if (prefersSimulcast) {
-            airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
+            simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
         } else {
-            airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
+            simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
         }
 
         boolean prefers24Hour = sharedPreferences.getBoolean(getString(R.string.pref_24hour_key), false);
 
-        Preference timeFormatPref = findPreference(getString(R.string.pref_24hour_key));
         if (prefers24Hour) {
-            timeFormatPref.setSummary(getString(R.string.pref_24hour_off_summary));
+            format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
         } else {
-            timeFormatPref.setSummary(getString(R.string.pref_24hour_summary));
+            format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
         }
     }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))) {
-            Preference airingOrSimulcastPref = findPreference(s);
-            if (airingOrSimulcastPref.getSummary().toString().equals(getString(R.string.pref_airing_summary))) {
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_simulcast_summary));
+            if (simulcastPreference.isChecked()) {
+                simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
                 App.getInstance().switchAlarmTiming(true);
             } else {
-                airingOrSimulcastPref.setSummary(getString(R.string.pref_airing_summary));
+                simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
                 App.getInstance().switchAlarmTiming(false);
-
             }
         } else if (s.equals(getString(R.string.pref_24hour_key))) {
-            Preference pref24HourSummary = findPreference(s);
-            if (pref24HourSummary.getSummary().toString().equals(getString(R.string.pref_24hour_summary))) {
-                pref24HourSummary.setSummary(getString(R.string.pref_24hour_off_summary));
+            if (format24hourPreference.isChecked()) {
+                format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
             } else {
-                pref24HourSummary.setSummary(getString(R.string.pref_24hour_summary));
+                format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
+            }
+        } else if (s.equals(getString(R.string.pref_increment_key))) {
+            if (incrementPreference.isChecked()) {
+                incrementPreference.setSummary(getString(R.string.pref_increment_summary));
+            } else {
+                incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
             }
         }
     }
@@ -131,8 +136,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
-        PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_category_misc_key));
-        signOutPreference = preferenceCategory.getPreference(1);
+        PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_category_account_key));
+        signOutPreference = preferenceCategory.getPreference(0);
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
@@ -147,7 +152,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         });
 
-        signInPreference = preferenceCategory.getPreference(2);
+        signInPreference = preferenceCategory.getPreference(1);
         signInPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -169,17 +174,21 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             signInPreference.setVisible(true);
             signOutPreference.setVisible(false);
         }
+
+        simulcastPreference = (SwitchPreference) findPreference(getString(R.string.pref_simulcast_key));
+        format24hourPreference = (SwitchPreference) findPreference(getString(R.string.pref_24hour_key));
+        incrementPreference = (SwitchPreference) findPreference(getString(R.string.pref_increment_key));
     }
 
     public void signOut(Preference preference) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        SharedPreferences.Editor editr = sharedPreferences.edit();
-        editr.putBoolean(getString(R.string.shared_prefs_logged_in), false);
-        editr.putString(getString(R.string.credentials_password), "");
-        editr.putString(getString(R.string.credentials_username), "");
-        editr.putString(getString(R.string.mal_username_formatted), "");
-        editr.putString(getString(R.string.mal_userid), "");
-        editr.apply();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.shared_prefs_logged_in), false);
+        editor.putString(getString(R.string.credentials_password), "");
+        editor.putString(getString(R.string.credentials_username), "");
+        editor.putString(getString(R.string.mal_username_formatted), "");
+        editor.putString(getString(R.string.mal_userid), "");
+        editor.apply();
 
         File avatarFile = new File(activity.getFilesDir(), getString(R.string.file_avatar));
         if (avatarFile.exists()) {
@@ -211,12 +220,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         MalApiClient malApiClient = new MalApiClient(new MyShowsFragment());
 
         if (!add) {
-            for (Series series : App.getInstance().getUserAnimeList()){
+            for (Series series : App.getInstance().getUserAnimeList()) {
                 series.setInUserList(false);
             }
             App.getInstance().getUserAnimeList().clear();
         } else {
-            for (Series series : App.getInstance().getUserAnimeList()){
+            for (Series series : App.getInstance().getUserAnimeList()) {
                 malApiClient.addAnime(String.valueOf(series.getMALID()));
             }
         }
