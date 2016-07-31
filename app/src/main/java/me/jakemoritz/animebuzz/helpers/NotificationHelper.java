@@ -5,8 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v7.preference.PreferenceManager;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -60,7 +62,15 @@ public class NotificationHelper {
         NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
 
         Notification notification = mBuilder.build();
-        notification.defaults |= Notification.DEFAULT_VIBRATE;
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean vibrateOn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), true);
+
+        if (vibrateOn){
+            notification.defaults |= Notification.DEFAULT_VIBRATE;
+        } else {
+//            notification.defaults = Notification.DEF
+        }
 
         mNotificationManager.notify(series.getMALID(), notification);
     }

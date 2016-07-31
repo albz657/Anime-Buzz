@@ -9,6 +9,11 @@
             android:key="@string/pref_simulcast_key"
             android:summary="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_vibrate_key"
+            android:title="@string/pref_vibrate_title" />
     </PreferenceCategory>
 
     <PreferenceCategory
