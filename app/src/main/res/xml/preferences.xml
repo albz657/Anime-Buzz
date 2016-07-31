@@ -10,6 +10,13 @@
             android:summary="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
 
+        <RingtonePreference
+            android:key="@string/pref_ringtone_key"
+            android:title="@string/pref_ringtone_title"
+            android:showSilent="true"
+            android:showDefault="true"
+            android:ringtoneType="notification" />
+
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/pref_vibrate_key"

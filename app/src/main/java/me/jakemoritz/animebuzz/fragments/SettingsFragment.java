@@ -2,6 +2,9 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -19,6 +22,7 @@ import android.widget.Spinner;
 
 import net.xpece.android.support.preference.ListPreference;
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
+import net.xpece.android.support.preference.RingtonePreference;
 import net.xpece.android.support.preference.SwitchPreference;
 
 import java.io.File;
@@ -45,6 +49,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     SwitchPreference simulcastPreference;
     SwitchPreference format24hourPreference;
     SwitchPreference incrementPreference;
+    RingtonePreference ringtonePreference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,6 +110,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             } else {
                 incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
             }
+        } else if (s.equals(getString(R.string.pref_ringtone_key))) {
+            setRingtoneSummary();
         }
     }
 
@@ -130,14 +137,24 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
+    private void setRingtoneSummary() {
+        Uri ringtoneUri = Uri.parse(sharedPreferences.getString(getString(R.string.pref_ringtone_key), "DEFAULT_RINGTONE_URI"));
+        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+        String name = ringtone.getTitle(App.getInstance());
+        ringtonePreference.setSummary(name);
+    }
+
     @Override
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
         ListPreference ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
-        if (ledColors.getValue() == null){
+        if (ledColors.getValue() == null) {
             ledColors.setValueIndex(2);
         }
+
+        ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
+        setRingtoneSummary();
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 

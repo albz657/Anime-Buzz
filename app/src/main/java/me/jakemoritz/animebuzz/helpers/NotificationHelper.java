@@ -6,6 +6,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.preference.PreferenceManager;
@@ -78,6 +81,15 @@ public class NotificationHelper {
             notification.ledOnMS = 1000;
             notification.ledOffMS = 1000;
             notification.ledARGB = Integer.parseInt(ledOn,16);
+        }
+
+        String ringtonePref = sharedPreferences.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
+        Uri ringtoneUri = Uri.parse(ringtonePref);
+        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+        String name = ringtone.getTitle(App.getInstance());
+
+        if (!name.equals("Silent")){
+            notification.defaults |= Notification.DEFAULT_SOUND;
         }
 
         mNotificationManager.notify(series.getMALID(), notification);
