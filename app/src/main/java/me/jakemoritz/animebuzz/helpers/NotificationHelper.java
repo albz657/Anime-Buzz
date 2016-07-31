@@ -70,14 +70,14 @@ public class NotificationHelper {
             notification.defaults |= Notification.DEFAULT_VIBRATE;
         }
 
-        boolean ledOn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_led_key), true);
+        String ledOn = sharedPreferences.getString(App.getInstance().getString(R.string.pref_led_key), "-1");
 
-        if (ledOn){
+        if (!ledOn.equals("-1")){
 //            notification.defaults |= Notification.DEFAULT_LIGHTS;
             notification.flags = Notification.FLAG_SHOW_LIGHTS;
             notification.ledOnMS = 1000;
             notification.ledOffMS = 1000;
-            notification.ledARGB = 0xff0000ff;
+            notification.ledARGB = Integer.parseInt(ledOn,16);
         }
 
         mNotificationManager.notify(series.getMALID(), notification);

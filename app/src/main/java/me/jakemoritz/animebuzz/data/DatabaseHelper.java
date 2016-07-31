@@ -119,8 +119,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static synchronized DatabaseHelper getInstance(Context context){
-        if (mInstance == null){
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if (mInstance == null) {
             mInstance = new DatabaseHelper(context);
         }
         return mInstance;
@@ -154,6 +154,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_ALARM_ID, alarm.getId());
 
         App.getInstance().getDatabase().insert(TABLE_ALARMS, null, contentValues);
+        return true;
+    }
+
+    public boolean updateAlarm(AlarmHolder alarm) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
+        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
+        contentValues.put(KEY_ALARM_ID, alarm.getId());
+
+        App.getInstance().getDatabase().update(TABLE_ALARMS, contentValues, KEY_ALARM_ID + " =  ? ", new String[]{String.valueOf(alarm.getId())});
         return true;
     }
 
@@ -212,6 +222,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public Cursor getAlarm(int alarmId) {
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS + " WHERE " + KEY_ALARM_ID + " = ?", new String[]{String.valueOf(alarmId)});
+    }
+
+
     public Cursor getAllSeasonMetadata() {
         return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
     }
@@ -222,11 +237,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[]{String.valueOf(MALID)});
     }
 
-    public Integer deleteAlarm(int id){
+    public Integer deleteAlarm(int id) {
         return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
     }
 
-    public void deleteAllAlarms(){
+    public void deleteAllAlarms() {
         App.getInstance().getDatabase().delete(TABLE_ALARMS, null, null);
     }
 
@@ -262,6 +277,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
     }
 
+    public void saveAlarmToDb(AlarmHolder alarmHolder) {
+        Cursor cursor = getAlarm(alarmHolder.getId());
+        if (cursor.getCount() != 0) {
+            updateAlarm(alarmHolder);
+        } else {
+            insertAlarm(alarmHolder);
+        }
+        cursor.close();
+    }
+
     public void saveAllSeriesToDb(SeasonList allSeries) {
         SeriesList allSeriesList = new SeriesList();
         for (Season season : allSeries) {
@@ -285,7 +310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void saveSeriesToDb(Series series){
+    public void saveSeriesToDb(Series series) {
         Cursor cursor = getSeries(series.getMALID());
         if (cursor.getCount() != 0) {
             updateSeriesInDb(series);
@@ -300,7 +325,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         List<AlarmHolder> alarms = new ArrayList<>();
 
         cursor.moveToFirst();
-        for (int i = 0; i < cursor.getCount(); i++){
+        for (int i = 0; i < cursor.getCount(); i++) {
             AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
             alarms.add(tempAlarm);
             cursor.moveToNext();

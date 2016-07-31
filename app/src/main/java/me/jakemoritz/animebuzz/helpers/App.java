@@ -378,7 +378,7 @@ public class App extends Application {
 
     private void processNewAlarm(AlarmHolder alarmHolder) {
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        databaseHelper.insertAlarm(alarmHolder);
+        databaseHelper.saveAlarmToDb(alarmHolder);
 
         alarms.add(alarmHolder);
 

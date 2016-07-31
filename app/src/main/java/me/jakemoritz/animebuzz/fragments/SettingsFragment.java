@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 
+import net.xpece.android.support.preference.ListPreference;
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
 import net.xpece.android.support.preference.SwitchPreference;
 
@@ -133,6 +134,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        ListPreference ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
+        if (ledColors.getValue() == null){
+            ledColors.setValueIndex(2);
+        }
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 

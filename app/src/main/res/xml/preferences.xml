@@ -15,10 +15,11 @@
             android:key="@string/pref_vibrate_key"
             android:title="@string/pref_vibrate_title" />
 
-        <SwitchPreference
-            android:defaultValue="true"
+        <ListPreference
             android:key="@string/pref_led_key"
-            android:title="@string/pref_led_title" />
+            android:title="@string/pref_led_title"
+            android:entries="@array/led_colors"
+            android:entryValues="@array/led_colors_values" />
     </PreferenceCategory>
 
     <PreferenceCategory

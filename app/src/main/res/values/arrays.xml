@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="led_colors">
+        <item>None</item>
+        <item>Blue</item>
+        <item>Cyan</item>
+        <item>Green</item>
+        <item>Magenta</item>
+        <item>Red</item>
+        <item>White</item>
+        <item>Yellow</item>
+    </string-array>
+
+    <string-array name="led_colors_values">
+        <item>-1</item>
+        <item>0000ff</item>
+        <item>00ffff</item>
+        <item>00ff00</item>
+        <item>ff00ff</item>
+        <item>ff0000</item>
+        <item>ffffff</item>
+        <item>ffff00</item>
+    </string-array>
+</resources>
