@@ -10,13 +10,13 @@
 
         <TextView
             android:id="@+id/welcome"
-            style="@style/Base.TextAppearance.AppCompat.Display3"
+            style="@style/Base.TextAppearance.AppCompat.Display2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="60dp"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="20dp"
             android:width="300dp"
             android:text="@string/welcome_text"
             android:gravity="center"
@@ -53,7 +53,7 @@
 
             <TextView
                 android:id="@+id/benefit_notification"
-                style="@style/Base.TextAppearance.AppCompat.Title"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/bullet_notification"
@@ -62,7 +62,7 @@
 
             <TextView
                 android:id="@+id/benefit_backlog"
-                style="@style/Base.TextAppearance.AppCompat.Title"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/benefit_notification"

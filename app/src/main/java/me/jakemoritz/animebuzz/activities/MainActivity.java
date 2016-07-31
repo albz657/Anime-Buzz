@@ -32,6 +32,7 @@ import java.io.IOException;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
@@ -302,6 +303,16 @@ public class MainActivity extends AppCompatActivity
 
                 if (getSupportActionBar() != null) {
                     getSupportActionBar().setTitle(R.string.action_settings);
+                }
+            } else if (id == R.id.nav_about) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, new AboutFragment(), "About")
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .commit();
+                navigationView.getMenu().getItem(4).setChecked(true);
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle("About");
                 }
             }
         }

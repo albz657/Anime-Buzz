@@ -1,0 +1,133 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/thanks"
+        style="@style/Base.TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="80dp"
+        android:text="Thanks to the following:" />
+
+    <RelativeLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/thanks"
+        android:layout_centerHorizontal="true">
+
+        <RelativeLayout
+            android:id="@+id/about_senpai_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/bullet_senpai"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet" />
+
+            <TextView
+                android:id="@+id/about_senpai"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_senpai"
+                android:text="@string/about_senpai" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/about_senpai_link"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:layout_below="@id/about_senpai"
+                android:layout_marginTop="5dp"
+                android:layout_alignLeft="@id/about_senpai"
+                android:text="@string/about_senpai_url"
+                android:autoLink="web"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/about_mal_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/about_senpai_holder"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/bullet_mal"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet" />
+
+            <TextView
+                android:id="@+id/about_mal"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_mal"
+                android:text="@string/about_mal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/about_mal_link"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:layout_below="@id/about_mal"
+                android:layout_marginTop="5dp"
+                android:layout_alignLeft="@id/about_mal"
+                android:text="@string/about_mal_url"
+                android:autoLink="web"/>
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/about_ann_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/about_mal_holder"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/bullet_ann"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet" />
+
+            <TextView
+                android:id="@+id/about_ann"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_ann"
+                android:text="@string/about_ann" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/about_ann_link"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:layout_below="@id/about_ann"
+                android:layout_marginTop="5dp"
+                android:layout_alignLeft="@id/about_ann"
+                android:text="@string/about_ann_url"
+                android:autoLink="web"/>
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+</RelativeLayout>
+

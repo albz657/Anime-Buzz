@@ -97,7 +97,7 @@ public class App extends Application {
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
 //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();

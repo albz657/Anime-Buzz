@@ -50,7 +50,7 @@
 
                 <TextView
                     android:id="@+id/label_switch_simulcast"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    style="@style/Base.TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -76,7 +76,7 @@
 
                 <TextView
                     android:id="@+id/label_switch_24hour"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    style="@style/Base.TextAppearance.AppCompat.Subhead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
