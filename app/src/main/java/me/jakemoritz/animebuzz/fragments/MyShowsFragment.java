@@ -87,7 +87,7 @@ public class MyShowsFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        activity.getMenuInflater().inflate(R.menu.debug_myshows, menu);
+        activity.getMenuInflater().inflate(R.menu.myshows_menu, menu);
     }
 
     @Override

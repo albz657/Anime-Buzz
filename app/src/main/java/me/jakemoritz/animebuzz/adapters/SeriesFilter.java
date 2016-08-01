@@ -29,7 +29,7 @@ public class SeriesFilter extends Filter {
             String filterPattern = constraint.toString().toLowerCase().trim();
 
             for (Series series : originalSeriesList){
-                if (series.getName().contains(filterPattern)){
+                if (series.getName().toLowerCase().contains(filterPattern)){
                     filteredSeriesList.add(series);
                 }
             }

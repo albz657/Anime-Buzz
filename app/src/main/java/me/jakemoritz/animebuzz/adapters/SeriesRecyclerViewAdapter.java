@@ -291,4 +291,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public SeriesList getAllSeries() {
         return allSeries;
     }
+
+    public void setAllSeries(SeriesList allSeries) {
+        this.allSeries = allSeries;
+    }
 }

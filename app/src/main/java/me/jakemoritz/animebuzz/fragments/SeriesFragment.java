@@ -12,6 +12,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +46,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public SenpaiExportHelper senpaiExportHelper;
     public View seriesLayout;
     public AppCompatActivity activity;
+    public RelativeLayout emptyView;
+    public TextView emptyText;
+    public ImageView emptyImage;
+    public SeriesFragment self;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +65,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         senpaiExportHelper = new SenpaiExportHelper(this);
 
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         swipeRefreshLayout.setOnRefreshListener(this);
 
 //        mAdapter.notifyDataSetChanged();
@@ -85,22 +93,64 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         container.removeAllViews();
         container.clearDisappearingChildren();
         seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout);
+
+        emptyView = (RelativeLayout) inflater.inflate((R.layout.empty_view), null);
+        emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
+        emptyImage = (ImageView) emptyView.findViewById(R.id.empty_image);
+
         Context context = recyclerView.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         if (this instanceof SeasonsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(new SeriesList(), this);
-
+            self = (SeasonsFragment) this;
         } else if (this instanceof MyShowsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
+            self = (MyShowsFragment) this;
         }
         recyclerView.setAdapter(mAdapter);
+
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+
+            @Override
+            public void onChanged() {
+                if (mAdapter.getVisibleSeries().isEmpty()){
+                    seriesLayout.setVisibility(View.GONE);
+                    emptyView.setVisibility(View.VISIBLE);
+                    container.addView(emptyView, 0);
+
+                    Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
+                    emptyImage.setAlpha((float) 0.5);
+                    if (self instanceof MyShowsFragment){
+                        emptyText.setText(R.string.empty_text_myshows);
+                    } else {
+                        emptyText.setText("");
+                    }
+
+                } else {
+                    container.removeView(emptyView);
+//                    emptyView.setVisibility(View.GONE);
+                    seriesLayout.setVisibility(View.VISIBLE);
+                }
+//                seriesLayout.setVisibility(View.GONE);
+//                container.removeAllViews();
+//                seriesLayout = emptyView;
+//                container.addView();
+
+/*                seriesLayout = activity.getLayoutInflater().inflate()
+                recyclerView.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);*/
+
+//                super.onChanged();
+            }
+        });
         mAdapter.notifyDataSetChanged();
         return seriesLayout;
     }
@@ -108,16 +158,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void seasonPostersImported() {
         mAdapter.notifyDataSetChanged();
-
-
     }
 
     @Override
     public void seasonDataRetrieved(Season season) {
         App.getInstance().getAllAnimeSeasons().add(season);
         App.getInstance().saveNewSeasonData(season);
-//        App.getInstance().saveNewSeasonData(season);
-//        App.getInstance().loadAnimeFromDB();
 
         if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
             App.getInstance().setGettingCurrentBrowsing(true);
@@ -130,8 +176,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
-
-        //mAdapter.notifyDataSetChanged();
     }
 
     @Override

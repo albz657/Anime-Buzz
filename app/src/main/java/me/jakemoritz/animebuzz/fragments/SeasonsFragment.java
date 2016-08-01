@@ -3,6 +3,11 @@ package me.jakemoritz.animebuzz.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -49,11 +54,8 @@ public class SeasonsFragment extends SeriesFragment {
         });
         refreshToolbar();
 
-        if (App.getInstance().isInitializing()) {
-
-        } else {
+        if (!App.getInstance().isInitializing()) {
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
-
         }
 
         if (App.getInstance().isJustLaunchedSeasons()){
@@ -69,8 +71,7 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void loadSeason(String seasonName) {
-        mAdapter.getAllSeries().clear();
-        mAdapter.getAllSeries().addAll(App.getInstance().getSeasonFromName(seasonName).getSeasonSeries());
+        mAdapter.setAllSeries(App.getInstance().getSeasonFromName(seasonName).getSeasonSeries());
         mAdapter.getVisibleSeries().clear();
         mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
         mAdapter.notifyDataSetChanged();
@@ -145,6 +146,27 @@ public class SeasonsFragment extends SeriesFragment {
         }
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        activity.getMenuInflater().inflate(R.menu.seasons_menu, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+    }
 
     @Override
     public void onRefresh() {
