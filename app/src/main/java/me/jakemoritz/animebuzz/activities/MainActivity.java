@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             return true;
         } else {
             return super.dispatchTouchEvent(ev);
@@ -166,10 +166,10 @@ public class MainActivity extends AppCompatActivity
                             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                             .commit();
 
-                        if (getSupportActionBar() != null) {
-                            getSupportActionBar().setTitle(R.string.fragment_watching_queue);
-                        }
-                  //  }
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                    }
+                    //  }
 
 
                 } else {
@@ -206,10 +206,9 @@ public class MainActivity extends AppCompatActivity
 
     public void loadDrawerUserInfo() {
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
-        if (avatarFile.exists()) {
-            ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-            Picasso.with(this).load(avatarFile).placeholder(R.drawable.placeholder).fit().centerCrop().into(drawerAvatar);
-        }
+        ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
+        Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
