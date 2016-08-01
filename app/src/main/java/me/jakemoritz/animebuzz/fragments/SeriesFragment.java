@@ -136,19 +136,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
                 } else {
                     container.removeView(emptyView);
-//                    emptyView.setVisibility(View.GONE);
                     seriesLayout.setVisibility(View.VISIBLE);
                 }
-//                seriesLayout.setVisibility(View.GONE);
-//                container.removeAllViews();
-//                seriesLayout = emptyView;
-//                container.addView();
-
-/*                seriesLayout = activity.getLayoutInflater().inflate()
-                recyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);*/
-
-//                super.onChanged();
             }
         });
         mAdapter.notifyDataSetChanged();

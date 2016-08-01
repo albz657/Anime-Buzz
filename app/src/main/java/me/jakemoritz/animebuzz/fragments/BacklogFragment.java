@@ -10,7 +10,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.Collections;
 
@@ -25,13 +30,15 @@ public class BacklogFragment extends Fragment {
 
     private BacklogRecyclerViewAdapter mAdapter;
     private AppCompatActivity activity;
+    public RelativeLayout emptyView;
+    public TextView emptyText;
+    public ImageView emptyImage;
 
     public BacklogRecyclerViewAdapter getmAdapter() {
         return mAdapter;
     }
 
     /**
-
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
@@ -72,12 +79,16 @@ public class BacklogFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         container.removeAllViews();
         container.clearDisappearingChildren();
 
-        View view = inflater.inflate(R.layout.fragment_backlog, container, false);
+        final View view = inflater.inflate(R.layout.fragment_backlog, container, false);
+
+        emptyView = (RelativeLayout) inflater.inflate((R.layout.empty_view), null);
+        emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
+        emptyImage = (ImageView) emptyView.findViewById(R.id.empty_image);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -87,8 +98,27 @@ public class BacklogFragment extends Fragment {
             Collections.sort(App.getInstance().getBacklog(), new BacklogItemComparator());
             mAdapter = new BacklogRecyclerViewAdapter(App.getInstance().getBacklog());
             mAdapter.touchHelper.attachToRecyclerView((RecyclerView) view);
+            mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                @Override
+                public void onChanged() {
+                    if (mAdapter.getItemCount() == 0) {
+                        view.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.VISIBLE);
+                        container.addView(emptyView, 0);
+
+                        Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
+                        emptyImage.setAlpha((float) 0.5);
+                        emptyText.setText(R.string.empty_text_backlog);
+
+                    } else {
+                        container.removeView(emptyView);
+                        view.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
             recyclerView.setAdapter(mAdapter);
         }
+        mAdapter.notifyDataSetChanged();
         return view;
     }
 
