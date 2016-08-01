@@ -3,11 +3,6 @@ package me.jakemoritz.animebuzz.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -19,7 +14,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
-import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
@@ -151,26 +145,6 @@ public class SeasonsFragment extends SeriesFragment {
         }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_notify) {
-
-            //senpaiExportHelper.getSeasonList();
-
-            ANNSearchHelper helper = new ANNSearchHelper();
-            helper.getImages(this, mAdapter.getAllSeries());
-            //helper.getImages(this, mAdapter.getAllSeries());
-        } else if (id == R.id.action_verify) {
-
-            senpaiExportHelper.getLatestSeasonData();/*
-            ANNSearchHelper helper = new ANNSearchHelper((MainActivity) getActivity());
-            helper.getImages(this, mAdapter.getAllSeries());*/
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public void onRefresh() {
@@ -187,25 +161,4 @@ public class SeasonsFragment extends SeriesFragment {
 
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        activity.getMenuInflater().inflate(R.menu.debug_season, menu);
-
-        MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
-    }
 }

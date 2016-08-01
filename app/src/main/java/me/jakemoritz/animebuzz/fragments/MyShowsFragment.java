@@ -67,7 +67,10 @@ public class MyShowsFragment extends SeriesFragment {
 
         loadUserSortingPreference();
 
-        if (App.getInstance().isJustLaunchedMyShows()){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
+
+        if (App.getInstance().isJustLaunchedMyShows() && loggedIn){
             onRefresh();
             swipeRefreshLayout.post(new Runnable() {
                 @Override
@@ -75,8 +78,9 @@ public class MyShowsFragment extends SeriesFragment {
                     swipeRefreshLayout.setRefreshing(true);
                 }
             });
-            App.getInstance().setJustLaunchedMyShows(false);
         }
+
+        App.getInstance().setJustLaunchedMyShows(false);
     }
 
     @Override

@@ -16,7 +16,7 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="60dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="60dp"
             android:width="300dp"
             android:text="@string/welcome_text"
             android:gravity="center"
