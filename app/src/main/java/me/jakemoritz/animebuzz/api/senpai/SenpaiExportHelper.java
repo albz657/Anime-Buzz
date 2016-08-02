@@ -171,6 +171,7 @@ public class SenpaiExportHelper {
                     editor.apply();
 
                     if (App.getInstance().isInitializing()){
+                        response.body().getSeasonMetadata().setCurrentOrNewer(true);
                         App.getInstance().setCurrentlyBrowsingSeason(response.body());
 
                     }

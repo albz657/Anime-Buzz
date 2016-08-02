@@ -206,7 +206,6 @@ public class App extends Application {
     private void setCurrentOrNewer() {
         List<SeasonMetadata> metadataList = new ArrayList<>(seasonsList);
         Collections.sort(metadataList, new SeasonMetadataComparator());
-        SeasonMetadata pendingSeason = null;
         SeasonMetadata latestSeason = null;
 
         String latestSeasonName = getLatestSeasonName();
@@ -313,6 +312,12 @@ public class App extends Application {
         series.setNextEpisodeAirtime(nextEpisodeAirtime);
         series.setNextEpisodeSimulcastTime(nextEpisodeSimulcastTime);
 
+        String nextEpisodeAirtimeFormatted = formatAiringTime(series, false);
+        String nextEpisodeSimulcastTimeFormatted = formatAiringTime(series, true);
+
+        series.setNextEpisodeAirtimeFormatted(nextEpisodeAirtimeFormatted);
+        series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeSimulcastTimeFormatted);
+
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         Calendar cal;
@@ -338,9 +343,9 @@ public class App extends Application {
         processNewAlarm(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID()));
 
         // debug code
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-        String formattedNext = format.format(nextEpisode.getTime());
-        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + formattedNext);
+//        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
+//        String formattedNext = format.format(nextEpisode.getTime());
+        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + nextEpisode.getTimeInMillis());
 
     }
 

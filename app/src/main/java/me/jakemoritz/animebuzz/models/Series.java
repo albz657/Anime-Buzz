@@ -19,6 +19,24 @@ public class Series {
     private long nextEpisodeSimulcastTime;
     private List<Long> backlog;
     private int episodesWatched;
+    private String nextEpisodeAirtimeFormatted;
+    private String nextEpisodeSimulcastTimeFormatted;
+
+    public String getNextEpisodeSimulcastTimeFormatted() {
+        return nextEpisodeSimulcastTimeFormatted;
+    }
+
+    public void setNextEpisodeSimulcastTimeFormatted(String nextEpisodeSimulcastTimeFormatted) {
+        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
+    }
+
+    public String getNextEpisodeAirtimeFormatted() {
+        return nextEpisodeAirtimeFormatted;
+    }
+
+    public void setNextEpisodeAirtimeFormatted(String nextEpisodeAirtimeFormatted) {
+        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
+    }
 
     public void setAirdate(int airdate) {
         this.airdate = airdate;
@@ -150,9 +168,11 @@ public class Series {
         this.nextEpisodeAirtime = 0;
         this.nextEpisodeSimulcastTime = 0;
         this.episodesWatched = 0;
+        this.nextEpisodeAirtimeFormatted = "";
+        this.nextEpisodeSimulcastTimeFormatted = "";
     }
 
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched) {
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted) {
         this.airdate = airdate;
         this.name = name;
         this.MALID = MALID;
@@ -167,6 +187,8 @@ public class Series {
         this.nextEpisodeAirtime = nextEpisodeAirtime;
         this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
         this.episodesWatched = episodesWatched;
+        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
+        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
     }
 
 }

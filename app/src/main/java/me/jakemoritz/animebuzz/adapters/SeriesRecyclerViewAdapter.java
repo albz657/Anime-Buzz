@@ -70,11 +70,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(mListener.activity.getString(R.string.pref_simulcast_key), false);
-        final boolean loggedIn = sharedPref.getBoolean(mListener.activity.getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer()) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
-                holder.mDate.setText(App.getInstance().formatAiringTime(holder.series, prefersSimulcast));
+                if (prefersSimulcast){
+                    holder.mDate.setText(holder.series.getNextEpisodeSimulcastTimeFormatted());
+                } else {
+                    holder.mDate.setText(holder.series.getNextEpisodeAirtimeFormatted());
+                }
             } else {
                 holder.mDate.setText("TBA");
             }
