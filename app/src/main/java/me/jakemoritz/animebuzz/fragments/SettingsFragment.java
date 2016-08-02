@@ -269,8 +269,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (!App.getInstance().getUserAnimeList().isEmpty()){
             importExistingSeries();
         }
-
-
     }
 
     @Override
