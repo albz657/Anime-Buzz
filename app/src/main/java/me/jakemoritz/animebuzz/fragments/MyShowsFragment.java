@@ -17,11 +17,13 @@ import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
@@ -194,6 +196,21 @@ public class MyShowsFragment extends SeriesFragment {
         }
 
         super.seasonPostersImported();
+    }
+
+    @Override
+    public void seasonDataRetrieved(Season season) {
+        App.getInstance().getAllAnimeSeasons().add(season);
+        App.getInstance().saveNewSeasonData(season);
+
+        if (App.getInstance().isNetworkAvailable()){
+            if (helper == null){
+                helper = new ANNSearchHelper();
+            }
+            helper.getImages(this, mAdapter.getAllSeries());
+        } else {
+            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+        }
     }
 
     @Override
