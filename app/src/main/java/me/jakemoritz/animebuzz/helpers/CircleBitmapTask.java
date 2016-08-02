@@ -16,7 +16,7 @@ public class CircleBitmapTask extends AsyncTask<List<CircleBitmapHolder> , Void,
 
     @Override
     protected void onPostExecute(List<CircleBitmapHolder> circleBitmapHolders) {
-        App.getInstance().cacheCircleBitmaps(circleBitmapHolders);
+//        App.getInstance().cacheCircleBitmaps(circleBitmapHolders);
     }
 
     @Override

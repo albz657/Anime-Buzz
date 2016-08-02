@@ -8,17 +8,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,7 +26,6 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
@@ -239,25 +233,7 @@ public class App extends Application {
         return (metadataList.indexOf(pendingSeason) >= metadataList.indexOf(latestSeason));
     }
 
-    private File getCachedPosterFile(String ANNID, String size) {
-        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-
-        if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
-            if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                if (size.equals("circle")){
-                    return new File(imageCacheDirectory, ANNID + "_circle.jpg");
-                }
-                else if (size.equals("small")) {
-                    return new File(imageCacheDirectory, ANNID + "_small.jpg");
-                } else {
-                    return new File(imageCacheDirectory, ANNID + ".jpg");
-                }
-            }
-        }
-        return null;
-    }
-
+  /*
     public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
         for (CircleBitmapHolder holder : holderList){
             if (holder.getBitmap() != null){
@@ -298,29 +274,8 @@ public class App extends Application {
         CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
         circleBitmapTask.execute(holderList);
     }
+*/
 
-    public void cachePosters(List<ImageResponseHolder> imageResponses) {
-        for (ImageResponseHolder imageResponse : imageResponses) {
-            try {
-                File file = getCachedPosterFile(imageResponse.getANNID(), imageResponse.getSize());
-                if (file != null) {
-                    FileOutputStream fos = new FileOutputStream(file);
-                    imageResponse.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                    fos.close();
-                } else {
-                    Log.d(TAG, "null file");
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            imageResponse.getBitmap().recycle();
-        }
-        if (delegate != null) {
-            delegate.seasonPostersImported();
-        }
-    }
 
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

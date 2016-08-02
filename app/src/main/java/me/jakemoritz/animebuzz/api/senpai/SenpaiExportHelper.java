@@ -87,7 +87,7 @@ public class SenpaiExportHelper {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
-                .client(client)
+                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -155,7 +155,7 @@ public class SenpaiExportHelper {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
-                .client(client)
+                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 

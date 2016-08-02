@@ -90,7 +90,7 @@ public class ANNSearchHelper {
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl("http://cdn.animenewsnetwork.com/")
-                    .client(client)
+                    .client(new OkHttpClient())
                     .addConverterFactory(SimpleXmlConverterFactory.create())
                     .build();
 
