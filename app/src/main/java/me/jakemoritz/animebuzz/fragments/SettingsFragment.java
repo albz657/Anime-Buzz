@@ -86,6 +86,13 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         } else {
             format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
         }
+
+        boolean promptIncrement = sharedPreferences.getBoolean(getString(R.string.pref_increment_key), false);
+        if (promptIncrement){
+            incrementPreference.setSummary(getString(R.string.pref_increment_summary));
+        } else {
+            incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
+        }
     }
 
     @Override
@@ -200,6 +207,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         simulcastPreference = (SwitchPreference) findPreference(getString(R.string.pref_simulcast_key));
         format24hourPreference = (SwitchPreference) findPreference(getString(R.string.pref_24hour_key));
         incrementPreference = (SwitchPreference) findPreference(getString(R.string.pref_increment_key));
+
+        if (signedIn){
+            incrementPreference.setEnabled(true);
+        } else {
+            incrementPreference.setEnabled(false);
+        }
     }
 
     public void signOut(Preference preference) {

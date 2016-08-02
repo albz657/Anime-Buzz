@@ -121,6 +121,7 @@ public class App extends Application {
             alarms.get(2).setAlarmTime(time);*/
         }
     }
+
     /* HELPERS */
 
     public String formatTime(Long time) {
