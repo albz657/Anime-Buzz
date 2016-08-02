@@ -59,6 +59,9 @@ public class MalImportHelper {
         }
 
         dbHelper.saveSeriesList(App.getInstance().getUserAnimeList());
-        delegate.malDataRead();
+
+        if (delegate != null){
+            delegate.malDataRead();
+        }
     }
 }

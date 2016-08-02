@@ -64,6 +64,7 @@ public class App extends Application {
     private AlarmManager alarmManager;
     private boolean justLaunchedMyShows = false;
     private boolean justLaunchedSeasons = false;
+    private boolean justRemoved = false;
     private SQLiteDatabase database;
     private List<SeasonMetadata> syncingSeasons;
 
@@ -646,5 +647,13 @@ public class App extends Application {
 
     public void setInitializingGotImages(boolean initializingGotImages) {
         this.initializingGotImages = initializingGotImages;
+    }
+
+    public boolean isJustRemoved() {
+        return justRemoved;
+    }
+
+    public void setJustRemoved(boolean justRemoved) {
+        this.justRemoved = justRemoved;
     }
 }

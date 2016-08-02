@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -40,13 +41,30 @@ public class MyShowsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
+
         if (App.getInstance().isNetworkAvailable()) {
-            senpaiExportHelper.getLatestSeasonData();
-            updating = true;
+            if (!mAdapter.getAllSeries().isEmpty()){
+                senpaiExportHelper.getLatestSeasonData();
+                updating = true;
+
+            } else {
+                if (loggedIn){
+                    new MalApiClient(this).getUserList();
+                    updating = true;
+
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+
+                }
+            }
         } else {
+            swipeRefreshLayout.setRefreshing(false);
+
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
-
+        Log.d(TAG, "s");
     }
 
     @Override
@@ -80,6 +98,7 @@ public class MyShowsFragment extends SeriesFragment {
                     swipeRefreshLayout.setRefreshing(true);
                 }
             });
+
         }
 
         App.getInstance().setJustLaunchedMyShows(false);
@@ -234,6 +253,8 @@ public class MyShowsFragment extends SeriesFragment {
             updating = false;
         }
 
-        mAdapter.notifyDataSetChanged();
+        if (mAdapter != null){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

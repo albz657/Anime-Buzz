@@ -24,7 +24,7 @@ public class ImportFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(callback.activity);
-        builder.setMessage("Do you want to add the series currently in your list to your MAL list?")
+        builder.setMessage("Signed in! Do you want to add the anime currently in your list to your MAL list?")
                 .setPositiveButton("Add All", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

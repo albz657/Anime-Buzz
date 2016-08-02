@@ -235,6 +235,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         preference.setVisible(false);
         signInPreference.setVisible(true);
+        incrementPreference.setEnabled(false);
+        incrementPreference.setChecked(false);
     }
 
     private void importExistingSeries() {
@@ -282,6 +284,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (!App.getInstance().getUserAnimeList().isEmpty()){
             importExistingSeries();
         }
+
+        incrementPreference.setEnabled(true);
     }
 
     @Override

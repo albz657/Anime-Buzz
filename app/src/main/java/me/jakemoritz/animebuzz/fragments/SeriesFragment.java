@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -64,22 +65,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
         senpaiExportHelper = new SenpaiExportHelper(this);
 
-
         swipeRefreshLayout.setOnRefreshListener(this);
-
-//        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onRefresh() {
-
     }
 
     @Override
     public void onPause() {
         super.onPause();
 
-        if (swipeRefreshLayout != null){
+        if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setRefreshing(false);
             swipeRefreshLayout.destroyDrawingCache();
             swipeRefreshLayout.clearAnimation();
@@ -92,11 +85,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         activity = (AppCompatActivity) getActivity();
     }
 
-
-
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         container.removeAllViews();
         container.clearDisappearingChildren();
         seriesLayout = inflater.inflate(R.layout.fragment_series_list, container, false);
@@ -123,32 +114,63 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             @Override
             public void onChanged() {
-                if (!App.getInstance().isInitializing()){
-                    if (mAdapter.getVisibleSeries().isEmpty()){
-                        seriesLayout.setVisibility(View.GONE);
-                        emptyView.setVisibility(View.VISIBLE);
-                        if (emptyView.getParent() != null){
-                            ((ViewGroup) emptyView.getParent()).removeView(emptyView);
-                        }
-                        container.addView(emptyView, 0);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshEmpty();
 
-                        Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
-                        emptyImage.setAlpha((float) 0.5);
-                        if (self instanceof MyShowsFragment){
-                            emptyText.setText(R.string.empty_text_myshows);
-                        } else {
-                            emptyText.setText(R.string.empty_text_season);
-                        }
+                        if (App.getInstance().isJustRemoved()){
+                            App.getInstance().setJustRemoved(false);
 
-                    } else {
-                        container.removeView(emptyView);
-                        seriesLayout.setVisibility(View.VISIBLE);
+                            FragmentManager manager = activity.getSupportFragmentManager();
+                            manager.beginTransaction()
+                                    .detach(self)
+                                    .attach(self)
+                                    .commit();
+                        }
+                       /*
+                        container.requestLayout();
+                        container.invalidate();*/
                     }
-                }
+                });
+
+
             }
         });
-        mAdapter.notifyDataSetChanged();
+        refreshEmpty();
         return seriesLayout;
+    }
+
+    private void refreshEmpty(){
+        if (!App.getInstance().isInitializing()){
+            if (mAdapter.getVisibleSeries().isEmpty()){
+                recyclerView.setVisibility(View.GONE);
+
+                if (emptyView.getParent() != null){
+                    ((ViewGroup) emptyView.getParent()).removeView(emptyView);
+                }
+                swipeRefreshLayout.addView(emptyView, 0);
+                swipeRefreshLayout.removeView(recyclerView);
+
+                Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
+                emptyImage.setAlpha((float) 0.5);
+                if (self instanceof MyShowsFragment){
+                    emptyText.setText(R.string.empty_text_myshows);
+                } else {
+                    emptyText.setText(R.string.empty_text_season);
+                }
+
+            } else {
+                swipeRefreshLayout.removeView(emptyView);
+
+                if (recyclerView.getParent() != null){
+                    ((ViewGroup) recyclerView.getParent()).removeView(recyclerView);
+                }
+                swipeRefreshLayout.addView(recyclerView, 0);
+
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }
     }
 
     @Override

@@ -240,6 +240,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                 Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
             }
         }
+        App.getInstance().setJustRemoved(true);
 
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
@@ -254,8 +255,9 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         notifyDataSetChanged();
 
+
         App.getInstance().removeAlarm(item);
-        Snackbar.make(parent, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+        Snackbar.make(mListener.getView(), "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
     public void addSeries(Series item, int position) {
