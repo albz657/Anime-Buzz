@@ -266,7 +266,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         preference.setVisible(false);
         signOutPreference.setVisible(true);
 
-        importExistingSeries();
+        if (!App.getInstance().getUserAnimeList().isEmpty()){
+            importExistingSeries();
+        }
 
 
     }

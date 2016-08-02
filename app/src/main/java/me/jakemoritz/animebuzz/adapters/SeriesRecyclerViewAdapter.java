@@ -274,6 +274,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             visibleSeries.addAll(allSeries);
         }
 
+//        App.getInstance().getCircleBitmap(item);
+
         notifyDataSetChanged();
 
         if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {

@@ -121,22 +121,27 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             @Override
             public void onChanged() {
-                if (mAdapter.getVisibleSeries().isEmpty()){
-                    seriesLayout.setVisibility(View.GONE);
-                    emptyView.setVisibility(View.VISIBLE);
-                    container.addView(emptyView, 0);
+                if (!App.getInstance().isInitializing()){
+                    if (mAdapter.getVisibleSeries().isEmpty()){
+                        seriesLayout.setVisibility(View.GONE);
+                        emptyView.setVisibility(View.VISIBLE);
+                        if (emptyView.getParent() != null){
+                            ((ViewGroup) emptyView.getParent()).removeView(emptyView);
+                        }
+                        container.addView(emptyView, 0);
 
-                    Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
-                    emptyImage.setAlpha((float) 0.5);
-                    if (self instanceof MyShowsFragment){
-                        emptyText.setText(R.string.empty_text_myshows);
+                        Picasso.with(App.getInstance()).load(R.drawable.empty).fit().centerCrop().into(emptyImage);
+                        emptyImage.setAlpha((float) 0.5);
+                        if (self instanceof MyShowsFragment){
+                            emptyText.setText(R.string.empty_text_myshows);
+                        } else {
+                            emptyText.setText(R.string.empty_text_season);
+                        }
+
                     } else {
-                        emptyText.setText("");
+                        container.removeView(emptyView);
+                        seriesLayout.setVisibility(View.VISIBLE);
                     }
-
-                } else {
-                    container.removeView(emptyView);
-                    seriesLayout.setVisibility(View.VISIBLE);
                 }
             }
         });

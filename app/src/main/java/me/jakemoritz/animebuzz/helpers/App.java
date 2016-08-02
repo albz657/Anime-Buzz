@@ -97,7 +97,7 @@ public class App extends Application {
             DatabaseHelper helper = new DatabaseHelper(this);
             alarms = helper.getAllAlarms();
 //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
 //            loadAlarms();
@@ -245,7 +245,10 @@ public class App extends Application {
 
         if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
             if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                if (size.equals("small")) {
+                if (size.equals("circle")){
+                    return new File(imageCacheDirectory, ANNID + "_circle.jpg");
+                }
+                else if (size.equals("small")) {
                     return new File(imageCacheDirectory, ANNID + "_small.jpg");
                 } else {
                     return new File(imageCacheDirectory, ANNID + ".jpg");
@@ -253,6 +256,47 @@ public class App extends Application {
             }
         }
         return null;
+    }
+
+    public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
+        for (CircleBitmapHolder holder : holderList){
+            if (holder.getBitmap() != null){
+                try {
+                    File file = getCachedPosterFile(holder.getANNID(), "circle");
+                    if (file != null) {
+                        FileOutputStream fos = new FileOutputStream(file);
+                        holder.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                    } else {
+                        Log.d(TAG, "null file");
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                holder.getBitmap().recycle();
+            }
+        }
+
+    }
+
+    public void getCircleBitmap(Series series) {
+        List<CircleBitmapHolder> holderList = new ArrayList<>();
+
+        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+
+            File smallBitmapFile = new File(imageCacheDirectory, series.getANNID() + "_small.jpg");
+
+            if (smallBitmapFile.exists()) {
+                CircleBitmapHolder bitmapHolder = new CircleBitmapHolder(String.valueOf(series.getANNID()), null, smallBitmapFile);
+                holderList.add(bitmapHolder);
+            }
+
+
+        CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
+        circleBitmapTask.execute(holderList);
     }
 
     public void cachePosters(List<ImageResponseHolder> imageResponses) {
@@ -284,12 +328,12 @@ public class App extends Application {
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
-    public void refreshBacklog(){
-        if (mainActivity != null){
-            if (mainActivity.getSupportFragmentManager().getFragments() != null){
-                for (Fragment fragment : mainActivity.getSupportFragmentManager().getFragments()){
-                    if (fragment instanceof BacklogFragment){
-                        if (((BacklogFragment) fragment).getmAdapter() != null){
+    public void refreshBacklog() {
+        if (mainActivity != null) {
+            if (mainActivity.getSupportFragmentManager().getFragments() != null) {
+                for (Fragment fragment : mainActivity.getSupportFragmentManager().getFragments()) {
+                    if (fragment instanceof BacklogFragment) {
+                        if (((BacklogFragment) fragment).getmAdapter() != null) {
                             ((BacklogFragment) fragment).getmAdapter().notifyDataSetChanged();
                         }
                     }
@@ -456,14 +500,14 @@ public class App extends Application {
         SeasonList newerSeasonList;
         if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
             newerSeasonList = new SeasonList(allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size()));
-            for (Season newerSeason : newerSeasonList){
+            for (Season newerSeason : newerSeasonList) {
                 allSeriesList.addAll(newerSeason.getSeasonSeries());
             }
 
             allSeasonList.get(indexOfThisSeason).getSeasonSeries().addAll(season.getSeasonSeries());
             SeriesList filteredList = new SeriesList(allSeasonList.get(indexOfThisSeason).getSeasonSeries());
             for (Series series : season.getSeasonSeries()) {
-                if (allSeriesList.contains(series)){
+                if (allSeriesList.contains(series)) {
                     filteredList.remove(series);
                 }
             }
@@ -505,11 +549,11 @@ public class App extends Application {
         userAnimeList = loadUserList();
     }
 
-    public SeriesList loadUserList(){
+    public SeriesList loadUserList() {
         SeriesList userList = new SeriesList();
-        for (Season season : allAnimeSeasons){
-            for (Series series : season.getSeasonSeries()){
-                if (series.isInUserList()){
+        for (Season season : allAnimeSeasons) {
+            for (Series series : season.getSeasonSeries()) {
+                if (series.isInUserList()) {
                     userList.add(series);
                 }
             }
