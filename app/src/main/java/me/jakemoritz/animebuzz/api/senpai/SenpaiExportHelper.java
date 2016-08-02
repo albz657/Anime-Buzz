@@ -13,6 +13,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.concurrent.TimeUnit;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
@@ -22,6 +24,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -77,8 +80,14 @@ public class SenpaiExportHelper {
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -139,8 +148,14 @@ public class SenpaiExportHelper {
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(1, TimeUnit.MINUTES)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 

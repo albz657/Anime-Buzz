@@ -58,7 +58,7 @@ public class SeasonsFragment extends SeriesFragment {
             loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
         }
 
-        if (App.getInstance().isJustLaunchedSeasons()){
+        if (App.getInstance().isJustLaunchedSeasons()) {
             onRefresh();
             swipeRefreshLayout.post(new Runnable() {
                 @Override
@@ -93,7 +93,7 @@ public class SeasonsFragment extends SeriesFragment {
             seasonNames.add(metadata.getName());
 
             if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
-                 previousSpinnerIndex = metadataList.indexOf(metadata);
+                previousSpinnerIndex = metadataList.indexOf(metadata);
             }
         }
 
@@ -102,7 +102,7 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void seasonPostersImported() {
-        if (isVisible()){
+        if (isVisible()) {
             refreshToolbar();
 
         }
@@ -121,9 +121,11 @@ public class SeasonsFragment extends SeriesFragment {
 
         }
 
-        if (updating){
+        if (swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(false);
-            updating = false;
+            if (updating) {
+                updating = false;
+            }
         }
         super.seasonPostersImported();
     }
@@ -152,6 +154,17 @@ public class SeasonsFragment extends SeriesFragment {
         activity.getMenuInflater().inflate(R.menu.seasons_menu, menu);
 
         MenuItem item = menu.findItem(R.id.action_search);
+        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                return true;
+            }
+        });
         SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -170,14 +183,14 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        if (App.getInstance().isNetworkAvailable()){
-            for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
-                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
+        if (App.getInstance().isNetworkAvailable()) {
+            for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
+                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
                     senpaiExportHelper.getSeasonData(metadata);
-
                 }
             }
-            updating = true;        } else {
+            updating = true;
+        } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
 

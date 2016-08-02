@@ -680,6 +680,10 @@ public class App extends Application {
         this.delegate = delegate;
     }
 
+    public SeasonPostersImportResponse getDelegate() {
+        return delegate;
+    }
+
     private SeasonPostersImportResponse delegate = null;
 
     public String getCurrentlyBrowsingSeasonName() {

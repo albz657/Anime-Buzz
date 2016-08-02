@@ -133,6 +133,9 @@ public class ANNSearchHelper {
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
                     Log.d(TAG, "Failed getting image batch");
+                    if (App.getInstance().getDelegate() != null){
+                        App.getInstance().getDelegate().seasonPostersImported();
+                    }
                 }
             });
         }
