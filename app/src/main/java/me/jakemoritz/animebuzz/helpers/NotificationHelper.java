@@ -48,6 +48,7 @@ public class NotificationHelper {
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
                         .setAutoCancel(true)
+                        .setProgress(0, 0, true)
                         .setContentTitle("Downloading anime images");
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);

@@ -206,7 +206,7 @@ public class MyShowsFragment extends SeriesFragment {
                 helper = new ANNSearchHelper();
             }
 
-            if (App.getInstance().isInitializing()){
+            if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()){
                 helper.getImages(this, season.getSeasonSeries());
             } else {
                 helper.getImages(this, mAdapter.getAllSeries());
