@@ -108,7 +108,6 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
 
         }
 
-        final Season season = new Season(seasonSeries, seasonMetadata);
-        return season;
+        return new Season(seasonSeries, seasonMetadata);
     }
 }

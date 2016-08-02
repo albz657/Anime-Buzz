@@ -26,16 +26,15 @@ public class MalImportHelper {
         this.delegate = delegate;
     }
 
-    public void matchSeries(List<MatchHolder> matchList){
+    public void matchSeries(List<MatchHolder> matchList) {
         SeriesList matchedSeries = new SeriesList();
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
         Cursor res = null;
-        for (MatchHolder match : matchList){
-            res = dbHelper.getSeries(match.getMALID());
-            if (res.getCount() > 0){
-                res.moveToFirst();
-                Series tempSeries = dbHelper.getSeriesWithCursor(res);
+        for (MatchHolder match : matchList) {
+            Series tempSeries = dbHelper.getSeries(match.getMALID());
+
+            if (tempSeries != null) {
                 tempSeries.setInUserList(true);
                 tempSeries.setEpisodesWatched(match.getEpisodesWatched());
                 matchedSeries.add(tempSeries);
@@ -48,23 +47,19 @@ public class MalImportHelper {
             }
         }
 
-        if (res != null){
-            res.close();
-        }
-
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
 
-        if (fragment.mAdapter != null){
+        if (fragment.mAdapter != null) {
             fragment.mAdapter.getVisibleSeries().clear();
             fragment.mAdapter.getVisibleSeries().addAll(App.getInstance().getUserAnimeList());
         }
 
 
-        if (fragment instanceof MyShowsFragment){
+        if (fragment instanceof MyShowsFragment) {
             ((MyShowsFragment) fragment).loadUserSortingPreference();
         }
 
-        App.getInstance().saveUserListToDB();
+        dbHelper.saveSeriesList(App.getInstance().getUserAnimeList());
         delegate.malDataRead();
     }
 }

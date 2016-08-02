@@ -43,6 +43,28 @@ public class NotificationHelper {
         mNotificationManager.notify(100, mBuilder.build());
     }
 
+    public void createImagesNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(App.getInstance())
+                        .setSmallIcon(R.drawable.bolt_copy)
+                        .setAutoCancel(true)
+                        .setContentTitle("Downloading anime images");
+
+        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent("image".hashCode(), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notification = mBuilder.build();
+
+        mNotificationManager.notify("image".hashCode(), notification);
+    }
+
     public void createNewEpisodeNotification(Series series) {
 /*        Bitmap bitmap = null;
         if (series.getANNID() > 0) {

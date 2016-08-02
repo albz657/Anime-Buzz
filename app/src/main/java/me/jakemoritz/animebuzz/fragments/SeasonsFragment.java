@@ -20,6 +20,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -101,6 +102,21 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
+    public void seasonDataRetrieved(Season season) {
+        super.seasonDataRetrieved(season);
+
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+            if (updating) {
+                updating = false;
+            }
+        }
+
+        NotificationHelper notificationHelper = new NotificationHelper();
+        notificationHelper.createImagesNotification();
+    }
+
+    @Override
     public void seasonPostersImported() {
         if (isVisible()) {
             refreshToolbar();
@@ -121,12 +137,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         }
 
-        if (swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(false);
-            if (updating) {
-                updating = false;
-            }
-        }
+
         super.seasonPostersImported();
     }
 

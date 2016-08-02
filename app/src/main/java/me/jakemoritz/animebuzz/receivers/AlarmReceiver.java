@@ -47,7 +47,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             }*/
 
-//            databaseHelper.updateSeriesInDb(series);
+//            databaseHelper.updateSeries(series);
 //            cursor.close();
         }
 

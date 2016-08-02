@@ -81,13 +81,13 @@ public class SenpaiExportHelper {
         Gson gson = gsonBuilder.create();
 
         OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.MINUTES)
-                .readTimeout(1, TimeUnit.MINUTES)
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://www.senpai.moe/")
-                .client(new OkHttpClient())
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -173,7 +173,7 @@ public class SenpaiExportHelper {
                     App.getInstance().setCurrentlyBrowsingSeasonName(response.body().getSeasonMetadata().getName());
 
                     DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
-                    databaseHelper.saveSeasonMetadataToDb(response.body().getSeasonMetadata());
+                    databaseHelper.saveSeasonMetadata(response.body().getSeasonMetadata());
 
                     fragment.seasonDataRetrieved(response.body());
                     Log.d(TAG, "Got latest season data");
@@ -182,8 +182,6 @@ public class SenpaiExportHelper {
 
             @Override
             public void onFailure(Call<Season> call, Throwable t) {
-                NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel("Latest season".hashCode());
                 Log.d(TAG, "Failed getting latest season data");
             }
         });

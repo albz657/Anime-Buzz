@@ -3,9 +3,6 @@ package me.jakemoritz.animebuzz.models;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-
 public class Series {
 
     private int airdate;
@@ -121,17 +118,6 @@ public class Series {
 
     public void setEpisodesWatched(int episodesWatched) {
         this.episodesWatched = episodesWatched;
-    }
-
-    public void removeFromBacklog(long time) {
-        backlog.remove(time);
-        DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(this);
-/*        for (Iterator backlogIterator = backlog.iterator(); backlogIterator.hasNext();) {
-            long episodeTime = (long) backlogIterator.next();
-            if (episodeTime == time) {
-                backlog.remove(episodeTime);
-            }
-        }*/
     }
 
     @Override

@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.api.ann;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
@@ -106,6 +108,9 @@ public class ANNSearchHelper {
             call.enqueue(new Callback<ANNXMLHolder>() {
                 @Override
                 public void onResponse(Call<ANNXMLHolder> call, Response<ANNXMLHolder> response) {
+                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel("image".hashCode());
+
                     if (response.isSuccessful()) {
                         if (response.body().getAnimeList() != null) {
                             List<ImageRequestHolder> getImageBatch = new ArrayList<>();
@@ -132,6 +137,8 @@ public class ANNSearchHelper {
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
+                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel("image".hashCode());
                     Log.d(TAG, "Failed getting image batch");
                     if (App.getInstance().getDelegate() != null){
                         App.getInstance().getDelegate().seasonPostersImported();

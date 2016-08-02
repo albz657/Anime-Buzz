@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -25,6 +26,7 @@ import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
@@ -138,7 +140,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
             series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-            DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
+            DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(new SeriesList(Arrays.asList(series)));
 
             notifyDataSetChanged();
         }
@@ -151,7 +153,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         }
 
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-        DatabaseHelper.getInstance(App.getInstance()).saveSeriesToDb(series);
+        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(new SeriesList(Arrays.asList(series)));
 
         notifyDataSetChanged();
     }

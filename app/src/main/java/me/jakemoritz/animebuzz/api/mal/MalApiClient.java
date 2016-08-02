@@ -1,7 +1,6 @@
 package me.jakemoritz.animebuzz.api.mal;
 
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
@@ -95,12 +94,7 @@ public class MalApiClient {
             String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
             DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
-            Cursor res = dbHelper.getSeries(Integer.valueOf(MALID));
-            Series series = null;
-            if (res.getCount() > 0) {
-                res.moveToFirst();
-                series = dbHelper.getSeriesWithCursor(res);
-            }
+            Series series = dbHelper.getSeries(Integer.valueOf(MALID));
 
             if (series != null){
                 MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);

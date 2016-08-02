@@ -11,7 +11,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -64,9 +66,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper mInstance;
 
-    public DatabaseHelper(Context context) {
+    private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
+    }
+
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new DatabaseHelper(context);
+        }
+        return mInstance;
     }
 
     private String buildAnimeTable() {
@@ -119,12 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static synchronized DatabaseHelper getInstance(Context context) {
-        if (mInstance == null) {
-            mInstance = new DatabaseHelper(context);
-        }
-        return mInstance;
-    }
+//    Insert/Update
 
     private boolean insertSeries(Series series) {
         ContentValues contentValues = new ContentValues();
@@ -147,47 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean insertAlarm(AlarmHolder alarm) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
-        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
-        contentValues.put(KEY_ALARM_ID, alarm.getId());
-
-        App.getInstance().getDatabase().insert(TABLE_ALARMS, null, contentValues);
-        return true;
-    }
-
-    public boolean updateAlarm(AlarmHolder alarm) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
-        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
-        contentValues.put(KEY_ALARM_ID, alarm.getId());
-
-        App.getInstance().getDatabase().update(TABLE_ALARMS, contentValues, KEY_ALARM_ID + " =  ? ", new String[]{String.valueOf(alarm.getId())});
-        return true;
-    }
-
-    private boolean insertSeasonMetadata(SeasonMetadata metadata) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_SEASON_KEY, metadata.getKey());
-        contentValues.put(KEY_SEASON_NAME, metadata.getName());
-        contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
-
-        App.getInstance().getDatabase().insert(TABLE_SEASONS, null, contentValues);
-        return true;
-    }
-
-    public boolean updateSeasonMetadataInDb(SeasonMetadata metadata) {
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_SEASON_KEY, metadata.getKey());
-        contentValues.put(KEY_SEASON_NAME, metadata.getName());
-        contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
-
-        App.getInstance().getDatabase().update(TABLE_SEASONS, contentValues, KEY_SEASON_KEY + " =  ? ", new String[]{metadata.getKey()});
-        return true;
-    }
-
-    public boolean updateSeriesInDb(Series series) {
+    private boolean updateSeries(Series series) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
@@ -209,49 +173,65 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public Cursor getSeries(int MALID) {
+    private boolean insertAlarm(AlarmHolder alarm) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
+        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
+        contentValues.put(KEY_ALARM_ID, alarm.getId());
+
+        App.getInstance().getDatabase().insert(TABLE_ALARMS, null, contentValues);
+        return true;
+    }
+
+    private boolean updateAlarm(AlarmHolder alarm) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
+        contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
+        contentValues.put(KEY_ALARM_ID, alarm.getId());
+
+        App.getInstance().getDatabase().update(TABLE_ALARMS, contentValues, KEY_ALARM_ID + " =  ? ", new String[]{String.valueOf(alarm.getId())});
+        return true;
+    }
+
+    private boolean insertSeasonMetadata(SeasonMetadata metadata) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_SEASON_KEY, metadata.getKey());
+        contentValues.put(KEY_SEASON_NAME, metadata.getName());
+        contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
+
+        App.getInstance().getDatabase().insert(TABLE_SEASONS, null, contentValues);
+        return true;
+    }
+
+    public boolean updateSeasonMetadata(SeasonMetadata metadata) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(KEY_SEASON_KEY, metadata.getKey());
+        contentValues.put(KEY_SEASON_NAME, metadata.getName());
+        contentValues.put(KEY_SEASON_DATE, metadata.getStart_timestamp());
+
+        App.getInstance().getDatabase().update(TABLE_SEASONS, contentValues, KEY_SEASON_KEY + " =  ? ", new String[]{metadata.getKey()});
+        return true;
+    }
+
+//    Get
+
+    public Series getSeries(int MALID) {
+        Cursor cursor = getSeriesCursor(MALID);
+        Series series = null;
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            series = getSeriesFromCursor(cursor);
+        }
+        cursor.close();
+
+        return series;
+    }
+
+    private Cursor getSeriesCursor(int MALID){
         return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
     }
 
-    public Cursor getSeasonMetadata(String seasonKey) {
-        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS + " WHERE " + KEY_SEASON_KEY + " = ?", new String[]{seasonKey});
-    }
-
-    public Cursor getAllSeries() {
-        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME, null);
-    }
-
-
-    public Cursor getAlarm(int alarmId) {
-        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS + " WHERE " + KEY_ALARM_ID + " = ?", new String[]{String.valueOf(alarmId)});
-    }
-
-
-    public Cursor getAllSeasonMetadata() {
-        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
-    }
-
-    public Integer deleteSeries(int MALID) {
-        return App.getInstance().getDatabase().delete(TABLE_ANIME,
-                KEY_MALID + " = ? ",
-                new String[]{String.valueOf(MALID)});
-    }
-
-    public Integer deleteAlarm(int id) {
-        return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
-    }
-
-    public void deleteAllAlarms() {
-        App.getInstance().getDatabase().delete(TABLE_ALARMS, null, null);
-    }
-
-    public Integer deleteSeasonMetadata(String seasonKey) {
-        return App.getInstance().getDatabase().delete(TABLE_SEASONS,
-                KEY_SEASON_KEY + " = ? ",
-                new String[]{seasonKey});
-    }
-
-    public SeriesList getSeriesBySeason(String seasonName) {
+    private SeriesList getSeriesBySeason(String seasonName) {
         SeriesList seriesBySeason = new SeriesList();
 
         Cursor res = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_ANIME_SEASON + " ='" + seasonName + "'", null);
@@ -259,7 +239,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res.moveToFirst();
 
         for (int i = 0; i < res.getCount(); i++) {
-            seriesBySeason.add(getSeriesWithCursor(res));
+            seriesBySeason.add(getSeriesFromCursor(res));
             res.moveToNext();
         }
 
@@ -267,84 +247,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return seriesBySeason;
     }
 
-    public void saveSeasonMetadataToDb(SeasonMetadata metadata) {
-        Cursor cursor = getSeasonMetadata(metadata.getKey());
-        if (cursor.getCount() != 0) {
-            updateSeasonMetadataInDb(metadata);
-        } else {
-            insertSeasonMetadata(metadata);
-        }
-        cursor.close();
-    }
-
-    public void saveAlarmToDb(AlarmHolder alarmHolder) {
-        Cursor cursor = getAlarm(alarmHolder.getId());
-        if (cursor.getCount() != 0) {
-            updateAlarm(alarmHolder);
-        } else {
-            insertAlarm(alarmHolder);
-        }
-        cursor.close();
-    }
-
-    public void saveAllSeriesToDb(SeasonList allSeries) {
-        SeriesList allSeriesList = new SeriesList();
-        for (Season season : allSeries) {
-            allSeriesList.addAll(season.getSeasonSeries());
-        }
-        saveSeriesListToDb(allSeriesList);
-    }
-
-    public void saveSeriesListToDb(SeriesList seriesList) {
-        Cursor cursor = null;
-        for (Series series : seriesList) {
-            cursor = getSeries(series.getMALID());
-            if (cursor.getCount() != 0) {
-                updateSeriesInDb(series);
-            } else {
-                insertSeries(series);
-            }
-        }
-        if (cursor != null) {
-            cursor.close();
-        }
-    }
-
-    public void saveSeriesToDb(Series series) {
-        Cursor cursor = getSeries(series.getMALID());
-        if (cursor.getCount() != 0) {
-            updateSeriesInDb(series);
-        } else {
-            insertSeries(series);
-        }
-    }
-
-    public List<AlarmHolder> getAllAlarms() {
-        Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
-
-        List<AlarmHolder> alarms = new ArrayList<>();
-
-        cursor.moveToFirst();
-        for (int i = 0; i < cursor.getCount(); i++) {
-            AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
-            alarms.add(tempAlarm);
-            cursor.moveToNext();
-        }
-
-        cursor.close();
-
-        return alarms;
-    }
-
-    private AlarmHolder getAlarmWithCursor(Cursor res) {
-        int id = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_ID));
-        long time = (long) res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
-        String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
-
-        return new AlarmHolder(name, time, id);
-    }
-
-    public Series getSeriesWithCursor(Cursor res) {
+    private Series getSeriesFromCursor(Cursor res) {
         int airdate = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_AIRDATE));
         String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NAME));
         int MALID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_MALID));
@@ -366,7 +269,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched);
     }
 
-    public SeasonMetadata getSeasonMetadataWithCursor(Cursor res) {
+    public SeasonList getAllAnimeSeasons(){
+        SeasonList seasons = new SeasonList();
+        for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
+            SeriesList tempSeason = getSeriesBySeason(metadata.getName());
+            if (tempSeason.size() > 0) {
+                seasons.add(new Season(tempSeason, metadata));
+            }
+        }
+        return seasons;
+    }
+
+    private Cursor getSeasonMetadataCursor(String seasonKey) {
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS + " WHERE " + KEY_SEASON_KEY + " = ?", new String[]{seasonKey});
+    }
+
+    public SeasonMetadata getSeasonMetadataFromCursor(Cursor res) {
         String seasonName = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_NAME));
         String seasonDate = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_DATE));
         String seasonKey = res.getString(res.getColumnIndex(DatabaseHelper.KEY_SEASON_KEY));
@@ -374,34 +292,96 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new SeasonMetadata(seasonName, seasonDate, seasonKey);
     }
 
-    public SeriesList getSeriesUserWatching() {
-        SeriesList userList = new SeriesList();
+    public Set<SeasonMetadata> getAllSeasonMetadata(){
+        Set<SeasonMetadata> seasonList = new HashSet<>();
 
-        Cursor res = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_IS_IN_USER_LIST + " ='" + 1 + "'", null);
+        Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
 
-        res.moveToFirst();
+        cursor.moveToFirst();
 
-        for (int i = 0; i < res.getCount(); i++) {
-            userList.add(getSeriesWithCursor(res));
-            res.moveToNext();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            seasonList.add(getSeasonMetadataFromCursor(cursor));
+            cursor.moveToNext();
         }
 
-        res.close();
-        return userList;
+        cursor.close();
+        return seasonList;
     }
 
-    public SeriesList getSeriesFromDb() {
-        Cursor res = getAllSeries();
+    public List<AlarmHolder> getAllAlarms() {
+        Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
 
-        res.moveToFirst();
-        SeriesList seriesList = new SeriesList();
+        List<AlarmHolder> alarms = new ArrayList<>();
 
-        for (int i = 0; i < res.getCount(); i++) {
-            getSeriesWithCursor(res);
-            res.moveToNext();
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
+            alarms.add(tempAlarm);
+            cursor.moveToNext();
         }
 
-        res.close();
-        return seriesList;
+        cursor.close();
+
+        return alarms;
     }
+
+    private Cursor getAlarmCursor(int alarmId) {
+        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS + " WHERE " + KEY_ALARM_ID + " = ?", new String[]{String.valueOf(alarmId)});
+    }
+
+    private AlarmHolder getAlarmWithCursor(Cursor res) {
+        int id = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_ID));
+        long time = (long) res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
+        String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
+
+        return new AlarmHolder(name, time, id);
+    }
+
+//    Delete
+
+    public Integer deleteAlarm(int id) {
+        return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
+    }
+
+    public void deleteAllAlarms() {
+        App.getInstance().getDatabase().delete(TABLE_ALARMS, null, null);
+    }
+
+//    Public saving
+
+    public void saveSeasonMetadata(SeasonMetadata metadata) {
+        Cursor cursor = getSeasonMetadataCursor(metadata.getKey());
+        if (cursor.getCount() != 0) {
+            updateSeasonMetadata(metadata);
+        } else {
+            insertSeasonMetadata(metadata);
+        }
+        cursor.close();
+    }
+
+    public void saveAlarm(AlarmHolder alarmHolder) {
+        Cursor cursor = getAlarmCursor(alarmHolder.getId());
+        if (cursor.getCount() != 0) {
+            updateAlarm(alarmHolder);
+        } else {
+            insertAlarm(alarmHolder);
+        }
+        cursor.close();
+    }
+
+    public void saveSeriesList(SeriesList seriesList) {
+        Cursor cursor = null;
+        for (Series series : seriesList) {
+            cursor = getSeriesCursor(series.getMALID());
+            if (cursor.getCount() != 0) {
+                updateSeries(series);
+            } else {
+                insertSeries(series);
+            }
+        }
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
 }

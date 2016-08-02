@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Arrays;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
@@ -237,7 +238,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         App.getInstance().getUserAnimeList().remove(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.updateSeriesInDb(item);
+        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (mListener instanceof MyShowsFragment) {
             visibleSeries.remove(item);
@@ -265,7 +266,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         App.getInstance().getUserAnimeList().add(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.updateSeriesInDb(item);
+        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (mListener instanceof MyShowsFragment) {
             allSeries.clear();
