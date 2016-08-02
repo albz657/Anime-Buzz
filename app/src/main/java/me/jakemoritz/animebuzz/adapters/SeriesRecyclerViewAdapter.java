@@ -51,6 +51,10 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         malApiClient = new MalApiClient(mListener);
     }
 
+    public void setVisibleSeries(SeriesList visibleSeries) {
+        this.visibleSeries = visibleSeries;
+    }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -68,7 +72,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         boolean prefersSimulcast = sharedPref.getBoolean(mListener.activity.getString(R.string.pref_simulcast_key), false);
         final boolean loggedIn = sharedPref.getBoolean(mListener.activity.getString(R.string.shared_prefs_logged_in), false);
 
-        if (App.getInstance().isCurrentOrNewer(holder.series.getSeason())) {
+        if (App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer()) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
                 holder.mDate.setText(App.getInstance().formatAiringTime(holder.series, prefersSimulcast));
             } else {
@@ -269,10 +273,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (mListener instanceof MyShowsFragment) {
-            allSeries.clear();
-            allSeries.addAll(App.getInstance().getUserAnimeList());
-            visibleSeries.clear();
-            visibleSeries.addAll(allSeries);
+            visibleSeries = (SeriesList) allSeries.clone();
         }
 
 //        App.getInstance().getCircleBitmap(item);

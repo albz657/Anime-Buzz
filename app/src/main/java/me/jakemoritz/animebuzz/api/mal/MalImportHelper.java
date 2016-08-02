@@ -50,8 +50,7 @@ public class MalImportHelper {
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
 
         if (fragment.mAdapter != null) {
-            fragment.mAdapter.getVisibleSeries().clear();
-            fragment.mAdapter.getVisibleSeries().addAll(App.getInstance().getUserAnimeList());
+            fragment.mAdapter.setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());
         }
 
 

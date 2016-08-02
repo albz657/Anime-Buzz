@@ -57,8 +57,9 @@ public class App extends Application {
     private List<AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
+    private boolean initializingGotImages = false;
     private boolean tryingToVerify = false;
-    private String currentlyBrowsingSeasonName = "";
+    private Season currentlyBrowsingSeason;
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
     private boolean justLaunchedMyShows = false;
@@ -91,7 +92,15 @@ public class App extends Application {
             dummyAlarm();
             rescheduleAlarms();
 
-            currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+            String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
+
+
+            for (Season season : allAnimeSeasons){
+                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)){
+                    currentlyBrowsingSeason = season;
+                }
+            }
+
         }
     }
 
@@ -194,20 +203,28 @@ public class App extends Application {
         return formattedTime;
     }
 
-    public boolean isCurrentOrNewer(String seasonName) {
+    private void setCurrentOrNewer() {
         List<SeasonMetadata> metadataList = new ArrayList<>(seasonsList);
         Collections.sort(metadataList, new SeasonMetadataComparator());
         SeasonMetadata pendingSeason = null;
         SeasonMetadata latestSeason = null;
+
+        String latestSeasonName = getLatestSeasonName();
         for (SeasonMetadata metadata : metadataList) {
-            if (metadata.getName().equals(seasonName)) {
-                pendingSeason = metadata;
-            }
-            if (metadata.getName().equals(getLatestSeasonName())) {
+            if (metadata.getName().equals(latestSeasonName)) {
                 latestSeason = metadata;
             }
         }
-        return (metadataList.indexOf(pendingSeason) >= metadataList.indexOf(latestSeason));
+
+        int latestIndex = metadataList.indexOf(latestSeason);
+
+        for (SeasonMetadata metadata : seasonsList){
+            if (metadataList.indexOf(metadata) >= latestIndex){
+                metadata.setCurrentOrNewer(true);
+            } else {
+                metadata.setCurrentOrNewer(false);
+            }
+        }
     }
 
   /*
@@ -439,6 +456,7 @@ public class App extends Application {
     public void loadData(){
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
         seasonsList = databaseHelper.getAllSeasonMetadata();
+        setCurrentOrNewer();
         allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
         userAnimeList = loadUserList();
         backlog = loadBacklog();
@@ -584,12 +602,12 @@ public class App extends Application {
 
     private SeasonPostersImportResponse delegate = null;
 
-    public String getCurrentlyBrowsingSeasonName() {
-        return currentlyBrowsingSeasonName;
+    public Season getCurrentlyBrowsingSeason() {
+        return currentlyBrowsingSeason;
     }
 
-    public void setCurrentlyBrowsingSeasonName(String currentlyBrowsingSeasonName) {
-        this.currentlyBrowsingSeasonName = currentlyBrowsingSeasonName;
+    public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
+        this.currentlyBrowsingSeason = currentlyBrowsingSeason;
     }
 
     public boolean isPostInitializing() {
@@ -616,23 +634,11 @@ public class App extends Application {
         this.syncingSeasons = syncingSeasons;
     }
 
-    public void setSeasonsList(Set<SeasonMetadata> seasonsList) {
-        this.seasonsList = seasonsList;
+    public boolean isInitializingGotImages() {
+        return initializingGotImages;
     }
 
-    public void setAllAnimeSeasons(SeasonList allAnimeSeasons) {
-        this.allAnimeSeasons = allAnimeSeasons;
-    }
-
-    public void setUserAnimeList(SeriesList userAnimeList) {
-        this.userAnimeList = userAnimeList;
-    }
-
-    public void setBacklog(List<BacklogItem> backlog) {
-        this.backlog = backlog;
-    }
-
-    public void setAlarms(List<AlarmHolder> alarms) {
-        this.alarms = alarms;
+    public void setInitializingGotImages(boolean initializingGotImages) {
+        this.initializingGotImages = initializingGotImages;
     }
 }

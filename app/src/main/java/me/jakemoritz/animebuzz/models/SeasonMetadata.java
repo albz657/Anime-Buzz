@@ -5,11 +5,30 @@ public class SeasonMetadata {
     private String name;
     private String start_timestamp;
     private String key;
+    private boolean currentOrNewer;
+    private boolean latest;
 
     public SeasonMetadata(String name, String start_timestamp, String key) {
         this.name = name;
         this.start_timestamp = start_timestamp;
         this.key = key;
+        this.latest = false;
+    }
+
+    public SeasonMetadata(String name, String start_timestamp, String key, boolean latest) {
+        this.name = name;
+        this.start_timestamp = start_timestamp;
+        this.key = key;
+        this.latest = latest;
+    }
+
+
+    public boolean isLatest() {
+        return latest;
+    }
+
+    public void setLatest(boolean latest) {
+        this.latest = latest;
     }
 
     @Override
@@ -21,6 +40,14 @@ public class SeasonMetadata {
 
         return key.equals(metadata.key);
 
+    }
+
+    public boolean isCurrentOrNewer() {
+        return currentOrNewer;
+    }
+
+    public void setCurrentOrNewer(boolean currentOrNewer) {
+        this.currentOrNewer = currentOrNewer;
     }
 
     @Override

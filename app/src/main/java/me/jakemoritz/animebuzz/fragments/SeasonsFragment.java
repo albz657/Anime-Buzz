@@ -24,6 +24,7 @@ import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeasonsFragment extends SeriesFragment {
 
@@ -56,7 +57,7 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
         }
 
         if (App.getInstance().isJustLaunchedSeasons()) {
@@ -72,12 +73,12 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void loadSeason(String seasonName) {
-        mAdapter.setAllSeries(App.getInstance().getSeasonFromName(seasonName).getSeasonSeries());
-        mAdapter.getVisibleSeries().clear();
-        mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
+        Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
+        mAdapter.setAllSeries(currentlyBrowsingSeason.getSeasonSeries());
+        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
         mAdapter.notifyDataSetChanged();
 
-        App.getInstance().setCurrentlyBrowsingSeasonName(seasonName);
+        App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
 
     private List<String> getSpinnerItems() {
@@ -93,7 +94,7 @@ public class SeasonsFragment extends SeriesFragment {
         for (SeasonMetadata metadata : metadataList) {
             seasonNames.add(metadata.getName());
 
-            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
+            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
                 previousSpinnerIndex = metadataList.indexOf(metadata);
             }
         }
@@ -129,7 +130,7 @@ public class SeasonsFragment extends SeriesFragment {
             ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
             ((MainActivity) activity).progressView.stopAnimation();
 
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeasonName());
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
 
             App.getInstance().setPostInitializing(true);
 
@@ -196,7 +197,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void onRefresh() {
         if (App.getInstance().isNetworkAvailable()) {
             for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
-                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
+                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
                     senpaiExportHelper.getSeasonData(metadata);
                 }
             }

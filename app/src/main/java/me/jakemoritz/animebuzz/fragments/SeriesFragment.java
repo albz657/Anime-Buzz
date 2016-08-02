@@ -92,6 +92,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         activity = (AppCompatActivity) getActivity();
     }
 
+
+
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -159,7 +161,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         App.getInstance().getAllAnimeSeasons().add(season);
         App.getInstance().saveNewSeasonData(season);
 
-        if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())){
+        if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())){
             App.getInstance().setGettingCurrentBrowsing(true);
         }
         if (App.getInstance().isNetworkAvailable()){
@@ -179,7 +181,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().setSyncingSeasons(new ArrayList<SeasonMetadata>());
 
             for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()) {
-                if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeasonName())) {
+                if (!seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
                     App.getInstance().getSyncingSeasons().add(seasonMetadata);
                 }
             }

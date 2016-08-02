@@ -67,6 +67,8 @@ public class ANNSearchHelper {
             }
 
             getPictureUrlBatch(getImageURLBatch.remove(0));
+        } else {
+            fragment.seasonPostersImported();
         }
     }
 
@@ -80,6 +82,10 @@ public class ANNSearchHelper {
                     }
                 }
             }, 1000);
+        } else {
+            if (App.getInstance().isInitializing()){
+                App.getInstance().setInitializingGotImages(true);
+            }
         }
     }
 

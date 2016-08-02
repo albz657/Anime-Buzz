@@ -164,10 +164,8 @@ public class MyShowsFragment extends SeriesFragment {
             hasDateList.add(series);
         }
 
-        mAdapter.getAllSeries().clear();
-        mAdapter.getVisibleSeries().clear();
-        mAdapter.getAllSeries().addAll(hasDateList);
-        mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
+        mAdapter.setAllSeries(hasDateList);
+        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
     }
 
     private void sortByName() {
@@ -177,13 +175,13 @@ public class MyShowsFragment extends SeriesFragment {
         editor.apply();
 
         Collections.sort(mAdapter.getAllSeries(), new SeriesNameComparator());
-        mAdapter.getVisibleSeries().clear();
-        mAdapter.getVisibleSeries().addAll(mAdapter.getAllSeries());
+        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
     }
 
     @Override
     public void seasonPostersImported() {
-        if (App.getInstance().isInitializing()) {
+        if (App.getInstance().isInitializingGotImages()) {
+            App.getInstance().setInitializing(false);
             new MalApiClient(this).getUserList();
 
 
@@ -207,7 +205,13 @@ public class MyShowsFragment extends SeriesFragment {
             if (helper == null){
                 helper = new ANNSearchHelper();
             }
-            helper.getImages(this, mAdapter.getAllSeries());
+
+            if (App.getInstance().isInitializing()){
+                helper.getImages(this, season.getSeasonSeries());
+            } else {
+                helper.getImages(this, mAdapter.getAllSeries());
+
+            }
         } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
@@ -215,8 +219,8 @@ public class MyShowsFragment extends SeriesFragment {
 
     @Override
     public void malDataRead() {
-        if (App.getInstance().isInitializing()) {
-            App.getInstance().setInitializing(false);
+        if (App.getInstance().isInitializingGotImages()) {
+            App.getInstance().setInitializingGotImages(false);
             App.getInstance().setPostInitializing(true);
 
             ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
