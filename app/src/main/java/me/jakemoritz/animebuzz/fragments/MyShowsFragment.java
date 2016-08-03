@@ -87,10 +87,7 @@ public class MyShowsFragment extends SeriesFragment {
 
         loadUserSortingPreference();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
-
-        if (App.getInstance().isJustLaunchedMyShows() && loggedIn){
+        if (App.getInstance().isJustLaunchedMyShows()){
             onRefresh();
             swipeRefreshLayout.post(new Runnable() {
                 @Override
@@ -208,7 +205,14 @@ public class MyShowsFragment extends SeriesFragment {
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
         if (updating) {
-            malApiClient.getUserList();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+            boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
+
+            if (isLoggedIn){
+                malApiClient.getUserList();
+            } else {
+                swipeRefreshLayout.setRefreshing(false);
+            }
 
         }
 

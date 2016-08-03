@@ -267,6 +267,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             for (Series series : App.getInstance().getUserAnimeList()) {
                 series.setInUserList(false);
             }
+            DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(App.getInstance().getUserAnimeList());
             App.getInstance().getUserAnimeList().clear();
         } else {
             for (Series series : App.getInstance().getUserAnimeList()) {
