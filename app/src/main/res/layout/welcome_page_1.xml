@@ -80,6 +80,27 @@
                 android:layout_toLeftOf="@id/benefit_backlog"
                 android:text="@string/bullet"
                 android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/benefit_browse"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/benefit_backlog"
+                android:layout_toRightOf="@id/bullet_backlog"
+                android:text="@string/benefit_browse_text"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_browse"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/benefit_backlog"
+                android:layout_toLeftOf="@id/benefit_browse"
+                android:text="@string/bullet"
+                android:textColor="#FFFFFF" />
         </RelativeLayout>
 
         <TextView

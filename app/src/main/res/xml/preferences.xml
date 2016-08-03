@@ -46,6 +46,12 @@
             android:summary="@string/pref_increment_summary"
             android:title="@string/pref_increment_title"/>
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_firebase_key"
+            android:summary="@string/pref_firebase_summary"
+            android:title="@string/pref_firebase_title"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory

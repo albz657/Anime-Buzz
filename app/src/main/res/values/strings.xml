@@ -30,6 +30,8 @@
     <string name="bullet">&#8226;</string>
     <string name="benefit_notification_text">Notifications when new episodes air</string>
     <string name="benefit_backlog_text">A backlog of episodes you haven\'t watched yet</string>
+    <string name="benefit_browse_text">A season browser to discover and follow new series</string>
+
     <string name="swipe_left_setup">Swipe left to begin setup</string>
 
     <!--Welcome Page 2-->
@@ -102,6 +104,10 @@
     <string name="pref_increment_title">Prompt to increment episode count</string>
     <string name="pref_increment_summary">Prompt will be displayed after swiping item in watching queue. (for MAL)</string>
     <string name="pref_increment_off_summary">Prompt will not be displayed after swiping item in watching queue. (for MAL)</string>
+
+    <string name="pref_firebase_key">firebasekey</string>
+    <string name="pref_firebase_title">Report anonymous usage data</string>
+    <string name="pref_firebase_summary">Help improve Anime Buzz by automatically reporting anonymous usage data.</string>
 
     <string name="pref_category_account_title">Account</string>
     <string name="pref_category_account_key">categoryaccountkey</string>

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -22,6 +23,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.xpece.android.support.preference.ListPreference;
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
@@ -56,6 +59,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     SwitchPreference format24hourPreference;
     SwitchPreference incrementPreference;
     RingtonePreference ringtonePreference;
+    SwitchPreference firebasePreference;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -125,6 +130,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         } else if (s.equals(getString(R.string.pref_ringtone_key))) {
             setRingtoneSummary();
+        } else if (s.equals(getString(R.string.pref_firebase_key))){
+            FirebaseAnalytics.getInstance(App.getInstance()).setAnalyticsCollectionEnabled(firebasePreference.isChecked());
         }
     }
 
@@ -168,6 +175,14 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
         setRingtoneSummary();
+
+        firebasePreference = (SwitchPreference) findPreference(getString(R.string.pref_firebase_key));
+
+        boolean isDebuggable =  ( 0 != ( App.getInstance().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) );
+
+        if (isDebuggable){
+            firebasePreference.setEnabled(false);
+        }
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
