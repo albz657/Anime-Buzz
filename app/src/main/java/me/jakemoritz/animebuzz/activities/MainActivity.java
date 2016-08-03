@@ -188,8 +188,11 @@ public class MainActivity extends AppCompatActivity
     public void loadDrawerUserInfo() {
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-        Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-
+        if (avatarFile.exists()){
+            Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        } else {
+            Picasso.with(this).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        }
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);

@@ -235,7 +235,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (avatarFile.exists()) {
             avatarFile.delete();
         }
-        ((MainActivity) activity).loadDrawerUserInfo();
+        App.getInstance().getMainActivity().loadDrawerUserInfo();
 
         Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_SHORT).show();
 
@@ -314,6 +314,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (!App.getInstance().getUserAnimeList().isEmpty()){
             importExistingSeries();
         }
+
+        App.getInstance().getMainActivity().loadDrawerUserInfo();
 
         incrementPreference.setEnabled(true);
         incrementPreference.setChecked(true);
