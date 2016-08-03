@@ -54,7 +54,7 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (bitmap != null){
-            activity.cacheUserAvatar(bitmap);
+            App.getInstance().cacheUserAvatar(bitmap);
         }
     }
 

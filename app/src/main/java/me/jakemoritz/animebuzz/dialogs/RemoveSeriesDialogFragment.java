@@ -4,8 +4,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.preference.PreferenceManager;
 
+import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class RemoveSeriesDialogFragment extends DialogFragment {
@@ -27,9 +31,11 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Are you sure you want to delete this from your list?")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         listener.removeSeriesDialogClosed(true, series, position);
@@ -41,6 +47,14 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
                         listener.removeSeriesDialogClosed(false, series, position);
                     }
                 });
+
+        if (loggedIn){
+            builder.setMessage("Are you sure you want to remove this from your list? (including your MAL list)");
+
+        } else {
+            builder.setMessage("Are you sure you want to remove this from your list?");
+
+        }
 
         return builder.create();
     }

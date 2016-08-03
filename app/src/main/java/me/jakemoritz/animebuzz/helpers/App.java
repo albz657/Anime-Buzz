@@ -7,12 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -91,7 +95,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -125,6 +129,20 @@ public class App extends Application {
     }
 
     /* HELPERS */
+
+    public void cacheUserAvatar(Bitmap bitmap) {
+        try {
+            FileOutputStream fos = openFileOutput(getString(R.string.file_avatar), Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.close();
+
+            mainActivity.loadDrawerUserInfo();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public String formatTime(Long time) {
         Calendar cal = Calendar.getInstance();

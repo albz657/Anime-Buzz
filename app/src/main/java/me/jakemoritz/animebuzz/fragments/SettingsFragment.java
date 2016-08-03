@@ -1,6 +1,9 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -30,11 +33,14 @@ import java.io.File;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -256,6 +262,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         MalApiClient malApiClient = new MalApiClient(new MyShowsFragment());
 
+
         if (!add) {
             for (Series series : App.getInstance().getUserAnimeList()) {
                 series.setInUserList(false);
@@ -283,6 +290,19 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         App.getInstance().setJustLaunchedMyShows(true);
         App.getInstance().setJustSignedInFromSettings(true);
+
+        App.getInstance().getBacklog().clear();
+
+        AlarmManager alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
+        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+            notificationIntent.putExtra("MALID", alarm.getId());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, 0);
+            alarmManager.cancel(pendingIntent);
+        }
+
+        App.getInstance().getAlarms().clear();
+        DatabaseHelper.getInstance(App.getInstance()).deleteAllAlarms();
 
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         if (!username.isEmpty()) {
