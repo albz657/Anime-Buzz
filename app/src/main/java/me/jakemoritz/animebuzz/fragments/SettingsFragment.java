@@ -281,11 +281,22 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         preference.setVisible(false);
         signOutPreference.setVisible(true);
 
+        App.getInstance().setJustLaunchedMyShows(true);
+        App.getInstance().setJustSignedInFromSettings(true);
+
+        String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
+        if (!username.isEmpty()) {
+            String summary = getString(R.string.pref_account_summary_on) + username + "'.";
+            signOutPreference.setSummary(summary);
+        }
+
         if (!App.getInstance().getUserAnimeList().isEmpty()){
             importExistingSeries();
         }
 
         incrementPreference.setEnabled(true);
+        incrementPreference.setChecked(true);
+
     }
 
     @Override

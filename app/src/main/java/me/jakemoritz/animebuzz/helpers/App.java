@@ -62,6 +62,7 @@ public class App extends Application {
     private Season currentlyBrowsingSeason;
     private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
+    private boolean justSignedInFromSettings = false;
     private boolean justLaunchedMyShows = false;
     private boolean justLaunchedSeasons = false;
     private boolean justRemoved = false;
@@ -655,5 +656,13 @@ public class App extends Application {
 
     public void setJustRemoved(boolean justRemoved) {
         this.justRemoved = justRemoved;
+    }
+
+    public boolean isJustSignedInFromSettings() {
+        return justSignedInFromSettings;
+    }
+
+    public void setJustSignedInFromSettings(boolean justSignedInFromSettings) {
+        this.justSignedInFromSettings = justSignedInFromSettings;
     }
 }

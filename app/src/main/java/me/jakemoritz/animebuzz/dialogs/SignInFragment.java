@@ -105,6 +105,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         if (signInSuccessful) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(App.getInstance().getString(R.string.mal_username_formatted), usernameField.getText().toString());
             editor.putString(getString(R.string.credentials_username), usernameField.getText().toString().trim());
             editor.putString(getString(R.string.credentials_password), passwordField.getText().toString());
             editor.putBoolean(getString(R.string.shared_prefs_logged_in), true);

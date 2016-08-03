@@ -119,8 +119,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                     public void run() {
                         refreshEmpty();
 
-                        if (App.getInstance().isJustRemoved()){
+                        if ((App.getInstance().isJustRemoved() && mAdapter.getAllSeries().isEmpty()) || App.getInstance().isJustSignedInFromSettings()){
                             App.getInstance().setJustRemoved(false);
+                            App.getInstance().setJustSignedInFromSettings(false);
 
                             FragmentManager manager = activity.getSupportFragmentManager();
                             manager.beginTransaction()
