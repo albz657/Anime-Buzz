@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.api.mal;
 
-import android.database.Cursor;
-
 import java.util.List;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -30,7 +28,7 @@ public class MalImportHelper {
         SeriesList matchedSeries = new SeriesList();
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
-        Cursor res = null;
+
         for (MatchHolder match : matchList) {
             Series tempSeries = dbHelper.getSeries(match.getMALID());
 
@@ -40,14 +38,15 @@ public class MalImportHelper {
                 matchedSeries.add(tempSeries);
 
 //                App.getInstance().getCircleBitmap(tempSeries);
-
-                if (tempSeries.getAirdate() > 0 && tempSeries.getSimulcast_airdate() > 0) {
-                    App.getInstance().makeAlarm(tempSeries);
-                }
             }
         }
 
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
+        for (Series series : App.getInstance().getUserAnimeList()){
+            if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {
+                App.getInstance().makeAlarm(series);
+            }
+        }
 
         if (fragment.mAdapter != null) {
             fragment.mAdapter.setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());

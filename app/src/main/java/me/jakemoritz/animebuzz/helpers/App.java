@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -107,7 +108,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -375,6 +376,7 @@ public class App extends Application {
         alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
         processNewAlarm(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID()));
 
+        DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
         // debug code
 //        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 //        String formattedNext = format.format(nextEpisode.getTime());
@@ -409,6 +411,7 @@ public class App extends Application {
 
     private void processNewAlarm(AlarmHolder alarmHolder) {
         DatabaseHelper.getInstance(this).saveAlarm(alarmHolder);
+
         alarms.put(alarmHolder.getId(), alarmHolder);
     }
 
