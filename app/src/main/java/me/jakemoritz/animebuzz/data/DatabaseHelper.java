@@ -11,8 +11,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.helpers.App;
@@ -317,15 +319,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return seasonList;
     }
 
-    public List<AlarmHolder> getAllAlarms() {
+    public Map<Integer, AlarmHolder> getAllAlarms() {
+        Map<Integer, AlarmHolder> alarms = new HashMap<>();
         Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
-
-        List<AlarmHolder> alarms = new ArrayList<>();
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
-            alarms.add(tempAlarm);
+            alarms.put(tempAlarm.getId(), tempAlarm);
             cursor.moveToNext();
         }
 

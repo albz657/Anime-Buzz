@@ -25,9 +25,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
@@ -61,7 +62,7 @@ public class App extends Application {
     private SeasonList allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private List<BacklogItem> backlog;
-    private List<AlarmHolder> alarms;
+    private Map<Integer, AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean initializingGotImages = false;
@@ -98,7 +99,7 @@ public class App extends Application {
         userAnimeList = new SeriesList();
         seasonsList = new HashSet<>();
         backlog = new ArrayList<>();
-        alarms = new ArrayList<>();
+        alarms = new HashMap<>();
 
         database = DatabaseHelper.getInstance(this).getWritableDatabase();
 
@@ -131,11 +132,11 @@ public class App extends Application {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
             time += 5000L;
-            alarms.get(0).setAlarmTime(time);
-            time += 5000L;
+            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
+            /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
             time += 5000L;
-            alarms.get(2).setAlarmTime(time);
+            alarms.get(2).setAlarmTime(time);*/
         }
     }
 
@@ -326,7 +327,7 @@ public class App extends Application {
 
     public void rescheduleAlarms() {
         alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
-        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+        for (AlarmHolder alarm : App.getInstance().getAlarms().values()) {
             Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
             notificationIntent.putExtra("MALID", alarm.getId());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, 0);
@@ -408,22 +409,12 @@ public class App extends Application {
 
     private void processNewAlarm(AlarmHolder alarmHolder) {
         DatabaseHelper.getInstance(this).saveAlarm(alarmHolder);
-        alarms.add(alarmHolder);
+        alarms.put(alarmHolder.getId(), alarmHolder);
     }
 
     public void removeAlarmFromStructure(int id) {
-        List<AlarmHolder> newAlarms = new ArrayList<>(alarms);
-        AlarmHolder alarm;
-        for (Iterator alarmIterator = alarms.iterator(); alarmIterator.hasNext(); ) {
-            alarm = (AlarmHolder) alarmIterator.next();
-            if (alarm.getId() == id) {
-                newAlarms.remove(alarm);
-
-                DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-                dbHelper.deleteAlarm(alarm.getId());
-            }
-        }
-        alarms = newAlarms;
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
+        dbHelper.deleteAlarm(id);
     }
 
     public void removeAlarm(Series series) {
@@ -585,7 +576,7 @@ public class App extends Application {
         this.justLaunchedMyShows = justLaunchedMyShows;
     }
 
-    public List<AlarmHolder> getAlarms() {
+    public Map<Integer, AlarmHolder> getAlarms() {
         return alarms;
     }
 

@@ -310,7 +310,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         App.getInstance().getBacklog().clear();
 
         AlarmManager alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
-        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+        for (AlarmHolder alarm : App.getInstance().getAlarms().values()) {
             Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
             notificationIntent.putExtra("MALID", alarm.getId());
             PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, 0);
