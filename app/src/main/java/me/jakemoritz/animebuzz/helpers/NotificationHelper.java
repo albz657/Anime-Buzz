@@ -127,6 +127,8 @@ public class NotificationHelper {
             notification.defaults |= Notification.DEFAULT_SOUND;
         }
 
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
         mNotificationManager.notify(series.getMALID(), notification);
     }
 

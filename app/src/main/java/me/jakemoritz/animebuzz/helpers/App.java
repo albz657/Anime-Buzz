@@ -93,7 +93,7 @@ public class App extends Application {
             editor.apply();
         }
 
-//        SQLiteStudioService.instance().start(this);
+        SQLiteStudioService.instance().start(this);
 
         mInstance = this;
         allAnimeSeasons = new SeasonList();
@@ -108,7 +108,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -133,7 +133,9 @@ public class App extends Application {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
             time += 5000L;
-            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
+//            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
+            alarms.get(Integer.valueOf("30014")).setAlarmTime(time);
+
             /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
             time += 5000L;
