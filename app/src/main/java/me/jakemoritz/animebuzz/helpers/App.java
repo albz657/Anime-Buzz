@@ -108,7 +108,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");

@@ -33,6 +33,7 @@ public class SeasonsFragment extends SeriesFragment {
     private Spinner toolbarSpinner;
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     private int previousSpinnerIndex = 0;
+    private SearchView searchView;
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -149,7 +150,15 @@ public class SeasonsFragment extends SeriesFragment {
                 toolbarSpinner.setVisibility(View.GONE);
                 activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
             } else {
-                toolbarSpinner.setVisibility(View.VISIBLE);
+                if (searchView != null) {
+                    if (!searchView.isIconified()) {
+                        toolbarSpinner.setVisibility(View.INVISIBLE);
+                    } else {
+                        toolbarSpinner.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    toolbarSpinner.setVisibility(View.VISIBLE);
+                }
                 activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
 
                 seasonsSpinnerAdapter.getSeasonNames().clear();
@@ -165,32 +174,40 @@ public class SeasonsFragment extends SeriesFragment {
         super.onCreateOptionsMenu(menu, inflater);
         activity.getMenuInflater().inflate(R.menu.seasons_menu, menu);
 
-        MenuItem item = menu.findItem(R.id.action_search);
-        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+        final MenuItem item = menu.findItem(R.id.action_search);
+        searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                return true;
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus && searchView.getQuery().toString().isEmpty()) {
+                    toolbarSpinner.setVisibility(View.VISIBLE);
+                    searchView.setIconified(true);
+                } else {
+                    if (searchView.isIconified()) {
+                        toolbarSpinner.setVisibility(View.VISIBLE);
+                    } else {
+                        toolbarSpinner.setVisibility(View.INVISIBLE);
+                    }
+                }
             }
         });
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mAdapter.getFilter().filter(query);
-                return false;
-            }
+                                              @Override
+                                              public boolean onQueryTextSubmit(String query) {
+                                                  mAdapter.getFilter().filter(query);
+                                                  return false;
+                                              }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });
+                                              @Override
+                                              public boolean onQueryTextChange(String newText) {
+                                                  mAdapter.getFilter().filter(newText);
+
+                                                  return false;
+                                              }
+                                          }
+
+        );
     }
 
     @Override
@@ -205,7 +222,6 @@ public class SeasonsFragment extends SeriesFragment {
         } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
-
     }
 
 }

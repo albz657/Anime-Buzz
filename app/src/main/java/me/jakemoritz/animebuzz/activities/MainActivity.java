@@ -200,6 +200,8 @@ public class MainActivity extends AppCompatActivity
         drawerUsername.setText(malUsername);
     }
 
+
+
     @Override
     protected void onPause() {
         super.onPause();
