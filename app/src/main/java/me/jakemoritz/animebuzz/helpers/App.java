@@ -159,6 +159,34 @@ public class App extends Application {
         }
     }
 
+    public String formatBacklogTime(Long time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(time);
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
+
+        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
+        SimpleDateFormat hourFormat = null;
+
+        String formattedTime = format.format(cal.getTime());
+
+        DateFormatHelper helper = new DateFormatHelper();
+        formattedTime += helper.getDayOfMonthSuffix(cal.get(Calendar.DAY_OF_MONTH));
+
+        if (prefers24Hour) {
+            hourFormat = new SimpleDateFormat(", kk:mm");
+            formattedTime += hourFormat.format(cal.getTime());
+
+        } else {
+            hourFormat = new SimpleDateFormat(", h:mm");
+            formattedTime += hourFormat.format(cal.getTime());
+            formattedTime += new SimpleDateFormat(" a").format(cal.getTime());
+        }
+
+        return formattedTime;
+    }
+
     public String formatTime(Long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(new Date(time));

@@ -119,7 +119,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         }
 
-        holder.mDate.setText(App.getInstance().formatTime(holder.backlogItem.getAlarmTime()));
+        holder.mDate.setText(App.getInstance().formatBacklogTime(holder.backlogItem.getAlarmTime()));
     }
 
     @Override
