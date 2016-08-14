@@ -9,7 +9,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -32,53 +31,51 @@ public class MalImportHelper {
 
     public void matchSeries(List<MatchHolder> matchList) {
         SeriesList matchedSeries = new SeriesList();
-        DatabaseHelper dbHelper = null;
 
-        if (App.getInstance().isInitializingGotImages()) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            String latestSeasonName = sharedPreferences.getString(App.getInstance().getString(R.string.shared_prefs_latest_season), "");
-            Season latestSeason = null;
-            if (!latestSeasonName.isEmpty()) {
-                for (Season season : App.getInstance().getAllAnimeSeasons()) {
-                    if (season.getSeasonMetadata().getName().equals(latestSeasonName)) {
-                        latestSeason = season;
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        String latestSeasonName = sharedPreferences.getString(App.getInstance().getString(R.string.shared_prefs_latest_season), "");
+        Season latestSeason = null;
+
+        if (!latestSeasonName.isEmpty()) {
+            for (Season season : App.getInstance().getAllAnimeSeasons()) {
+                if (season.getSeasonMetadata().getName().equals(latestSeasonName)) {
+                    latestSeason = season;
+                    break;
+                }
+            }
+        }
+
+        if (latestSeason != null) {
+            MatchHolder match = null;
+            for (Iterator matchedIterator = matchList.iterator(); matchedIterator.hasNext(); ) {
+                match = (MatchHolder) matchedIterator.next();
+                for (Series savedSeries : latestSeason.getSeasonSeries()) {
+                    if (match.getMALID() == savedSeries.getMALID()) {
+                        savedSeries.setInUserList(true);
+                        savedSeries.setEpisodesWatched(match.getEpisodesWatched());
+                        matchedSeries.add(savedSeries);
+                        matchedIterator.remove();
                         break;
                     }
                 }
             }
 
-            if (latestSeason != null) {
-                MatchHolder match = null;
-                for (Iterator matchedIterator = matchList.iterator(); matchedIterator.hasNext(); ) {
-                    match = (MatchHolder) matchedIterator.next();
-                    for (Series savedSeries : latestSeason.getSeasonSeries()) {
-                        if (match.getMALID() == savedSeries.getMALID()) {
-                            savedSeries.setInUserList(true);
-                            savedSeries.setEpisodesWatched(match.getEpisodesWatched());
-                            matchedSeries.add(savedSeries);
-                            matchedIterator.remove();
-                            break;
-                        }
-                    }
-                }
+        }
 
-            }
-        } else {
-            dbHelper = DatabaseHelper.getInstance(App.getInstance());
+/*        DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
 
-            for (MatchHolder match : matchList) {
+        for (MatchHolder match : matchList) {
 
-                Series tempSeries = dbHelper.getSeries(match.getMALID());
+            Series tempSeries = dbHelper.getSeries(match.getMALID());
 
-                if (tempSeries != null) {
-                    tempSeries.setInUserList(true);
-                    tempSeries.setEpisodesWatched(match.getEpisodesWatched());
-                    matchedSeries.add(tempSeries);
+            if (tempSeries != null) {
+                tempSeries.setInUserList(true);
+                tempSeries.setEpisodesWatched(match.getEpisodesWatched());
+                matchedSeries.add(tempSeries);
 
 //                App.getInstance().getCircleBitmap(tempSeries);
-                }
             }
-        }
+        }*/
 
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
         for (Series series : App.getInstance().getUserAnimeList()) {
@@ -96,9 +93,9 @@ public class MalImportHelper {
             ((MyShowsFragment) fragment).loadUserSortingPreference();
         }
 
-        if (dbHelper != null) {
+/*        if (dbHelper != null) {
             dbHelper.saveSeriesList(App.getInstance().getUserAnimeList());
-        }
+        }*/
 
         if (delegate != null) {
             delegate.malDataRead();
