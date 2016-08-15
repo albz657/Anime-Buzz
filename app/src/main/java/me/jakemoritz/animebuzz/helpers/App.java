@@ -407,20 +407,7 @@ public class App extends Application {
         dbHelper.deleteAllAlarms();
 
         for (Series series : userAnimeList) {
-            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-            notificationIntent.putExtra("name", series.getName());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
-
-            long nextEpisodeTime;
-            if (prefersSimulcast) {
-                nextEpisodeTime = series.getNextEpisodeSimulcastTime();
-            } else {
-                nextEpisodeTime = series.getNextEpisodeAirtime();
-            }
-
-            alarmManager.set(AlarmManager.RTC, nextEpisodeTime, pendingIntent);
-            processNewAlarm(new AlarmHolder(series.getName(), nextEpisodeTime, series.getMALID()));
-
+            makeAlarm(series);
         }
     }
 
