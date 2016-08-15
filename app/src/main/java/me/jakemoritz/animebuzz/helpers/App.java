@@ -39,7 +39,7 @@ import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
-import me.jakemoritz.animebuzz.interfaces.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
@@ -17,9 +18,9 @@ import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.MalDataRead;
-import me.jakemoritz.animebuzz.interfaces.MalEndpointInterface;
-import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalDataRead;
+import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -37,6 +38,7 @@ public class MalApiClient {
     private static final String BASE_URL = "http://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
+    private SeriesRecyclerViewAdapter adapterListener;
     private VerifyCredentialsResponse verifyListener;
     private MalDataRead malDataReadListener;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -58,6 +60,11 @@ public class MalApiClient {
         this.verifyListener = verifyListener;
     }
 
+    public MalApiClient(SeriesRecyclerViewAdapter adapterListener) {
+        this.adapterListener = adapterListener;
+        this.verifyListener = adapterListener;
+    }
+
     public void addAnime(String MALID) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
@@ -71,15 +78,17 @@ public class MalApiClient {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful() && response.raw().message().equals("Created")) {
+                        adapterListener.itemAdded(true);
                         Log.d(TAG, response.toString());
-
+                    } else {
+                        adapterListener.itemAdded(false);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
+                    adapterListener.itemAdded(false);
                     Log.d(TAG, t.toString());
-
                 }
             });
         }
@@ -96,7 +105,7 @@ public class MalApiClient {
             DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
             Series series = dbHelper.getSeries(Integer.valueOf(MALID));
 
-            if (series != null){
+            if (series != null) {
                 MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
                 Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + (series.getEpisodesWatched() + 1) + "</episode></entry>", MALID);
                 call.enqueue(new Callback<Void>() {
@@ -131,15 +140,17 @@ public class MalApiClient {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful() && response.raw().message().equals("OK")) {
+                        adapterListener.itemDeleted(true);
                         Log.d(TAG, response.toString());
-
+                    } else {
+                        adapterListener.itemDeleted(false);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
+                    adapterListener.itemDeleted(false);
                     Log.d(TAG, t.toString());
-
                 }
             });
         }
@@ -207,6 +218,9 @@ public class MalApiClient {
                     Request.Builder requestBuilder = original.newBuilder()
                             .header("Authorization", basic)
                             .header("Accept", "application/xml")
+//                            .cacheControl(CacheControl.FORCE_NETWORK)
+//                            .addHeader("Cache-Control", "no-cache")
+//                            .addHeader("Cache-Control", "no-store")
                             .method(original.method(), original.body());
 
                     Request request = requestBuilder.build();
@@ -227,23 +241,19 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
                 if (response.isSuccessful()) {
-                    if (verifyListener != null) {
-                        verifyListener.verifyCredentialsResponseReceived(true);
+                    verifyListener.verifyCredentialsResponseReceived(true);
 
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        if (response.body().getUsername() != null) {
-                            editor.putString(App.getInstance().getString(R.string.mal_username_formatted), response.body().getUsername());
-                        }
-                        if (response.body().getUserID() != null) {
-                            editor.putString(App.getInstance().getString(R.string.mal_userid), response.body().getUserID());
-                        }
-                        editor.apply();
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    if (response.body().getUsername() != null) {
+                        editor.putString(App.getInstance().getString(R.string.mal_username_formatted), response.body().getUsername());
                     }
+                    if (response.body().getUserID() != null) {
+                        editor.putString(App.getInstance().getString(R.string.mal_userid), response.body().getUserID());
+                    }
+                    editor.apply();
                 } else {
-                    if (verifyListener != null) {
-                        verifyListener.verifyCredentialsResponseReceived(false);
-                    }
+                    verifyListener.verifyCredentialsResponseReceived(false);
                 }
                 App.getInstance().setTryingToVerify(false);
 
@@ -251,9 +261,8 @@ public class MalApiClient {
 
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
-                if (verifyListener != null) {
-                    verifyListener.verifyCredentialsResponseReceived(false);
-                }
+                verifyListener.verifyCredentialsResponseReceived(false);
+
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());
             }

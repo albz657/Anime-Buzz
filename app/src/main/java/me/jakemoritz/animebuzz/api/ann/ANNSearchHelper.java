@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.ANNEndpointInterface;
+import me.jakemoritz.animebuzz.interfaces.retrofit.ANNEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
 import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;

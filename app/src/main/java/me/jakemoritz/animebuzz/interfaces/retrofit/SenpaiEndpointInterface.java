@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.interfaces;
+package me.jakemoritz.animebuzz.interfaces.retrofit;
 
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;

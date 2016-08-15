@@ -180,7 +180,8 @@ public class MyShowsFragment extends SeriesFragment {
             hasDateList.add(series);
         }
 
-        mAdapter.setAllSeries(hasDateList);
+        mAdapter.getAllSeries().clear();
+        mAdapter.getAllSeries().addAll(hasDateList);
         mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
     }
 

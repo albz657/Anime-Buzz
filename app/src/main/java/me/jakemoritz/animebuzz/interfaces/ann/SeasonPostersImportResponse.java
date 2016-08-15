@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.interfaces;
+package me.jakemoritz.animebuzz.interfaces.ann;
 
 public interface SeasonPostersImportResponse {
     void seasonPostersImported();

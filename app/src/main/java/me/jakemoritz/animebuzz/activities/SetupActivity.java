@@ -24,7 +24,7 @@ import com.redbooth.WelcomeCoordinatorLayout;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
 
@@ -125,8 +125,8 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean signInSuccessful) {
-        if (signInSuccessful) {
+    public void verifyCredentialsResponseReceived(boolean verified) {
+        if (verified) {
             RelativeLayout malSignInContainer = (RelativeLayout) findViewById(R.id.mal_sign_in_container);
             malSignInContainer.setVisibility(View.GONE);
             malSignInContainer.setEnabled(false);

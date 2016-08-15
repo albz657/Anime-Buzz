@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.interfaces;
+package me.jakemoritz.animebuzz.interfaces.senpai;
 
 import me.jakemoritz.animebuzz.models.Season;
 

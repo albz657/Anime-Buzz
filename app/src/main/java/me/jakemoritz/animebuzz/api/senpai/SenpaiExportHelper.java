@@ -21,7 +21,7 @@ import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.SenpaiEndpointInterface;
+import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import okhttp3.OkHttpClient;

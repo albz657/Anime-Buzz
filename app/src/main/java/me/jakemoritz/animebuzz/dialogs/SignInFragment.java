@@ -21,7 +21,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SignInFragment extends DialogFragment implements VerifyCredentialsResponse {
 
@@ -101,8 +101,8 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean signInSuccessful) {
-        if (signInSuccessful) {
+    public void verifyCredentialsResponseReceived(boolean verified) {
+        if (verified) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(App.getInstance().getString(R.string.mal_username_formatted), usernameField.getText().toString());
