@@ -37,8 +37,8 @@ public class MalApiClient {
     private static final String BASE_URL = "http://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
-    private VerifyCredentialsResponse responseDelegate;
-    private MalDataRead delegate;
+    private VerifyCredentialsResponse verifyListener;
+    private MalDataRead malDataReadListener;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -47,15 +47,15 @@ public class MalApiClient {
 
     public MalApiClient(SeriesFragment seriesFragment) {
         this.seriesFragment = seriesFragment;
-        this.delegate = seriesFragment;
+        this.malDataReadListener = seriesFragment;
     }
 
     public MalApiClient() {
 
     }
 
-    public MalApiClient(VerifyCredentialsResponse responseDelegate) {
-        this.responseDelegate = responseDelegate;
+    public MalApiClient(VerifyCredentialsResponse verifyListener) {
+        this.verifyListener = verifyListener;
     }
 
     public void addAnime(String MALID) {
@@ -173,7 +173,7 @@ public class MalApiClient {
                                         matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes())));
                                     }
                                 }
-                                MalImportHelper helper = new MalImportHelper(seriesFragment, delegate);
+                                MalImportHelper helper = new MalImportHelper(seriesFragment, malDataReadListener);
                                 helper.matchSeries(matchList);
 
                                 getUserAvatar();
@@ -227,9 +227,8 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
                 if (response.isSuccessful()) {
-                    if (responseDelegate != null) {
-                        responseDelegate.verifyCredentialsResponseReceived(true);
-
+                    if (verifyListener != null) {
+                        verifyListener.verifyCredentialsResponseReceived(true);
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
                         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -242,8 +241,8 @@ public class MalApiClient {
                         editor.apply();
                     }
                 } else {
-                    if (responseDelegate != null) {
-                        responseDelegate.verifyCredentialsResponseReceived(false);
+                    if (verifyListener != null) {
+                        verifyListener.verifyCredentialsResponseReceived(false);
                     }
                 }
                 App.getInstance().setTryingToVerify(false);
@@ -252,8 +251,8 @@ public class MalApiClient {
 
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
-                if (responseDelegate != null) {
-                    responseDelegate.verifyCredentialsResponseReceived(false);
+                if (verifyListener != null) {
+                    verifyListener.verifyCredentialsResponseReceived(false);
                 }
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());

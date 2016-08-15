@@ -218,4 +218,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void malDataRead() {
         mAdapter.notifyDataSetChanged();
     }
+
+
 }

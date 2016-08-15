@@ -225,43 +225,26 @@ public class App extends Application {
         return formattedTime;
     }
 
-    public String formatAiringTime(Series series, boolean prefersSimulcast) {
-        Calendar cal;
-        if (prefersSimulcast) {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
-        } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        }
-
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
-
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
-            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-        }
-
+    public String formatAiringTime(Calendar calendar) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
 
         SimpleDateFormat format = new SimpleDateFormat("MMMM d");
         SimpleDateFormat hourFormat = null;
 
-        String formattedTime = format.format(nextEpisode.getTime());
+        String formattedTime = format.format(calendar.getTime());
 
         DateFormatHelper helper = new DateFormatHelper();
-        formattedTime += helper.getDayOfMonthSuffix(nextEpisode.get(Calendar.DAY_OF_MONTH));
+        formattedTime += helper.getDayOfMonthSuffix(calendar.get(Calendar.DAY_OF_MONTH));
 
         if (prefers24Hour) {
             hourFormat = new SimpleDateFormat(", kk:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
+            formattedTime += hourFormat.format(calendar.getTime());
 
         } else {
             hourFormat = new SimpleDateFormat(", h:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
-            formattedTime += new SimpleDateFormat(" a").format(nextEpisode.getTime());
+            formattedTime += hourFormat.format(calendar.getTime());
+            formattedTime += new SimpleDateFormat(" a").format(calendar.getTime());
         }
 
         return formattedTime;
@@ -371,33 +354,35 @@ public class App extends Application {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
 
-        long nextEpisodeAirtime = getNextEpisodeTime(series, false);
-        long nextEpisodeSimulcastTime = getNextEpisodeTime(series, true);
-        series.setNextEpisodeAirtime(nextEpisodeAirtime);
-        series.setNextEpisodeSimulcastTime(nextEpisodeSimulcastTime);
-
-        String nextEpisodeAirtimeFormatted = formatAiringTime(series, false);
-        String nextEpisodeSimulcastTimeFormatted = formatAiringTime(series, true);
-
-        series.setNextEpisodeAirtimeFormatted(nextEpisodeAirtimeFormatted);
-        series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeSimulcastTimeFormatted);
-
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Calendar cal;
+        Calendar initialAirTime;
         if (prefersSimulcast) {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+            initialAirTime = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
         } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+            initialAirTime = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
         }
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
 
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
+        Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, initialAirTime.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, initialAirTime.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, initialAirTime.get(Calendar.DAY_OF_WEEK));
+        nextEpisode.set(Calendar.SECOND, 0);
+
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.SECOND, 0);
+        if (currentTime.compareTo(nextEpisode) >= 0) {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode);
+
+        if (prefersSimulcast) {
+            series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
+        } else {
+            series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
         }
 
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);

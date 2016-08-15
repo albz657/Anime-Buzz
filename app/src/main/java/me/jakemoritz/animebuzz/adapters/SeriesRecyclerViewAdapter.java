@@ -28,10 +28,11 @@ import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener, VerifyCredentialsResponse {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
@@ -42,6 +43,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
     private MalApiClient malApiClient;
+    private Series itemToBeRemoved;
 
     public SeriesRecyclerViewAdapter(SeriesList items, SeriesFragment listener) {
         allSeries = items;
@@ -200,7 +202,17 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     @Override
     public void removeSeriesDialogClosed(boolean accepted, Series series, int position) {
         if (accepted) {
-            removeSeries(series, position);
+            removeSeriesHelper(series, position);
+        }
+    }
+
+    @Override
+    public void verifyCredentialsResponseReceived(boolean signInSuccessful) {
+        if (signInSuccessful){
+            removeSeries(itemToBeRemoved);
+        } else {
+            Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+
         }
     }
 
@@ -230,16 +242,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
     }
 
-    public void removeSeries(Series item, int position) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
-        boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
-        if (loggedIn) {
-            if (App.getInstance().isNetworkAvailable()) {
-                malApiClient.deleteAnime(String.valueOf(item.getMALID()));
-            } else {
-                Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
-            }
-        }
+    private void removeSeries(Series item){
         App.getInstance().setJustRemoved(true);
 
         item.setInUserList(false);
@@ -258,6 +261,26 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         App.getInstance().removeAlarm(item);
         Snackbar.make(mListener.getView(), "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+    }
+
+    public void removeSeriesHelper(Series item, int position) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mListener.getContext());
+        boolean loggedIn = sharedPref.getBoolean(mListener.getActivity().getString(R.string.shared_prefs_logged_in), false);
+
+        if (loggedIn) {
+            if (App.getInstance().isNetworkAvailable()) {
+                String username = sharedPref.getString(App.getInstance().getString(R.string.credentials_username), "");
+                String password = sharedPref.getString(App.getInstance().getString(R.string.credentials_password), "");
+
+                itemToBeRemoved = item;
+
+                new MalApiClient(this).verify(username, password);
+            } else {
+                Snackbar.make(mListener.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            removeSeries(item);
+        }
     }
 
     public void addSeries(Series item, int position) {

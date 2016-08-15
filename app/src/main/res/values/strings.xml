@@ -17,6 +17,9 @@
 
     <string name="no_network_available">No network available.</string>
 
+    <string name="credentials_failed">It appears your MAL credentials have changed. </string>
+
+
     <string name="empty_text_myshows">You aren\'t following any shows. Why not check the season browser?</string>
     <string name="empty_text_backlog">You\'re all caught up!</string>
     <string name="empty_text_season">No anime was found.</string>
