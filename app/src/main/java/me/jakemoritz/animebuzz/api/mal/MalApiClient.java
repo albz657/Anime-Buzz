@@ -221,6 +221,8 @@ public class MalApiClient {
 //                            .cacheControl(CacheControl.FORCE_NETWORK)
 //                            .addHeader("Cache-Control", "no-cache")
 //                            .addHeader("Cache-Control", "no-store")
+//                            .addHeader("Cache-Control", "must-revalidate")
+
                             .method(original.method(), original.body());
 
                     Request request = requestBuilder.build();

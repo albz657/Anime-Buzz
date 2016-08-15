@@ -52,6 +52,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public ImageView emptyImage;
     public SeriesFragment self;
 
+    public void verified(boolean verified){
+        mAdapter.verified(verified);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
