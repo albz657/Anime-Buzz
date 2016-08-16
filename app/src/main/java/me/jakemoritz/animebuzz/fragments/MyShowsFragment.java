@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,14 +21,14 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
+import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MyShowsFragment extends SeriesFragment {
+public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeCountResponse{
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
-
 
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
@@ -52,15 +51,12 @@ public class MyShowsFragment extends SeriesFragment {
                     setUpdating(true);
                 } else {
                     getSwipeRefreshLayout().setRefreshing(false);
-
                 }
             }
         } else {
             getSwipeRefreshLayout().setRefreshing(false);
-
             Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
-        Log.d(TAG, "s");
     }
 
     @Override
@@ -136,13 +132,12 @@ public class MyShowsFragment extends SeriesFragment {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 
-        if (sortPref.equals("date")) {
-            sortByDate();
-        } else if (sortPref.equals("name")) {
+        if (sortPref.equals("name")) {
             sortByName();
+        } else {
+            sortByDate();
         }
     }
-
 
     private void sortByDate() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
@@ -235,7 +230,7 @@ public class MyShowsFragment extends SeriesFragment {
     }
 
     @Override
-    public void malDataRead() {
+    public void malDataImported() {
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializingGotImages(false);
             App.getInstance().setPostInitializing(true);
@@ -253,6 +248,15 @@ public class MyShowsFragment extends SeriesFragment {
 
         if (getmAdapter() != null){
             getmAdapter().notifyDataSetChanged();
+        }
+
+        loadUserSortingPreference();
+    }
+
+    @Override
+    public void episodeCountIncremented(boolean incremented) {
+        if (!incremented){
+            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_SHORT).show();
         }
     }
 }

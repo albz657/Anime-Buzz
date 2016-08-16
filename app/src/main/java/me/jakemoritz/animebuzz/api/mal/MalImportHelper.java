@@ -8,22 +8,21 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.mal.MalDataRead;
+import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class MalImportHelper {
 
-    private MalDataRead delegate;
+    private MalDataImportedListener malDataImportedListener;
     private SeriesFragment fragment;
 
-    public MalImportHelper(SeriesFragment seriesFragment, MalDataRead delegate) {
+    public MalImportHelper(SeriesFragment seriesFragment, MalDataImportedListener malDataImportedListener) {
         this.fragment = seriesFragment;
-        this.delegate = delegate;
+        this.malDataImportedListener = malDataImportedListener;
     }
 
     public void matchSeries(List<MatchHolder> matchList) {
@@ -43,7 +42,7 @@ public class MalImportHelper {
         }
 
         if (latestSeason != null) {
-            MatchHolder match = null;
+            MatchHolder match;
             for (Iterator matchedIterator = matchList.iterator(); matchedIterator.hasNext(); ) {
                 match = (MatchHolder) matchedIterator.next();
                 for (Series savedSeries : latestSeason.getSeasonSeries()) {
@@ -59,21 +58,6 @@ public class MalImportHelper {
 
         }
 
-/*        DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
-
-        for (MatchHolder match : matchList) {
-
-            Series tempSeries = dbHelper.getSeries(match.getMALID());
-
-            if (tempSeries != null) {
-                tempSeries.setInUserList(true);
-                tempSeries.setEpisodesWatched(match.getEpisodesWatched());
-                matchedSeries.add(tempSeries);
-
-//                App.getInstance().getCircleBitmap(tempSeries);
-            }
-        }*/
-
         App.getInstance().getUserAnimeList().addAll(matchedSeries);
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {
@@ -85,17 +69,8 @@ public class MalImportHelper {
             fragment.getmAdapter().setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());
         }
 
-
-        if (fragment instanceof MyShowsFragment) {
-            ((MyShowsFragment) fragment).loadUserSortingPreference();
-        }
-
-/*        if (dbHelper != null) {
-            dbHelper.saveSeriesList(App.getInstance().getUserAnimeList());
-        }*/
-
-        if (delegate != null) {
-            delegate.malDataRead();
+        if (malDataImportedListener != null) {
+            malDataImportedListener.malDataImported();
         }
     }
 }

@@ -18,8 +18,9 @@
     <string name="no_network_available">No network available.</string>
 
     <string name="remove_failed">There was a problem removing this anime from your MAL list. Please try again later.</string>
-
     <string name="add_failed">There was a problem adding this anime to your MAL list. Please try again later.</string>
+    <string name="user_list_failed">There was a problem getting your MAL list. Please try again later.</string>
+    <string name="increment_failed">There was a problem incrementing the episode count.</string>
 
     <string name="empty_text_myshows">You aren\'t following any shows. Why not check the season browser?</string>
     <string name="empty_text_backlog">You\'re all caught up!</string>

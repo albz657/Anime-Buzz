@@ -38,7 +38,8 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
-import me.jakemoritz.animebuzz.interfaces.mal.MalDataRead;
+import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
+import me.jakemoritz.animebuzz.interfaces.mal.UserListResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
@@ -48,7 +49,7 @@ import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, UserListResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -118,12 +119,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
         Context context = recyclerView.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        self = this;
+
         if (this instanceof SeasonsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(new SeriesList(), this);
-            self = (SeasonsFragment) this;
         } else if (this instanceof MyShowsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
-            self = (MyShowsFragment) this;
         }
         recyclerView.setAdapter(mAdapter);
 
@@ -232,8 +233,15 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void malDataRead() {
+    public void malDataImported() {
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void userListReceived(boolean received) {
+        if (!received){
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.user_list_failed), Snackbar.LENGTH_SHORT).show();
+        }
     }
 
 //    Item modification
@@ -398,10 +406,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         this.updating = updating;
     }
 
-    public void setMalApiClient(MalApiClient malApiClient) {
-        this.malApiClient = malApiClient;
-    }
-
     public void setAnnHelper(ANNSearchHelper annHelper) {
         this.annHelper = annHelper;
     }
@@ -409,4 +413,5 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void setAdding(boolean adding) {
         this.adding = adding;
     }
+
 }
