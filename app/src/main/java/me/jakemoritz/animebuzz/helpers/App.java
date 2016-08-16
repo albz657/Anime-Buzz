@@ -271,11 +271,13 @@ public class App extends Application {
 
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        DateFormatHelper dateFormatHelper = new DateFormatHelper();
+
         Calendar initialAirTime;
         if (prefersSimulcast) {
-            initialAirTime = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
+            initialAirTime = dateFormatHelper.getCalFromSeconds(series.getSimulcast_airdate());
         } else {
-            initialAirTime = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
+            initialAirTime = dateFormatHelper.getCalFromSeconds(series.getAirdate());
         }
 
         Calendar nextEpisode = Calendar.getInstance();
