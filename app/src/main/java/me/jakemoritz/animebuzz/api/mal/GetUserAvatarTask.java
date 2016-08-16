@@ -12,8 +12,6 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
@@ -21,12 +19,6 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
     private final static String TAG = GetUserAvatarTask.class.getSimpleName();
 
     private final static String BASE_URL = "http://cdn.myanimelist.net/images/userimages/";
-
-    private MainActivity activity;
-
-    public GetUserAvatarTask(SeriesFragment fragment) {
-        this.activity = (MainActivity) fragment.activity;
-    }
 
     @Override
     protected Bitmap doInBackground(Void... voids) {

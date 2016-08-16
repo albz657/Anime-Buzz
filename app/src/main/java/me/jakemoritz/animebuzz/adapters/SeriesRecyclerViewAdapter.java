@@ -42,7 +42,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     private SeriesList allSeries = null;
     private SeriesList visibleSeries = null;
-    public SeriesFragment mParent = null;
+    private SeriesFragment mParent = null;
     private ViewGroup parent;
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
@@ -79,7 +79,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mTitle.setText(visibleSeries.get(position).getName());
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
-        boolean prefersSimulcast = sharedPref.getBoolean(mParent.activity.getString(R.string.pref_simulcast_key), false);
+        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
         if (App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer()) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
@@ -189,7 +189,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             @Override
             public void onClick(View v) {
                 RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
-                dialogFragment.show(mParent.activity.getFragmentManager(), TAG);
+                dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
             }
         });
     }
@@ -254,7 +254,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     @Override
     public void signInAgain(boolean wantsToSignIn) {
         if (wantsToSignIn){
-            SignInFragment signInFragment = SignInFragment.newInstance(mParent, null);
+            SignInFragment signInFragment = SignInFragment.newInstance(mParent);
             signInFragment.show(mParent.getActivity().getFragmentManager(), TAG);
         } else {
 

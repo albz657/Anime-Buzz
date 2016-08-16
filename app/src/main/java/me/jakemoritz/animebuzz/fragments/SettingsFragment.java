@@ -45,7 +45,7 @@ import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
-public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -207,7 +207,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (App.getInstance().isNetworkAvailable()) {
-                    SignInFragment signInFragment = SignInFragment.newInstance(self, preference);
+                    SignInFragment signInFragment = SignInFragment.newInstance(self);
                     signInFragment.show(activity.getFragmentManager(), "");
                 } else {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
@@ -300,8 +300,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         Snackbar.make(activity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
     }
 
-    public void signIn(Preference preference) {
-        preference.setVisible(false);
+    public void signIn() {
+        signInPreference.setVisible(false);
         signOutPreference.setVisible(true);
 
         App.getInstance().setJustLaunchedMyShows(true);
@@ -356,4 +356,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
 
+    @Override
+    public void verified(boolean verified) {
+        if (verified){
+           signIn();
+        }
+    }
 }

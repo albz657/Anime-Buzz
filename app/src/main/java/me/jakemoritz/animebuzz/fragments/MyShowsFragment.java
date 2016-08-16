@@ -17,7 +17,6 @@ import android.widget.TextView;
 import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -32,7 +31,6 @@ public class MyShowsFragment extends SeriesFragment {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
-    private MalApiClient malApiClient;
 
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
@@ -45,24 +43,23 @@ public class MyShowsFragment extends SeriesFragment {
         boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().isNetworkAvailable()) {
-            if (!mAdapter.getAllSeries().isEmpty()){
-                senpaiExportHelper.getLatestSeasonData();
-                updating = true;
+            if (!getmAdapter().getAllSeries().isEmpty()){
+                getSenpaiExportHelper().getLatestSeasonData();
+                setUpdating(true);
 
             } else {
                 if (loggedIn){
                     new MalApiClient(this).getUserList();
-                    updating = true;
-
+                    setUpdating(true);
                 } else {
-                    swipeRefreshLayout.setRefreshing(false);
+                    getSwipeRefreshLayout().setRefreshing(false);
 
                 }
             }
         } else {
-            swipeRefreshLayout.setRefreshing(false);
+            getSwipeRefreshLayout().setRefreshing(false);
 
-            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
         Log.d(TAG, "s");
     }
@@ -71,28 +68,28 @@ public class MyShowsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        malApiClient = new MalApiClient(this);
+        setMalApiClient(new MalApiClient(this));
 
-        if (activity.getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
+        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
 
             }
 
-            activity.getSupportActionBar().setTitle(R.string.fragment_myshows);
-            activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+            App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.fragment_myshows);
+            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
 
         loadUserSortingPreference();
 
         if (App.getInstance().isJustLaunchedMyShows()){
             onRefresh();
-            swipeRefreshLayout.post(new Runnable() {
+            getSwipeRefreshLayout().post(new Runnable() {
                 @Override
                 public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
+                    getSwipeRefreshLayout().setRefreshing(true);
                 }
             });
 
@@ -105,14 +102,13 @@ public class MyShowsFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        activity.getMenuInflater().inflate(R.menu.myshows_menu, menu);
+        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        activity.getSupportFragmentManager().getFragments().size();
         if (id == R.id.action_sort) {
             PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_sort));
             popupMenu.inflate(R.menu.sort_menu);
@@ -127,7 +123,7 @@ public class MyShowsFragment extends SeriesFragment {
                         sortByName();
                     }
 
-                    mAdapter.notifyDataSetChanged();
+                    getmAdapter().notifyDataSetChanged();
                     return false;
                 }
             });
@@ -160,7 +156,7 @@ public class MyShowsFragment extends SeriesFragment {
 
         SeriesList noDateList = new SeriesList();
         SeriesList hasDateList = new SeriesList();
-        for (Series series : mAdapter.getVisibleSeries()) {
+        for (Series series : getmAdapter().getVisibleSeries()) {
             if (series.getSimulcast_airdate() < 0 || series.getAirdate() < 0) {
                 noDateList.add(series);
             } else {
@@ -180,9 +176,9 @@ public class MyShowsFragment extends SeriesFragment {
             hasDateList.add(series);
         }
 
-        mAdapter.getAllSeries().clear();
-        mAdapter.getAllSeries().addAll(hasDateList);
-        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
+        getmAdapter().getAllSeries().clear();
+        getmAdapter().getAllSeries().addAll(hasDateList);
+        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
     }
 
     private void sortByName() {
@@ -191,8 +187,8 @@ public class MyShowsFragment extends SeriesFragment {
         editor.putString(getString(R.string.shared_prefs_sorting), "name");
         editor.apply();
 
-        Collections.sort(mAdapter.getAllSeries(), new SeriesNameComparator());
-        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
+        Collections.sort(getmAdapter().getAllSeries(), new SeriesNameComparator());
+        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
     }
 
     @Override
@@ -205,14 +201,14 @@ public class MyShowsFragment extends SeriesFragment {
             TextView loadingText = (TextView) App.getInstance().getMainActivity().progressViewHolder.findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
-        if (updating) {
+        if (isUpdating()) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
 
             if (isLoggedIn){
-                malApiClient.getUserList();
+                getMalApiClient().getUserList();
             } else {
-                swipeRefreshLayout.setRefreshing(false);
+                getSwipeRefreshLayout().setRefreshing(false);
             }
 
         }
@@ -226,18 +222,18 @@ public class MyShowsFragment extends SeriesFragment {
         App.getInstance().saveNewSeasonData(season);
 
         if (App.getInstance().isNetworkAvailable()){
-            if (helper == null){
-                helper = new ANNSearchHelper();
+            if (getHelper() == null){
+                setHelper(new ANNSearchHelper());
             }
 
             if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()){
-                helper.getImages(this, season.getSeasonSeries());
+                getHelper().getImages(this, season.getSeasonSeries());
             } else {
-                helper.getImages(this, mAdapter.getAllSeries());
+                getHelper().getImages(this, getmAdapter().getAllSeries());
 
             }
         } else {
-            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -247,19 +243,19 @@ public class MyShowsFragment extends SeriesFragment {
             App.getInstance().setInitializingGotImages(false);
             App.getInstance().setPostInitializing(true);
 
-            ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
-            ((MainActivity) activity).progressView.stopAnimation();
+            App.getInstance().getMainActivity().progressViewHolder.setVisibility(View.GONE);
+            App.getInstance().getMainActivity().progressView.stopAnimation();
 
-            senpaiExportHelper.getSeasonList();
+            getSenpaiExportHelper().getSeasonList();
         }
 
-        if (updating) {
-            swipeRefreshLayout.setRefreshing(false);
-            updating = false;
+        if (isUpdating()) {
+            getSwipeRefreshLayout().setRefreshing(false);
+            setUpdating(false);
         }
 
-        if (mAdapter != null){
-            mAdapter.notifyDataSetChanged();
+        if (getmAdapter() != null){
+            getmAdapter().notifyDataSetChanged();
         }
     }
 }

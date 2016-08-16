@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -39,7 +38,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
+        toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -63,10 +62,10 @@ public class SeasonsFragment extends SeriesFragment {
 
         if (App.getInstance().isJustLaunchedSeasons()) {
             onRefresh();
-            swipeRefreshLayout.post(new Runnable() {
+            getSwipeRefreshLayout().post(new Runnable() {
                 @Override
                 public void run() {
-                    swipeRefreshLayout.setRefreshing(true);
+                    getSwipeRefreshLayout().setRefreshing(true);
                 }
             });
             App.getInstance().setJustLaunchedSeasons(false);
@@ -75,9 +74,9 @@ public class SeasonsFragment extends SeriesFragment {
 
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
-        mAdapter.setAllSeries(currentlyBrowsingSeason.getSeasonSeries());
-        mAdapter.setVisibleSeries((SeriesList) mAdapter.getAllSeries().clone());
-        mAdapter.notifyDataSetChanged();
+        getmAdapter().setAllSeries(currentlyBrowsingSeason.getSeasonSeries());
+        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+        getmAdapter().notifyDataSetChanged();
 
         App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
@@ -107,10 +106,10 @@ public class SeasonsFragment extends SeriesFragment {
     public void seasonDataRetrieved(Season season) {
         super.seasonDataRetrieved(season);
 
-        if (swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(false);
-            if (updating) {
-                updating = false;
+        if (getSwipeRefreshLayout().isRefreshing()) {
+            getSwipeRefreshLayout().setRefreshing(false);
+            if (isUpdating()) {
+                setUpdating(false);
             }
         }
 
@@ -128,14 +127,14 @@ public class SeasonsFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
 
-            ((MainActivity) activity).progressViewHolder.setVisibility(View.GONE);
-            ((MainActivity) activity).progressView.stopAnimation();
+            App.getInstance().getMainActivity().progressViewHolder.setVisibility(View.GONE);
+            App.getInstance().getMainActivity().progressView.stopAnimation();
 
             loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
 
             App.getInstance().setPostInitializing(true);
 
-            senpaiExportHelper.getSeasonList();
+            getSenpaiExportHelper().getSeasonList();
 
         }
 
@@ -144,11 +143,11 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     public void refreshToolbar() {
-        if (activity.getSupportActionBar() != null && toolbarSpinner != null) {
+        if (App.getInstance().getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
             List<String> seasons = getSpinnerItems();
             if (seasons.isEmpty()) {
                 toolbarSpinner.setVisibility(View.GONE);
-                activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+                App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
             } else {
                 if (searchView != null) {
                     if (!searchView.isIconified()) {
@@ -159,7 +158,7 @@ public class SeasonsFragment extends SeriesFragment {
                 } else {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
-                activity.getSupportActionBar().setDisplayShowTitleEnabled(false);
+                App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 
                 seasonsSpinnerAdapter.getSeasonNames().clear();
                 seasonsSpinnerAdapter.getSeasonNames().addAll(seasons);
@@ -172,7 +171,7 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        activity.getMenuInflater().inflate(R.menu.seasons_menu, menu);
+        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.seasons_menu, menu);
 
         final MenuItem item = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
@@ -195,13 +194,13 @@ public class SeasonsFragment extends SeriesFragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                                               @Override
                                               public boolean onQueryTextSubmit(String query) {
-                                                  mAdapter.getFilter().filter(query);
+                                                  getmAdapter().getFilter().filter(query);
                                                   return false;
                                               }
 
                                               @Override
                                               public boolean onQueryTextChange(String newText) {
-                                                  mAdapter.getFilter().filter(newText);
+                                                  getmAdapter().getFilter().filter(newText);
 
                                                   return false;
                                               }
@@ -215,12 +214,12 @@ public class SeasonsFragment extends SeriesFragment {
         if (App.getInstance().isNetworkAvailable()) {
             for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
                 if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
-                    senpaiExportHelper.getSeasonData(metadata);
+                    getSenpaiExportHelper().getSeasonData(metadata);
                 }
             }
-            updating = true;
+            setUpdating(true);
         } else {
-            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
     }
 

@@ -26,7 +26,9 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataRead;
@@ -37,23 +39,25 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener {
 
-    public SeriesRecyclerViewAdapter mAdapter;
-    public RecyclerView recyclerView;
-    public SwipeRefreshLayout swipeRefreshLayout;
-    public ANNSearchHelper helper;
-    public boolean updating = false;
-    public SenpaiExportHelper senpaiExportHelper;
-    public View seriesLayout;
-    public AppCompatActivity activity;
-    public RelativeLayout emptyView;
-    public TextView emptyText;
-    public ImageView emptyImage;
-    public SeriesFragment self;
+    private SeriesRecyclerViewAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ANNSearchHelper helper;
+    private boolean updating = false;
+    private SenpaiExportHelper senpaiExportHelper;
+    private View seriesLayout;
+    private AppCompatActivity activity;
+    private RelativeLayout emptyView;
+    private TextView emptyText;
+    private ImageView emptyImage;
+    private SeriesFragment self;
+    private MalApiClient malApiClient;
 
-    public void verified(boolean verified){
-        mAdapter.verified(verified);
+    @Override
+    public void verified(boolean verified) {
+
     }
 
     @Override
@@ -146,6 +150,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         return seriesLayout;
     }
 
+
+
     private void refreshEmpty(){
         if (!App.getInstance().isInitializing()){
             if (mAdapter.getVisibleSeries().isEmpty()){
@@ -223,5 +229,65 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         mAdapter.notifyDataSetChanged();
     }
 
+//    Getters/Setters
 
+    public SeriesRecyclerViewAdapter getmAdapter() {
+        return mAdapter;
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
+    }
+
+    public SwipeRefreshLayout getSwipeRefreshLayout() {
+        return swipeRefreshLayout;
+    }
+
+    public ANNSearchHelper getHelper() {
+        return helper;
+    }
+
+    public boolean isUpdating() {
+        return updating;
+    }
+
+    public SenpaiExportHelper getSenpaiExportHelper() {
+        return senpaiExportHelper;
+    }
+
+    public View getSeriesLayout() {
+        return seriesLayout;
+    }
+
+    public RelativeLayout getEmptyView() {
+        return emptyView;
+    }
+
+    public TextView getEmptyText() {
+        return emptyText;
+    }
+
+    public ImageView getEmptyImage() {
+        return emptyImage;
+    }
+
+    public SeriesFragment getSelf() {
+        return self;
+    }
+
+    public MalApiClient getMalApiClient() {
+        return malApiClient;
+    }
+
+    public void setUpdating(boolean updating) {
+        this.updating = updating;
+    }
+
+    public void setMalApiClient(MalApiClient malApiClient) {
+        this.malApiClient = malApiClient;
+    }
+
+    public void setHelper(ANNSearchHelper helper) {
+        this.helper = helper;
+    }
 }

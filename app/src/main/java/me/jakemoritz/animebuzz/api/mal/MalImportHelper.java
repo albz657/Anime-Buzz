@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -19,12 +18,10 @@ import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class MalImportHelper {
 
-    private MainActivity activity;
     private MalDataRead delegate;
     private SeriesFragment fragment;
 
     public MalImportHelper(SeriesFragment seriesFragment, MalDataRead delegate) {
-        this.activity = (MainActivity) seriesFragment.activity;
         this.fragment = seriesFragment;
         this.delegate = delegate;
     }
@@ -84,8 +81,8 @@ public class MalImportHelper {
             }
         }
 
-        if (fragment.mAdapter != null) {
-            fragment.mAdapter.setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());
+        if (fragment.getmAdapter() != null) {
+            fragment.getmAdapter().setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());
         }
 
 

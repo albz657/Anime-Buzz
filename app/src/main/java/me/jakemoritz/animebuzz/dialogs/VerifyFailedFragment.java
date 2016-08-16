@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class VerifyFailedFragment extends DialogFragment {
 
@@ -27,7 +27,7 @@ public class VerifyFailedFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(((SeriesRecyclerViewAdapter) listener).mParent.getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(App.getInstance().getMainActivity());
         builder.setMessage("We failed to verify your MAL credentials. If your credentials were changed, you'll need to sign in again in order to access your MAL account.")
                 .setPositiveButton("Sign in", new DialogInterface.OnClickListener() {
                     @Override

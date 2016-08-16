@@ -1,18 +1,19 @@
 package me.jakemoritz.animebuzz.dialogs;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,47 +22,50 @@ import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SignInFragment extends DialogFragment implements VerifyCredentialsResponse {
 
-    Fragment callback;
-    Preference preference;
-    View dialogView;
-    EditText passwordField;
-    EditText usernameField;
+    private SignInFragmentListener listener;
+    private View dialogView;
+    private EditText passwordField;
+    private EditText usernameField;
 
     public SignInFragment() {
     }
 
-    public static SignInFragment newInstance(Fragment callback, Preference preference) {
+    public static SignInFragment newInstance(SignInFragmentListener listener) {
         SignInFragment fragment = new SignInFragment();
-        fragment.callback = callback;
-        fragment.preference = preference;
+        fragment.listener = listener;
         return fragment;
     }
 
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
-
-        if (callback instanceof SeriesFragment){
-            ((SeriesFragment) callback).verified(true);
-        }
+        listener.verified(false);
     }
 
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(callback.getActivity());
+    public void onStart() {
+        super.onStart();
 
-        dialogView = callback.getActivity().getLayoutInflater().inflate(R.layout.fragment_sign_in, null);
-        builder.setView(dialogView);
+        DisplayMetrics metrics = new DisplayMetrics();
+        App.getInstance().getMainActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        float logicalDensity = metrics.density;
+        int px = (int) Math.ceil(400 * logicalDensity);
+        Dialog dialog = getDialog();
 
-            usernameField = (EditText) dialogView.findViewById(R.id.edit_username);
-            passwordField = (EditText) dialogView.findViewById(R.id.edit_password);
+        dialog.getWindow().setLayout(px, dialog.getWindow().getAttributes().height);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        dialogView = inflater.inflate(R.layout.fragment_sign_in, container);
+        usernameField = (EditText) dialogView.findViewById(R.id.edit_username);
+        passwordField = (EditText) dialogView.findViewById(R.id.edit_password);
 
         passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -86,21 +90,21 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                    if (App.getInstance().isNetworkAvailable()){
-                        attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
-                    } else {
-                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
-                        View view1 = failSnackbar.getView();
-                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
-                        params.gravity = Gravity.TOP;
-                        view.setLayoutParams(params);
-                        failSnackbar.show();
-                    }
+                if (App.getInstance().isNetworkAvailable()){
+                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                } else {
+                    Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
+                    View view1 = failSnackbar.getView();
+                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
+                    params.gravity = Gravity.TOP;
+                    view.setLayoutParams(params);
+                    failSnackbar.show();
+                }
 
             }
         });
 
-        return builder.create();
+        return dialogView;
     }
 
     private void attemptVerification(String username, String password) {
@@ -108,7 +112,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            Snackbar.make(callback.getView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(App.getInstance().getMainActivity().navigationView, getString(R.string.trying_to_verify), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -123,13 +127,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             editor.putBoolean(getString(R.string.shared_prefs_logged_in), true);
             editor.apply();
 
-            if (callback instanceof SettingsFragment){
-                ((SettingsFragment) callback).signIn(preference);
-            }
-
-            if (callback instanceof SeriesFragment){
-                ((SeriesFragment) callback).verified(true);
-            }
+            listener.verified(true);
 
             getDialog().cancel();
         } else {
@@ -140,6 +138,10 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             view.setLayoutParams(params);
             failSnackbar.show();
         }
+    }
+
+    public interface SignInFragmentListener {
+        void verified(boolean verified);
     }
 
 }
