@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
@@ -38,7 +37,6 @@ public class MalApiClient {
     private static final String BASE_URL = "http://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
-    private SeriesRecyclerViewAdapter adapterListener;
     private VerifyCredentialsResponse verifyListener;
     private MalDataRead malDataReadListener;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -47,22 +45,18 @@ public class MalApiClient {
                     .baseUrl(BASE_URL)
                     .addConverterFactory(SimpleXmlConverterFactory.create());
 
+
+    public MalApiClient() {
+    }
+
     public MalApiClient(SeriesFragment seriesFragment) {
         this.seriesFragment = seriesFragment;
         this.malDataReadListener = seriesFragment;
-    }
-
-    public MalApiClient() {
-
+        this.verifyListener = seriesFragment;
     }
 
     public MalApiClient(VerifyCredentialsResponse verifyListener) {
         this.verifyListener = verifyListener;
-    }
-
-    public MalApiClient(SeriesRecyclerViewAdapter adapterListener) {
-        this.adapterListener = adapterListener;
-        this.verifyListener = adapterListener;
     }
 
     public void addAnime(String MALID) {
@@ -78,16 +72,16 @@ public class MalApiClient {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful() && response.raw().message().equals("Created")) {
-                        adapterListener.itemAdded(true);
+                        seriesFragment.itemAdded(true);
                         Log.d(TAG, response.toString());
                     } else {
-                        adapterListener.itemAdded(false);
+                        seriesFragment.itemAdded(false);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    adapterListener.itemAdded(false);
+                    seriesFragment.itemAdded(false);
                     Log.d(TAG, t.toString());
                 }
             });
@@ -140,16 +134,16 @@ public class MalApiClient {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
                     if (response.isSuccessful() && response.raw().message().equals("OK")) {
-                        adapterListener.itemDeleted(true);
+                        seriesFragment.itemDeleted(true);
                         Log.d(TAG, response.toString());
                     } else {
-                        adapterListener.itemDeleted(false);
+                        seriesFragment.itemDeleted(false);
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    adapterListener.itemDeleted(false);
+                    seriesFragment.itemDeleted(false);
                     Log.d(TAG, t.toString());
                 }
             });

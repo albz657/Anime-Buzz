@@ -205,7 +205,6 @@ public class SeasonsFragment extends SeriesFragment {
                                                   return false;
                                               }
                                           }
-
         );
     }
 

@@ -29,6 +29,7 @@ public class VerifyFailedFragment extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(App.getInstance().getMainActivity());
         builder.setMessage("We failed to verify your MAL credentials. If your credentials were changed, you'll need to sign in again in order to access your MAL account.")
+                .setTitle("Verification failed")
                 .setPositiveButton("Sign in", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

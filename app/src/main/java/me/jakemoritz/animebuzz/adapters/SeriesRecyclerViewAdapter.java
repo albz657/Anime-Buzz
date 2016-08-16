@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.adapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,57 +18,63 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.Arrays;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.SignInFragment;
-import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
-import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener {
+public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
     private SeriesList allSeries = null;
     private SeriesList visibleSeries = null;
     private SeriesFragment mParent = null;
-    private ViewGroup parent;
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
-    private MalApiClient malApiClient;
-    private MalApiClient modifyMalApiClient;
-    private Series itemToBeChanged;
-    private boolean adding = false;
-    private boolean deleting = false;
+    private ModifyItemStatusListener modifyListener;
 
     public SeriesRecyclerViewAdapter(SeriesList items, SeriesFragment listener) {
         allSeries = items;
-        mParent = listener;
         visibleSeries = new SeriesList(items);
         self = this;
-        malApiClient = new MalApiClient(mParent);
-        modifyMalApiClient = new MalApiClient(this);
+        mParent = listener;
+        modifyListener = listener;
     }
 
-    public void setVisibleSeries(SeriesList visibleSeries) {
-        this.visibleSeries = visibleSeries;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+
+        public final TextView mTitle;
+        public final ImageView mPoster;
+        public final TextView mDate;
+        public final TextView mSimulcast;
+        public final ImageButton mAddButton;
+        public final ImageButton mMinusButton;
+        public final ImageView mWatch;
+
+        public Series series;
+
+        public ViewHolder(View view) {
+            super(view);
+            mView = view;
+            mTitle = (TextView) view.findViewById(R.id.series_title);
+            mPoster = (ImageView) view.findViewById(R.id.series_poster);
+            mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
+            mDate = (TextView) view.findViewById(R.id.series_date);
+            mAddButton = (ImageButton) view.findViewById(R.id.add_button);
+            mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);
+            mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
+        }
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.series_list_item, parent, false);
-        this.parent = parent;
         return new ViewHolder(view);
     }
 
@@ -210,167 +215,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     @Override
     public void removeSeriesDialogClosed(boolean accepted, Series series, int position) {
         if (accepted) {
-            itemStatusChangeHelper(series);
-            deleting = true;
-        }
-    }
-
-    @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
-        if (verified) {
-            if (adding) {
-                modifyMalApiClient.addAnime(String.valueOf(itemToBeChanged.getMALID()));
-            } else {
-                modifyMalApiClient.deleteAnime(String.valueOf(itemToBeChanged.getMALID()));
-            }
-        } else {
-            adding = false;
-            deleting = false;
-            VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this);
-            dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "SeriesRecyclerViewAdapter");
-        }
-    }
-
-    @Override
-    public void itemAdded(boolean added) {
-        if (added){
-            addSeries(itemToBeChanged);
-        } else {
-            adding = false;
-            Snackbar.make(mParent.getView(), App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void itemDeleted(boolean deleted) {
-        if (deleted){
-            removeSeries(itemToBeChanged);
-        } else {
-            deleting = false;
-            Snackbar.make(mParent.getView(), App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void signInAgain(boolean wantsToSignIn) {
-        if (wantsToSignIn){
-            SignInFragment signInFragment = SignInFragment.newInstance(mParent);
-            signInFragment.show(mParent.getActivity().getFragmentManager(), TAG);
-        } else {
-
-        }
-    }
-
-    public void verified(boolean verified){
-        if (verified){
-            Snackbar.make(mParent.getView(), "Your MAL credentials have been verified.", Snackbar.LENGTH_SHORT).show();
-
-        }
-
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-
-        public final TextView mTitle;
-        public final ImageView mPoster;
-        public final TextView mDate;
-        public final TextView mSimulcast;
-        public final ImageButton mAddButton;
-        public final ImageButton mMinusButton;
-        public final ImageView mWatch;
-
-        public Series series;
-
-        public ViewHolder(View view) {
-            super(view);
-            mView = view;
-            mTitle = (TextView) view.findViewById(R.id.series_title);
-            mPoster = (ImageView) view.findViewById(R.id.series_poster);
-            mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
-            mDate = (TextView) view.findViewById(R.id.series_date);
-            mAddButton = (ImageButton) view.findViewById(R.id.add_button);
-            mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);
-            mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
-        }
-    }
-
-    private void removeSeries(Series item) {
-        deleting = false;
-
-        App.getInstance().setJustRemoved(true);
-
-        item.setInUserList(false);
-        App.getInstance().getUserAnimeList().remove(item);
-
-        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
-
-        if (mParent instanceof MyShowsFragment) {
-            visibleSeries.remove(item);
-            allSeries.remove(item);
-        }
-
-        notifyDataSetChanged();
-
-        App.getInstance().removeAlarm(item);
-        Snackbar.make(mParent.getView(), "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
-    }
-
-    private void itemStatusChangeHelper(Series item) {
-        itemToBeChanged = item;
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
-        boolean loggedIn = sharedPref.getBoolean(mParent.getActivity().getString(R.string.shared_prefs_logged_in), false);
-
-        if (loggedIn) {
-            if (App.getInstance().isNetworkAvailable()) {
-                String username = sharedPref.getString(App.getInstance().getString(R.string.credentials_username), "");
-                String password = sharedPref.getString(App.getInstance().getString(R.string.credentials_password), "");
-
-                modifyMalApiClient.verify(username, password);
-            } else {
-                adding = false;
-                deleting = false;
-                Snackbar.make(mParent.getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
-            }
-        } else {
-            if (adding){
-                addSeries(itemToBeChanged);
-            } else {
-                removeSeries(itemToBeChanged);
-            }
+            modifyListener.modifyItem(series);
         }
     }
 
     private void addSeriesHelper(Series series){
-        itemStatusChangeHelper(series);
-        adding = true;
-    }
-
-    public void addSeries(Series item) {
-        adding = false;
-
-        item.setInUserList(true);
-        App.getInstance().getUserAnimeList().add(item);
-
-        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
-
-        if (mParent instanceof MyShowsFragment) {
-            visibleSeries = (SeriesList) allSeries.clone();
-        }
-
-//        App.getInstance().getCircleBitmap(item);
-
-        notifyDataSetChanged();
-
-        if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
-            App.getInstance().makeAlarm(item);
-        }
-
-        Snackbar.make(parent, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
-
+        modifyListener.modifyItem(series);
+        mParent.setAdding(true);
     }
 
     public SeriesList getVisibleSeries() {
@@ -383,5 +234,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     public void setAllSeries(SeriesList allSeries) {
         this.allSeries = allSeries;
+    }
+
+    public void setVisibleSeries(SeriesList visibleSeries) {
+        this.visibleSeries = visibleSeries;
+    }
+
+    public interface ModifyItemStatusListener {
+        void modifyItem(Series item);
     }
 }

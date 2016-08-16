@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,23 +31,31 @@ import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
+import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
+import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataRead;
+import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataRead, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener {
+
+    private static final String TAG = SeriesFragment.class.getSimpleName();
 
     private SeriesRecyclerViewAdapter mAdapter;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ANNSearchHelper helper;
+    private ANNSearchHelper annHelper;
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
     private View seriesLayout;
@@ -54,17 +65,15 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private ImageView emptyImage;
     private SeriesFragment self;
     private MalApiClient malApiClient;
-
-    @Override
-    public void verified(boolean verified) {
-
-    }
+    private boolean adding = false;
+    private Series itemToBeChanged;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        helper = new ANNSearchHelper();
+        annHelper = new ANNSearchHelper();
+        malApiClient = new MalApiClient(this);
     }
 
     @Override
@@ -150,8 +159,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         return seriesLayout;
     }
 
-
-
     private void refreshEmpty(){
         if (!App.getInstance().isInitializing()){
             if (mAdapter.getVisibleSeries().isEmpty()){
@@ -198,10 +205,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().setGettingCurrentBrowsing(true);
         }
         if (App.getInstance().isNetworkAvailable()){
-            if (helper == null){
-                helper = new ANNSearchHelper();
+            if (annHelper == null){
+                annHelper = new ANNSearchHelper();
             }
-            helper.getImages(this, season.getSeasonSeries());
+            annHelper.getImages(this, season.getSeasonSeries());
         } else {
             Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
         }
@@ -229,22 +236,145 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         mAdapter.notifyDataSetChanged();
     }
 
+//    Item modification
+
+    @Override
+    public void itemAdded(boolean added) {
+        if (added){
+            addSeries(itemToBeChanged);
+        } else {
+            adding = false;
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    private void addSeries(Series item) {
+        adding = false;
+
+        item.setInUserList(true);
+        App.getInstance().getUserAnimeList().add(item);
+
+        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
+        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
+
+        if (this instanceof MyShowsFragment) {
+            getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+        }
+
+//        App.getInstance().getCircleBitmap(item);
+
+        getmAdapter().notifyDataSetChanged();
+
+        if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
+            App.getInstance().makeAlarm(item);
+        }
+
+        Snackbar.make(swipeRefreshLayout, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
+
+    }
+
+    private void removeSeries(Series item) {
+        App.getInstance().setJustRemoved(true);
+
+        item.setInUserList(false);
+        App.getInstance().getUserAnimeList().remove(item);
+
+        DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
+        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
+
+        if (this instanceof MyShowsFragment) {
+            getmAdapter().getVisibleSeries().remove(item);
+            getmAdapter().getAllSeries().remove(item);
+        }
+
+        getmAdapter().notifyDataSetChanged();
+
+        App.getInstance().removeAlarm(item);
+        Snackbar.make(swipeRefreshLayout, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void itemDeleted(boolean deleted) {
+        if (deleted){
+            removeSeries(itemToBeChanged);
+        } else {
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void modifyItem(Series item) {
+        itemStatusChangeHelper(item);
+    }
+
+    private void itemStatusChangeHelper(Series item) {
+        itemToBeChanged = item;
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean loggedIn = sharedPref.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
+
+        if (loggedIn) {
+            if (App.getInstance().isNetworkAvailable()) {
+                String username = sharedPref.getString(App.getInstance().getString(R.string.credentials_username), "");
+                String password = sharedPref.getString(App.getInstance().getString(R.string.credentials_password), "");
+
+                malApiClient.verify(username, password);
+            } else {
+                adding = false;
+                Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            }
+        } else {
+            if (adding){
+                addSeries(itemToBeChanged);
+            } else {
+                removeSeries(itemToBeChanged);
+            }
+        }
+    }
+
+    @Override
+    public void signInAgain(boolean wantsToSignIn) {
+        if (wantsToSignIn){
+            SignInFragment signInFragment = SignInFragment.newInstance(this);
+            signInFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+        }
+    }
+
+    @Override
+    public void verifyCredentialsResponseReceived(boolean verified) {
+        if (verified) {
+            if (adding) {
+                malApiClient.addAnime(String.valueOf(itemToBeChanged.getMALID()));
+            } else {
+                malApiClient.deleteAnime(String.valueOf(itemToBeChanged.getMALID()));
+            }
+        } else {
+            adding = false;
+            VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this);
+            dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "SeriesRecyclerViewAdapter");
+        }
+    }
+
+    @Override
+    public void verified(boolean verified) {
+        if (verified){
+            Snackbar.make(swipeRefreshLayout, "Your MAL credentials have been verified.", Snackbar.LENGTH_SHORT).show();
+
+        }
+    }
+
 //    Getters/Setters
 
     public SeriesRecyclerViewAdapter getmAdapter() {
         return mAdapter;
     }
 
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
-    }
-
     public SwipeRefreshLayout getSwipeRefreshLayout() {
         return swipeRefreshLayout;
     }
 
-    public ANNSearchHelper getHelper() {
-        return helper;
+    public ANNSearchHelper getAnnHelper() {
+        return annHelper;
     }
 
     public boolean isUpdating() {
@@ -259,21 +389,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         return seriesLayout;
     }
 
-    public RelativeLayout getEmptyView() {
-        return emptyView;
-    }
-
-    public TextView getEmptyText() {
-        return emptyText;
-    }
-
-    public ImageView getEmptyImage() {
-        return emptyImage;
-    }
-
-    public SeriesFragment getSelf() {
-        return self;
-    }
 
     public MalApiClient getMalApiClient() {
         return malApiClient;
@@ -287,7 +402,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         this.malApiClient = malApiClient;
     }
 
-    public void setHelper(ANNSearchHelper helper) {
-        this.helper = helper;
+    public void setAnnHelper(ANNSearchHelper annHelper) {
+        this.annHelper = annHelper;
+    }
+
+    public void setAdding(boolean adding) {
+        this.adding = adding;
     }
 }

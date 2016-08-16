@@ -18,7 +18,6 @@ import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
-import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
@@ -49,7 +48,7 @@ public class MyShowsFragment extends SeriesFragment {
 
             } else {
                 if (loggedIn){
-                    new MalApiClient(this).getUserList();
+                    getMalApiClient().getUserList();
                     setUpdating(true);
                 } else {
                     getSwipeRefreshLayout().setRefreshing(false);
@@ -68,14 +67,11 @@ public class MyShowsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        setMalApiClient(new MalApiClient(this));
-
         if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
-
             }
 
             App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.fragment_myshows);
@@ -195,7 +191,8 @@ public class MyShowsFragment extends SeriesFragment {
     public void seasonPostersImported() {
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializing(false);
-            new MalApiClient(this).getUserList();
+
+            getMalApiClient().getUserList();
 
 
             TextView loadingText = (TextView) App.getInstance().getMainActivity().progressViewHolder.findViewById(R.id.loading_text);
@@ -222,14 +219,14 @@ public class MyShowsFragment extends SeriesFragment {
         App.getInstance().saveNewSeasonData(season);
 
         if (App.getInstance().isNetworkAvailable()){
-            if (getHelper() == null){
-                setHelper(new ANNSearchHelper());
+            if (getAnnHelper() == null){
+                setAnnHelper(new ANNSearchHelper());
             }
 
             if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()){
-                getHelper().getImages(this, season.getSeasonSeries());
+                getAnnHelper().getImages(this, season.getSeasonSeries());
             } else {
-                getHelper().getImages(this, getmAdapter().getAllSeries());
+                getAnnHelper().getImages(this, getmAdapter().getAllSeries());
 
             }
         } else {
