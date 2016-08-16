@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -27,11 +28,13 @@ import java.util.Collections;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -49,7 +52,7 @@ import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, UserListResponse {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, UserListResponse, FailedInitializationFragment.FailedInitializationListener {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -187,6 +190,20 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void failedInitializationResponse(boolean retryNow) {
+        if (retryNow){
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
+            startActivity(intent);
+        } else {
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory( Intent.CATEGORY_HOME );
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
+        }
+    }
+
+    @Override
     public void seasonPostersImported(boolean imported) {
         if (imported){
             mAdapter.notifyDataSetChanged();
@@ -208,7 +225,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
             }
         } else {
-            Snackbar.make(seriesLayout, getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+            if (!App.getInstance().isInitializing()){
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+            } else {
+                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+                failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+            }
         }
     }
 

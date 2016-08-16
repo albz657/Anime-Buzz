@@ -17,6 +17,7 @@ import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
+import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
@@ -227,7 +228,12 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
                 Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
             }
         } else {
-            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+            if (!App.getInstance().isInitializing()){
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+            } else {
+                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+                failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+            }
         }
     }
 
