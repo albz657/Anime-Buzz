@@ -72,7 +72,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                     if (App.getInstance().isNetworkAvailable()) {
                         attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                     } else {
-                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                     }
                 }
                 return false;
@@ -86,7 +86,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                 if (App.getInstance().isNetworkAvailable()) {
                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                 } else {
-                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -120,7 +120,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             malApiClient.verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.trying_to_verify), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -143,7 +143,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
             Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         } else {
-            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_failed), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 }

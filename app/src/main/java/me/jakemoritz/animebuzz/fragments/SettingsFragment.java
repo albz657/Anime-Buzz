@@ -34,7 +34,6 @@ import net.xpece.android.support.preference.SwitchPreference;
 import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
@@ -204,7 +203,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                     SignInFragment signInFragment = SignInFragment.newInstance(self);
                     signInFragment.show(activity.getFragmentManager(), "");
                 } else {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
 
                 return false;
@@ -246,7 +245,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
         App.getInstance().getMainActivity().loadDrawerUserInfo();
 
-        Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_LONG).show();
 
         preference.setVisible(false);
         signInPreference.setVisible(true);
@@ -289,7 +288,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         malApiClient.getUserList();
-        ((MainActivity) activity).navigationView.getMenu().getItem(1).setChecked(true);
+        App.getInstance().getMainActivity().getNavigationView().getMenu().getItem(1).setChecked(true);
 
         Snackbar.make(activity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
     }

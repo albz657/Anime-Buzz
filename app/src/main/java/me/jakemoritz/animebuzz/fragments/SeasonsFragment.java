@@ -218,7 +218,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
             setUpdating(true);
         } else {
-            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
     }
 

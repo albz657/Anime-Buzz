@@ -222,11 +222,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 }
                 annHelper.getImages(season.getSeasonSeries());
             } else {
-                Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (!App.getInstance().isInitializing()){
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
             } else {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
                 failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
@@ -259,7 +259,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void userListReceived(boolean received) {
         if (!received){
-            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.user_list_failed), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.user_list_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -271,7 +271,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             addSeries(itemToBeChanged);
         } else {
             adding = false;
-            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -325,7 +325,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (deleted){
             removeSeries(itemToBeChanged);
         } else {
-            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -348,7 +348,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 malApiClient.verify(username, password);
             } else {
                 adding = false;
-                Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (adding){
@@ -385,7 +385,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void verified(boolean verified) {
         if (verified){
-            Snackbar.make(swipeRefreshLayout, "Your MAL credentials have been verified.", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(swipeRefreshLayout, "Your MAL credentials have been verified.", Snackbar.LENGTH_LONG).show();
 
         }
     }

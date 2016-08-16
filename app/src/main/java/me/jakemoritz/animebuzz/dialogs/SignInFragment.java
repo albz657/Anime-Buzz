@@ -74,7 +74,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
                     if (App.getInstance().isNetworkAvailable()){
                         attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                     } else {
-                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
+                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
                         View view = failSnackbar.getView();
                         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
                         params.gravity = Gravity.TOP;
@@ -93,7 +93,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
                 if (App.getInstance().isNetworkAvailable()){
                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                 } else {
-                    Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT);
+                    Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
                     View view1 = failSnackbar.getView();
                     FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
                     params.gravity = Gravity.TOP;
@@ -112,7 +112,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            Snackbar.make(App.getInstance().getMainActivity().navigationView, getString(R.string.trying_to_verify), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(App.getInstance().getMainActivity().getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -131,7 +131,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
             getDialog().cancel();
         } else {
-            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.verification_failed), Snackbar.LENGTH_SHORT);
+            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.verification_failed), Snackbar.LENGTH_LONG);
             View view = failSnackbar.getView();
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
             params.gravity = Gravity.TOP;

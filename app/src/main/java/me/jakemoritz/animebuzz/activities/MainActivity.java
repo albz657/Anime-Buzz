@@ -134,18 +134,6 @@ public class MainActivity extends AppCompatActivity
                 if (startupIntent.getBooleanExtra("openBacklogFragment", false)) {
                     navigationView.getMenu().getItem(0).setChecked(true);
 
-                    /*if (App.getInstance().getBacklogFragment().isVisible()){
-                        for (Fragment fragment : getSupportFragmentManager().getFragments()){
-                            getSupportFragmentManager().beginTransaction()
-                                    .remove(fragment)
-                                    .commit();
-                        }
-
-                        /*getSupportFragmentManager().beginTransaction()
-                                .add(R.id.content_main, App.getInstance().getBacklogFragment(), getString(R.string.fragment_watching_queue))
-                                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                                .commit();
-                    } else {*/
                     getSupportFragmentManager();
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.content_main, new BacklogFragment())
@@ -155,9 +143,6 @@ public class MainActivity extends AppCompatActivity
                     if (getSupportActionBar() != null) {
                         getSupportActionBar().setTitle(R.string.fragment_watching_queue);
                     }
-                    //  }
-
-
                 } else {
                     navigationView.getMenu().getItem(1).setChecked(true);
 
@@ -171,9 +156,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             }
-
         }
-
     }
 
     @Override
@@ -311,5 +294,9 @@ public class MainActivity extends AppCompatActivity
 
     public CircularProgressView getProgressView() {
         return progressView;
+    }
+
+    public NavigationView getNavigationView() {
+        return navigationView;
     }
 }

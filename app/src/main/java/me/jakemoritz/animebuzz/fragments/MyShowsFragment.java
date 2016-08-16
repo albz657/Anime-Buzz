@@ -56,7 +56,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             }
         } else {
             getSwipeRefreshLayout().setRefreshing(false);
-            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -225,11 +225,11 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
                     getAnnHelper().getImages(getmAdapter().getAllSeries());
                 }
             } else {
-                Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (!App.getInstance().isInitializing()){
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
             } else {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
                 failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
@@ -264,7 +264,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     @Override
     public void episodeCountIncremented(boolean incremented) {
         if (!incremented) {
-            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 }
