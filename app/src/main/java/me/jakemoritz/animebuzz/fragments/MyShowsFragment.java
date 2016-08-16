@@ -190,7 +190,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             getMalApiClient().getUserList();
 
 
-            TextView loadingText = (TextView) App.getInstance().getMainActivity().progressViewHolder.findViewById(R.id.loading_text);
+            TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
             loadingText.setText(getString(R.string.initial_loading_myshows));
         }
         if (isUpdating()) {
@@ -237,8 +237,8 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             App.getInstance().setInitializingGotImages(false);
             App.getInstance().setPostInitializing(true);
 
-            App.getInstance().getMainActivity().progressViewHolder.setVisibility(View.GONE);
-            App.getInstance().getMainActivity().progressView.stopAnimation();
+            App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
+            App.getInstance().getMainActivity().getProgressView().stopAnimation();
 
             getSenpaiExportHelper().getSeasonList();
         }

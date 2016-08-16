@@ -39,19 +39,10 @@ public class MainActivity extends AppCompatActivity
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    public NavigationView navigationView;
+    private NavigationView navigationView;
     private DrawerLayout drawer;
-    public CircularProgressView progressView;
-    public RelativeLayout progressViewHolder;
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (App.getInstance().isInitializing()) {
-            return true;
-        } else {
-            return super.dispatchTouchEvent(ev);
-        }
-    }
+    private CircularProgressView progressView;
+    private RelativeLayout progressViewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,23 +176,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void loadDrawerUserInfo() {
-        File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
-        ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-        if (avatarFile.exists()){
-            Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        } else {
-            Picasso.with(this).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        }
-
-        TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String malUsername = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
-        drawerUsername.setText(malUsername);
-    }
-
-
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -307,5 +281,35 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    public void loadDrawerUserInfo() {
+        File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
+        ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
+        if (avatarFile.exists()){
+            Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        } else {
+            Picasso.with(this).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        }
 
+        TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String malUsername = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
+        drawerUsername.setText(malUsername);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (App.getInstance().isInitializing()) {
+            return true;
+        } else {
+            return super.dispatchTouchEvent(ev);
+        }
+    }
+
+    public RelativeLayout getProgressViewHolder() {
+        return progressViewHolder;
+    }
+
+    public CircularProgressView getProgressView() {
+        return progressView;
+    }
 }

@@ -128,8 +128,8 @@ public class SeasonsFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
 
-            App.getInstance().getMainActivity().progressViewHolder.setVisibility(View.GONE);
-            App.getInstance().getMainActivity().progressView.stopAnimation();
+            App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
+            App.getInstance().getMainActivity().getProgressView().stopAnimation();
 
             loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
 
