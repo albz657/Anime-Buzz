@@ -26,7 +26,7 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeCountResponse{
+public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeCountResponse {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
@@ -41,12 +41,12 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().isNetworkAvailable()) {
-            if (!getmAdapter().getAllSeries().isEmpty()){
+            if (!getmAdapter().getAllSeries().isEmpty()) {
                 getSenpaiExportHelper().getLatestSeasonData();
                 setUpdating(true);
 
             } else {
-                if (loggedIn){
+                if (loggedIn) {
                     getMalApiClient().getUserList();
                     setUpdating(true);
                 } else {
@@ -76,7 +76,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
         loadUserSortingPreference();
 
-        if (App.getInstance().isJustLaunchedMyShows()){
+        if (App.getInstance().isJustLaunchedMyShows()) {
             onRefresh();
             getSwipeRefreshLayout().post(new Runnable() {
                 @Override
@@ -126,7 +126,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     }
 
     public void loadUserSortingPreference() {
-        if (!isAdded()){
+        if (!isAdded()) {
             return;
         }
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
@@ -183,7 +183,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     }
 
     @Override
-    public void seasonPostersImported() {
+    public void seasonPostersImported(boolean imported) {
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializing(false);
 
@@ -197,35 +197,37 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
 
-            if (isLoggedIn){
+            if (isLoggedIn) {
                 getMalApiClient().getUserList();
             } else {
                 getSwipeRefreshLayout().setRefreshing(false);
             }
-
         }
 
-        super.seasonPostersImported();
+        super.seasonPostersImported(imported);
     }
 
     @Override
     public void seasonDataRetrieved(Season season) {
-        App.getInstance().getAllAnimeSeasons().add(season);
-        App.getInstance().saveNewSeasonData(season);
+        if (season != null) {
+            App.getInstance().getAllAnimeSeasons().add(season);
+            App.getInstance().saveNewSeasonData(season);
 
-        if (App.getInstance().isNetworkAvailable()){
-            if (getAnnHelper() == null){
-                setAnnHelper(new ANNSearchHelper());
-            }
+            if (App.getInstance().isNetworkAvailable()) {
+                if (getAnnHelper() == null) {
+                    setAnnHelper(new ANNSearchHelper(this));
+                }
 
-            if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()){
-                getAnnHelper().getImages(this, season.getSeasonSeries());
+                if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()) {
+                    getAnnHelper().getImages(season.getSeasonSeries());
+                } else {
+                    getAnnHelper().getImages(getmAdapter().getAllSeries());
+                }
             } else {
-                getAnnHelper().getImages(this, getmAdapter().getAllSeries());
-
+                Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
             }
         } else {
-            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -246,7 +248,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             setUpdating(false);
         }
 
-        if (getmAdapter() != null){
+        if (getmAdapter() != null) {
             getmAdapter().notifyDataSetChanged();
         }
 
@@ -255,7 +257,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
     @Override
     public void episodeCountIncremented(boolean incremented) {
-        if (!incremented){
+        if (!incremented) {
             Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_SHORT).show();
         }
     }

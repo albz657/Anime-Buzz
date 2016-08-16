@@ -99,7 +99,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
 
         boolean promptIncrement = sharedPreferences.getBoolean(getString(R.string.pref_increment_key), false);
-        if (promptIncrement){
+        if (promptIncrement) {
             incrementPreference.setSummary(getString(R.string.pref_increment_summary));
         } else {
             incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
@@ -109,13 +109,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))) {
-            if (simulcastPreference.isChecked()) {
-                simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
-                App.getInstance().switchAlarmTiming(true);
-            } else {
-                simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
-                App.getInstance().switchAlarmTiming(false);
-            }
+            App.getInstance().switchAlarmTiming();
         } else if (s.equals(getString(R.string.pref_24hour_key))) {
             if (format24hourPreference.isChecked()) {
                 format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
@@ -130,7 +124,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         } else if (s.equals(getString(R.string.pref_ringtone_key))) {
             setRingtoneSummary();
-        } else if (s.equals(getString(R.string.pref_firebase_key))){
+        } else if (s.equals(getString(R.string.pref_firebase_key))) {
             FirebaseAnalytics.getInstance(App.getInstance()).setAnalyticsCollectionEnabled(firebasePreference.isChecked());
         }
     }
@@ -178,9 +172,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         firebasePreference = (SwitchPreference) findPreference(getString(R.string.pref_firebase_key));
 
-        boolean isDebuggable =  ( 0 != ( App.getInstance().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) );
+        boolean isDebuggable = (0 != (App.getInstance().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
 
-        if (isDebuggable){
+        if (isDebuggable) {
             firebasePreference.setEnabled(false);
         }
 
@@ -229,7 +223,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         format24hourPreference = (SwitchPreference) findPreference(getString(R.string.pref_24hour_key));
         incrementPreference = (SwitchPreference) findPreference(getString(R.string.pref_increment_key));
 
-        if (signedIn){
+        if (signedIn) {
             incrementPreference.setEnabled(true);
         } else {
             incrementPreference.setEnabled(false);
@@ -326,7 +320,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             signOutPreference.setSummary(summary);
         }
 
-        if (!App.getInstance().getUserAnimeList().isEmpty()){
+        if (!App.getInstance().getUserAnimeList().isEmpty()) {
             importExistingSeries();
         }
 
@@ -358,8 +352,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     @Override
     public void verified(boolean verified) {
-        if (verified){
-           signIn();
+        if (verified) {
+            signIn();
         }
     }
 }

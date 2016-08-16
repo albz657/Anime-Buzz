@@ -72,7 +72,7 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonData(final SeasonMetadata metadata) {
-        if (App.getInstance().isPostInitializing()){
+        if (App.getInstance().isPostInitializing()) {
             updateNotification(metadata.getName());
         }
 
@@ -97,8 +97,8 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
                 if (response.isSuccessful()) {
-                    if (App.getInstance().isPostInitializing()){
-                        if (App.getInstance().getSyncingSeasons().isEmpty()){
+                    if (App.getInstance().isPostInitializing()) {
+                        if (App.getInstance().getSyncingSeasons().isEmpty()) {
                             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotificationManager.cancel(100);
 
@@ -170,7 +170,7 @@ public class SenpaiExportHelper {
                     editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getName());
                     editor.apply();
 
-                    if (App.getInstance().isInitializing()){
+                    if (App.getInstance().isInitializing()) {
                         response.body().getSeasonMetadata().setCurrentOrNewer(true);
                         App.getInstance().setCurrentlyBrowsingSeason(response.body());
 
@@ -186,7 +186,7 @@ public class SenpaiExportHelper {
 
             @Override
             public void onFailure(Call<Season> call, Throwable t) {
-                Log.d(TAG, "Failed getting latest season data");
+                fragment.seasonDataRetrieved(null);
             }
         });
     }

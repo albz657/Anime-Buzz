@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +38,6 @@ import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
-import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
@@ -69,7 +67,6 @@ public class App extends Application {
     private boolean initializingGotImages = false;
     private boolean tryingToVerify = false;
     private Season currentlyBrowsingSeason;
-    private boolean gettingCurrentBrowsing = false;
     private AlarmManager alarmManager;
     private boolean justSignedInFromSettings = false;
     private boolean justLaunchedMyShows = false;
@@ -187,44 +184,6 @@ public class App extends Application {
         return formattedTime;
     }
 
-    public String formatTime(Long time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date(time));
-
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
-
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
-            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-        }
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
-
-        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
-        SimpleDateFormat hourFormat = null;
-
-        String formattedTime = format.format(nextEpisode.getTime());
-
-        DateFormatHelper helper = new DateFormatHelper();
-        formattedTime += helper.getDayOfMonthSuffix(nextEpisode.get(Calendar.DAY_OF_MONTH));
-
-        if (prefers24Hour) {
-            hourFormat = new SimpleDateFormat(", kk:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
-
-        } else {
-            hourFormat = new SimpleDateFormat(", h:mm");
-            formattedTime += hourFormat.format(nextEpisode.getTime());
-            formattedTime += new SimpleDateFormat(" a").format(nextEpisode.getTime());
-        }
-
-        return formattedTime;
-    }
-
     public String formatAiringTime(Calendar calendar) {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
@@ -272,50 +231,6 @@ public class App extends Application {
             }
         }
     }
-
-  /*
-    public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
-        for (CircleBitmapHolder holder : holderList){
-            if (holder.getBitmap() != null){
-                try {
-                    File file = getCachedPosterFile(holder.getANNID(), "circle");
-                    if (file != null) {
-                        FileOutputStream fos = new FileOutputStream(file);
-                        holder.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                        fos.close();
-                    } else {
-                        Log.d(TAG, "null file");
-                    }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                holder.getBitmap().recycle();
-            }
-        }
-
-    }
-
-    public void getCircleBitmap(Series series) {
-        List<CircleBitmapHolder> holderList = new ArrayList<>();
-
-        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-
-            File smallBitmapFile = new File(imageCacheDirectory, series.getANNID() + "_small.jpg");
-
-            if (smallBitmapFile.exists()) {
-                CircleBitmapHolder bitmapHolder = new CircleBitmapHolder(String.valueOf(series.getANNID()), null, smallBitmapFile);
-                holderList.add(bitmapHolder);
-            }
-
-
-        CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
-        circleBitmapTask.execute(holderList);
-    }
-*/
-
 
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -399,7 +314,7 @@ public class App extends Application {
 
     }
 
-    public void switchAlarmTiming(boolean prefersSimulcast) {
+    public void switchAlarmTiming() {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
         alarms.clear();
@@ -530,27 +445,6 @@ public class App extends Application {
         this.database = database;
     }
 
-    private long getNextEpisodeTime(Series series, boolean simulcastTime) {
-        Calendar cal;
-        if (simulcastTime) {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getSimulcast_airdate());
-        } else {
-            cal = new DateFormatHelper().getCalFromSeconds(series.getAirdate());
-        }
-
-        Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, cal.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, cal.get(Calendar.DAY_OF_WEEK));
-
-        Calendar current = Calendar.getInstance();
-        if (current.compareTo(nextEpisode) > 0) {
-            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-        }
-
-        return nextEpisode.getTimeInMillis();
-    }
-
     public String getLatestSeasonName() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -621,20 +515,6 @@ public class App extends Application {
         this.tryingToVerify = tryingToVerify;
     }
 
-    public void setGettingCurrentBrowsing(boolean gettingCurrentBrowsing) {
-        this.gettingCurrentBrowsing = gettingCurrentBrowsing;
-    }
-
-    public void setDelegate(SeasonPostersImportResponse delegate) {
-        this.delegate = delegate;
-    }
-
-    public SeasonPostersImportResponse getDelegate() {
-        return delegate;
-    }
-
-    private SeasonPostersImportResponse delegate = null;
-
     public Season getCurrentlyBrowsingSeason() {
         return currentlyBrowsingSeason;
     }
@@ -691,3 +571,46 @@ public class App extends Application {
         this.justSignedInFromSettings = justSignedInFromSettings;
     }
 }
+
+  /*
+    public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
+        for (CircleBitmapHolder holder : holderList){
+            if (holder.getBitmap() != null){
+                try {
+                    File file = getCachedPosterFile(holder.getANNID(), "circle");
+                    if (file != null) {
+                        FileOutputStream fos = new FileOutputStream(file);
+                        holder.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                    } else {
+                        Log.d(TAG, "null file");
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                holder.getBitmap().recycle();
+            }
+        }
+
+    }
+
+    public void getCircleBitmap(Series series) {
+        List<CircleBitmapHolder> holderList = new ArrayList<>();
+
+        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+
+            File smallBitmapFile = new File(imageCacheDirectory, series.getANNID() + "_small.jpg");
+
+            if (smallBitmapFile.exists()) {
+                CircleBitmapHolder bitmapHolder = new CircleBitmapHolder(String.valueOf(series.getANNID()), null, smallBitmapFile);
+                holderList.add(bitmapHolder);
+            }
+
+
+        CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
+        circleBitmapTask.execute(holderList);
+    }
+*/

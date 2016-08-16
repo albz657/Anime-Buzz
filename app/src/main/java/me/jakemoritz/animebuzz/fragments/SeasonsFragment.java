@@ -113,15 +113,16 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        NotificationHelper notificationHelper = new NotificationHelper();
-        notificationHelper.createImagesNotification();
+        if (season != null){
+            NotificationHelper notificationHelper = new NotificationHelper();
+            notificationHelper.createImagesNotification();
+        }
     }
 
     @Override
-    public void seasonPostersImported() {
+    public void seasonPostersImported(boolean imported) {
         if (isVisible()) {
             refreshToolbar();
-
         }
 
         if (App.getInstance().isInitializing()) {
@@ -138,8 +139,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         }
 
-
-        super.seasonPostersImported();
+        super.seasonPostersImported(imported);
     }
 
     public void refreshToolbar() {

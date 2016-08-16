@@ -73,15 +73,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        annHelper = new ANNSearchHelper();
+        annHelper = new ANNSearchHelper(this);
         malApiClient = new MalApiClient(this);
+        senpaiExportHelper = new SenpaiExportHelper(this);
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        senpaiExportHelper = new SenpaiExportHelper(this);
 
         swipeRefreshLayout.setOnRefreshListener(this);
     }
@@ -147,13 +146,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                                     .attach(self)
                                     .commit();
                         }
-                       /*
-                        container.requestLayout();
-                        container.invalidate();*/
                     }
                 });
-
-
             }
         });
         refreshEmpty();
@@ -193,25 +187,28 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void seasonPostersImported() {
-        mAdapter.notifyDataSetChanged();
+    public void seasonPostersImported(boolean imported) {
+        if (imported){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
     public void seasonDataRetrieved(Season season) {
-        App.getInstance().getAllAnimeSeasons().add(season);
-        App.getInstance().saveNewSeasonData(season);
+        if (season != null){
+            App.getInstance().getAllAnimeSeasons().add(season);
+            App.getInstance().saveNewSeasonData(season);
 
-        if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())){
-            App.getInstance().setGettingCurrentBrowsing(true);
-        }
-        if (App.getInstance().isNetworkAvailable()){
-            if (annHelper == null){
-                annHelper = new ANNSearchHelper();
+            if (App.getInstance().isNetworkAvailable()){
+                if (annHelper == null){
+                    annHelper = new ANNSearchHelper(this);
+                }
+                annHelper.getImages(season.getSeasonSeries());
+            } else {
+                Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
             }
-            annHelper.getImages(this, season.getSeasonSeries());
         } else {
-            Snackbar.make(seriesLayout, getString(R.string.no_network_available), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(seriesLayout, getString(R.string.senpai_failed), Snackbar.LENGTH_SHORT).show();
         }
     }
 

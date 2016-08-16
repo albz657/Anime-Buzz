@@ -3,20 +3,19 @@ package me.jakemoritz.animebuzz.api.ann;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
+import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
+import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.ANNEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
-import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
-import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
 import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
@@ -30,14 +29,14 @@ public class ANNSearchHelper {
     private final static String TAG = ANNSearchHelper.class.getSimpleName();
 
     private List<SeriesList> getImageURLBatch;
+    private SeriesFragment seriesFragment;
 
-    public ANNSearchHelper() {
+    public ANNSearchHelper(SeriesFragment fragment) {
+        this.seriesFragment = fragment;
         this.getImageURLBatch = new ArrayList<>();
     }
 
-    public void getImages(SeriesFragment fragment, SeriesList seriesList) {
-        App.getInstance().setDelegate(fragment);
-
+    public void getImages(SeriesList seriesList) {
         SeriesList cleanedList = new SeriesList();
         for (Series series : seriesList) {
             if (series.getANNID() > 0) {
@@ -68,7 +67,7 @@ public class ANNSearchHelper {
 
             getPictureUrlBatch(getImageURLBatch.remove(0));
         } else {
-            fragment.seasonPostersImported();
+            seriesFragment.seasonPostersImported(false);
         }
     }
 
@@ -138,24 +137,21 @@ public class ANNSearchHelper {
                         }
                     }
                     processNext();
-                    Log.d(TAG, "Got image batch");
                 }
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
                     NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                     mNotificationManager.cancel("image".hashCode());
-                    Log.d(TAG, "Failed getting image batch");
-                    if (App.getInstance().getDelegate() != null){
-                        App.getInstance().getDelegate().seasonPostersImported();
-                    }
+
+                    seriesFragment.seasonPostersImported(false);
                 }
             });
         }
     }
 
     private void getImageFromURL(List<ImageRequestHolder> imageRequests) {
-        GetImageTask task = new GetImageTask();
+        GetImageTask task = new GetImageTask(seriesFragment);
         task.execute(imageRequests);
     }
 }

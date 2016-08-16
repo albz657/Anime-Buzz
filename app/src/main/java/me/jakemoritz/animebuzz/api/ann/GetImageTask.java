@@ -16,27 +16,32 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.ann.models.ImageResponseHolder;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void> {
 
     private static final String TAG = GetImageTask.class.getSimpleName();
 
+    private SeriesFragment seriesFragment;
+
+    public GetImageTask(SeriesFragment seriesFragment) {
+        this.seriesFragment = seriesFragment;
+    }
+
     @Override
     protected void onPostExecute(Void aVoid) {
-        if (App.getInstance().getDelegate() != null) {
-            App.getInstance().getDelegate().seasonPostersImported();
-        }
+        seriesFragment.seasonPostersImported(true);
     }
 
     @Override
     protected Void doInBackground(List<ImageRequestHolder>... imageRequests) {
         List<ImageResponseHolder> imageResponses = new ArrayList<>();
-        for (ImageRequestHolder imageRequest : imageRequests[0]){
+        for (ImageRequestHolder imageRequest : imageRequests[0]) {
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();
                 imageResponses.add(new ImageResponseHolder(imageRequest.getANNID(), imageRequest.getSize(), bitmap));
-            } catch (IOException e){
+            } catch (IOException e) {
                 Log.d("OOPS", "null bitmap");
 
                 e.printStackTrace();
@@ -52,10 +57,9 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void
 
         if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
             if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                if (size.equals("circle")){
+                if (size.equals("circle")) {
                     return new File(imageCacheDirectory, ANNID + "_circle.jpg");
-                }
-                else if (size.equals("small")) {
+                } else if (size.equals("small")) {
                     return new File(imageCacheDirectory, ANNID + "_small.jpg");
                 } else {
                     return new File(imageCacheDirectory, ANNID + ".jpg");
