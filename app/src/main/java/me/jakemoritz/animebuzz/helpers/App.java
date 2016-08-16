@@ -82,8 +82,8 @@ public class App extends Application {
         super.onCreate();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isDebuggable =  ( 0 != ( getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE ) );
-        if (isDebuggable){
+        boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
+        if (isDebuggable) {
             FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(getString(R.string.pref_firebase_key), false);
@@ -111,8 +111,8 @@ public class App extends Application {
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
 
 
-            for (Season season : allAnimeSeasons){
-                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)){
+            for (Season season : allAnimeSeasons) {
+                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
                     currentlyBrowsingSeason = season;
                 }
             }
@@ -156,7 +156,7 @@ public class App extends Application {
         }
     }
 
-    public String formatBacklogTime(Long time){
+    public String formatBacklogTime(Long time) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(time);
 
@@ -184,10 +184,7 @@ public class App extends Application {
         return formattedTime;
     }
 
-    public String formatAiringTime(Calendar calendar) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
-
+    public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
         SimpleDateFormat format = new SimpleDateFormat("MMMM d");
         SimpleDateFormat hourFormat = null;
 
@@ -196,7 +193,7 @@ public class App extends Application {
         DateFormatHelper helper = new DateFormatHelper();
         formattedTime += helper.getDayOfMonthSuffix(calendar.get(Calendar.DAY_OF_MONTH));
 
-        if (prefers24Hour) {
+        if (prefers24hour) {
             hourFormat = new SimpleDateFormat(", kk:mm");
             formattedTime += hourFormat.format(calendar.getTime());
 
@@ -223,8 +220,8 @@ public class App extends Application {
 
         int latestIndex = metadataList.indexOf(latestSeason);
 
-        for (SeasonMetadata metadata : seasonsList){
-            if (metadataList.indexOf(metadata) >= latestIndex){
+        for (SeasonMetadata metadata : seasonsList) {
+            if (metadataList.indexOf(metadata) >= latestIndex) {
                 metadata.setCurrentOrNewer(true);
             } else {
                 metadata.setCurrentOrNewer(false);
@@ -265,12 +262,7 @@ public class App extends Application {
 
     }
 
-    public void makeAlarm(Series series) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
-
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
+    public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
         DateFormatHelper dateFormatHelper = new DateFormatHelper();
 
         Calendar initialAirTime;
@@ -292,15 +284,29 @@ public class App extends Application {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
         }
 
-        String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode);
+        String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
+        String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
         if (prefersSimulcast) {
             series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
         } else {
             series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
         }
+
+        return nextEpisode;
+    }
+
+    public void makeAlarm(Series series) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
+
+        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
 
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         notificationIntent.putExtra("MALID", series.getMALID());
@@ -403,7 +409,7 @@ public class App extends Application {
 
     /* LOADING */
 
-    public void loadData(){
+    public void loadData() {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
         seasonsList = databaseHelper.getAllSeasonMetadata();
         setCurrentOrNewer();

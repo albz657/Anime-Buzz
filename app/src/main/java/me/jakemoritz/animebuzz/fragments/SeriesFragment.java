@@ -386,7 +386,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void verified(boolean verified) {
         if (verified){
             Snackbar.make(swipeRefreshLayout, "Your MAL credentials have been verified.", Snackbar.LENGTH_LONG).show();
-
         }
     }
 

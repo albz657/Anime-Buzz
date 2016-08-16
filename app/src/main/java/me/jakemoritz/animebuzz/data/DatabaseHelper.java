@@ -57,6 +57,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_EPISODES_WATCHED = "episodeswatched";
     private static final String KEY_NEXT_EPISODE_AIRTIME_FORMATTED = "nextepisodeairtimeformatted";
     private static final String KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED = "nextepisodesimulcastairtimeformatted";
+    private static final String KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 = "nextepisodeairtimeformatted_twofour";
+    private static final String KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 = "nextepisodesimulcastairtimeformatted_twofour";
 
     // Season metadata columns
     private static final String KEY_SEASON_NAME = "seasonnname";
@@ -99,7 +101,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 KEY_NEXT_EPISODE_SIMULCAST_AIRTIME + " INTEGER, " +
                 KEY_EPISODES_WATCHED + " INTEGER, " +
                 KEY_NEXT_EPISODE_AIRTIME_FORMATTED + " TEXT, " +
-                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED + " TEXT" +
+                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED + " TEXT, " +
+                KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT, " +
+                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT" +
                 ")";
     }
 
@@ -154,6 +158,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_EPISODES_WATCHED, series.getEpisodesWatched());
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED, series.getNextEpisodeAirtimeFormatted());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED, series.getNextEpisodeSimulcastTimeFormatted());
+        contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24, series.getNextEpisodeAirtimeFormatted24());
+        contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24, series.getNextEpisodeSimulcastTimeFormatted24());
 
         App.getInstance().getDatabase().insert(TABLE_ANIME, null, contentValues);
         return true;
@@ -177,6 +183,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_EPISODES_WATCHED, series.getEpisodesWatched());
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED, series.getNextEpisodeAirtimeFormatted());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED, series.getNextEpisodeSimulcastTimeFormatted());
+        contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24, series.getNextEpisodeAirtimeFormatted24());
+        contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24, series.getNextEpisodeSimulcastTimeFormatted24());
 
         App.getInstance().getDatabase().update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
@@ -272,12 +280,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int episodesWatched = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_EPISODES_WATCHED));
         String nextEpisodeAirtimeFormatted = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_AIRTIME_FORMATTED));
         String nextEpisodeSimulcastAirtimeFormatted = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED));
+        String nextEpisodeAirtimeFormatted24 = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
+        String nextEpisodeSimulcastAirtimeFormatted24 = res.getString(res.getColumnIndex(DatabaseHelper.KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
 
         Type type = new TypeToken<ArrayList<Long>>() {
         }.getType();
         List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(DatabaseHelper.KEY_BACKLOG)), type);
 
-        return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted);
+        return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24);
     }
 
     public SeasonList getAllAnimeSeasons(){
@@ -341,7 +351,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private AlarmHolder getAlarmWithCursor(Cursor res) {
         int id = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_ID));
-        long time = (long) res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
+        long time = res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
         String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
 
         return new AlarmHolder(name, time, id);

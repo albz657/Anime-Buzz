@@ -88,11 +88,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         if (App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer()) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
-                if (prefersSimulcast) {
-                    holder.mDate.setText(holder.series.getNextEpisodeSimulcastTimeFormatted());
-                } else {
-                    holder.mDate.setText(holder.series.getNextEpisodeAirtimeFormatted());
-                }
+                holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
                 holder.mDate.setText("TBA");
             }
@@ -219,7 +215,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
     }
 
-    private void addSeriesHelper(Series series){
+    private void addSeriesHelper(Series series) {
         modifyListener.modifyItem(series);
         mParent.setAdding(true);
     }

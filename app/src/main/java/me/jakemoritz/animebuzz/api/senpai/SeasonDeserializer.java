@@ -10,12 +10,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -106,16 +104,8 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
             if (MALID > 0){
                 final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
 
-                DateFormatHelper dateFormatHelper = new DateFormatHelper();
-
-                Calendar nextEpisodeAirtime = dateFormatHelper.getCalFromSeconds(series.getAirdate());
-                Calendar nextEpisodeSimulcastTime = dateFormatHelper.getCalFromSeconds(series.getSimulcast_airdate());
-
-                String nextEpisodeAirtimeFormatted = App.getInstance().formatAiringTime(nextEpisodeAirtime);
-                String nextEpisodeSimulcastTimeFormatted = App.getInstance().formatAiringTime(nextEpisodeSimulcastTime);
-
-                series.setNextEpisodeAirtimeFormatted(nextEpisodeAirtimeFormatted);
-                series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeSimulcastTimeFormatted);
+                App.getInstance().generateNextEpisodeTimes(series, true);
+                App.getInstance().generateNextEpisodeTimes(series, false);
 
                 seasonSeries.add(series);
             }

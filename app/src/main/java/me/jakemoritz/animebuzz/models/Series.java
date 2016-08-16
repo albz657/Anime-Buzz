@@ -1,7 +1,13 @@
 package me.jakemoritz.animebuzz.models;
 
+import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class Series {
 
@@ -21,6 +27,24 @@ public class Series {
     private int episodesWatched;
     private String nextEpisodeAirtimeFormatted;
     private String nextEpisodeSimulcastTimeFormatted;
+    private String nextEpisodeAirtimeFormatted24;
+    private String nextEpisodeSimulcastTimeFormatted24;
+
+    public String getNextEpisodeSimulcastTimeFormatted24() {
+        return nextEpisodeSimulcastTimeFormatted24;
+    }
+
+    public void setNextEpisodeSimulcastTimeFormatted24(String nextEpisodeSimulcastTimeFormatted24) {
+        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+    }
+
+    public String getNextEpisodeAirtimeFormatted24() {
+        return nextEpisodeAirtimeFormatted24;
+    }
+
+    public void setNextEpisodeAirtimeFormatted24(String nextEpisodeAirtimeFormatted24) {
+        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
+    }
 
     public String getNextEpisodeSimulcastTimeFormatted() {
         return nextEpisodeSimulcastTimeFormatted;
@@ -138,6 +162,26 @@ public class Series {
         this.episodesWatched = episodesWatched;
     }
 
+    public String getNextEpisodeTimeFormatted(){
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean prefers24Hour = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_24hour_key), false);
+        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
+
+        if (prefersSimulcast) {
+            if (prefers24Hour){
+                return nextEpisodeSimulcastTimeFormatted24;
+            } else {
+                return nextEpisodeSimulcastTimeFormatted;
+            }
+        } else {
+            if (prefers24Hour){
+                return nextEpisodeAirtimeFormatted24;
+            } else {
+                return nextEpisodeAirtimeFormatted;
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -170,9 +214,11 @@ public class Series {
         this.episodesWatched = 0;
         this.nextEpisodeAirtimeFormatted = "";
         this.nextEpisodeSimulcastTimeFormatted = "";
+        this.nextEpisodeAirtimeFormatted24 = "";
+        this.nextEpisodeSimulcastTimeFormatted24 = "";
     }
 
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted) {
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24) {
         this.airdate = airdate;
         this.name = name;
         this.MALID = MALID;
@@ -189,6 +235,8 @@ public class Series {
         this.episodesWatched = episodesWatched;
         this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
         this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
+        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
     }
 
 }
