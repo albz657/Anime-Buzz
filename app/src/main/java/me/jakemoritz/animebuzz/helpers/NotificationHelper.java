@@ -89,12 +89,15 @@ public class NotificationHelper {
                         .setContentTitle("New episode released");
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
-        resultIntent.putExtra("openBacklogFragment", true);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        resultIntent.putExtra("notificationClicked", true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
-        stackBuilder.addParentStack(MainActivity.class);
+//        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(series.getMALID(), PendingIntent.FLAG_UPDATE_CURRENT);
+        resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -128,6 +131,9 @@ public class NotificationHelper {
         }
 
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+        notification.flags |= Notification.FLAG_NO_CLEAR;
+
 
         mNotificationManager.notify(series.getMALID(), notification);
     }

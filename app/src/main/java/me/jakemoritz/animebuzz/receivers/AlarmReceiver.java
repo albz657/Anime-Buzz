@@ -39,6 +39,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                 App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
 
             }*/
+            if (App.getInstance().getMainActivity() != null){
+                App.getInstance().getMainActivity().episodeNotificationReceived();
+            }
 
 //            databaseHelper.updateSeries(series);
 //            cursor.close();
@@ -50,4 +53,10 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
 
+    public interface EpisodeNotificationListener{
+        void episodeNotificationReceived();
+    }
+
 }
+
+

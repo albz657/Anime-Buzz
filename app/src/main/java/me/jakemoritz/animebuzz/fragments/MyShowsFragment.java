@@ -190,9 +190,11 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
             getMalApiClient().getUserList();
 
+            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null){
+                TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
+                loadingText.setText(getString(R.string.initial_loading_myshows));
+            }
 
-            TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
-            loadingText.setText(getString(R.string.initial_loading_myshows));
         }
         if (isUpdating()) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());

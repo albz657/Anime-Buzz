@@ -74,6 +74,7 @@ public class App extends Application {
     private boolean justRemoved = false;
     private SQLiteDatabase database;
     private List<SeasonMetadata> syncingSeasons;
+    private boolean appVisible = false;
 
     private MainActivity mainActivity;
 
@@ -105,7 +106,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -577,6 +578,14 @@ public class App extends Application {
 
     public void setJustSignedInFromSettings(boolean justSignedInFromSettings) {
         this.justSignedInFromSettings = justSignedInFromSettings;
+    }
+
+    public boolean isAppVisible() {
+        return appVisible;
+    }
+
+    public void setAppVisible(boolean appVisible) {
+        this.appVisible = appVisible;
     }
 }
 

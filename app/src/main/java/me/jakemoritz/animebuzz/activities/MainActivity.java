@@ -33,9 +33,10 @@ import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AlarmReceiver.EpisodeNotificationListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -131,7 +132,7 @@ public class MainActivity extends AppCompatActivity
 
         } else {
             if (startupIntent != null) {
-                if (startupIntent.getBooleanExtra("openBacklogFragment", false)) {
+                if (startupIntent.getBooleanExtra("notificationClicked", false)) {
                     navigationView.getMenu().getItem(0).setChecked(true);
 
                     getSupportFragmentManager();
@@ -163,6 +164,7 @@ public class MainActivity extends AppCompatActivity
     protected void onPause() {
         super.onPause();
         App.getInstance().saveData();
+        App.getInstance().setAppVisible(false);
     }
 
     @Override
@@ -171,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         if (!App.getInstance().getDatabase().isOpen()) {
             App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
         }
-
+        App.getInstance().setAppVisible(true);
     }
 
     @Override
@@ -267,7 +269,7 @@ public class MainActivity extends AppCompatActivity
     public void loadDrawerUserInfo() {
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-        if (avatarFile.exists()){
+        if (avatarFile.exists()) {
             Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
         } else {
             Picasso.with(this).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
@@ -298,5 +300,33 @@ public class MainActivity extends AppCompatActivity
 
     public NavigationView getNavigationView() {
         return navigationView;
+    }
+
+    @Override
+    public void episodeNotificationReceived() {
+        if (!getSupportFragmentManager().getFragments().isEmpty()) {
+            if (getSupportFragmentManager().getFragments().get(0) instanceof MyShowsFragment) {
+                ((MyShowsFragment) getSupportFragmentManager().getFragments().get(0)).getmAdapter().notifyDataSetChanged();
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if (intent.hasExtra("notificationClicked")) {
+            navigationView.getMenu().getItem(0).setChecked(true);
+
+            getSupportFragmentManager();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, new BacklogFragment())
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit();
+
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+            }
+        }
     }
 }
