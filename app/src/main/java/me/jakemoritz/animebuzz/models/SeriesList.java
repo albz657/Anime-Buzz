@@ -27,6 +27,10 @@ public class SeriesList extends ArrayList<Series> {
             currentEntry.setSimulcast_delay(series.getSimulcast_delay());
             currentEntry.setSeason(series.getSeason());
             currentEntry.setEpisodesWatched(series.getEpisodesWatched());
+            currentEntry.setNextEpisodeAirtimeFormatted(series.getNextEpisodeAirtimeFormatted());
+            currentEntry.setNextEpisodeSimulcastTimeFormatted(series.getNextEpisodeSimulcastTimeFormatted());
+            currentEntry.setNextEpisodeAirtimeFormatted24(series.getNextEpisodeAirtimeFormatted24());
+            currentEntry.setNextEpisodeSimulcastTimeFormatted24(series.getNextEpisodeSimulcastTimeFormatted24());
 
             return true;
         } else {

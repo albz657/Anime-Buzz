@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database info
     public static final String DATABASE_NAME = "buzzDB";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Table names
     private static String TABLE_ANIME = "TABLE_ANIME";
@@ -132,10 +132,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SEASONS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
-        onCreate(db);
+        switch (oldVersion){
+            case 1:
+                db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
+                db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT");
+        }
     }
 
 //    Insert/Update
