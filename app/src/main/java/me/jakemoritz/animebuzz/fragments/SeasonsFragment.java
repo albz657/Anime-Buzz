@@ -78,6 +78,8 @@ public class SeasonsFragment extends SeriesFragment {
         getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
         getmAdapter().notifyDataSetChanged();
 
+        getmAdapter().setSeriesFilter(null);
+
         App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
 
@@ -220,6 +222,10 @@ public class SeasonsFragment extends SeriesFragment {
         } else {
             Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    public interface BrowsingSeasonChangeListener {
+        void changedBrowsingSeason();
     }
 
 }

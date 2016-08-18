@@ -236,6 +236,10 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         this.visibleSeries = visibleSeries;
     }
 
+    public void setSeriesFilter(SeriesFilter seriesFilter) {
+        this.seriesFilter = seriesFilter;
+    }
+
     public interface ModifyItemStatusListener {
         void modifyItem(Series item);
     }

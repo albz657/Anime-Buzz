@@ -27,10 +27,19 @@ public class SeriesList extends ArrayList<Series> {
             currentEntry.setSimulcast_delay(series.getSimulcast_delay());
             currentEntry.setSeason(series.getSeason());
             currentEntry.setEpisodesWatched(series.getEpisodesWatched());
-            currentEntry.setNextEpisodeAirtimeFormatted(series.getNextEpisodeAirtimeFormatted());
-            currentEntry.setNextEpisodeSimulcastTimeFormatted(series.getNextEpisodeSimulcastTimeFormatted());
-            currentEntry.setNextEpisodeAirtimeFormatted24(series.getNextEpisodeAirtimeFormatted24());
-            currentEntry.setNextEpisodeSimulcastTimeFormatted24(series.getNextEpisodeSimulcastTimeFormatted24());
+
+            if (!series.getNextEpisodeAirtimeFormatted().isEmpty()){
+                currentEntry.setNextEpisodeAirtimeFormatted(series.getNextEpisodeAirtimeFormatted());
+            }
+            if (!series.getNextEpisodeSimulcastTimeFormatted().isEmpty()){
+                currentEntry.setNextEpisodeSimulcastTimeFormatted(series.getNextEpisodeSimulcastTimeFormatted());
+            }
+            if (!series.getNextEpisodeAirtimeFormatted24().isEmpty()){
+                currentEntry.setNextEpisodeAirtimeFormatted24(series.getNextEpisodeAirtimeFormatted24());
+            }
+            if (!series.getNextEpisodeSimulcastTimeFormatted24().isEmpty()){
+                currentEntry.setNextEpisodeSimulcastTimeFormatted24(series.getNextEpisodeSimulcastTimeFormatted24());
+            }
 
             return true;
         } else {
