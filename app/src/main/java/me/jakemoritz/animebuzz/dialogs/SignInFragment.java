@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.dialogs;
 
-import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -51,13 +49,13 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
     public void onStart() {
         super.onStart();
 
-        DisplayMetrics metrics = new DisplayMetrics();
+/*        DisplayMetrics metrics = new DisplayMetrics();
         App.getInstance().getMainActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         float logicalDensity = metrics.density;
         int px = (int) Math.ceil(400 * logicalDensity);
         Dialog dialog = getDialog();
 
-        dialog.getWindow().setLayout(px, dialog.getWindow().getAttributes().height);
+        dialog.getWindow().setLayout(px, dialog.getWindow().getAttributes().height);*/
     }
 
     @Nullable
