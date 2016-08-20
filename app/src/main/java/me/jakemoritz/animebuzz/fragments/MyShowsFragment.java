@@ -42,18 +42,9 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
         if (App.getInstance().isNetworkAvailable()) {
-            if (!getmAdapter().getAllSeries().isEmpty()) {
-                getSenpaiExportHelper().getLatestSeasonData();
-                setUpdating(true);
+            getSenpaiExportHelper().getLatestSeasonData();
+            setUpdating(true);
 
-            } else {
-                if (loggedIn) {
-                    getMalApiClient().getUserList();
-                    setUpdating(true);
-                } else {
-                    getSwipeRefreshLayout().setRefreshing(false);
-                }
-            }
         } else {
             getSwipeRefreshLayout().setRefreshing(false);
             Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
@@ -190,12 +181,13 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
             getMalApiClient().getUserList();
 
-            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null){
+            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null) {
                 TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
                 loadingText.setText(getString(R.string.initial_loading_myshows));
             }
 
         }
+
         if (isUpdating()) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
@@ -221,16 +213,12 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
                     setAnnHelper(new ANNSearchHelper(this));
                 }
 
-                if (App.getInstance().isPostInitializing() || App.getInstance().isInitializing()) {
-                    getAnnHelper().getImages(season.getSeasonSeries());
-                } else {
-                    getAnnHelper().getImages(getmAdapter().getAllSeries());
-                }
+                getAnnHelper().getImages(season.getSeasonSeries());
             } else {
                 Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
-            if (!App.getInstance().isInitializing()){
+            if (!App.getInstance().isInitializing()) {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
             } else {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
