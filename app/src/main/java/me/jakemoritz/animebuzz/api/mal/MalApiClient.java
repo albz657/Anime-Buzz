@@ -165,17 +165,19 @@ public class MalApiClient {
                     if (response.body().getAnimeList() != null) {
                         List<MatchHolder> matchList = new ArrayList<>();
                         for (AnimeListHolder list : response.body().getAnimeList()) {
-                            if (list.getMALID() != null && list.getMy_status() != null && list.getMy_status().equals("1")) {
-                                matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes())));
+                            if (list.getMALID() != null && list.getMy_status() != null) {
+                                if (list.getMy_status().equals("1")) {
+                                    matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes())));
+                                }
                             }
                         }
-
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
                     }
                 } else {
                     seriesFragment.userListReceived(false);
                 }
+
             }
 
             @Override

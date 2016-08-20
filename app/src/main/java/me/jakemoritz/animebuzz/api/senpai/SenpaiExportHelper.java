@@ -106,11 +106,9 @@ public class SenpaiExportHelper {
                         } else {
                             getSeasonData(App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1));
                         }
-
                     }
 
                     fragment.seasonDataRetrieved(response.body());
-                    Log.d(TAG, "Got season data for: '" + metadata.getName() + "'");
                 }
             }
 
@@ -180,7 +178,6 @@ public class SenpaiExportHelper {
                     databaseHelper.saveSeasonMetadata(response.body().getSeasonMetadata());
 
                     fragment.seasonDataRetrieved(response.body());
-                    Log.d(TAG, "Got latest season data");
                 }
             }
 

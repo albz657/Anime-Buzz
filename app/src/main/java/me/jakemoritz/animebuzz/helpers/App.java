@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.FileNotFoundException;
@@ -27,6 +28,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +93,7 @@ public class App extends Application {
             editor.apply();
         }
 
-//        SQLiteStudioService.instance().start(this);
+        Stetho.initializeWithDefaults(this);
 
         mInstance = this;
         allAnimeSeasons = new SeasonList();
@@ -107,6 +109,8 @@ public class App extends Application {
             loadData();
             //            backlogDummyData();
 //            dummyAlarm();
+
+            removeOlderShows();
             rescheduleAlarms();
 
             String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
@@ -246,6 +250,18 @@ public class App extends Application {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void removeOlderShows(){
+        String latestSeasonName = getLatestSeasonName();
+        for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext();){
+            Series series = (Series) iterator.next();
+            if (!series.getSeason().equals(latestSeasonName)){
+                removeAlarm(series);
+                series.setInUserList(false);
+                iterator.remove();
             }
         }
     }

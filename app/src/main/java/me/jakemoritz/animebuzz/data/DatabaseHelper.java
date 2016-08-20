@@ -139,7 +139,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-//    Insert/Update
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        super.onDowngrade(db, oldVersion, newVersion);
+    }
+
+    //    Insert/Update
 
     private boolean insertSeries(Series series) {
         ContentValues contentValues = new ContentValues();
