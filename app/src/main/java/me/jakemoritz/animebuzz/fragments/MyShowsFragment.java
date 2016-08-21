@@ -178,7 +178,9 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializing(false);
 
-            getMalApiClient().getUserList();
+            if (App.getInstance().getLoggedIn()){
+                getMalApiClient().getUserList();
+            }
 
             if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null) {
                 TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);

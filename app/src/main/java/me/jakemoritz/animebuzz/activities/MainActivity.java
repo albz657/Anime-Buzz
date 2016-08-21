@@ -306,7 +306,9 @@ public class MainActivity extends AppCompatActivity
     public void episodeNotificationReceived() {
         if (!getSupportFragmentManager().getFragments().isEmpty()) {
             if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof MyShowsFragment) {
-                ((MyShowsFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
+                MyShowsFragment myShowsFragment = ((MyShowsFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1));
+                myShowsFragment.getmAdapter().notifyDataSetChanged();
+                myShowsFragment.loadUserSortingPreference();
             }
         }
     }

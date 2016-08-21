@@ -483,6 +483,11 @@ public class App extends Application {
         return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
     }
 
+    public boolean getLoggedIn() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
+    }
+
     public Season getSeasonFromName(String seasonName) {
         for (Season season : allAnimeSeasons) {
             if (season.getSeasonMetadata().getName().equals(seasonName)) {

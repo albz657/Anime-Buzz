@@ -19,7 +19,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -115,10 +114,10 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (season != null) {
+        /*if (season != null) {
             NotificationHelper notificationHelper = new NotificationHelper();
             notificationHelper.createImagesNotification();
-        }
+        }*/
     }
 
     @Override

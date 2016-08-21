@@ -267,8 +267,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     public void addToMAL(boolean add) {
+        MyShowsFragment myShowsFragment = new MyShowsFragment();
 
-        MalApiClient malApiClient = new MalApiClient(new MyShowsFragment());
+        MalApiClient malApiClient = new MalApiClient(myShowsFragment);
 
 
         if (!add) {
@@ -284,7 +285,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
 
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, new MyShowsFragment(), getString(R.string.fragment_myshows))
+                .replace(R.id.content_main, myShowsFragment, getString(R.string.fragment_myshows))
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .commit();
         malApiClient.getUserList();
@@ -321,6 +322,17 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         if (!App.getInstance().getUserAnimeList().isEmpty()) {
             importExistingSeries();
+        } else {
+            MyShowsFragment myShowsFragment = new MyShowsFragment();
+
+            activity.getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, myShowsFragment, getString(R.string.fragment_myshows))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit();
+            new MalApiClient(myShowsFragment).getUserList();
+            App.getInstance().getMainActivity().getNavigationView().getMenu().getItem(1).setChecked(true);
+
+            Snackbar.make(activity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         }
 
         App.getInstance().getMainActivity().loadDrawerUserInfo();
