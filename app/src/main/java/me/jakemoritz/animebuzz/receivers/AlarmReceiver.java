@@ -38,6 +38,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 }
             }
 
+            App.getInstance().setNotificationReceived(true);
+
             series.getBacklog().add(time);
             App.getInstance().getBacklog().add(new BacklogItem(series, time));
             App.getInstance().makeAlarm(series);

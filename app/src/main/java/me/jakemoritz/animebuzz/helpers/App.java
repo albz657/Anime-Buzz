@@ -76,7 +76,7 @@ public class App extends Application {
     private SQLiteDatabase database;
     private List<SeasonMetadata> syncingSeasons;
     private boolean appVisible = false;
-
+    private boolean notificationReceived = false;
     private MainActivity mainActivity;
 
     @Override
@@ -105,7 +105,7 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -220,9 +220,9 @@ public class App extends Application {
         }
     }
 
-    private void setCurrent(){
-        for (SeasonMetadata seasonMetadata : seasonsList){
-            if (seasonMetadata.getName().equals(getLatestSeasonName())){
+    private void setCurrent() {
+        for (SeasonMetadata seasonMetadata : seasonsList) {
+            if (seasonMetadata.getName().equals(getLatestSeasonName())) {
                 seasonMetadata.setCurrentOrNewer(true);
                 break;
             }
@@ -290,10 +290,15 @@ public class App extends Application {
         nextEpisode.set(Calendar.DAY_OF_WEEK, initialAirTime.get(Calendar.DAY_OF_WEEK));
         nextEpisode.set(Calendar.SECOND, 0);
 
-        Calendar currentTime = Calendar.getInstance();
-        currentTime.set(Calendar.SECOND, 0);
-        if (currentTime.compareTo(nextEpisode) >= 0) {
+        if (!App.getInstance().isNotificationReceived()) {
+            Calendar currentTime = Calendar.getInstance();
+            currentTime.set(Calendar.SECOND, 0);
+            if (currentTime.compareTo(nextEpisode) >= 0) {
+                nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+            }
+        } else {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+            App.getInstance().setNotificationReceived(false);
         }
 
         String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
@@ -605,6 +610,14 @@ public class App extends Application {
 
     public void setAppVisible(boolean appVisible) {
         this.appVisible = appVisible;
+    }
+
+    public boolean isNotificationReceived() {
+        return notificationReceived;
+    }
+
+    public void setNotificationReceived(boolean notificationReceived) {
+        this.notificationReceived = notificationReceived;
     }
 }
 

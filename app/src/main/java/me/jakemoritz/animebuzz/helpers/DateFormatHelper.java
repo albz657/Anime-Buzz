@@ -43,9 +43,8 @@ public class DateFormatHelper {
     public Calendar getCalFromSeconds(int seconds) {
         Long ms = Long.valueOf(String.valueOf(seconds) + "000");
 
-        Date date = new Date(ms);
         Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
+        cal.setTimeInMillis(ms);
 
         return cal;
     }

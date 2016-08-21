@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
+import android.content.SharedPreferences;
+import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -13,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -49,6 +52,13 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
 
         final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
         App.getInstance().getSeasonsList().add(seasonMetadata);
+
+        if (App.getInstance().isInitializing() && App.getInstance().getLatestSeasonName().isEmpty()){
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), seasonMetadata.getName());
+            editor.apply();
+        }
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
@@ -104,8 +114,12 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
             if (MALID > 0){
                 final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
 
-                App.getInstance().generateNextEpisodeTimes(series, true);
-                App.getInstance().generateNextEpisodeTimes(series, false);
+
+                if (seasonName.equals(App.getInstance().getLatestSeasonName())){
+                    App.getInstance().generateNextEpisodeTimes(series, true);
+                    App.getInstance().generateNextEpisodeTimes(series, false);
+                }
+
 
                 seasonSeries.add(series);
             }
