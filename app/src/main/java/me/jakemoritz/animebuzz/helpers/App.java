@@ -107,7 +107,6 @@ public class App extends Application {
             //            backlogDummyData();
             dummyAlarm();
 
-            removeOlderShows();
             rescheduleAlarms();
         }
     }

@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -27,14 +28,21 @@ public class AlarmReceiver extends BroadcastReceiver {
             NotificationHelper helper = new NotificationHelper();
             helper.createNewEpisodeNotification(series);
 
-            App.getInstance().removeAlarmFromStructure(series.getMALID());
-
+//            App.getInstance().removeAlarmFromStructure(series.getMALID());
             long time = System.currentTimeMillis();
+
+            for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
+                if (alarmHolder.getId() == intentExtra){
+                    time = alarmHolder.getAlarmTime();
+                    break;
+                }
+            }
+
             series.getBacklog().add(time);
             App.getInstance().getBacklog().add(new BacklogItem(series, time));
             App.getInstance().makeAlarm(series);
 
-            App.getInstance().refreshBacklog();
+//            App.getInstance().refreshBacklog();
             /*if (App.getInstance().getBacklogFragment().getmAdapter() != null){
                 App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
 
