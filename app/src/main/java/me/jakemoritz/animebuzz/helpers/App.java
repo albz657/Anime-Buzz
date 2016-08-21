@@ -254,7 +254,7 @@ public class App extends Application {
         }
     }
 
-    private void removeOlderShows(){
+    public void removeOlderShows(){
         String latestSeasonName = getLatestSeasonName();
         for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext();){
             Series series = (Series) iterator.next();

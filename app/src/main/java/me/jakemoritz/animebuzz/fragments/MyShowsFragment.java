@@ -44,7 +44,6 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getLatestSeasonData();
             setUpdating(true);
-
         } else {
             getSwipeRefreshLayout().setRefreshing(false);
             Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();

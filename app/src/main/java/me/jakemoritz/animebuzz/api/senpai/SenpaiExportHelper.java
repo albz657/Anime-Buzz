@@ -168,6 +168,8 @@ public class SenpaiExportHelper {
                     editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getName());
                     editor.apply();
 
+                    App.getInstance().removeOlderShows();
+
                     response.body().getSeasonMetadata().setCurrentOrNewer(true);
                     App.getInstance().setCurrentlyBrowsingSeason(response.body());
 

@@ -115,7 +115,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (season != null){
+        if (season != null) {
             NotificationHelper notificationHelper = new NotificationHelper();
             notificationHelper.createImagesNotification();
         }
@@ -213,11 +213,7 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onRefresh() {
         if (App.getInstance().isNetworkAvailable()) {
-            for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
-                if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
-                    getSenpaiExportHelper().getSeasonData(metadata);
-                }
-            }
+            getSenpaiExportHelper().getSeasonData(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata());
             setUpdating(true);
         } else {
             Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
