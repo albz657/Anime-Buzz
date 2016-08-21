@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.FileNotFoundException;
@@ -93,8 +92,6 @@ public class App extends Application {
             editor.apply();
         }
 
-        Stetho.initializeWithDefaults(this);
-
         mInstance = this;
         allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
@@ -108,20 +105,10 @@ public class App extends Application {
         if (completedSetup) {
             loadData();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             removeOlderShows();
             rescheduleAlarms();
-
-            String currentlyBrowsingSeasonName = sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-
-
-            for (Season season : allAnimeSeasons) {
-                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
-                    currentlyBrowsingSeason = season;
-                }
-            }
-
         }
     }
 
@@ -254,11 +241,11 @@ public class App extends Application {
         }
     }
 
-    public void removeOlderShows(){
+    public void removeOlderShows() {
         String latestSeasonName = getLatestSeasonName();
-        for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext();){
+        for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext(); ) {
             Series series = (Series) iterator.next();
-            if (!series.getSeason().equals(latestSeasonName)){
+            if (!series.getSeason().equals(latestSeasonName)) {
                 removeAlarm(series);
                 series.setInUserList(false);
                 iterator.remove();
@@ -431,6 +418,15 @@ public class App extends Application {
         seasonsList = databaseHelper.getAllSeasonMetadata();
         setCurrentOrNewer();
         allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
+
+        String currentlyBrowsingSeasonName = getLatestSeasonName();
+
+        for (Season season : allAnimeSeasons) {
+            if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
+                currentlyBrowsingSeason = season;
+            }
+        }
+
         userAnimeList = loadUserList();
         backlog = loadBacklog();
         alarms = databaseHelper.getAllAlarms();
@@ -438,11 +434,9 @@ public class App extends Application {
 
     private SeriesList loadUserList() {
         SeriesList userList = new SeriesList();
-        for (Season season : App.getInstance().getAllAnimeSeasons()) {
-            for (Series series : season.getSeasonSeries()) {
-                if (series.isInUserList()) {
-                    userList.add(series);
-                }
+        for (Series series : currentlyBrowsingSeason.getSeasonSeries()) {
+            if (series.isInUserList()) {
+                userList.add(series);
             }
         }
         return userList;
