@@ -305,8 +305,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void episodeNotificationReceived() {
         if (!getSupportFragmentManager().getFragments().isEmpty()) {
-            if (getSupportFragmentManager().getFragments().get(0) instanceof MyShowsFragment) {
-                ((MyShowsFragment) getSupportFragmentManager().getFragments().get(0)).getmAdapter().notifyDataSetChanged();
+            if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof MyShowsFragment) {
+                ((MyShowsFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
             }
         }
     }
@@ -315,17 +315,31 @@ public class MainActivity extends AppCompatActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
+        boolean backlogVisible;
         if (intent.hasExtra("notificationClicked")) {
-            navigationView.getMenu().getItem(0).setChecked(true);
+            if (!getSupportFragmentManager().getFragments().isEmpty()) {
+                if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
+                    ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
+                    backlogVisible = true;
+                } else {
+                    backlogVisible = false;
+                }
+            } else {
+                backlogVisible = false;
+            }
 
-            getSupportFragmentManager();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, new BacklogFragment())
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .commit();
+            if (!backlogVisible) {
+                navigationView.getMenu().getItem(0).setChecked(true);
 
-            if (getSupportActionBar() != null) {
-                getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                getSupportFragmentManager();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.content_main, new BacklogFragment())
+                        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                        .commit();
+
+                if (getSupportActionBar() != null) {
+                    getSupportActionBar().setTitle(R.string.fragment_watching_queue);
+                }
             }
         }
     }

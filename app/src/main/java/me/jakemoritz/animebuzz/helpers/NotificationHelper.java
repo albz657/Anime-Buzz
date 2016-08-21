@@ -131,8 +131,8 @@ public class NotificationHelper {
         }
 
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
-        notification.flags |= Notification.FLAG_NO_CLEAR;
+//        notification.flags |= Notification.FLAG_ONGOING_EVENT;
+//        notification.flags |= Notification.FLAG_NO_CLEAR;
 
 
         mNotificationManager.notify(series.getMALID(), notification);
