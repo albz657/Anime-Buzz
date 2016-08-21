@@ -220,6 +220,15 @@ public class App extends Application {
         }
     }
 
+    private void setCurrent(){
+        for (SeasonMetadata seasonMetadata : seasonsList){
+            if (seasonMetadata.getName().equals(getLatestSeasonName())){
+                seasonMetadata.setCurrentOrNewer(true);
+                break;
+            }
+        }
+    }
+
     public boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
@@ -415,7 +424,8 @@ public class App extends Application {
     public void loadData() {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
         seasonsList = databaseHelper.getAllSeasonMetadata();
-        setCurrentOrNewer();
+//        setCurrentOrNewer();
+        setCurrent();
         allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
 
         String currentlyBrowsingSeasonName = getLatestSeasonName();

@@ -112,8 +112,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         } else {
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.GONE);
-            holder.mDate.setText("");
-            holder.mWatch.setVisibility(View.INVISIBLE);
+            holder.mDate.setText("Not airing");
+//            holder.mWatch.setVisibility(View.INVISIBLE);
         }
 
         if (prefersSimulcast) {
