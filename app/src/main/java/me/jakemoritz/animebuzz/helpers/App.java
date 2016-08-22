@@ -256,6 +256,7 @@ public class App extends Application {
             if (!series.getSeason().equals(latestSeasonName)) {
                 removeAlarm(series);
                 series.setInUserList(false);
+                DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
                 iterator.remove();
             }
         }
