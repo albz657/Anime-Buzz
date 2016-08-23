@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceManager;
 
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -32,7 +31,6 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
@@ -48,7 +46,7 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
                     }
                 });
 
-        if (loggedIn){
+        if (App.getInstance().getLoggedIn()){
             builder.setMessage("Are you sure you want to remove this from your list? (including your MAL list)");
 
         } else {

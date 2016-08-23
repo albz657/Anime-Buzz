@@ -338,9 +338,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         itemToBeChanged = item;
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean loggedIn = sharedPref.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
 
-        if (loggedIn) {
+        if (App.getInstance().getLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {
                 String username = sharedPref.getString(App.getInstance().getString(R.string.credentials_username), "");
                 String password = sharedPref.getString(App.getInstance().getString(R.string.credentials_password), "");

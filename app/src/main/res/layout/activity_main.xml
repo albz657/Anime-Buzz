@@ -51,6 +51,6 @@
             android:text="@string/initial_loading_season"
             android:textAlignment="center"
             android:textColor="#D9000000"
-            android:textSize="16dp" />
+            android:textSize="16sp" />
     </RelativeLayout>
 </android.support.v4.widget.DrawerLayout>

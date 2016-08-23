@@ -51,25 +51,20 @@ public class MainActivity extends AppCompatActivity
 
         App.getInstance().setMainActivity(this);
 
-        Intent startupIntent = getIntent();
-        if (startupIntent != null) {
-            if (startupIntent.getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
-                editor.apply();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-                App.getInstance().setInitializing(true);
+        if (sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false)) {
+            App.getInstance().setInitializing(true);
 
-                progressView = (CircularProgressView) findViewById(R.id.progress_view);
-                progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
-                progressViewHolder.setVisibility(View.VISIBLE);
-                progressView.startAnimation();
-            } else {
-                App.getInstance().setJustLaunchedMyShows(true);
-                App.getInstance().setJustLaunchedSeasons(true);
-            }
+            progressView = (CircularProgressView) findViewById(R.id.progress_view);
+            progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
+            progressViewHolder.setVisibility(View.VISIBLE);
+            progressView.startAnimation();
+        } else {
+            App.getInstance().setJustLaunchedMyShows(true);
+            App.getInstance().setJustLaunchedSeasons(true);
         }
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -94,10 +89,7 @@ public class MainActivity extends AppCompatActivity
         loadDrawerUserInfo();
 
         if (App.getInstance().isInitializing()) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
-
-            if (loggedIn) {
+            if (App.getInstance().getLoggedIn()) {
                 navigationView.getMenu().getItem(1).setChecked(true);
 
                 MyShowsFragment myShowsFragment = new MyShowsFragment();
@@ -130,6 +122,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         } else {
+            Intent startupIntent = getIntent();
             if (startupIntent != null) {
                 if (startupIntent.getBooleanExtra("notificationClicked", false)) {
                     navigationView.getMenu().getItem(0).setChecked(true);

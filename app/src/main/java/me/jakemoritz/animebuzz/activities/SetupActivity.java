@@ -55,8 +55,12 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
+                editor.apply();
+
                 Intent intent = new Intent(activity, MainActivity.class);
-                intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
                 startActivity(intent);
                 finish();
             }

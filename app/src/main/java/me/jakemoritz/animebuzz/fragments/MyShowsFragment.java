@@ -38,9 +38,6 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
     @Override
     public void onRefresh() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean loggedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
-
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getLatestSeasonData();
             setUpdating(true);

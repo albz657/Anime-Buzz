@@ -133,9 +133,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean displayPrompt = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_increment_key), true);
-        boolean loggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
 
-        if (displayPrompt && loggedIn) {
+        if (displayPrompt && App.getInstance().getLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
