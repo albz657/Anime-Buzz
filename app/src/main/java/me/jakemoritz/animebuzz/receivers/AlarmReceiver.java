@@ -18,53 +18,42 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (intentExtra > 0) {
             Series series = null;
 
-            for (Series eachSeries : App.getInstance().getUserAnimeList()) {
-                if (eachSeries.getMALID() == intentExtra) {
-                    series = eachSeries;
-                    break;
+            if (series != null){
+                for (Series eachSeries : App.getInstance().getUserAnimeList()) {
+                    if (eachSeries.getMALID() == intentExtra) {
+                        series = eachSeries;
+                        break;
+                    }
+                }
+
+                NotificationHelper helper = new NotificationHelper();
+                helper.createNewEpisodeNotification(series);
+
+                long time = System.currentTimeMillis();
+
+                for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
+                    if (alarmHolder.getId() == intentExtra){
+                        time = alarmHolder.getAlarmTime();
+                        break;
+                    }
+                }
+
+                App.getInstance().setNotificationReceived(true);
+
+                series.getBacklog().add(time);
+                App.getInstance().getBacklog().add(new BacklogItem(series, time));
+                App.getInstance().makeAlarm(series);
+
+
+                if (App.getInstance().getMainActivity() != null){
+                    App.getInstance().getMainActivity().episodeNotificationReceived();
                 }
             }
-
-            NotificationHelper helper = new NotificationHelper();
-            helper.createNewEpisodeNotification(series);
-
-//            App.getInstance().removeAlarmFromStructure(series.getMALID());
-            long time = System.currentTimeMillis();
-
-            for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
-                if (alarmHolder.getId() == intentExtra){
-                    time = alarmHolder.getAlarmTime();
-                    break;
-                }
-            }
-
-            App.getInstance().setNotificationReceived(true);
-
-            series.getBacklog().add(time);
-            App.getInstance().getBacklog().add(new BacklogItem(series, time));
-            App.getInstance().makeAlarm(series);
-
-//            App.getInstance().refreshBacklog();
-            /*if (App.getInstance().getBacklogFragment().getmAdapter() != null){
-                App.getInstance().getBacklogFragment().getmAdapter().notifyDataSetChanged();
-
-            }*/
-            if (App.getInstance().getMainActivity() != null){
-                App.getInstance().getMainActivity().episodeNotificationReceived();
-            }
-
-//            databaseHelper.updateSeries(series);
-//            cursor.close();
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             App.getInstance().rescheduleAlarms();
         }
-    }
-
-
-    public interface EpisodeNotificationListener{
-        void episodeNotificationReceived();
     }
 
 }
