@@ -33,10 +33,9 @@ import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AlarmReceiver.EpisodeNotificationListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -302,7 +301,6 @@ public class MainActivity extends AppCompatActivity
         return navigationView;
     }
 
-    @Override
     public void episodeNotificationReceived() {
         if (!getSupportFragmentManager().getFragments().isEmpty()) {
             if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof MyShowsFragment) {
