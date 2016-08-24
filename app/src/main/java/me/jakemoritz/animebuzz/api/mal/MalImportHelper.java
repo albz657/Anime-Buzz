@@ -3,11 +3,15 @@ package me.jakemoritz.animebuzz.api.mal;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.ann.GetImageTask;
+import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
+import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
@@ -41,24 +45,52 @@ public class MalImportHelper {
             }
         }
 
+        List<ImageRequestHolder> imageRequests = new ArrayList<>();
+
         if (latestSeason != null) {
-            MatchHolder match;
-            for (Iterator matchedIterator = matchList.iterator(); matchedIterator.hasNext(); ) {
-                match = (MatchHolder) matchedIterator.next();
+            for (MatchHolder matchHolder : matchList) {
                 for (Series savedSeries : latestSeason.getSeasonSeries()) {
-                    if (match.getMALID() == savedSeries.getMALID()) {
+                    if (matchHolder.getMALID() == savedSeries.getMALID()) {
+                        if (savedSeries.getANNID() == -1  && matchHolder.getImageURL() != null){
+                                imageRequests.add(new ImageRequestHolder(matchHolder.getImageURL(), String.valueOf(savedSeries.getMALID()), "MAL"));
+                        }
+
                         savedSeries.setInUserList(true);
-                        savedSeries.setEpisodesWatched(match.getEpisodesWatched());
+                        savedSeries.setEpisodesWatched(matchHolder.getEpisodesWatched());
                         matchedSeries.add(savedSeries);
-                        matchedIterator.remove();
                         break;
                     }
                 }
             }
-
         }
 
-        App.getInstance().getUserAnimeList().addAll(matchedSeries);
+        if (!imageRequests.isEmpty()){
+            GetImageTask task = new GetImageTask(fragment);
+            task.execute(imageRequests);
+        }
+
+        SeriesList remainingSeries = new SeriesList();
+        SeriesList removedSeries = new SeriesList();
+        if (App.getInstance().getUserAnimeList().isEmpty()){
+            App.getInstance().getUserAnimeList().addAll(matchedSeries);
+        } else {
+            for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext();){
+                Series series = (Series) iterator.next();
+                if (!matchedSeries.contains(series)){
+                    series.setInUserList(false);
+                    App.getInstance().removeAlarm(series);
+                    removedSeries.add(series);
+                    iterator.remove();
+                } else {
+                    remainingSeries.add(series);
+                }
+            }
+
+            App.getInstance().getUserAnimeList().addAll(remainingSeries);
+        }
+
+        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
+
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {
                 App.getInstance().makeAlarm(series);

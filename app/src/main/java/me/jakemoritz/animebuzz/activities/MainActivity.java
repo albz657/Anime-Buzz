@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false)) {
+        if (!sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false)) {
             App.getInstance().setInitializing(true);
 
             progressView = (CircularProgressView) findViewById(R.id.progress_view);

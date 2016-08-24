@@ -243,10 +243,23 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         }
 
         if (getmAdapter() != null) {
+            if (getmAdapter().getAllSeries().isEmpty()){
+                getmAdapter().getVisibleSeries().clear();
+            }
             getmAdapter().notifyDataSetChanged();
         }
 
         loadUserSortingPreference();
+    }
+
+    @Override
+    public void userListReceived(boolean received) {
+        super.userListReceived(received);
+
+        if (isUpdating()) {
+            getSwipeRefreshLayout().setRefreshing(false);
+            setUpdating(false);
+        }
     }
 
     @Override

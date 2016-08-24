@@ -15,6 +15,8 @@ public class AnimeListHolder {
     @Element(name="my_watched_episodes")
     private String my_watched_episodes;
 
+    @Element(name="series_image")
+    private String series_image;
 
     public String getMy_watched_episodes() {
         return my_watched_episodes;
@@ -26,5 +28,9 @@ public class AnimeListHolder {
 
     public String getMy_status() {
         return my_status;
+    }
+
+    public String getSeries_image() {
+        return series_image;
     }
 }

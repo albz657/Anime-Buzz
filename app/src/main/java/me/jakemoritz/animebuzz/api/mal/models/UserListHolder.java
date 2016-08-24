@@ -8,7 +8,7 @@ import java.util.List;
 @Root(name="myanimelist", strict = false)
 public class UserListHolder {
 
-    @ElementList(inline=true)
+    @ElementList(inline=true, required = false)
     private List<AnimeListHolder> animeList;
 
     public List<AnimeListHolder> getAnimeList() {

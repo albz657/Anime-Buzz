@@ -139,7 +139,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                     public void run() {
                         refreshEmpty();
 
-                        if ((App.getInstance().isJustRemoved() && mAdapter.getAllSeries().isEmpty()) || App.getInstance().isJustSignedInFromSettings()){
+//                        if ((App.getInstance().isJustRemoved() && mAdapter.getAllSeries().isEmpty()) || App.getInstance().isJustSignedInFromSettings()){
                             App.getInstance().setJustRemoved(false);
                             App.getInstance().setJustSignedInFromSettings(false);
 
@@ -149,7 +149,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                                     .attach(self)
                                     .commit();
                         }
-                    }
+//                    }
                 });
             }
         });

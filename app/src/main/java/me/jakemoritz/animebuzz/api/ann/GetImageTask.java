@@ -42,8 +42,6 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();
                 imageResponses.add(new ImageResponseHolder(imageRequest.getANNID(), imageRequest.getSize(), bitmap));
             } catch (IOException e) {
-                Log.d("OOPS", "null bitmap");
-
                 e.printStackTrace();
             }
         }
@@ -61,6 +59,8 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void
                     return new File(imageCacheDirectory, ANNID + "_circle.jpg");
                 } else if (size.equals("small")) {
                     return new File(imageCacheDirectory, ANNID + "_small.jpg");
+                } else if (size.equals("MAL")) {
+                    return new File(imageCacheDirectory, ANNID + "_MAL.jpg");
                 } else {
                     return new File(imageCacheDirectory, ANNID + ".jpg");
                 }

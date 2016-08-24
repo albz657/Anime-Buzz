@@ -88,7 +88,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
-        if ((mParent instanceof MyShowsFragment) || (mParent instanceof  SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
+        if ((mParent instanceof MyShowsFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
@@ -161,14 +161,16 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
 
-
         Picasso picasso = Picasso.with(mParent.getContext());
-        if (holder.series.getANNID() > 0) {
-            File cacheDirectory = mParent.getContext().getDir(("cache"), Context.MODE_PRIVATE);
-            File imageCacheDirectory = new File(cacheDirectory, "images");
-            File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
-            if (smallBitmapFile.exists()) {
-                picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        File cacheDirectory = mParent.getContext().getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+        File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
+        if (smallBitmapFile.exists()) {
+            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        } else {
+            File MALbitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + "_MAL.jpg");
+            if (MALbitmapFile.exists()) {
+                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
             } else {
                 File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
                 if (bitmapFile.exists()) {
@@ -177,10 +179,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                     picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
                 }
             }
-        } else {
-            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
-
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override

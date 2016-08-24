@@ -371,7 +371,6 @@ public class App extends Application {
         alarmManager.cancel(pendingIntent);
         removeAlarmFromStructure(series.getMALID());
 
-        Log.d(TAG, "Alarm removed for: " + series.getName());
     }
 
     /* SAVING */

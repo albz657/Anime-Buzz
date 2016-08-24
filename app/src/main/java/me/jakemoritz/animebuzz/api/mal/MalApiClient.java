@@ -7,6 +7,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -22,6 +23,7 @@ import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -167,12 +169,26 @@ public class MalApiClient {
                         for (AnimeListHolder list : response.body().getAnimeList()) {
                             if (list.getMALID() != null && list.getMy_status() != null) {
                                 if (list.getMy_status().equals("1")) {
-                                    matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes())));
+                                    matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes()), list.getSeries_image()));
                                 }
                             }
                         }
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
+                    } else {
+                        SeriesList removedSeries = new SeriesList(App.getInstance().getUserAnimeList());
+
+                        Series series;
+                        for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
+                            series = (Series) iterator.next();
+                            series.setInUserList(false);
+                            App.getInstance().removeAlarm(series);
+                            iterator.remove();
+                        }
+
+                        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
+
+                        seriesFragment.malDataImported();
                     }
                 } else {
                     seriesFragment.userListReceived(false);
