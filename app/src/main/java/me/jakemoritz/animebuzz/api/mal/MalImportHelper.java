@@ -4,7 +4,6 @@ import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -74,18 +73,17 @@ public class MalImportHelper {
         if (App.getInstance().getUserAnimeList().isEmpty()){
             App.getInstance().getUserAnimeList().addAll(matchedSeries);
         } else {
-            for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext();){
-                Series series = (Series) iterator.next();
-                if (!matchedSeries.contains(series)){
+            for (Series series : App.getInstance().getUserAnimeList()){
+                if (matchedSeries.contains(series)){
+                    remainingSeries.add(series);
+                } else {
                     series.setInUserList(false);
                     App.getInstance().removeAlarm(series);
                     removedSeries.add(series);
-                    iterator.remove();
-                } else {
-                    remainingSeries.add(series);
                 }
             }
 
+            App.getInstance().getUserAnimeList().clear();
             App.getInstance().getUserAnimeList().addAll(remainingSeries);
         }
 
