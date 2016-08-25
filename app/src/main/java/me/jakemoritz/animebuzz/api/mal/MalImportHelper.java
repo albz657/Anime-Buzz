@@ -74,17 +74,18 @@ public class MalImportHelper {
             App.getInstance().getUserAnimeList().addAll(matchedSeries);
         } else {
             for (Series series : App.getInstance().getUserAnimeList()){
-                if (matchedSeries.contains(series)){
-                    remainingSeries.add(series);
-                } else {
+                if (!matchedSeries.contains(series)){
                     series.setInUserList(false);
                     App.getInstance().removeAlarm(series);
                     removedSeries.add(series);
                 }
             }
 
-            App.getInstance().getUserAnimeList().clear();
-            App.getInstance().getUserAnimeList().addAll(remainingSeries);
+            App.getInstance().getUserAnimeList().removeAll(removedSeries);
+            App.getInstance().getUserAnimeList().addAll(matchedSeries);
+
+//            App.getInstance().getUserAnimeList().clear();
+//            App.getInstance().getUserAnimeList().addAll(remainingSeries);
         }
 
         DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
