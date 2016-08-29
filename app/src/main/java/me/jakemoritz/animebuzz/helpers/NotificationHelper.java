@@ -67,20 +67,6 @@ public class NotificationHelper {
     }
 
     public void createNewEpisodeNotification(Series series) {
-/*        Bitmap bitmap = null;
-        if (series.getANNID() > 0) {
-            File cacheDirectory = App.getInstance().getDir(("cache"), Context.MODE_PRIVATE);
-            File imageCacheDirectory = new File(cacheDirectory, "images");
-            File circleBitmap = new File(imageCacheDirectory, series.getANNID() + "_circle.jpg");
-            if (circleBitmap.exists()) {
-                bitmap = BitmapFactory.decodeFile(circleBitmap.getPath());
-            }
-        }
-
-        if (bitmap == null) {
-            bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), R.drawable.empty);
-        }*/
-
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
@@ -89,7 +75,7 @@ public class NotificationHelper {
                         .setContentTitle("New episode released");
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         resultIntent.putExtra("notificationClicked", true);
 

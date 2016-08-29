@@ -142,7 +142,6 @@ public class MainActivity extends AppCompatActivity
             menuIndex = 4;
         }
 
-
         navigationView.getMenu().getItem(menuIndex).setChecked(true);
 
         getSupportFragmentManager().beginTransaction()
@@ -275,6 +274,8 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+
 
     @Override
     protected void onNewIntent(Intent intent) {

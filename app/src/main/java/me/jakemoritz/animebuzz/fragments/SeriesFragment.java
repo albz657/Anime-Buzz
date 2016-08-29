@@ -62,6 +62,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private MalApiClient malApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,7 +118,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         binding.setDataset(getmAdapter().getVisibleSeries());
 
         recyclerView.setAdapter(mAdapter);
-//        recyclerView.setEmptyView(emptyView);
 
         return swipeRefreshLayout;
     }

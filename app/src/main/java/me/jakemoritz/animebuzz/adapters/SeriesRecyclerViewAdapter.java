@@ -217,8 +217,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     private void addSeriesHelper(Series series) {
-        modifyListener.modifyItem(series);
         mParent.setAdding(true);
+        modifyListener.modifyItem(series);
     }
 
     public SeriesList getVisibleSeries() {

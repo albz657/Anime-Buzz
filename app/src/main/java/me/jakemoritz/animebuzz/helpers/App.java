@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.database.sqlite.SQLiteDatabase;
+import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -105,7 +106,7 @@ public class App extends Application {
         if (completedSetup && !initializing) {
             loadData();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -122,7 +123,7 @@ public class App extends Application {
             long time = System.currentTimeMillis();
             time += 5000L;
 //            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
-            alarms.get(Integer.valueOf("30014")).setAlarmTime(time);
+            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(time);
 
             /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
@@ -457,7 +458,7 @@ public class App extends Application {
     }
 
     private List<BacklogItem> loadBacklog() {
-        List<BacklogItem> backlog = new ArrayList<>();
+        List<BacklogItem> backlog = new ObservableArrayList<>();
         for (Series series : App.getInstance().getUserAnimeList()) {
             for (Long episodeTime : series.getBacklog()) {
                 backlog.add(new BacklogItem(series, episodeTime));
