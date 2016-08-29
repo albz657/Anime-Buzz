@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.preference.Preference;
 
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class SignOutFragment extends DialogFragment {
 
@@ -26,7 +27,7 @@ public class SignOutFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(callback.activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(App.getInstance().getMainActivity());
         builder.setMessage("Are you sure you want to sign out from your MAL account?")
                 .setPositiveButton("Sign Out", new DialogInterface.OnClickListener() {
                     @Override

@@ -43,7 +43,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
             setUpdating(true);
         } else {
             getSwipeRefreshLayout().setRefreshing(false);
-            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -213,7 +213,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
                 getAnnHelper().getImages(season.getSeasonSeries());
             } else {
-                Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (!App.getInstance().isInitializing()) {

@@ -215,12 +215,8 @@ public class SeasonsFragment extends SeriesFragment {
             getSenpaiExportHelper().getSeasonData(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata());
             setUpdating(true);
         } else {
-            Snackbar.make(getSeriesLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
-    }
-
-    public interface BrowsingSeasonChangeListener {
-        void changedBrowsingSeason();
     }
 
 }

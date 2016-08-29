@@ -12,8 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceManager;
@@ -48,18 +46,18 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
-    SharedPreferences sharedPreferences;
-    SettingsFragment self;
-    Preference signInPreference;
-    Preference signOutPreference;
-    public AppCompatActivity activity;
+    private SharedPreferences sharedPreferences;
+    private SettingsFragment self;
+    private Preference signInPreference;
+    private Preference signOutPreference;
 
-    SwitchPreference simulcastPreference;
-    SwitchPreference format24hourPreference;
-    SwitchPreference incrementPreference;
-    RingtonePreference ringtonePreference;
-    SwitchPreference firebasePreference;
+    private SwitchPreference simulcastPreference;
+    private SwitchPreference format24hourPreference;
+    private SwitchPreference incrementPreference;
+    private RingtonePreference ringtonePreference;
+    private SwitchPreference firebasePreference;
 
+    private MalApiClient malApiClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,19 +66,19 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         self = this;
         setCorrectSummaries();
 
-        if (activity.getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
+        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
             }
 
-            activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
     }
 
     private void setCorrectSummaries() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance().getMainActivity());
         boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
 
         if (prefersSimulcast) {
@@ -137,16 +135,16 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
         setDivider(null);
 
-        if (activity.getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) activity.findViewById(R.id.toolbar_spinner);
+        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
 
             }
 
-            activity.getSupportActionBar().setTitle(R.string.action_settings);
-            activity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+            App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.action_settings);
+            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
     }
 
@@ -160,7 +158,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     @Override
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance().getMainActivity());
         ListPreference ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
         if (ledColors.getValue() == null) {
             ledColors.setValueIndex(2);
@@ -190,7 +188,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 SignOutFragment signOutFragment = SignOutFragment.newInstance(self, preference);
-                signOutFragment.show(activity.getFragmentManager(), "");
+                signOutFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "");
                 return false;
             }
         });
@@ -201,7 +199,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             public boolean onPreferenceClick(Preference preference) {
                 if (App.getInstance().isNetworkAvailable()) {
                     SignInFragment signInFragment = SignInFragment.newInstance(self);
-                    signInFragment.show(activity.getFragmentManager(), "");
+                    signInFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "");
                 } else {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
@@ -239,7 +237,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         editor.putString(getString(R.string.mal_userid), "");
         editor.apply();
 
-        File avatarFile = new File(activity.getFilesDir(), getString(R.string.file_avatar));
+        File avatarFile = new File(App.getInstance().getMainActivity().getFilesDir(), getString(R.string.file_avatar));
         if (avatarFile.exists()) {
             avatarFile.delete();
         }
@@ -255,7 +253,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     private void importExistingSeries() {
         ImportFragment importFragment = ImportFragment.newInstance(this);
-        importFragment.show(activity.getFragmentManager(), "");
+        importFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "");
     }
 
     @Override
@@ -284,14 +282,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         }
 
-        activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, myShowsFragment, getString(R.string.fragment_myshows))
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .commit();
-        malApiClient.getUserList();
-        App.getInstance().getMainActivity().getNavigationView().getMenu().getItem(1).setChecked(true);
+        App.getInstance().getMainActivity().startFragment(myShowsFragment);
 
-        Snackbar.make(activity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+        malApiClient.getUserList();
+
+
+        Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
     }
 
     public void signIn() {
@@ -325,14 +321,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         } else {
             MyShowsFragment myShowsFragment = new MyShowsFragment();
 
-            activity.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, myShowsFragment, getString(R.string.fragment_myshows))
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .commit();
+            App.getInstance().getMainActivity().startFragment(myShowsFragment);
             new MalApiClient(myShowsFragment).getUserList();
-            App.getInstance().getMainActivity().getNavigationView().getMenu().getItem(1).setChecked(true);
 
-            Snackbar.make(activity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         }
 
         App.getInstance().getMainActivity().loadDrawerUserInfo();
@@ -342,11 +334,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        activity = (AppCompatActivity) getActivity();
-    }
 
     @Override
     public void onResume() {
