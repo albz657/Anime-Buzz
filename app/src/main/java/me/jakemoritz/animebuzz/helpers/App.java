@@ -62,7 +62,7 @@ public class App extends Application {
     private SeriesList userAnimeList;
     private SeasonList allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
-    private List<BacklogItem> backlog;
+    private ObservableArrayList<BacklogItem> backlog;
     private Map<Integer, AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
@@ -97,7 +97,7 @@ public class App extends Application {
         allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
         seasonsList = new HashSet<>();
-        backlog = new ArrayList<>();
+        backlog = new ObservableArrayList<>();
         alarms = new HashMap<>();
 
         database = DatabaseHelper.getInstance(this).getWritableDatabase();
@@ -457,8 +457,8 @@ public class App extends Application {
         return userList;
     }
 
-    private List<BacklogItem> loadBacklog() {
-        List<BacklogItem> backlog = new ObservableArrayList<>();
+    private ObservableArrayList<BacklogItem> loadBacklog() {
+        ObservableArrayList<BacklogItem> backlog = new ObservableArrayList<>();
         for (Series series : App.getInstance().getUserAnimeList()) {
             for (Long episodeTime : series.getBacklog()) {
                 backlog.add(new BacklogItem(series, episodeTime));
@@ -518,7 +518,7 @@ public class App extends Application {
         return alarms;
     }
 
-    public List<BacklogItem> getBacklog() {
+    public ObservableArrayList<BacklogItem> getBacklog() {
         return backlog;
     }
 

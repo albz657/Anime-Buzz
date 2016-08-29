@@ -70,7 +70,6 @@ public class BacklogFragment extends Fragment {
         TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
         emptyText.setText(getString(R.string.empty_text_backlog));
 
-        // Set the adapter
         Context context = view.getContext();
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.backlog);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));

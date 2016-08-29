@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
-               startFragment(seasonsFragment);
+                startFragment(seasonsFragment);
             }
 
         } else {
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
                 if (startupIntent.getBooleanExtra("notificationClicked", false)) {
                     startFragment(new BacklogFragment());
                 } else {
-                    startFragment(new SeasonsFragment());
+                    startFragment(new MyShowsFragment());
                 }
             }
         }
@@ -131,13 +131,13 @@ public class MainActivity extends AppCompatActivity
         } else if (fragment instanceof MyShowsFragment) {
             id = getString(R.string.fragment_myshows);
             menuIndex = 1;
-        } else if (fragment instanceof SeasonsFragment){
+        } else if (fragment instanceof SeasonsFragment) {
             id = getString(R.string.fragment_seasons);
             menuIndex = 2;
-        } else if (fragment instanceof SettingsFragment){
+        } else if (fragment instanceof SettingsFragment) {
             id = getString(R.string.action_settings);
             menuIndex = 3;
-        } else if (fragment instanceof AboutFragment){
+        } else if (fragment instanceof AboutFragment) {
             id = "About";
             menuIndex = 4;
         }
@@ -217,7 +217,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if (newFragment != null){
+        if (newFragment != null) {
             startFragment(newFragment);
         }
 
@@ -271,27 +271,24 @@ public class MainActivity extends AppCompatActivity
                 MyShowsFragment myShowsFragment = ((MyShowsFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1));
                 myShowsFragment.getmAdapter().notifyDataSetChanged();
                 myShowsFragment.loadUserSortingPreference();
+            } else if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
+                ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
             }
         }
     }
-
 
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        boolean backlogVisible;
+        boolean backlogVisible = false;
         if (intent.hasExtra("notificationClicked")) {
             if (!getSupportFragmentManager().getFragments().isEmpty()) {
                 if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
                     ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
                     backlogVisible = true;
-                } else {
-                    backlogVisible = false;
                 }
-            } else {
-                backlogVisible = false;
             }
 
             if (!backlogVisible) {

@@ -5,15 +5,15 @@
 
         <import type="android.view.View" />
         <import type="java.util.List"/>
+        <import type="android.databinding.ObservableArrayList"/>
         <import type="me.jakemoritz.animebuzz.models.BacklogItem"/>
 
         <variable
             name="dataset"
-            type="List&lt;BacklogItem&gt;" />
+            type="ObservableArrayList&lt;BacklogItem&gt;" />
     </data>
 
     <FrameLayout
-        android:id="@+id/swipe_view_holder"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -28,7 +28,7 @@
             android:layout_marginTop="5dp"
             android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
             app:layoutManager="LinearLayoutManager"
-            tools:context="me.jakemoritz.animebuzz.fragments.BacklogFragment"
+            tools:context=".fragments.BacklogFragment"
             tools:listitem="@layout/backlog_list_item" />
 
         <RelativeLayout
