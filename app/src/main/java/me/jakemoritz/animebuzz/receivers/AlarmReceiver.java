@@ -18,14 +18,14 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (intentExtra > 0) {
             Series series = null;
 
-            if (series != null){
-                for (Series eachSeries : App.getInstance().getUserAnimeList()) {
-                    if (eachSeries.getMALID() == intentExtra) {
-                        series = eachSeries;
-                        break;
-                    }
+            for (Series eachSeries : App.getInstance().getUserAnimeList()) {
+                if (eachSeries.getMALID() == intentExtra) {
+                    series = eachSeries;
+                    break;
                 }
+            }
 
+            if (series != null){
                 NotificationHelper helper = new NotificationHelper();
                 helper.createNewEpisodeNotification(series);
 

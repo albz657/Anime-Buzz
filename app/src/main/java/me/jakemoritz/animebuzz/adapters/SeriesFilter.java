@@ -41,7 +41,8 @@ public class SeriesFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
-        adapter.setVisibleSeries((SeriesList) results.values);
+        adapter.getVisibleSeries().clear();
+        adapter.getVisibleSeries().addAll((SeriesList) results.values);
         adapter.notifyDataSetChanged();
     }
 }

@@ -229,13 +229,6 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         return allSeries;
     }
 
-    public void setAllSeries(SeriesList allSeries) {
-        this.allSeries = allSeries;
-    }
-
-    public void setVisibleSeries(SeriesList visibleSeries) {
-        this.visibleSeries = visibleSeries;
-    }
 
     public void setSeriesFilter(SeriesFilter seriesFilter) {
         this.seriesFilter = seriesFilter;

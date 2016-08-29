@@ -1,9 +1,10 @@
 package me.jakemoritz.animebuzz.models;
 
-import java.util.ArrayList;
+import android.databinding.ObservableArrayList;
+
 import java.util.Collection;
 
-public class SeriesList extends ArrayList<Series> {
+public class SeriesList extends ObservableArrayList<Series> {
 
     public SeriesList(Collection<? extends Series> c) {
         addAll(c);

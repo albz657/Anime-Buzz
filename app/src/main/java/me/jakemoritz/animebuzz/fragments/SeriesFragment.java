@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +30,7 @@ import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
@@ -42,7 +45,6 @@ import me.jakemoritz.animebuzz.interfaces.mal.UserListResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
-import me.jakemoritz.animebuzz.misc.RecyclerViewWithEmpty;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -60,7 +62,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private MalApiClient malApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,8 +92,13 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
-        RecyclerViewWithEmpty recyclerView = (RecyclerViewWithEmpty) swipeRefreshLayout.findViewById(R.id.list);
+        container.clearDisappearingChildren();
+        container.removeAllViews();
+
+        FragmentSeriesListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_list, container, false);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) binding.getRoot();
+        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
         RelativeLayout emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
@@ -108,8 +114,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
+        binding.setDataset(getmAdapter().getVisibleSeries());
+
         recyclerView.setAdapter(mAdapter);
-        recyclerView.setEmptyView(emptyView);
+//        recyclerView.setEmptyView(emptyView);
 
         return swipeRefreshLayout;
     }
@@ -212,7 +220,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (this instanceof MyShowsFragment) {
-            getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+            getmAdapter().getVisibleSeries().clear();
+            getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
         }
 
 //        App.getInstance().getCircleBitmap(item);

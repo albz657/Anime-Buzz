@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity
     private DrawerLayout drawer;
     private CircularProgressView progressView;
     private RelativeLayout progressViewHolder;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Set up drawer and nav view
@@ -259,6 +260,10 @@ public class MainActivity extends AppCompatActivity
 
     public NavigationView getNavigationView() {
         return navigationView;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
     }
 
     public void episodeNotificationReceived() {

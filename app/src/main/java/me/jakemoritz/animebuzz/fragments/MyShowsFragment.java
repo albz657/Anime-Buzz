@@ -157,7 +157,8 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
         getmAdapter().getAllSeries().clear();
         getmAdapter().getAllSeries().addAll(hasDateList);
-        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+        getmAdapter().getVisibleSeries().clear();
+        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }
 
     private void sortByName() {
@@ -167,7 +168,8 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         editor.apply();
 
         Collections.sort(getmAdapter().getAllSeries(), new SeriesNameComparator());
-        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+        getmAdapter().getVisibleSeries().clear();
+        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }
 
     @Override

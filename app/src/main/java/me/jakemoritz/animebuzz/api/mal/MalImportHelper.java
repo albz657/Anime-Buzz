@@ -97,7 +97,8 @@ public class MalImportHelper {
         }
 
         if (fragment.getmAdapter() != null) {
-            fragment.getmAdapter().setVisibleSeries((SeriesList) App.getInstance().getUserAnimeList().clone());
+            fragment.getmAdapter().getVisibleSeries().clear();
+            fragment.getmAdapter().getVisibleSeries().addAll((SeriesList) App.getInstance().getUserAnimeList().clone());
         }
 
         if (malDataImportedListener != null) {

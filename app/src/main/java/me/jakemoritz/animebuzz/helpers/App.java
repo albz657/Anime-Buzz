@@ -102,7 +102,7 @@ public class App extends Application {
         database = DatabaseHelper.getInstance(this).getWritableDatabase();
 
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
-        if (completedSetup) {
+        if (completedSetup && !initializing) {
             loadData();
             //            backlogDummyData();
 //            dummyAlarm();

@@ -22,7 +22,6 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeasonsFragment extends SeriesFragment {
 
@@ -37,7 +36,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
+        toolbarSpinner = (Spinner) App.getInstance().getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -73,8 +72,10 @@ public class SeasonsFragment extends SeriesFragment {
 
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
-        getmAdapter().setAllSeries(currentlyBrowsingSeason.getSeasonSeries());
-        getmAdapter().setVisibleSeries((SeriesList) getmAdapter().getAllSeries().clone());
+        getmAdapter().getAllSeries().clear();
+        getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
+        getmAdapter().getVisibleSeries().clear();
+        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
         getmAdapter().notifyDataSetChanged();
 
         getmAdapter().setSeriesFilter(null);
