@@ -14,7 +14,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
-import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -99,6 +98,7 @@ public class App extends Application {
         seasonsList = new HashSet<>();
         backlog = new ObservableArrayList<>();
         alarms = new HashMap<>();
+        alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
 
         database = DatabaseHelper.getInstance(this).getWritableDatabase();
 
@@ -106,7 +106,7 @@ public class App extends Application {
         if (completedSetup && !initializing) {
             loadData();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -266,14 +266,16 @@ public class App extends Application {
     /* ALARMS */
 
     public void rescheduleAlarms() {
-        alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
         for (AlarmHolder alarm : App.getInstance().getAlarms().values()) {
-            Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-            notificationIntent.putExtra("MALID", alarm.getId());
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, 0);
-            alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
+            setAlarm(alarm);
         }
+    }
 
+    private void setAlarm(AlarmHolder alarm){
+        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        notificationIntent.putExtra("MALID", alarm.getId());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
@@ -323,27 +325,23 @@ public class App extends Application {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
 
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
         Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
 
-        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        notificationIntent.putExtra("MALID", series.getMALID());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), series.getMALID(), notificationIntent, 0);
-        alarmManager.set(AlarmManager.RTC, nextEpisode.getTimeInMillis(), pendingIntent);
-        processNewAlarm(new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID()));
+        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID());
+
+        setAlarm(newAlarm);
+
+        processNewAlarm(newAlarm);
 
         DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
         // debug code
 //        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 //        String formattedNext = format.format(nextEpisode.getTime());
-        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + nextEpisode.getTimeInMillis());
+//        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + nextEpisode.getTimeInMillis());
 
     }
 
     public void switchAlarmTiming() {
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
         alarms.clear();
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         dbHelper.deleteAllAlarms();
@@ -365,13 +363,11 @@ public class App extends Application {
     }
 
     public void removeAlarm(Series series) {
-        alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent deleteIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, 0);
 
         alarmManager.cancel(pendingIntent);
         removeAlarmFromStructure(series.getMALID());
-
     }
 
     /* SAVING */
