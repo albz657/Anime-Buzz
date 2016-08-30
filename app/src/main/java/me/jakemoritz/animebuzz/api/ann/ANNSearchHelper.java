@@ -82,7 +82,7 @@ public class ANNSearchHelper {
                 }
             }, 1000);
         } else {
-            if (App.getInstance().isInitializing()){
+            if (App.getInstance().isInitializing() && App.getInstance().getLoggedIn()){
                 App.getInstance().setInitializingGotImages(true);
             }
         }

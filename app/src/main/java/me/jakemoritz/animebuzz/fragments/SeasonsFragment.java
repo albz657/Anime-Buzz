@@ -138,7 +138,6 @@ public class SeasonsFragment extends SeriesFragment {
             App.getInstance().setPostInitializing(true);
 
             getSenpaiExportHelper().getSeasonList();
-
         }
 
         super.seasonPostersImported(imported);
