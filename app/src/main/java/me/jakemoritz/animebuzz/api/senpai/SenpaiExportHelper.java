@@ -177,6 +177,8 @@ public class SenpaiExportHelper {
                     databaseHelper.saveSeasonMetadata(response.body().getSeasonMetadata());
 
                     fragment.seasonDataRetrieved(response.body());
+                } else {
+                    fragment.seasonDataRetrieved(null);
                 }
             }
 

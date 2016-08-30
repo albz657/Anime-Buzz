@@ -218,6 +218,8 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
+            getSwipeRefreshLayout().setRefreshing(false);
+
             if (!App.getInstance().isInitializing()) {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
             } else {
