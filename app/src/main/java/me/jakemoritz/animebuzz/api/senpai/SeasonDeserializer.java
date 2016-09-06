@@ -12,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -114,12 +115,15 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
             if (MALID > 0){
                 final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
 
-
                 if (seasonName.equals(App.getInstance().getLatestSeasonName())){
                     App.getInstance().generateNextEpisodeTimes(series, true);
                     App.getInstance().generateNextEpisodeTimes(series, false);
-                }
 
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putLong(App.getInstance().getString(R.string.last_update_time), Calendar.getInstance().getTimeInMillis());
+                    editor.apply();
+                }
 
                 seasonSeries.add(series);
             }

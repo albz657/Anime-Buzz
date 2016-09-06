@@ -13,6 +13,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.Spinner;
 
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,8 +101,10 @@ public class App extends Application {
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
         if (completedSetup && !initializing) {
             loadData();
+
+            updateFormattedTimes();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -117,7 +121,7 @@ public class App extends Application {
             long time = System.currentTimeMillis();
             time += 5000L;
 //            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
-            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(time);
+            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(1472529050000L);
 
             /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
@@ -127,6 +131,29 @@ public class App extends Application {
     }
 
     /* HELPERS */
+    private void updateFormattedTimes() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        long lastUpdatedTime = sharedPreferences.getLong(getString(R.string.last_update_time), 0L);
+
+        Calendar currentCalendar = Calendar.getInstance();
+
+        Calendar lastUpdatedCalendar = Calendar.getInstance();
+        lastUpdatedCalendar.setTimeInMillis(lastUpdatedTime);
+
+        boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
+
+        if (!sameDay) {
+            for (Series series : currentlyBrowsingSeason.getSeasonSeries()) {
+                generateNextEpisodeTimes(series, true);
+                generateNextEpisodeTimes(series, false);
+            }
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putLong(getString(R.string.last_update_time), currentCalendar.getTimeInMillis());
+            editor.apply();
+        }
+    }
+
     public void fixToolbar(String fragment) {
         if (mainActivity.getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) mainActivity.findViewById(R.id.toolbar_spinner);
@@ -173,42 +200,42 @@ public class App extends Application {
         }
     }
 
-    public String formatBacklogTime(Long time) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(time);
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefers24Hour = sharedPref.getBoolean(getString(R.string.pref_24hour_key), false);
-
-        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
-        SimpleDateFormat hourFormat = null;
-
-        String formattedTime = format.format(cal.getTime());
-
-        DateFormatHelper helper = new DateFormatHelper();
-        formattedTime += helper.getDayOfMonthSuffix(cal.get(Calendar.DAY_OF_MONTH));
-
-        if (prefers24Hour) {
-            hourFormat = new SimpleDateFormat(", kk:mm");
-            formattedTime += hourFormat.format(cal.getTime());
-
-        } else {
-            hourFormat = new SimpleDateFormat(", h:mm");
-            formattedTime += hourFormat.format(cal.getTime());
-            formattedTime += new SimpleDateFormat(" a").format(cal.getTime());
-        }
-
-        return formattedTime;
-    }
-
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
         SimpleDateFormat format = new SimpleDateFormat("MMMM d");
-        SimpleDateFormat hourFormat = null;
+        SimpleDateFormat hourFormat;
 
-        String formattedTime = format.format(calendar.getTime());
+        String formattedTime = "";
 
         DateFormatHelper helper = new DateFormatHelper();
-        formattedTime += helper.getDayOfMonthSuffix(calendar.get(Calendar.DAY_OF_MONTH));
+
+        Calendar currentTime = Calendar.getInstance();
+
+        //DEBUG
+//        calendar.setTimeInMillis(1473047450000L);
+
+        if (currentTime.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)){
+            int dayDiff = calendar.get(Calendar.DAY_OF_YEAR) - currentTime.get(Calendar.DAY_OF_YEAR);
+
+            if (dayDiff <= 1){
+                // yesterday, today, tomorrow OR x days ago
+                formattedTime = DateUtils.getRelativeTimeSpanString(calendar.getTimeInMillis(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS).toString();
+            } else if (dayDiff >= 2 && dayDiff <= 6){
+                // day of week
+                formattedTime = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+            } else if (dayDiff == 7) {
+                formattedTime = "Next " + calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+            } else {
+                // normal date
+                formattedTime = format.format(calendar.getTime());
+                formattedTime += helper.getDayOfMonthSuffix(calendar.get(Calendar.DAY_OF_MONTH));
+            }
+        }
+
+
+        /*formattedTime = DateUtils.getRelativeTimeSpanString(calendar.getTimeInMillis(), System.currentTimeMillis(), 0, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
+        formattedTime = DateUtils.getRelativeTimeSpanString(System.currentTimeMillis(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
+        formattedTime = DateUtils.getRelativeTimeSpanString(1473259168106L, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
+        formattedTime = DateUtils.getRelativeTimeSpanString(1473220250000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();*/
 
         if (prefers24hour) {
             hourFormat = new SimpleDateFormat(", kk:mm");

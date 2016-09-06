@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
@@ -51,13 +52,16 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         holder.backlogItem = seriesList.get(position);
         holder.mTitle.setText(holder.backlogItem.getSeries().getName());
 
-        Picasso picasso = Picasso.with(App.getInstance());
-        if (holder.backlogItem.getSeries().getANNID() > 0) {
-            File cacheDirectory = App.getInstance().getDir(("cache"), Context.MODE_PRIVATE);
-            File imageCacheDirectory = new File(cacheDirectory, "images");
-            File smallBitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
-            if (smallBitmapFile.exists()) {
-                picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
+        File cacheDirectory = App.getInstance().getMainActivity().getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+        File smallBitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
+        if (smallBitmapFile.exists()) {
+            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        } else {
+            File MALbitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getMALID() + "_MAL.jpg");
+            if (MALbitmapFile.exists()) {
+                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
             } else {
                 File bitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + ".jpg");
                 if (bitmapFile.exists()) {
@@ -66,8 +70,6 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
                     picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
                 }
             }
-        } else {
-            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
@@ -119,7 +121,11 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         }
 
-        holder.mDate.setText(App.getInstance().formatBacklogTime(holder.backlogItem.getAlarmTime()));
+        boolean prefers24hour = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_24hour_key), false);
+
+        Calendar backlogCalendar = Calendar.getInstance();
+        backlogCalendar.setTimeInMillis(holder.backlogItem.getAlarmTime());
+        holder.mDate.setText(App.getInstance().formatAiringTime(backlogCalendar, prefers24hour));
     }
 
     @Override

@@ -67,6 +67,7 @@ public class SeasonsFragment extends SeriesFragment {
                 }
             });
             App.getInstance().setJustLaunchedSeasons(false);
+            App.getInstance().setJustLaunchedMyShows(false);
         }
     }
 

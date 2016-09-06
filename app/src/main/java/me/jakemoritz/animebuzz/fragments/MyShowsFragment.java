@@ -52,6 +52,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         }
 
         App.getInstance().setJustLaunchedMyShows(false);
+        App.getInstance().setJustLaunchedSeasons(false);
     }
 
     @Override
