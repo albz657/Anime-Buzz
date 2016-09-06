@@ -34,6 +34,8 @@ public class SenpaiExportHelper {
 
     private final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
+    private final static String BASE_URL = "http://www.senpai.moe/";
+
     private SeriesFragment fragment;
 
     public SenpaiExportHelper(SeriesFragment fragment) {
@@ -41,12 +43,14 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonList() {
+        Log.d(TAG, "Getting season list");
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(AllSeasonsMetadata.class, new SeasonMetadataDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.senpai.moe/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -61,17 +65,23 @@ public class SenpaiExportHelper {
                     fragment.seasonListReceived(response.body().getMetadataList());
 
                     Log.d(TAG, "Got season list");
+                } else {
+                    fragment.seasonListReceived(null);
+
                 }
             }
 
             @Override
             public void onFailure(Call<AllSeasonsMetadata> call, Throwable t) {
                 Log.d(TAG, "Failed getting season list");
+                fragment.seasonListReceived(null);
             }
         });
     }
 
     public void getSeasonData(final SeasonMetadata metadata) {
+        Log.d(TAG, "Getting season data for: '" + metadata.getName() + "'");
+
         if (App.getInstance().isPostInitializing()) {
             updateNotification(metadata.getName());
         }
@@ -86,7 +96,7 @@ public class SenpaiExportHelper {
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.senpai.moe/")
+                .baseUrl(BASE_URL)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -109,6 +119,12 @@ public class SenpaiExportHelper {
                     }
 
                     fragment.seasonDataRetrieved(response.body());
+                } else {
+                    NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager.cancel(metadata.getName().hashCode());
+                    Log.d(TAG, "Failed getting season data for: '" + metadata.getName() + "'");
+
+                    fragment.seasonDataRetrieved(null);
                 }
             }
 
@@ -117,6 +133,8 @@ public class SenpaiExportHelper {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(metadata.getName().hashCode());
                 Log.d(TAG, "Failed getting season data for: '" + metadata.getName() + "'");
+
+                fragment.seasonDataRetrieved(null);
             }
         });
     }
@@ -142,17 +160,19 @@ public class SenpaiExportHelper {
     }
 
     public void getLatestSeasonData() {
+        Log.d(TAG, "Getting latest season data");
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
-        OkHttpClient client = new OkHttpClient.Builder()
+   /*     OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES)
-                .build();
+                .build();*/
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://www.senpai.moe/")
+                .baseUrl(BASE_URL)
                 .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
@@ -163,6 +183,8 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
                 if (response.isSuccessful()) {
+                    Log.d(TAG, "Got latest season data");
+
                     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getName());
@@ -178,12 +200,16 @@ public class SenpaiExportHelper {
 
                     fragment.seasonDataRetrieved(response.body());
                 } else {
+                    Log.d(TAG, "Failed getting latest season data");
+
                     fragment.seasonDataRetrieved(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Season> call, Throwable t) {
+                Log.d(TAG, "Failed getting latest season data");
+
                 fragment.seasonDataRetrieved(null);
             }
         });

@@ -15,14 +15,11 @@ import android.widget.TextView;
 import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
-import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
-import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
@@ -33,17 +30,6 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     public static MyShowsFragment newInstance() {
         MyShowsFragment fragment = new MyShowsFragment();
         return fragment;
-    }
-
-    @Override
-    public void onRefresh() {
-        if (App.getInstance().isNetworkAvailable()) {
-            getSenpaiExportHelper().getLatestSeasonData();
-            setUpdating(true);
-        } else {
-            getSwipeRefreshLayout().setRefreshing(false);
-            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-        }
     }
 
     @Override
@@ -69,38 +55,79 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
+    public void onRefresh() {
+        if (App.getInstance().isNetworkAvailable()) {
+            getSenpaiExportHelper().getLatestSeasonData();
+            setUpdating(true);
+        } else {
+            stopRefreshing();
+            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+    public void seasonPostersImported(boolean imported) {
+        super.seasonPostersImported(imported);
 
-        if (id == R.id.action_sort) {
-            PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_sort));
-            popupMenu.inflate(R.menu.sort_menu);
-            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    int id = item.getItemId();
-
-                    if (id == R.id.action_sort_date) {
-                        sortByDate();
-                    } else if (id == R.id.action_sort_name) {
-                        sortByName();
-                    }
-
-                    getmAdapter().notifyDataSetChanged();
-                    return false;
-                }
-            });
-            popupMenu.show();
-            return true;
+        if (!imported){
+            stopRefreshing();
         }
-        return super.onOptionsItemSelected(item);
+
+        if (App.getInstance().isInitializingGotImages()) {
+            App.getInstance().setInitializing(false);
+
+            if (App.getInstance().getLoggedIn()){
+                getMalApiClient().getUserList();
+            } else {
+                stopRefreshing();
+            }
+
+            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null) {
+                TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
+                loadingText.setText(getString(R.string.initial_loading_myshows));
+            }
+
+        }
+
+        if (isUpdating()) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+            boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
+
+            if (isLoggedIn) {
+                getMalApiClient().getUserList();
+            } else {
+                stopRefreshing();
+            }
+        }
+    }
+
+    @Override
+    public void malDataImported(boolean received) {
+        super.malDataImported(received);
+
+        if (App.getInstance().isInitializingGotImages()) {
+            App.getInstance().setInitializingGotImages(false);
+            App.getInstance().setPostInitializing(true);
+
+            stopInitialSpinner();
+
+            getSenpaiExportHelper().getSeasonList();
+        }
+
+        if (getmAdapter() != null) {
+            if (getmAdapter().getAllSeries().isEmpty()){
+                getmAdapter().getVisibleSeries().clear();
+            }
+        }
+
+        loadUserSortingPreference();
+    }
+
+    @Override
+    public void episodeCountIncremented(boolean incremented) {
+        if (!incremented) {
+            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
+        }
     }
 
     public void loadUserSortingPreference() {
@@ -163,103 +190,37 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     }
 
     @Override
-    public void seasonPostersImported(boolean imported) {
-        if (App.getInstance().isInitializingGotImages()) {
-            App.getInstance().setInitializing(false);
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
 
-            if (App.getInstance().getLoggedIn()){
-                getMalApiClient().getUserList();
-            }
-
-            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null) {
-                TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
-                loadingText.setText(getString(R.string.initial_loading_myshows));
-            }
-
-        }
-
-        if (isUpdating()) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
-
-            if (isLoggedIn) {
-                getMalApiClient().getUserList();
-            } else {
-                getSwipeRefreshLayout().setRefreshing(false);
-            }
-        }
-
-        super.seasonPostersImported(imported);
+        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
     }
 
     @Override
-    public void seasonDataRetrieved(Season season) {
-        if (season != null) {
-            App.getInstance().getAllAnimeSeasons().add(season);
-            App.getInstance().saveNewSeasonData(season);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
 
-            if (App.getInstance().isNetworkAvailable()) {
-                if (getAnnHelper() == null) {
-                    setAnnHelper(new ANNSearchHelper(this));
+        if (id == R.id.action_sort) {
+            PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_sort));
+            popupMenu.inflate(R.menu.sort_menu);
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int id = item.getItemId();
+
+                    if (id == R.id.action_sort_date) {
+                        sortByDate();
+                    } else if (id == R.id.action_sort_name) {
+                        sortByName();
+                    }
+
+                    getmAdapter().notifyDataSetChanged();
+                    return false;
                 }
-
-                getAnnHelper().getImages(season.getSeasonSeries());
-            } else {
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-            }
-        } else {
-            getSwipeRefreshLayout().setRefreshing(false);
-
-            if (!App.getInstance().isInitializing()) {
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
-            } else {
-                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-                failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
-            }
+            });
+            popupMenu.show();
+            return true;
         }
-    }
-
-    @Override
-    public void malDataImported() {
-        if (App.getInstance().isInitializingGotImages()) {
-            App.getInstance().setInitializingGotImages(false);
-            App.getInstance().setPostInitializing(true);
-
-            App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
-            App.getInstance().getMainActivity().getProgressView().stopAnimation();
-
-            getSenpaiExportHelper().getSeasonList();
-        }
-
-        if (isUpdating()) {
-            getSwipeRefreshLayout().setRefreshing(false);
-            setUpdating(false);
-        }
-
-        if (getmAdapter() != null) {
-            if (getmAdapter().getAllSeries().isEmpty()){
-                getmAdapter().getVisibleSeries().clear();
-            }
-            getmAdapter().notifyDataSetChanged();
-        }
-
-        loadUserSortingPreference();
-    }
-
-    @Override
-    public void userListReceived(boolean received) {
-        super.userListReceived(received);
-
-        if (isUpdating()) {
-            getSwipeRefreshLayout().setRefreshing(false);
-            setUpdating(false);
-        }
-    }
-
-    @Override
-    public void episodeCountIncremented(boolean incremented) {
-        if (!incremented) {
-            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
-        }
+        return super.onOptionsItemSelected(item);
     }
 }

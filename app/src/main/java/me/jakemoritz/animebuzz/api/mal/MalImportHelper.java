@@ -102,7 +102,7 @@ public class MalImportHelper {
         }
 
         if (malDataImportedListener != null) {
-            malDataImportedListener.malDataImported();
+            malDataImportedListener.malDataImported(true);
         }
     }
 }

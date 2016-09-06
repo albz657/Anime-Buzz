@@ -70,6 +70,17 @@ public class SeasonsFragment extends SeriesFragment {
         }
     }
 
+    @Override
+    public void onRefresh() {
+        if (App.getInstance().isNetworkAvailable()) {
+            getSenpaiExportHelper().getSeasonData(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata());
+            setUpdating(true);
+        } else {
+            stopRefreshing();
+            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+        }
+    }
+
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
         getmAdapter().getAllSeries().clear();
@@ -81,66 +92,6 @@ public class SeasonsFragment extends SeriesFragment {
         getmAdapter().setSeriesFilter(null);
 
         App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
-    }
-
-    private List<String> getSpinnerItems() {
-        List<String> seasonNames = new ArrayList<>();
-
-        List<SeasonMetadata> metadataList = new ArrayList<>();
-        for (Season season : App.getInstance().getAllAnimeSeasons()) {
-            metadataList.add(season.getSeasonMetadata());
-        }
-
-        Collections.sort(metadataList, new SeasonMetadataComparator());
-
-        for (SeasonMetadata metadata : metadataList) {
-            seasonNames.add(metadata.getName());
-
-            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
-                previousSpinnerIndex = metadataList.indexOf(metadata);
-            }
-        }
-
-        return seasonNames;
-    }
-
-    @Override
-    public void seasonDataRetrieved(Season season) {
-        super.seasonDataRetrieved(season);
-
-        if (getSwipeRefreshLayout().isRefreshing()) {
-            getSwipeRefreshLayout().setRefreshing(false);
-            if (isUpdating()) {
-                setUpdating(false);
-            }
-        }
-
-        /*if (season != null) {
-            NotificationHelper notificationHelper = new NotificationHelper();
-            notificationHelper.createImagesNotification();
-        }*/
-    }
-
-    @Override
-    public void seasonPostersImported(boolean imported) {
-        if (isVisible()) {
-            refreshToolbar();
-        }
-
-        if (App.getInstance().isInitializing()) {
-            App.getInstance().setInitializing(false);
-
-            App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
-            App.getInstance().getMainActivity().getProgressView().stopAnimation();
-
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
-
-            App.getInstance().setPostInitializing(true);
-
-            getSenpaiExportHelper().getSeasonList();
-        }
-
-        super.seasonPostersImported(imported);
     }
 
     public void refreshToolbar() {
@@ -167,6 +118,49 @@ public class SeasonsFragment extends SeriesFragment {
                 seasonsSpinnerAdapter.notifyDataSetChanged();
                 toolbarSpinner.setSelection(previousSpinnerIndex);
             }
+        }
+    }
+
+    private List<String> getSpinnerItems() {
+        List<String> seasonNames = new ArrayList<>();
+
+        List<SeasonMetadata> metadataList = new ArrayList<>();
+        for (Season season : App.getInstance().getAllAnimeSeasons()) {
+            metadataList.add(season.getSeasonMetadata());
+        }
+
+        Collections.sort(metadataList, new SeasonMetadataComparator());
+
+        for (SeasonMetadata metadata : metadataList) {
+            seasonNames.add(metadata.getName());
+
+            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
+                previousSpinnerIndex = metadataList.indexOf(metadata);
+            }
+        }
+
+        return seasonNames;
+    }
+
+    @Override
+    public void seasonPostersImported(boolean imported) {
+        super.seasonPostersImported(imported);
+
+        stopRefreshing();
+
+        if (isVisible()) {
+            refreshToolbar();
+        }
+
+        if (App.getInstance().isInitializing()) {
+            App.getInstance().setInitializing(false);
+
+            stopInitialSpinner();
+
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
+            App.getInstance().setPostInitializing(true);
+
+            getSenpaiExportHelper().getSeasonList();
         }
     }
 
@@ -209,15 +203,4 @@ public class SeasonsFragment extends SeriesFragment {
                                           }
         );
     }
-
-    @Override
-    public void onRefresh() {
-        if (App.getInstance().isNetworkAvailable()) {
-            getSenpaiExportHelper().getSeasonData(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata());
-            setUpdating(true);
-        } else {
-            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-        }
-    }
-
 }

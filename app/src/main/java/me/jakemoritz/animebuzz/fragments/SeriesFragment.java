@@ -41,7 +41,6 @@ import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.UserListResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
@@ -50,7 +49,7 @@ import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, UserListResponse, FailedInitializationFragment.FailedInitializationListener {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -70,24 +69,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         annHelper = new ANNSearchHelper(this);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        swipeRefreshLayout.setOnRefreshListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-
-        if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setRefreshing(false);
-            swipeRefreshLayout.destroyDrawingCache();
-            swipeRefreshLayout.clearAnimation();
-        }
     }
 
     @Override
@@ -123,24 +104,17 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void failedInitializationResponse(boolean retryNow) {
-        if (retryNow){
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
-            startActivity(intent);
-        } else {
-            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-            homeIntent.addCategory( Intent.CATEGORY_HOME );
-            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(homeIntent);
-        }
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     @Override
-    public void seasonPostersImported(boolean imported) {
-        if (imported){
-            mAdapter.notifyDataSetChanged();
-        }
+    public void onPause() {
+        super.onPause();
+
+        stopRefreshing();
     }
 
     @Override
@@ -155,9 +129,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 }
                 annHelper.getImages(season.getSeasonSeries());
             } else {
+                stopRefreshing();
                 Snackbar.make(swipeRefreshLayout, getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
+            stopRefreshing();
+
             if (!App.getInstance().isInitializing()){
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
             } else {
@@ -168,8 +145,15 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void seasonPostersImported(boolean imported) {
+        if (imported){
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
-        if (App.getInstance().isPostInitializing()) {
+        if (App.getInstance().isPostInitializing() && seasonMetaList!= null) {
 
             App.getInstance().setSyncingSeasons(new ArrayList<SeasonMetadata>());
 
@@ -184,18 +168,50 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             new NotificationHelper().createUpdatingSeasonDataNotification(seasonMetadata.getName());
             senpaiExportHelper.getSeasonData(seasonMetadata);
         }
-    }
 
-    @Override
-    public void malDataImported() {
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void userListReceived(boolean received) {
-        if (!received){
-            Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.user_list_failed), Snackbar.LENGTH_LONG).show();
+        if (seasonMetaList == null){
+            Snackbar.make(swipeRefreshLayout, getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void malDataImported(boolean received) {
+        if (received){
+            mAdapter.notifyDataSetChanged();
+        }
+
+        if (updating) {
+            stopRefreshing();
+        }
+    }
+
+    @Override
+    public void failedInitializationResponse(boolean retryNow) {
+        if (retryNow){
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
+            startActivity(intent);
+        } else {
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory( Intent.CATEGORY_HOME );
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(homeIntent);
+        }
+    }
+
+    public void stopRefreshing(){
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setRefreshing(false);
+            updating = false;
+            swipeRefreshLayout.destroyDrawingCache();
+            swipeRefreshLayout.clearAnimation();
+        }
+    }
+
+    public void stopInitialSpinner(){
+        App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
+        App.getInstance().getMainActivity().getProgressView().stopAnimation();
+
     }
 
 //    Item modification

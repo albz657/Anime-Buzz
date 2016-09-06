@@ -1,5 +1,5 @@
 package me.jakemoritz.animebuzz.interfaces.mal;
 
 public interface MalDataImportedListener {
-    void malDataImported();
+    void malDataImported(boolean received);
 }

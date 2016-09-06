@@ -1,12 +1,9 @@
 package me.jakemoritz.animebuzz.api.ann;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
 import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
@@ -28,6 +25,8 @@ public class ANNSearchHelper {
 
     private final static String TAG = ANNSearchHelper.class.getSimpleName();
 
+    private final static String BASE_URL = "http://cdn.animenewsnetwork.com/";
+
     private List<SeriesList> getImageURLBatch;
     private SeriesFragment seriesFragment;
 
@@ -36,7 +35,7 @@ public class ANNSearchHelper {
         this.getImageURLBatch = new ArrayList<>();
     }
 
-    public void getImages(SeriesList seriesList) {
+    public void   getImages(SeriesList seriesList) {
         SeriesList cleanedList = new SeriesList();
         for (Series series : seriesList) {
             if (series.getANNID() > 0) {
@@ -90,13 +89,13 @@ public class ANNSearchHelper {
 
     private void getPictureUrlBatch(SeriesList seriesList) {
         if (!seriesList.isEmpty()) {
-            OkHttpClient client = new OkHttpClient.Builder()
+/*            OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(1, TimeUnit.MINUTES)
                     .readTimeout(1, TimeUnit.MINUTES)
-                    .build();
+                    .build();*/
 
             Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://cdn.animenewsnetwork.com/")
+                    .baseUrl(BASE_URL)
                     .client(new OkHttpClient())
                     .addConverterFactory(SimpleXmlConverterFactory.create())
                     .build();
@@ -113,8 +112,8 @@ public class ANNSearchHelper {
             call.enqueue(new Callback<ANNXMLHolder>() {
                 @Override
                 public void onResponse(Call<ANNXMLHolder> call, Response<ANNXMLHolder> response) {
-                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel("image".hashCode());
+/*                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel("image".hashCode());*/
 
                     if (response.isSuccessful()) {
                         if (response.body().getAnimeList() != null) {
@@ -141,8 +140,8 @@ public class ANNSearchHelper {
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
-                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel("image".hashCode());
+/*                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel("image".hashCode());*/
 
                     seriesFragment.seasonPostersImported(false);
                 }

@@ -188,17 +188,17 @@ public class MalApiClient {
 
                         DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
 
-                        seriesFragment.malDataImported();
+                        seriesFragment.malDataImported(true);
                     }
                 } else {
-                    seriesFragment.userListReceived(false);
+                    seriesFragment.malDataImported(false);
                 }
 
             }
 
             @Override
             public void onFailure(Call<UserListHolder> call, Throwable t) {
-                seriesFragment.userListReceived(false);
+                seriesFragment.malDataImported(false);
                 Log.d(TAG, "error: " + t.getMessage());
             }
         });
