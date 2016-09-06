@@ -19,7 +19,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -56,24 +55,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private RingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
 
-    private MalApiClient malApiClient;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         self = this;
         setCorrectSummaries();
-
-        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
-
-            if (toolbarSpinner != null) {
-                toolbarSpinner.setVisibility(View.GONE);
-            }
-
-            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
-        }
     }
 
     private void setCorrectSummaries() {
@@ -134,17 +121,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
         setDivider(null);
 
-        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
-
-            if (toolbarSpinner != null) {
-                toolbarSpinner.setVisibility(View.GONE);
-
-            }
-
-            App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.action_settings);
-            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
-        }
+        App.getInstance().fixToolbar(this.getClass().getSimpleName());
     }
 
     private void setRingtoneSummary() {

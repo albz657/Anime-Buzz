@@ -7,7 +7,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="action_settings">Settings</string>
+    <string name="last_update_time">lastupdatetime</string>
 
     <string name="initial_loading_myshows">Getting your currently watching shows from MAL&#8230;</string>
     <string name="initial_loading_season">Downloading the current season info&#8230;</string>
@@ -62,6 +62,8 @@
     <string name="fragment_myshows">Currently Watching</string>
     <string name="fragment_seasons">Season Browser</string>
     <string name="fragment_watching_queue">Watching Queue</string>
+    <string name="action_settings">Settings</string>
+    <string name="fragment_about">About</string>
 
     <!--File names-->
     <string name="file_alarms">alarms</string>

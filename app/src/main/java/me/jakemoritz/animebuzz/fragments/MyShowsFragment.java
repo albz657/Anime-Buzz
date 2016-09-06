@@ -10,7 +10,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -51,16 +50,7 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) App.getInstance().getMainActivity().findViewById(R.id.toolbar_spinner);
-
-            if (toolbarSpinner != null) {
-                toolbarSpinner.setVisibility(View.GONE);
-            }
-
-            App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.fragment_myshows);
-            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
-        }
+        App.getInstance().fixToolbar(this.getClass().getSimpleName());
 
         loadUserSortingPreference();
 

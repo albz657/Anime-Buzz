@@ -146,9 +146,9 @@ public class SeasonsFragment extends SeriesFragment {
     public void refreshToolbar() {
         if (App.getInstance().getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
             List<String> seasons = getSpinnerItems();
+
             if (seasons.isEmpty()) {
-                toolbarSpinner.setVisibility(View.GONE);
-                App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
+                App.getInstance().fixToolbar(this.getClass().getSimpleName());
             } else {
                 if (searchView != null) {
                     if (!searchView.isIconified()) {
@@ -159,6 +159,7 @@ public class SeasonsFragment extends SeriesFragment {
                 } else {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
+
                 App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 
                 seasonsSpinnerAdapter.getSeasonNames().clear();

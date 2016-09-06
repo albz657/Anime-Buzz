@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -43,18 +42,7 @@ public class BacklogFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (App.getInstance().getMainActivity().getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) (Spinner) App.getInstance().getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
-
-            if (toolbarSpinner != null) {
-                toolbarSpinner.setVisibility(View.GONE);
-
-            }
-
-            App.getInstance().getMainActivity().getSupportActionBar().setTitle(R.string.fragment_watching_queue);
-            App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(true);
-        }
-
+        App.getInstance().fixToolbar(this.getClass().getSimpleName());
     }
 
     @Override

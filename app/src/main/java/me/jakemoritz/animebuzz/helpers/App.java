@@ -13,6 +13,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
+import android.view.View;
+import android.widget.Spinner;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -125,6 +127,37 @@ public class App extends Application {
     }
 
     /* HELPERS */
+    public void fixToolbar(String fragment) {
+        if (mainActivity.getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) mainActivity.findViewById(R.id.toolbar_spinner);
+
+            String actionBarTitle = "";
+            switch (fragment) {
+                case "SettingsFragment":
+                    actionBarTitle = getString(R.string.action_settings);
+                    break;
+                case "SeasonsFragment":
+                    actionBarTitle = getString(R.string.fragment_seasons);
+                    break;
+                case "BacklogFragment":
+                    actionBarTitle = getString(R.string.fragment_watching_queue);
+                    break;
+                case "AboutFragment":
+                    actionBarTitle = getString(R.string.fragment_about);
+                    break;
+                case "MyShowsFragment":
+                    actionBarTitle = getString(R.string.fragment_myshows);
+                    break;
+            }
+
+            if (toolbarSpinner != null) {
+                toolbarSpinner.setVisibility(View.GONE);
+            }
+
+            mainActivity.getSupportActionBar().setTitle(actionBarTitle);
+            mainActivity.getSupportActionBar().setDisplayShowTitleEnabled(true);
+        }
+    }
 
     public void cacheUserAvatar(Bitmap bitmap) {
         try {
@@ -263,7 +296,7 @@ public class App extends Application {
         }
     }
 
-    private void setAlarm(AlarmHolder alarm){
+    private void setAlarm(AlarmHolder alarm) {
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         notificationIntent.putExtra("MALID", alarm.getId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
