@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -168,12 +167,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         setRingtoneSummary();
 
         firebasePreference = (SwitchPreference) findPreference(getString(R.string.pref_firebase_key));
-
-        boolean isDebuggable = (0 != (App.getInstance().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
-
-        if (isDebuggable) {
-            firebasePreference.setEnabled(false);
-        }
 
         boolean signedIn = sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
 

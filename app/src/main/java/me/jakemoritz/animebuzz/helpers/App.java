@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
@@ -14,8 +13,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
 import android.support.v7.preference.PreferenceManager;
-
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -84,13 +81,6 @@ public class App extends Application {
         super.onCreate();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean isDebuggable = (0 != (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE));
-        if (isDebuggable) {
-            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(getString(R.string.pref_firebase_key), false);
-            editor.apply();
-        }
 
         mInstance = this;
         allAnimeSeasons = new SeasonList();
