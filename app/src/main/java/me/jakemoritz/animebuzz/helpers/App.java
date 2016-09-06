@@ -82,6 +82,8 @@ public class App extends Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+        SQLiteStudioService.instance().start(this);
+
         mInstance = this;
         allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
