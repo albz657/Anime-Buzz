@@ -104,7 +104,7 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -131,7 +131,7 @@ public class App extends Application {
     }
 
     /* HELPERS */
-    private void updateFormattedTimes() {
+    public void updateFormattedTimes() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         long lastUpdatedTime = sharedPreferences.getLong(getString(R.string.last_update_time), 0L);
 

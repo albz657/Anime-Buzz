@@ -73,6 +73,8 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
+        super.onRefresh();
+
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getSeasonData(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata());
             setUpdating(true);

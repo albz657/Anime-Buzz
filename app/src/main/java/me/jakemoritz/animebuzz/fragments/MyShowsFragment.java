@@ -57,6 +57,8 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
 
     @Override
     public void onRefresh() {
+        super.onRefresh();
+
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getLatestSeasonData();
             setUpdating(true);

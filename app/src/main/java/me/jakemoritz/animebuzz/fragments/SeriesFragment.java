@@ -118,6 +118,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void onRefresh() {
+        App.getInstance().updateFormattedTimes();
+        getmAdapter().notifyDataSetChanged();
+    }
+
+    @Override
     public void seasonDataRetrieved(Season season) {
         if (season != null){
             App.getInstance().getAllAnimeSeasons().add(season);
