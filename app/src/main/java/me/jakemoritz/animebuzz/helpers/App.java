@@ -104,7 +104,7 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -121,7 +121,7 @@ public class App extends Application {
             long time = System.currentTimeMillis();
             time += 5000L;
 //            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
-            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(1472529050000L);
+            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(time);
 
             /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
@@ -345,10 +345,12 @@ public class App extends Application {
         nextEpisode.set(Calendar.MINUTE, initialAirTime.get(Calendar.MINUTE));
         nextEpisode.set(Calendar.DAY_OF_WEEK, initialAirTime.get(Calendar.DAY_OF_WEEK));
         nextEpisode.set(Calendar.SECOND, 0);
+        nextEpisode.set(Calendar.MILLISECOND, 0);
 
         if (!App.getInstance().isNotificationReceived()) {
             Calendar currentTime = Calendar.getInstance();
             currentTime.set(Calendar.SECOND, 0);
+            currentTime.set(Calendar.MILLISECOND, 0);
             if (currentTime.compareTo(nextEpisode) >= 0) {
                 nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
             }
