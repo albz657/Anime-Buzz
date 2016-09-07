@@ -152,9 +152,14 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     }
 
     @Override
-    public void incrementDialogClosed(boolean accepted, Series series, int position) {
-        if (accepted) {
+    public void incrementDialogClosed(int response, Series series, int position) {
+        if (response == 1) {
             new MalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
+        } else if (response == -1){
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(App.getInstance().getString(R.string.pref_increment_key), false);
+            editor.apply();
         }
 
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());

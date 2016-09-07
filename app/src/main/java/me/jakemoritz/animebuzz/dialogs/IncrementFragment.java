@@ -36,13 +36,19 @@ public class IncrementFragment extends DialogFragment {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.incrementDialogClosed(true, series, position);
+                        listener.incrementDialogClosed(1, series, position);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.incrementDialogClosed(false, series, position);
+                        listener.incrementDialogClosed(0, series, position);
+                    }
+                })
+                .setNeutralButton("Never", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        listener.incrementDialogClosed(-1, series, position);
                     }
                 })
                 .setCancelable(false);
@@ -58,6 +64,6 @@ public class IncrementFragment extends DialogFragment {
     }
 
     public interface IncrementDialogListener {
-        void incrementDialogClosed(boolean accepted, Series series, int position);
+        void incrementDialogClosed(int response, Series series, int position);
     }
 }
