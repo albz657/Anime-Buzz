@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.tasks;
 import android.os.AsyncTask;
 
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -15,8 +16,8 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... voids) {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
 
-
-        for (Iterator iterator = App.getInstance().getAllAnimeSeasons().iterator(); iterator.hasNext();){
+        CopyOnWriteArrayList<Season> safeAllAnimeList = new CopyOnWriteArrayList<Season>(App.getInstance().getAllAnimeSeasons());
+        for (Iterator iterator = safeAllAnimeList.iterator(); iterator.hasNext();){
             databaseHelper.saveSeriesList(((Season) iterator.next()).getSeasonSeries());
         }
 
