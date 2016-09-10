@@ -51,7 +51,6 @@ import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 import me.jakemoritz.animebuzz.tasks.SaveAllDataTask;
 import me.jakemoritz.animebuzz.tasks.SaveNewSeasonTask;
 import me.jakemoritz.animebuzz.tasks.SaveSeasonsListTask;
-import pl.com.salsoft.sqlitestudioremote.SQLiteStudioService;
 
 public class App extends Application {
 
@@ -86,8 +85,6 @@ public class App extends Application {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        SQLiteStudioService.instance().start(this);
-
         mInstance = this;
         allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
@@ -108,12 +105,6 @@ public class App extends Application {
 
             rescheduleAlarms();
         }
-    }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        SQLiteStudioService.instance().stop();
     }
 
     private void dummyAlarm() {

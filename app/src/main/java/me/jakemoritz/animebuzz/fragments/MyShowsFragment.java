@@ -19,11 +19,10 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
-import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeCountResponse {
+public class MyShowsFragment extends SeriesFragment {
 
     private static final String TAG = MyShowsFragment.class.getSimpleName();
 
@@ -124,13 +123,6 @@ public class MyShowsFragment extends SeriesFragment implements IncrementEpisodeC
         }
 
         loadUserSortingPreference();
-    }
-
-    @Override
-    public void episodeCountIncremented(boolean incremented) {
-        if (!incremented) {
-            Snackbar.make(getSwipeRefreshLayout(), App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
-        }
     }
 
     public void loadUserSortingPreference() {

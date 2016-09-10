@@ -24,6 +24,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
+import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -33,9 +34,11 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     private final List<BacklogItem> seriesList;
     public ItemTouchHelper touchHelper;
+    private MalApiClient malApiClient;
 
-    public BacklogRecyclerViewAdapter(List<BacklogItem> seriesList) {
+    public BacklogRecyclerViewAdapter(BacklogFragment parent, List<BacklogItem> seriesList) {
         this.seriesList = seriesList;
+        this.malApiClient = new MalApiClient(parent);
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
         touchHelper = new ItemTouchHelper(callback);
     }
@@ -154,7 +157,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     @Override
     public void incrementDialogClosed(int response, Series series, int position) {
         if (response == 1) {
-            new MalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
+            malApiClient.updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
         } else if (response == -1){
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             SharedPreferences.Editor editor = sharedPreferences.edit();

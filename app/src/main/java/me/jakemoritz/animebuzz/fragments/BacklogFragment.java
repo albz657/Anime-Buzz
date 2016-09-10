@@ -4,6 +4,7 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,12 +20,14 @@ import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.databinding.FragmentBacklogBinding;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
+import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 
-public class BacklogFragment extends Fragment {
+public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse {
 
     private static final String TAG = BacklogFragment.class.getSimpleName();
 
     private BacklogRecyclerViewAdapter mAdapter;
+    private View backlogLayout;
 
     public BacklogRecyclerViewAdapter getmAdapter() {
         return mAdapter;
@@ -53,22 +56,29 @@ public class BacklogFragment extends Fragment {
 
         FragmentBacklogBinding backlogBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_backlog, container, false);
 
-        View view = backlogBinding.getRoot();
+        backlogLayout = backlogBinding.getRoot();
 
-        TextView emptyText = (TextView) view.findViewById(R.id.empty_text);
+        TextView emptyText = (TextView) backlogLayout.findViewById(R.id.empty_text);
         emptyText.setText(getString(R.string.empty_text_backlog));
 
-        Context context = view.getContext();
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.backlog);
+        Context context = backlogLayout.getContext();
+        RecyclerView recyclerView = (RecyclerView) backlogLayout.findViewById(R.id.backlog);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
         Collections.sort(App.getInstance().getBacklog(), new BacklogItemComparator());
-        mAdapter = new BacklogRecyclerViewAdapter(App.getInstance().getBacklog());
+        mAdapter = new BacklogRecyclerViewAdapter(this, App.getInstance().getBacklog());
         mAdapter.touchHelper.attachToRecyclerView(recyclerView);
 
         recyclerView.setAdapter(mAdapter);
 
         backlogBinding.setDataset(App.getInstance().getBacklog());
 
-        return view;
+        return backlogLayout;
+    }
+
+    @Override
+    public void episodeCountIncremented(boolean incremented) {
+        if (!incremented) {
+            Snackbar.make(backlogLayout, App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
+        }
     }
 }

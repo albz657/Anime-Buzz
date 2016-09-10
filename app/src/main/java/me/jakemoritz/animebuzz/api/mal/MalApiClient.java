@@ -16,9 +16,9 @@ import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
@@ -42,6 +42,7 @@ public class MalApiClient {
     private SeriesFragment seriesFragment;
     private VerifyCredentialsResponse verifyListener;
     private MalDataImportedListener malDataImportedListener;
+    private IncrementEpisodeCountResponse incrementListener;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -50,6 +51,10 @@ public class MalApiClient {
 
 
     public MalApiClient() {
+    }
+
+    public MalApiClient(IncrementEpisodeCountResponse incrementListener){
+        this.incrementListener = incrementListener;
     }
 
     public MalApiClient(SeriesFragment seriesFragment) {
@@ -104,12 +109,12 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    ((MyShowsFragment) seriesFragment).episodeCountIncremented(response.isSuccessful() && response.raw().message().equals("OK"));
+                    incrementListener.episodeCountIncremented(response.isSuccessful() && response.raw().message().equals("OK"));
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    ((MyShowsFragment) seriesFragment).episodeCountIncremented(false);
+                    incrementListener.episodeCountIncremented(false);
                     Log.d(TAG, t.toString());
 
                 }
