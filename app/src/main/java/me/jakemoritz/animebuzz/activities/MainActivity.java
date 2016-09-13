@@ -2,7 +2,9 @@ package me.jakemoritz.animebuzz.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -24,9 +26,11 @@ import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.Iterator;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
@@ -34,6 +38,7 @@ import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -45,6 +50,38 @@ public class MainActivity extends AppCompatActivity
     private CircularProgressView progressView;
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
+    private boolean openRingtones = false;
+
+    private Fragment getCurrentFragment() {
+        if (!getSupportFragmentManager().getFragments().isEmpty()) {
+            Iterator iterator = getSupportFragmentManager().getFragments().iterator();
+            Fragment fragment = (Fragment) iterator.next();
+            Fragment previousFragment = fragment;
+
+            while (iterator.hasNext()) {
+                fragment = (Fragment) iterator.next();
+
+                if (fragment == null) {
+                    fragment = previousFragment;
+                } else {
+                    previousFragment = fragment;
+                }
+            }
+
+            return fragment;
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
+            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
+                openRingtones = true;
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +203,17 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         if (!App.getInstance().getDatabase().isOpen()) {
             App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
+        }
+
+        if (openRingtones){
+            final Fragment fragment = getCurrentFragment();
+            if (fragment instanceof SettingsFragment) {
+                SettingsFragment settingsFragment = (SettingsFragment) fragment;
+                CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
+                customRingtonePreference.setOpenList(true);
+                customRingtonePreference.performClick();
+            }
+            openRingtones = false;
         }
         App.getInstance().setAppVisible(true);
     }

@@ -67,6 +67,13 @@ public class NotificationHelper {
     }
 
     public void createNewEpisodeNotification(Series series) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+
+        String ringtonePref = sharedPreferences.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
+        Uri ringtoneUri = Uri.parse(ringtonePref);
+        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+        String name = ringtone.getTitle(App.getInstance());
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
@@ -88,9 +95,11 @@ public class NotificationHelper {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
 
+        if (!name.equals("Silent")){
+            mBuilder.setSound(ringtoneUri);
+        }
         Notification notification = mBuilder.build();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean vibrateOn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), true);
 
         if (vibrateOn) {
@@ -107,14 +116,12 @@ public class NotificationHelper {
             notification.ledARGB = Integer.parseInt(ledOn, 16);
         }
 
-        String ringtonePref = sharedPreferences.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
-        Uri ringtoneUri = Uri.parse(ringtonePref);
-        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
-        String name = ringtone.getTitle(App.getInstance());
 
-        if (!name.equals("Silent")) {
-            notification.defaults |= Notification.DEFAULT_SOUND;
-        }
+
+/*        if (!name.equals("Silent")) {
+//            notification.defaults |= Notification.DEFAULT_SOUND;
+
+        }*/
 
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
 //        notification.flags |= Notification.FLAG_ONGOING_EVENT;

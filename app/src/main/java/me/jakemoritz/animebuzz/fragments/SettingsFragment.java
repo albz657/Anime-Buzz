@@ -24,7 +24,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import net.xpece.android.support.preference.ListPreference;
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
-import net.xpece.android.support.preference.RingtonePreference;
 import net.xpece.android.support.preference.SwitchPreference;
 
 import java.io.File;
@@ -36,6 +35,7 @@ import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
@@ -52,7 +52,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private SwitchPreference simulcastPreference;
     private SwitchPreference format24hourPreference;
     private SwitchPreference incrementPreference;
-    private RingtonePreference ringtonePreference;
+    private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
 
     @Override
@@ -64,7 +64,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     private void setCorrectSummaries() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance().getMainActivity());
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
 
         if (prefersSimulcast) {
@@ -125,22 +125,27 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     private void setRingtoneSummary() {
-        Uri ringtoneUri = Uri.parse(sharedPreferences.getString(getString(R.string.pref_ringtone_key), "DEFAULT_RINGTONE_URI"));
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        String ringtoneKey = sharedPreferences.getString(getString(R.string.pref_ringtone_key), "Silent");
+
+        Uri ringtoneUri = Uri.parse(ringtoneKey);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
-        String name = ringtone.getTitle(App.getInstance());
-        ringtonePreference.setSummary(name);
+        if (ringtone != null) {
+            String name = ringtone.getTitle(App.getInstance());
+            ringtonePreference.setSummary(name);
+        }
     }
 
     @Override
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance().getMainActivity());
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         ListPreference ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
         if (ledColors.getValue() == null) {
             ledColors.setValueIndex(2);
         }
 
-        ringtonePreference = (RingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
+        ringtonePreference = (CustomRingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
         setRingtoneSummary();
 
         firebasePreference = (SwitchPreference) findPreference(getString(R.string.pref_firebase_key));
@@ -323,5 +328,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (verified) {
             signIn();
         }
+    }
+
+    public CustomRingtonePreference getRingtonePreference() {
+        return ringtonePreference;
     }
 }

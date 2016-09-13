@@ -10,7 +10,7 @@
             android:summary="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
 
-        <RingtonePreference
+        <me.jakemoritz.animebuzz.misc.CustomRingtonePreference
             android:key="@string/pref_ringtone_key"
             android:title="@string/pref_ringtone_title"
             android:showSilent="true"

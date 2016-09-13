@@ -9,6 +9,9 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
 
 
+    <!--Dangerous permissions-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:name=".helpers.App"
         android:allowBackup="false"

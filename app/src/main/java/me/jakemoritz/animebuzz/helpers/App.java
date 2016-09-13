@@ -612,6 +612,9 @@ public class App extends Application {
     }
 
     public MainActivity getMainActivity() {
+        if (mainActivity == null){
+            mainActivity = new MainActivity();
+        }
         return mainActivity;
     }
 
