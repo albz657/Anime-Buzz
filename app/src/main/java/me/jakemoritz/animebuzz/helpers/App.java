@@ -101,7 +101,7 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -315,10 +315,7 @@ public class App extends Application {
     }
 
     private void setAlarm(AlarmHolder alarm) {
-        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        notificationIntent.putExtra("MALID", alarm.getId());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), alarm.getId(), notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC, alarm.getAlarmTime(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(alarm.getId()));
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
@@ -376,7 +373,8 @@ public class App extends Application {
 
         setAlarm(newAlarm);
 
-        processNewAlarm(newAlarm);
+        DatabaseHelper.getInstance(this).saveAlarm(newAlarm);
+        alarms = DatabaseHelper.getInstance(this).getAllAlarms(database);
 
         DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
         // debug code
@@ -389,17 +387,11 @@ public class App extends Application {
     public void switchAlarmTiming() {
         alarms.clear();
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-        dbHelper.deleteAllAlarms();
+        dbHelper.deleteAllAlarms(App.getInstance().getDatabase());
 
         for (Series series : userAnimeList) {
             makeAlarm(series);
         }
-    }
-
-    private void processNewAlarm(AlarmHolder alarmHolder) {
-        DatabaseHelper.getInstance(this).saveAlarm(alarmHolder);
-
-        alarms.put(alarmHolder.getId(), alarmHolder);
     }
 
     public void removeAlarmFromStructure(int id) {
@@ -407,12 +399,31 @@ public class App extends Application {
         dbHelper.deleteAlarm(id);
     }
 
-    public void removeAlarm(Series series) {
-        Intent deleteIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, series.getMALID(), deleteIntent, 0);
+    private PendingIntent createPendingIntent(int id){
+        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        notificationIntent.putExtra("id", id);
+        return PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+    }
 
-        alarmManager.cancel(pendingIntent);
-        removeAlarmFromStructure(series.getMALID());
+    public void cancelAllAlarms(){
+        for (AlarmHolder alarmHolder : alarms.values()){
+            alarmManager.cancel(createPendingIntent(alarmHolder.getId()));
+        }
+    }
+
+    public void removeAlarm(Series series) {
+        int id = -1;
+        for (AlarmHolder alarmHolder : alarms.values()){
+            if (alarmHolder.getMALID() == series.getMALID()){
+                id = alarmHolder.getId();
+                break;
+            }
+        }
+
+        if (id != -1){
+            alarmManager.cancel(createPendingIntent(id));
+            removeAlarmFromStructure(id);
+        }
     }
 
     /* SAVING */
@@ -485,7 +496,7 @@ public class App extends Application {
 
         userAnimeList = loadUserList();
         backlog = loadBacklog();
-        alarms = databaseHelper.getAllAlarms();
+        alarms = databaseHelper.getAllAlarms(database);
     }
 
     private SeriesList loadUserList() {
@@ -609,6 +620,10 @@ public class App extends Application {
 
     public void setPostInitializing(boolean postInitializing) {
         this.postInitializing = postInitializing;
+    }
+
+    public void setAlarms(Map<Integer, AlarmHolder> alarms) {
+        this.alarms = alarms;
     }
 
     public MainActivity getMainActivity() {

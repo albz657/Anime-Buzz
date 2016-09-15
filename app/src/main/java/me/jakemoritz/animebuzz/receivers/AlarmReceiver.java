@@ -14,12 +14,21 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int intentExtra = intent.getIntExtra("MALID", -1);
-        if (intentExtra > 0) {
+        int intentExtra = intent.getIntExtra("id", -1);
+
+        AlarmHolder thisAlarm = null;
+        for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
+            if (alarmHolder.getId() == intentExtra){
+                thisAlarm = alarmHolder;
+                break;
+            }
+        }
+
+        if (thisAlarm != null) {
             Series series = null;
 
             for (Series eachSeries : App.getInstance().getUserAnimeList()) {
-                if (eachSeries.getMALID() == intentExtra) {
+                if (eachSeries.getMALID() == thisAlarm.getMALID()) {
                     series = eachSeries;
                     break;
                 }
@@ -29,19 +38,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                 NotificationHelper helper = new NotificationHelper();
                 helper.createNewEpisodeNotification(series);
 
-                long time = System.currentTimeMillis();
-
-                for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
-                    if (alarmHolder.getId() == intentExtra){
-                        time = alarmHolder.getAlarmTime();
-                        break;
-                    }
-                }
-
                 App.getInstance().setNotificationReceived(true);
 
-                series.getBacklog().add(time);
-                App.getInstance().getBacklog().add(new BacklogItem(series, time));
+                series.getBacklog().add(thisAlarm.getAlarmTime());
+                App.getInstance().getBacklog().add(new BacklogItem(series, thisAlarm.getAlarmTime()));
                 App.getInstance().makeAlarm(series);
 
 

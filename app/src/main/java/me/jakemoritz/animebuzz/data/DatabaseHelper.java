@@ -33,7 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Database info
     public static final String DATABASE_NAME = "buzzDB";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // Table names
     private static String TABLE_ANIME = "TABLE_ANIME";
@@ -69,6 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ALARM_ID = "alarmid";
     private static final String KEY_ALARM_NAME = "alarmname";
     private static final String KEY_ALARM_TIME = "alarmtime";
+    private static final String KEY_ALARM_MALID =" alarmmalid";
 
     private static DatabaseHelper mInstance;
 
@@ -117,9 +118,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private String buildAlarmTable() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_ALARMS +
-                "(" + KEY_ALARM_ID + " INTEGER PRIMARY KEY NOT NULL," +
+                "(" + KEY_ALARM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 KEY_ALARM_NAME + " TEXT," +
-                KEY_ALARM_TIME + " INTEGER" +
+                KEY_ALARM_TIME + " INTEGER, " +
+                KEY_ALARM_MALID + " INTEGER" +
                 ")";
     }
 
@@ -132,11 +134,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        switch (oldVersion){
+        switch (oldVersion) {
             case 1:
                 db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
                 db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT");
+            case 2:
+                upgradeAlarms(db);
+
         }
+    }
+
+    public void upgradeAlarms(SQLiteDatabase database) {
+        Map<Integer, AlarmHolder> oldAlarms = getAllAlarms(database);
+
+        deleteAllAlarms(database);
+
+        App.getInstance().cancelAllAlarms();
+
+        for (AlarmHolder alarm : oldAlarms.values()) {
+            insertAlarm(alarm, database);
+        }
+
+        Map<Integer, AlarmHolder> upgradedAlarms = getAllAlarms(database);
+
+        App.getInstance().setAlarms(upgradedAlarms);
+
+        App.getInstance().rescheduleAlarms();
     }
 
     //    Insert/Update
@@ -191,13 +214,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    private boolean insertAlarm(AlarmHolder alarm) {
+    private boolean insertAlarm(AlarmHolder alarm, SQLiteDatabase database) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
         contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
-        contentValues.put(KEY_ALARM_ID, alarm.getId());
+        contentValues.put(KEY_ALARM_MALID, alarm.getMALID());
 
-        App.getInstance().getDatabase().insert(TABLE_ALARMS, null, contentValues);
+        database.insert(TABLE_ALARMS, null, contentValues);
         return true;
     }
 
@@ -206,6 +229,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
         contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
         contentValues.put(KEY_ALARM_ID, alarm.getId());
+        contentValues.put(KEY_ALARM_MALID, alarm.getMALID());
 
         App.getInstance().getDatabase().update(TABLE_ALARMS, contentValues, KEY_ALARM_ID + " =  ? ", new String[]{String.valueOf(alarm.getId())});
         return true;
@@ -245,7 +269,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return series;
     }
 
-    private Cursor getSeriesCursor(int MALID){
+    private Cursor getSeriesCursor(int MALID) {
         return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
     }
 
@@ -291,7 +315,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24);
     }
 
-    public SeasonList getAllAnimeSeasons(){
+    public SeasonList getAllAnimeSeasons() {
         SeasonList seasons = new SeasonList();
         for (SeasonMetadata metadata : App.getInstance().getSeasonsList()) {
             SeriesList tempSeason = getSeriesBySeason(metadata.getName());
@@ -314,7 +338,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return new SeasonMetadata(seasonName, seasonDate, seasonKey);
     }
 
-    public Set<SeasonMetadata> getAllSeasonMetadata(){
+    public Set<SeasonMetadata> getAllSeasonMetadata() {
         Set<SeasonMetadata> seasonList = new HashSet<>();
 
         Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
@@ -330,9 +354,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return seasonList;
     }
 
-    public Map<Integer, AlarmHolder> getAllAlarms() {
+    public Map<Integer, AlarmHolder> getAllAlarms(SQLiteDatabase database) {
         Map<Integer, AlarmHolder> alarms = new HashMap<>();
-        Cursor cursor = App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -354,8 +378,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         int id = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_ID));
         long time = res.getLong(res.getColumnIndex(DatabaseHelper.KEY_ALARM_TIME));
         String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
+        int MALID = -1;
 
-        return new AlarmHolder(name, time, id);
+        try {
+            MALID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_MALID));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new AlarmHolder(name, time, id, MALID);
     }
 
 //    Delete
@@ -364,8 +395,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
     }
 
-    public void deleteAllAlarms() {
-        App.getInstance().getDatabase().delete(TABLE_ALARMS, null, null);
+    public void deleteAllAlarms(SQLiteDatabase database) {
+        database.delete(TABLE_ALARMS, null, null);
     }
 
 //    Public saving
@@ -385,7 +416,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (cursor.getCount() != 0) {
             updateAlarm(alarmHolder);
         } else {
-            insertAlarm(alarmHolder);
+            insertAlarm(alarmHolder, getWritableDatabase());
         }
         cursor.close();
     }
