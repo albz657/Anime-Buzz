@@ -26,7 +26,7 @@ public class AlarmsDataHelper {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_ALARMS +
                 "(" + KEY_ALARM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 KEY_ALARM_NAME + " TEXT," +
-                KEY_ALARM_TIME + " INTEGER, " +
+                KEY_ALARM_TIME + " INTEGER," +
                 KEY_ALARM_MALID + " INTEGER" +
                 ")";
     }
@@ -40,8 +40,6 @@ public class AlarmsDataHelper {
 
     public void upgradeAlarms(SQLiteDatabase database) {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
-
-        database.beginTransaction();
 
         database.execSQL("ALTER TABLE " + TABLE_ALARMS + " RENAME TO " + "TABLE_ALARMS_OLD");
         database.execSQL(buildAlarmTable());
@@ -59,9 +57,6 @@ public class AlarmsDataHelper {
         List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
 
         database.execSQL("DROP TABLE IF EXISTS " + "TABLE_ALARMS_OLD");
-        database.setTransactionSuccessful();
-        database.endTransaction();
-
 
         App.getInstance().setAlarms(upgradedAlarms);
 
