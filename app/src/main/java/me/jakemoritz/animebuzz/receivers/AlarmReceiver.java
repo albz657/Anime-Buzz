@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -41,6 +42,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 App.getInstance().setNotificationReceived(true);
 
                 App.getInstance().getAlarms().remove(thisAlarm);
+                AlarmsDataHelper.getInstance().deleteAlarm(thisAlarm.getId());
 
                 series.getBacklog().add(thisAlarm.getAlarmTime());
                 App.getInstance().getBacklog().add(new BacklogItem(series, thisAlarm.getAlarmTime()));
