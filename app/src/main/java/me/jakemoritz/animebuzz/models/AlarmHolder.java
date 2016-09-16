@@ -30,6 +30,12 @@ public class AlarmHolder {
         this.MALID = MALID;
     }
 
+    public AlarmHolder(String seriesName, long alarmTime, int MALID) {
+        this.seriesName = seriesName;
+        this.alarmTime = alarmTime;
+        this.MALID = MALID;
+    }
+
     public void setId(int id) {
         this.id = id;
     }

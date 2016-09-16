@@ -21,7 +21,7 @@ import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
+import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -88,7 +88,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
-        if ((mParent instanceof MyShowsFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
+        if ((mParent instanceof CurrentlyWatchingFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {

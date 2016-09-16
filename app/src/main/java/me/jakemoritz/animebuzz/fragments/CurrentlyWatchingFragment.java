@@ -22,12 +22,12 @@ import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MyShowsFragment extends SeriesFragment {
+public class CurrentlyWatchingFragment extends SeriesFragment {
 
-    private static final String TAG = MyShowsFragment.class.getSimpleName();
+    private static final String TAG = CurrentlyWatchingFragment.class.getSimpleName();
 
-    public static MyShowsFragment newInstance() {
-        MyShowsFragment fragment = new MyShowsFragment();
+    public static CurrentlyWatchingFragment newInstance() {
+        CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
         return fragment;
     }
 

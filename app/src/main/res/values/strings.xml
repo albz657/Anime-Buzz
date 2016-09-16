@@ -61,7 +61,7 @@
 
     <string name="fragment_myshows">Currently Watching</string>
     <string name="fragment_seasons">Season Browser</string>
-    <string name="fragment_watching_queue">Watching Queue</string>
+    <string name="fragment_watching_queue">Backlog</string>
     <string name="action_settings">Settings</string>
     <string name="fragment_about">About</string>
 

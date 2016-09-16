@@ -162,7 +162,7 @@ public class App extends Application {
                 case "AboutFragment":
                     actionBarTitle = getString(R.string.fragment_about);
                     break;
-                case "MyShowsFragment":
+                case "CurrentlyWatchingFragment":
                     actionBarTitle = getString(R.string.fragment_myshows);
                     break;
             }
@@ -368,11 +368,11 @@ public class App extends Application {
 
         Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
 
-        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), -1, series.getMALID());
+        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID());
+        newAlarm.setId((int) AlarmsDataHelper.getInstance().insertAlarm(newAlarm, database));
 
         setAlarm(newAlarm);
 
-        AlarmsDataHelper.getInstance().saveAlarm(newAlarm);
         alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
 
         DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
@@ -385,7 +385,6 @@ public class App extends Application {
 
     public void switchAlarmTiming() {
         alarms.clear();
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         AlarmsDataHelper.getInstance().deleteAllAlarms(App.getInstance().getDatabase());
 
         for (Series series : userAnimeList) {
@@ -394,7 +393,6 @@ public class App extends Application {
     }
 
     public void removeAlarmFromStructure(int id) {
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
         AlarmsDataHelper.getInstance().deleteAlarm(id);
     }
 

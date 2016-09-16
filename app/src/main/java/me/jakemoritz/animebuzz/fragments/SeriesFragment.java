@@ -91,7 +91,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (this instanceof SeasonsFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(new SeriesList(), this);
             emptyText.setText(getString(R.string.empty_text_season));
-        } else if (this instanceof MyShowsFragment) {
+        } else if (this instanceof CurrentlyWatchingFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
@@ -241,7 +241,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
         helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
-        if (this instanceof MyShowsFragment) {
+        if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().clear();
             getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
         }
@@ -267,7 +267,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
         helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
 
-        if (this instanceof MyShowsFragment) {
+        if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().remove(item);
             getmAdapter().getAllSeries().remove(item);
         }

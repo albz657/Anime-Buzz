@@ -60,14 +60,13 @@ public class AlarmsDataHelper {
         App.getInstance().rescheduleAlarms();
     }
 
-    private boolean insertAlarm(AlarmHolder alarm, SQLiteDatabase database) {
+    public long insertAlarm(AlarmHolder alarm, SQLiteDatabase database) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_ALARM_NAME, alarm.getSeriesName());
         contentValues.put(KEY_ALARM_TIME, alarm.getAlarmTime());
         contentValues.put(KEY_ALARM_MALID, alarm.getMALID());
 
-        database.insert(TABLE_ALARMS, null, contentValues);
-        return true;
+        return database.insert(TABLE_ALARMS, null, contentValues);
     }
 
     private boolean updateAlarm(AlarmHolder alarm) {

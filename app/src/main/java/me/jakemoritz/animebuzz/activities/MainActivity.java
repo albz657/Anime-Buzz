@@ -34,7 +34,7 @@ import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.fragments.MyShowsFragment;
+import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -133,11 +133,11 @@ public class MainActivity extends AppCompatActivity
 
         if (App.getInstance().isInitializing()) {
             if (App.getInstance().getLoggedIn()) {
-                MyShowsFragment myShowsFragment = new MyShowsFragment();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(myShowsFragment);
+                CurrentlyWatchingFragment currentlyWatchingFragment = new CurrentlyWatchingFragment();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
-                startFragment(myShowsFragment);
+                startFragment(currentlyWatchingFragment);
             } else {
                 SeasonsFragment seasonsFragment = new SeasonsFragment();
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
                 if (startupIntent.getBooleanExtra("notificationClicked", false)) {
                     startFragment(new BacklogFragment());
                 } else {
-                    startFragment(new MyShowsFragment());
+                    startFragment(new CurrentlyWatchingFragment());
                 }
             }
         }
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity
         if (fragment instanceof BacklogFragment) {
             id = getString(R.string.fragment_watching_queue);
             menuIndex = 0;
-        } else if (fragment instanceof MyShowsFragment) {
+        } else if (fragment instanceof CurrentlyWatchingFragment) {
             id = getString(R.string.fragment_myshows);
             menuIndex = 1;
         } else if (fragment instanceof SeasonsFragment) {
@@ -205,7 +205,7 @@ public class MainActivity extends AppCompatActivity
             App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
         }
 
-        if (openRingtones){
+        if (openRingtones) {
             final Fragment fragment = getCurrentFragment();
             if (fragment instanceof SettingsFragment) {
                 SettingsFragment settingsFragment = (SettingsFragment) fragment;
@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
 
         if (previousItemId != id) {
             if (id == R.id.nav_my_shows) {
-                newFragment = new MyShowsFragment();
+                newFragment = new CurrentlyWatchingFragment();
             } else if (id == R.id.nav_seasons) {
                 newFragment = new SeasonsFragment();
             } else if (id == R.id.nav_watching_queue) {
@@ -314,13 +314,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void episodeNotificationReceived() {
-        if (!getSupportFragmentManager().getFragments().isEmpty()) {
-            if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof MyShowsFragment) {
-                MyShowsFragment myShowsFragment = ((MyShowsFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1));
-                myShowsFragment.getmAdapter().notifyDataSetChanged();
-                myShowsFragment.loadUserSortingPreference();
-            } else if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
-                ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
+        if (getSupportFragmentManager().getFragments() != null) {
+            if (!getSupportFragmentManager().getFragments().isEmpty()) {
+                if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof CurrentlyWatchingFragment) {
+                    CurrentlyWatchingFragment currentlyWatchingFragment = ((CurrentlyWatchingFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1));
+                    currentlyWatchingFragment.getmAdapter().notifyDataSetChanged();
+                    currentlyWatchingFragment.loadUserSortingPreference();
+                } else if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
+                    ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
+                }
             }
         }
     }
