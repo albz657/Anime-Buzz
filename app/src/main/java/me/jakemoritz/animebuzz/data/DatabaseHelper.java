@@ -38,10 +38,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         isUpgrading = true;
         switch (oldVersion) {
             case 1:
-                AnimeDataHelper.getInstance().upgradeDatabaseVersionOne(db);
+                AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionTwo(db);
             case 2:
                 AlarmsDataHelper.getInstance().upgradeAlarms(db);
-                BacklogDataHelper.getInstance().upgradeToBacklogTable(db);
+                isUpgrading = true;
+                AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionThree(db);
         }
         isUpgrading = false;
     }

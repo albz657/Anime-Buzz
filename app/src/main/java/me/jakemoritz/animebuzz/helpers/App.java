@@ -35,6 +35,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.AnimeDataHelper;
+import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
@@ -301,7 +302,7 @@ public class App extends Application {
             if (!series.getSeason().equals(latestSeasonName)) {
                 removeAlarm(series);
                 series.setInUserList(false);
-                AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
+                AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
                 iterator.remove();
             }
         }
@@ -377,7 +378,7 @@ public class App extends Application {
 
         alarms.add(newAlarm);
 
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
         // debug code
 //        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 //        String formattedNext = format.format(nextEpisode.getTime());
@@ -518,11 +519,8 @@ public class App extends Application {
 
     private ObservableArrayList<BacklogItem> loadBacklog() {
         ObservableArrayList<BacklogItem> backlog = new ObservableArrayList<>();
-        for (Series series : App.getInstance().getUserAnimeList()) {
-            for (Long episodeTime : series.getBacklog()) {
-                backlog.add(new BacklogItem(series, episodeTime));
-            }
-        }
+
+        backlog.addAll(BacklogDataHelper.getInstance().getAllBacklogItems());
 
         Collections.sort(backlog, new BacklogItemComparator());
         return backlog;

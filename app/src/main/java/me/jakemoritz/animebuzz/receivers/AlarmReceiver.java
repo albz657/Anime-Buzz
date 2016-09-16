@@ -44,7 +44,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 App.getInstance().getAlarms().remove(thisAlarm);
                 AlarmsDataHelper.getInstance().deleteAlarm(thisAlarm.getId());
 
-                series.getBacklog().add(thisAlarm.getAlarmTime());
                 App.getInstance().getBacklog().add(new BacklogItem(series, thisAlarm.getAlarmTime()));
                 App.getInstance().makeAlarm(series);
 

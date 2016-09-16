@@ -6,10 +6,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.AnimeDataHelper;
+import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -28,9 +30,9 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
                 allAnime.addAll(season.getSeasonSeries());
             }
 
-            AnimeDataHelper.getInstance().saveSeriesList(allAnime);
+            AnimeDataHelper.getInstance().saveSeriesList(allAnime, App.getInstance().getDatabase());
 
-            AnimeDataHelper.getInstance().saveSeriesList(App.getInstance().getUserAnimeList());
+            AnimeDataHelper.getInstance().saveSeriesList(App.getInstance().getUserAnimeList(), App.getInstance().getDatabase());
 
             for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
                 SeasonDataHelper.getInstance().saveSeasonMetadata(metadata);
@@ -38,6 +40,10 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
 
             for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
                 AlarmsDataHelper.getInstance().saveAlarm(alarmHolder);
+            }
+
+            for (BacklogItem backlogItem : App.getInstance().getBacklog()){
+                BacklogDataHelper.getInstance().insertBacklogItem(backlogItem);
             }
 
             App.getInstance().getDatabase().setTransactionSuccessful();

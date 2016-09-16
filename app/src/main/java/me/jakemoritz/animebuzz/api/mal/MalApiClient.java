@@ -192,7 +192,7 @@ public class MalApiClient {
                             iterator.remove();
                         }
 
-                        AnimeDataHelper.getInstance().saveSeriesList(removedSeries);
+                        AnimeDataHelper.getInstance().saveSeriesList(removedSeries, App.getInstance().getDatabase());
 
                         seriesFragment.malDataImported(true);
                     }

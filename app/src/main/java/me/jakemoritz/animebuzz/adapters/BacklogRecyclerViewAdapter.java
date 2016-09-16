@@ -23,7 +23,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.AnimeDataHelper;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -33,12 +32,12 @@ import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
-    private final List<BacklogItem> seriesList;
+    private final List<BacklogItem> backlogItems;
     public ItemTouchHelper touchHelper;
     private MalApiClient malApiClient;
 
-    public BacklogRecyclerViewAdapter(BacklogFragment parent, List<BacklogItem> seriesList) {
-        this.seriesList = seriesList;
+    public BacklogRecyclerViewAdapter(BacklogFragment parent, List<BacklogItem> backlogItems) {
+        this.backlogItems = backlogItems;
         this.malApiClient = new MalApiClient(parent);
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
         touchHelper = new ItemTouchHelper(callback);
@@ -53,7 +52,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.backlogItem = seriesList.get(position);
+        holder.backlogItem = backlogItems.get(position);
         holder.mTitle.setText(holder.backlogItem.getSeries().getName());
 
         Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
@@ -134,12 +133,12 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public int getItemCount() {
-        return seriesList.size();
+        return backlogItems.size();
     }
 
     @Override
     public void onItemDismiss(int position) {
-        Series series = seriesList.get(position).getSeries();
+        Series series = backlogItems.get(position).getSeries();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean displayPrompt = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_increment_key), true);
@@ -148,8 +147,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-            AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
+            App.getInstance().getBacklog().remove(backlogItems.remove(position));
+            AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
 
             notifyDataSetChanged();
         }
@@ -166,8 +165,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             editor.apply();
         }
 
-        series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
+        App.getInstance().getBacklog().remove(backlogItems.remove(position));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
 
         notifyDataSetChanged();
     }

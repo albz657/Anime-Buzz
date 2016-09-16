@@ -240,7 +240,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         App.getInstance().getUserAnimeList().add(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)), App.getInstance().getDatabase());
 
         if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().clear();
@@ -266,7 +266,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         App.getInstance().getUserAnimeList().remove(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)), App.getInstance().getDatabase());
 
         if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().remove(item);

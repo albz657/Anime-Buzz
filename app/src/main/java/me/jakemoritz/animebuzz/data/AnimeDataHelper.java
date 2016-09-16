@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
@@ -85,7 +86,6 @@ public class AnimeDataHelper {
         contentValues.put(KEY_ANNID, series.getANNID());
         contentValues.put(KEY_SIMULCAST, series.getSimulcast());
         contentValues.put(KEY_SIMULCAST_DELAY, series.getSimulcast_delay());
-        contentValues.put(KEY_BACKLOG, new Gson().toJson(series.getBacklog()));
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
         contentValues.put(KEY_EPISODES_WATCHED, series.getEpisodesWatched());
@@ -110,7 +110,6 @@ public class AnimeDataHelper {
         contentValues.put(KEY_ANNID, series.getANNID());
         contentValues.put(KEY_SIMULCAST, series.getSimulcast());
         contentValues.put(KEY_SIMULCAST_DELAY, series.getSimulcast_delay());
-        contentValues.put(KEY_BACKLOG, new Gson().toJson(series.getBacklog()));
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME, series.getNextEpisodeAirtime());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME, series.getNextEpisodeSimulcastTime());
         contentValues.put(KEY_EPISODES_WATCHED, series.getEpisodesWatched());
@@ -123,9 +122,9 @@ public class AnimeDataHelper {
         return true;
     }
 
-    public void saveSeriesList(SeriesList seriesList) {
-
+    public void saveSeriesList(SeriesList seriesList, SQLiteDatabase database) {
         Cursor cursor = null;
+
         for (Series series : seriesList) {
             cursor = getSeriesCursor(series.getMALID());
             if (cursor.getCount() != 0) {
@@ -192,17 +191,60 @@ public class AnimeDataHelper {
         String nextEpisodeAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
         String nextEpisodeSimulcastAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
 
-        Type type = new TypeToken<ArrayList<Long>>() {
-        }.getType();
-        List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(KEY_BACKLOG)), type);
+        Series series = new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24);
 
-        return new Series(airdate, name, MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, backlog, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24);
+        if (DatabaseHelper.getInstance(App.getInstance()).isUpgrading()){
+            Type type = new TypeToken<ArrayList<Long>>() {
+            }.getType();
+            List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(KEY_BACKLOG)), type);
+
+            series.setBacklog(backlog);
+        }
+
+        return series;
+    }
+
+    public SeriesList getAllSeries(SQLiteDatabase database) {
+        SeriesList allSeries = new SeriesList();
+        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
+
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            Series series = getSeriesFromCursor(cursor);
+            allSeries.add(series);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+
+        return allSeries;
     }
 
     // misc
 
-    public void upgradeDatabaseVersionOne(SQLiteDatabase database){
+    public void upgradeDatabaseVersionToVersionTwo(SQLiteDatabase database) {
         database.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
         database.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT");
+    }
+
+    public void upgradeDatabaseVersionToVersionThree(SQLiteDatabase database) {
+        SeriesList allSeries = getAllSeries(database);
+
+        List<BacklogItem> oldBacklogItems = new ArrayList<>();
+
+        for (Series series : allSeries) {
+            if (!series.getBacklog().isEmpty()) {
+                for (Long backlogTime : series.getBacklog()) {
+                    oldBacklogItems.add(new BacklogItem(series, backlogTime));
+                }
+            }
+        }
+
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
+        database.execSQL(buildAnimeTable());
+
+        saveSeriesList(allSeries, database);
+
+        BacklogDataHelper.getInstance().upgradeToBacklogTable(oldBacklogItems, database);
     }
 }

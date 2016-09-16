@@ -91,7 +91,11 @@ public class BacklogDataHelper {
 
     // misc
 
-    public void upgradeToBacklogTable(SQLiteDatabase database){
+    public void upgradeToBacklogTable(List<BacklogItem> oldBacklogItems, SQLiteDatabase database){
+        database.execSQL(buildBacklogTable());
 
+        for (BacklogItem backlogItem : oldBacklogItems){
+            insertBacklogItem(backlogItem);
+        }
     }
 }

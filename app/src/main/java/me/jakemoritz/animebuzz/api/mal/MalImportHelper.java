@@ -89,7 +89,7 @@ public class MalImportHelper {
 //            App.getInstance().getUserAnimeList().addAll(remainingSeries);
         }
 
-        AnimeDataHelper.getInstance().saveSeriesList(removedSeries);
+        AnimeDataHelper.getInstance().saveSeriesList(removedSeries, App.getInstance().getDatabase());
 
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {
