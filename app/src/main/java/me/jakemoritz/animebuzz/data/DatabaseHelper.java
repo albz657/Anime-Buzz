@@ -73,6 +73,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper mInstance;
 
+    private boolean isUpdating = false;
+
     private DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
@@ -134,6 +136,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        isUpdating = true;
         switch (oldVersion) {
             case 1:
                 db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
@@ -142,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 upgradeAlarms(db);
 
         }
+        isUpdating = false;
     }
 
     public void upgradeAlarms(SQLiteDatabase database) {
@@ -383,10 +387,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String name = res.getString(res.getColumnIndex(DatabaseHelper.KEY_ALARM_NAME));
         int MALID = -1;
 
-        try {
+        if (!isUpdating){
             MALID = res.getInt(res.getColumnIndex(DatabaseHelper.KEY_ALARM_MALID));
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         return new AlarmHolder(name, time, id, MALID);
