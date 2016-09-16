@@ -478,26 +478,29 @@ public class App extends Application {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
 
         database.beginTransaction();
-
-        seasonsList = databaseHelper.getAllSeasonMetadata();
+        try {
+            seasonsList = databaseHelper.getAllSeasonMetadata();
 //        setCurrentOrNewer();
-        setCurrent();
-        allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
+            setCurrent();
+            allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
 
-        String currentlyBrowsingSeasonName = getLatestSeasonName();
+            String currentlyBrowsingSeasonName = getLatestSeasonName();
 
-        for (Season season : allAnimeSeasons) {
-            if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
-                currentlyBrowsingSeason = season;
+            for (Season season : allAnimeSeasons) {
+                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
+                    currentlyBrowsingSeason = season;
+                }
             }
+
+            userAnimeList = loadUserList();
+            backlog = loadBacklog();
+            alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
+
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
         }
 
-        userAnimeList = loadUserList();
-        backlog = loadBacklog();
-        alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
-
-        database.setTransactionSuccessful();
-        database.endTransaction();
     }
 
     private SeriesList loadUserList() {

@@ -41,8 +41,21 @@ public class AlarmsDataHelper {
     public void upgradeAlarms(SQLiteDatabase database) {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
-        database.execSQL("ALTER TABLE " + TABLE_ALARMS + " RENAME TO " + "TABLE_ALARMS_OLD");
-        database.execSQL(buildAlarmTable());
+        database.beginTransactionNonExclusive();
+        try{
+            database.execSQL("ALTER TABLE " + TABLE_ALARMS + " RENAME TO " + "TABLE_ALARMS_OLD");
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+
+        database.beginTransactionNonExclusive();
+        try{
+            database.execSQL(buildAlarmTable());
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
 
         DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
 
