@@ -147,7 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void upgradeAlarms(SQLiteDatabase database) {
         Map<Integer, AlarmHolder> oldAlarms = getAllAlarms(database);
 
-        deleteAllAlarms(database);
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
         database.execSQL(buildAlarmTable());
 
         App.getInstance().cancelAllAlarms(oldAlarms);
