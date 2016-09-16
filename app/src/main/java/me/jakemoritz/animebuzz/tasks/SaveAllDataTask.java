@@ -5,7 +5,9 @@ import android.os.AsyncTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Season;
@@ -26,12 +28,12 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
                 allAnime.addAll(season.getSeasonSeries());
             }
 
-            databaseHelper.saveSeriesList(allAnime);
+            AnimeDataHelper.getInstance().saveSeriesList(allAnime);
 
-            databaseHelper.saveSeriesList(App.getInstance().getUserAnimeList());
+            AnimeDataHelper.getInstance().saveSeriesList(App.getInstance().getUserAnimeList());
 
             for (SeasonMetadata metadata : App.getInstance().getSeasonsList()){
-                databaseHelper.saveSeasonMetadata(metadata);
+                SeasonDataHelper.getInstance().saveSeasonMetadata(metadata);
             }
 
             for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){

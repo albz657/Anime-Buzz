@@ -10,6 +10,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.ann.GetImageTask;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -88,7 +89,7 @@ public class MalImportHelper {
 //            App.getInstance().getUserAnimeList().addAll(remainingSeries);
         }
 
-        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
+        AnimeDataHelper.getInstance().saveSeriesList(removedSeries);
 
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {

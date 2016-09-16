@@ -34,7 +34,9 @@ import java.util.Set;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
@@ -299,7 +301,7 @@ public class App extends Application {
             if (!series.getSeason().equals(latestSeasonName)) {
                 removeAlarm(series);
                 series.setInUserList(false);
-                DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
+                AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
                 iterator.remove();
             }
         }
@@ -373,9 +375,9 @@ public class App extends Application {
 
         setAlarm(newAlarm);
 
-        alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
+        alarms.add(newAlarm);
 
-        DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
         // debug code
 //        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 //        String formattedNext = format.format(nextEpisode.getTime());
@@ -480,10 +482,10 @@ public class App extends Application {
 
         database.beginTransaction();
         try {
-            seasonsList = databaseHelper.getAllSeasonMetadata();
+            seasonsList = SeasonDataHelper.getInstance().getAllSeasonMetadata();
 //        setCurrentOrNewer();
             setCurrent();
-            allAnimeSeasons = databaseHelper.getAllAnimeSeasons();
+            allAnimeSeasons = SeasonDataHelper.getInstance().getAllAnimeSeasons();
 
             String currentlyBrowsingSeasonName = getLatestSeasonName();
 

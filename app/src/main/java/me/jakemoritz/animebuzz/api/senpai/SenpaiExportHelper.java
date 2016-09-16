@@ -19,6 +19,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
@@ -196,7 +197,7 @@ public class SenpaiExportHelper {
                     App.getInstance().setCurrentlyBrowsingSeason(response.body());
 
                     DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
-                    databaseHelper.saveSeasonMetadata(response.body().getSeasonMetadata());
+                    SeasonDataHelper.getInstance().saveSeasonMetadata(response.body().getSeasonMetadata());
 
                     fragment.seasonDataRetrieved(response.body());
                 } else {

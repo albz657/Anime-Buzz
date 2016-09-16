@@ -38,27 +38,7 @@ public class AlarmsDataHelper {
         return mInstance;
     }
 
-    public void upgradeAlarms(SQLiteDatabase database) {
-        List<AlarmHolder> oldAlarms = getAllAlarms(database);
-
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
-        database.execSQL(buildAlarmTable());
-
-        DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
-
-        App.getInstance().cancelAllAlarms(oldAlarms);
-
-        for (AlarmHolder alarm : oldAlarms) {
-            alarm.setMALID(alarm.getId());
-            insertAlarm(alarm, database);
-        }
-
-        List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
-
-        App.getInstance().setAlarms(upgradedAlarms);
-
-        App.getInstance().rescheduleAlarms();
-    }
+    // insertion
 
     public long insertAlarm(AlarmHolder alarm, SQLiteDatabase database) {
         ContentValues contentValues = new ContentValues();
@@ -79,6 +59,18 @@ public class AlarmsDataHelper {
         App.getInstance().getDatabase().update(TABLE_ALARMS, contentValues, KEY_ALARM_ID + " =  ? ", new String[]{String.valueOf(alarm.getId())});
         return true;
     }
+
+    public void saveAlarm(AlarmHolder alarmHolder) {
+        Cursor cursor = getAlarmCursor(alarmHolder.getId());
+        if (cursor.getCount() != 0) {
+            updateAlarm(alarmHolder);
+        } else {
+            insertAlarm(alarmHolder, DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
+        }
+        cursor.close();
+    }
+
+    // retrieval
 
     public List<AlarmHolder> getAllAlarms(SQLiteDatabase database) {
         List<AlarmHolder> alarms = new ArrayList<>();
@@ -113,15 +105,8 @@ public class AlarmsDataHelper {
         return new AlarmHolder(name, time, id, MALID);
     }
 
-    public void saveAlarm(AlarmHolder alarmHolder) {
-        Cursor cursor = getAlarmCursor(alarmHolder.getId());
-        if (cursor.getCount() != 0) {
-            updateAlarm(alarmHolder);
-        } else {
-            insertAlarm(alarmHolder, DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
-        }
-        cursor.close();
-    }
+
+    // deletion
 
     public Integer deleteAlarm(int id) {
         return App.getInstance().getDatabase().delete(TABLE_ALARMS, KEY_ALARM_ID + " = ? ", new String[]{String.valueOf(id)});
@@ -129,5 +114,29 @@ public class AlarmsDataHelper {
 
     public void deleteAllAlarms(SQLiteDatabase database) {
         database.delete(TABLE_ALARMS, null, null);
+    }
+
+    // misc
+
+    public void upgradeAlarms(SQLiteDatabase database) {
+        List<AlarmHolder> oldAlarms = getAllAlarms(database);
+
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
+        database.execSQL(buildAlarmTable());
+
+        DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
+
+        App.getInstance().cancelAllAlarms(oldAlarms);
+
+        for (AlarmHolder alarm : oldAlarms) {
+            alarm.setMALID(alarm.getId());
+            insertAlarm(alarm, database);
+        }
+
+        List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
+
+        App.getInstance().setAlarms(upgradedAlarms);
+
+        App.getInstance().rescheduleAlarms();
     }
 }

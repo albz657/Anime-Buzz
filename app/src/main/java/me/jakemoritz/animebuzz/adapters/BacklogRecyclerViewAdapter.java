@@ -22,6 +22,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
@@ -148,7 +149,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
             series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-            DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(new SeriesList(Arrays.asList(series)));
+            AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
 
             notifyDataSetChanged();
         }
@@ -166,7 +167,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         }
 
         series.getBacklog().remove(seriesList.remove(position).getAlarmTime());
-        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(new SeriesList(Arrays.asList(series)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)));
 
         notifyDataSetChanged();
     }

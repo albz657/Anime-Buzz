@@ -27,6 +27,7 @@ import java.io.File;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
@@ -244,7 +245,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             for (Series series : App.getInstance().getUserAnimeList()) {
                 series.setInUserList(false);
             }
-            DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(App.getInstance().getUserAnimeList());
+            AnimeDataHelper.getInstance().saveSeriesList(App.getInstance().getUserAnimeList());
             App.getInstance().getUserAnimeList().clear();
         } else {
             for (Series series : App.getInstance().getUserAnimeList()) {

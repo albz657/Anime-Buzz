@@ -15,6 +15,7 @@ import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -101,7 +102,7 @@ public class MalApiClient {
         String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
-        Series series = dbHelper.getSeries(Integer.valueOf(MALID));
+        Series series = AnimeDataHelper.getInstance().getSeries(Integer.valueOf(MALID));
 
         if (series != null) {
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
@@ -191,7 +192,7 @@ public class MalApiClient {
                             iterator.remove();
                         }
 
-                        DatabaseHelper.getInstance(App.getInstance()).saveSeriesList(removedSeries);
+                        AnimeDataHelper.getInstance().saveSeriesList(removedSeries);
 
                         seriesFragment.malDataImported(true);
                     }

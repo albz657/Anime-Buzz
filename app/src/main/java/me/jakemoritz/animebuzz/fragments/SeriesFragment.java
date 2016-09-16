@@ -29,6 +29,7 @@ import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
+import me.jakemoritz.animebuzz.data.AnimeDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
@@ -239,7 +240,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         App.getInstance().getUserAnimeList().add(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().clear();
@@ -265,7 +266,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         App.getInstance().getUserAnimeList().remove(item);
 
         DatabaseHelper helper = DatabaseHelper.getInstance(App.getInstance());
-        helper.saveSeriesList(new SeriesList(Arrays.asList(item)));
+        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(item)));
 
         if (this instanceof CurrentlyWatchingFragment) {
             getmAdapter().getVisibleSeries().remove(item);
