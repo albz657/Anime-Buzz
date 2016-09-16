@@ -42,14 +42,9 @@ public class AlarmsDataHelper {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
         database.beginTransaction();
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
-        database.setTransactionSuccessful();
-        database.endTransaction();
 
-        database.beginTransaction();
+        database.execSQL("ALTER TABLE " + TABLE_ALARMS + " RENAME TO " + "TABLE_ALARMS_OLD");
         database.execSQL(buildAlarmTable());
-        database.setTransactionSuccessful();
-        database.endTransaction();
 
         DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
 
@@ -62,6 +57,11 @@ public class AlarmsDataHelper {
         }
 
         List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
+
+        database.execSQL("DROP TABLE IF EXISTS " + "TABLE_ALARMS_OLD");
+        database.setTransactionSuccessful();
+        database.endTransaction();
+
 
         App.getInstance().setAlarms(upgradedAlarms);
 
