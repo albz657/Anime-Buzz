@@ -412,11 +412,14 @@ public class App extends Application {
 
     public void removeAlarm(Series series) {
         int id;
-        for (AlarmHolder alarmHolder : alarms){
+        AlarmHolder alarmHolder;
+        for (Iterator iterator = alarms.iterator(); iterator.hasNext();){
+            alarmHolder = (AlarmHolder) iterator.next();
             if (alarmHolder.getMALID() == series.getMALID()){
                 id = alarmHolder.getId();
                 alarmManager.cancel(createPendingIntent(id));
                 removeAlarmFromStructure(id);
+                iterator.remove();
             }
         }
     }
