@@ -20,8 +20,10 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment {
 
@@ -95,6 +97,15 @@ public class SeasonsFragment extends SeriesFragment {
         getmAdapter().setSeriesFilter(null);
 
         App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
+
+        dummyBacklogItem();
+    }
+
+    private void dummyBacklogItem(){
+        Series test = App.getInstance().getCurrentlyBrowsingSeason().getSeasonSeries().get(0);
+        Long time = System.currentTimeMillis();
+        test.getBacklog().add(time);
+        App.getInstance().getBacklog().add(new BacklogItem(test, time));
     }
 
     public void refreshToolbar() {

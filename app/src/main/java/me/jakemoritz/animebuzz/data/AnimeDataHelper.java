@@ -61,7 +61,6 @@ public class AnimeDataHelper {
                 KEY_ANNID + " INTEGER," +
                 KEY_SIMULCAST_DELAY + " DOUBLE," +
                 KEY_SIMULCAST + " TEXT," +
-                KEY_BACKLOG + " TEXT," +
                 KEY_NEXT_EPISODE_AIRTIME + " INTEGER," +
                 KEY_NEXT_EPISODE_SIMULCAST_AIRTIME + " INTEGER, " +
                 KEY_EPISODES_WATCHED + " INTEGER, " +
@@ -74,7 +73,7 @@ public class AnimeDataHelper {
 
     // insertion
 
-    private boolean insertSeries(Series series) {
+    private boolean insertSeries(Series series, SQLiteDatabase database) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_AIRDATE, series.getAirdate());
         contentValues.put(KEY_NAME, series.getName());
@@ -94,7 +93,7 @@ public class AnimeDataHelper {
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24, series.getNextEpisodeAirtimeFormatted24());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24, series.getNextEpisodeSimulcastTimeFormatted24());
 
-        App.getInstance().getDatabase().insert(TABLE_ANIME, null, contentValues);
+        database.insert(TABLE_ANIME, null, contentValues);
         return true;
     }
 
@@ -126,11 +125,11 @@ public class AnimeDataHelper {
         Cursor cursor = null;
 
         for (Series series : seriesList) {
-            cursor = getSeriesCursor(series.getMALID());
+            cursor = getSeriesCursor(series.getMALID(), database);
             if (cursor.getCount() != 0) {
                 updateSeries(series);
             } else {
-                insertSeries(series);
+                insertSeries(series, database);
             }
         }
         if (cursor != null) {
@@ -140,8 +139,8 @@ public class AnimeDataHelper {
 
     // retrieval
 
-    public Series getSeries(int MALID) {
-        Cursor cursor = getSeriesCursor(MALID);
+    public Series getSeries(int MALID, SQLiteDatabase database) {
+        Cursor cursor = getSeriesCursor(MALID, database);
         Series series = null;
         if (cursor.getCount() > 0) {
             cursor.moveToFirst();
@@ -152,8 +151,8 @@ public class AnimeDataHelper {
         return series;
     }
 
-    private Cursor getSeriesCursor(int MALID) {
-        return App.getInstance().getDatabase().rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
+    private Cursor getSeriesCursor(int MALID, SQLiteDatabase database) {
+        return database.rawQuery("SELECT * FROM " + TABLE_ANIME + " WHERE " + KEY_MALID + " = ?", new String[]{String.valueOf(MALID)});
     }
 
     public SeriesList getSeriesBySeason(String seasonName) {

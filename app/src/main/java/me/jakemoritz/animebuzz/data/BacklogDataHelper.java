@@ -39,12 +39,12 @@ public class BacklogDataHelper {
 
     // insertion
 
-    public long insertBacklogItem(BacklogItem backlogItem) {
+    public long insertBacklogItem(BacklogItem backlogItem, SQLiteDatabase database) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(KEY_BACKLOG_TIME, backlogItem.getAlarmTime());
         contentValues.put(KEY_BACKLOD_MALID, backlogItem.getSeries().getMALID());
 
-        return App.getInstance().getDatabase().insert(TABLE_BACKLOG, null, contentValues);
+        return database.insert(TABLE_BACKLOG, null, contentValues);
     }
 
     // retrieval
@@ -74,7 +74,7 @@ public class BacklogDataHelper {
         long time = res.getLong(res.getColumnIndex(KEY_BACKLOG_TIME));
         int MALID = res.getInt(res.getColumnIndex(KEY_BACKLOD_MALID));
 
-        Series series = AnimeDataHelper.getInstance().getSeries(MALID);
+        Series series = AnimeDataHelper.getInstance().getSeries(MALID, App.getInstance().getDatabase());
 
         return new BacklogItem(series, time, id);
     }
@@ -95,7 +95,7 @@ public class BacklogDataHelper {
         database.execSQL(buildBacklogTable());
 
         for (BacklogItem backlogItem : oldBacklogItems){
-            insertBacklogItem(backlogItem);
+            insertBacklogItem(backlogItem, database);
         }
     }
 }

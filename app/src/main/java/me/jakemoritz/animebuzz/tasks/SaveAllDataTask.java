@@ -43,7 +43,7 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
             }
 
             for (BacklogItem backlogItem : App.getInstance().getBacklog()){
-                BacklogDataHelper.getInstance().insertBacklogItem(backlogItem);
+                BacklogDataHelper.getInstance().insertBacklogItem(backlogItem, App.getInstance().getDatabase());
             }
 
             App.getInstance().getDatabase().setTransactionSuccessful();

@@ -102,7 +102,7 @@ public class MalApiClient {
         String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
-        Series series = AnimeDataHelper.getInstance().getSeries(Integer.valueOf(MALID));
+        Series series = AnimeDataHelper.getInstance().getSeries(Integer.valueOf(MALID), App.getInstance().getDatabase());
 
         if (series != null) {
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
