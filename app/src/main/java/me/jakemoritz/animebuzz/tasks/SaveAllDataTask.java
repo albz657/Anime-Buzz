@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -28,7 +29,7 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
         }
 
         for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
-            databaseHelper.saveAlarm(alarmHolder);
+            AlarmsDataHelper.getInstance().saveAlarm(alarmHolder);
         }
 
         return null;

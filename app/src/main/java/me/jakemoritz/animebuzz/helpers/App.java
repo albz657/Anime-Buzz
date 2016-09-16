@@ -33,6 +33,7 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
@@ -371,8 +372,8 @@ public class App extends Application {
 
         setAlarm(newAlarm);
 
-        DatabaseHelper.getInstance(this).saveAlarm(newAlarm);
-        alarms = DatabaseHelper.getInstance(this).getAllAlarms(database);
+        AlarmsDataHelper.getInstance().saveAlarm(newAlarm);
+        alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
 
         DatabaseHelper.getInstance(this).saveSeriesList(new SeriesList(Arrays.asList(series)));
         // debug code
@@ -385,7 +386,7 @@ public class App extends Application {
     public void switchAlarmTiming() {
         alarms.clear();
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-        dbHelper.deleteAllAlarms(App.getInstance().getDatabase());
+        AlarmsDataHelper.getInstance().deleteAllAlarms(App.getInstance().getDatabase());
 
         for (Series series : userAnimeList) {
             makeAlarm(series);
@@ -394,7 +395,7 @@ public class App extends Application {
 
     public void removeAlarmFromStructure(int id) {
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
-        dbHelper.deleteAlarm(id);
+        AlarmsDataHelper.getInstance().deleteAlarm(id);
     }
 
     private PendingIntent createPendingIntent(int id){
@@ -490,7 +491,7 @@ public class App extends Application {
 
         userAnimeList = loadUserList();
         backlog = loadBacklog();
-        alarms = databaseHelper.getAllAlarms(database);
+        alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
     }
 
     private SeriesList loadUserList() {

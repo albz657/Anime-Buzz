@@ -10,7 +10,7 @@ import java.util.List;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 
-public class AlaramsDataHelper {
+public class AlarmsDataHelper {
 
     private static String TABLE_ALARMS = "TABLE_ALARMS";
 
@@ -20,7 +20,7 @@ public class AlaramsDataHelper {
     private static final String KEY_ALARM_TIME = "alarmtime";
     private static final String KEY_ALARM_MALID ="alarmmalid";
 
-    private static AlaramsDataHelper mInstance;
+    private static AlarmsDataHelper mInstance;
 
     public String buildAlarmTable() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_ALARMS +
@@ -31,9 +31,9 @@ public class AlaramsDataHelper {
                 ")";
     }
 
-    public static synchronized AlaramsDataHelper getInstance() {
+    public static synchronized AlarmsDataHelper getInstance() {
         if (mInstance == null) {
-            mInstance = new AlaramsDataHelper();
+            mInstance = new AlarmsDataHelper();
         }
         return mInstance;
     }

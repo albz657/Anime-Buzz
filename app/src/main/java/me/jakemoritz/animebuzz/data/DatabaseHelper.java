@@ -121,7 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(buildAnimeTable());
         db.execSQL(buildSeasonTable());
-        db.execSQL(AlaramsDataHelper.getInstance().buildAlarmTable());
+        db.execSQL(AlarmsDataHelper.getInstance().buildAlarmTable());
     }
 
     @Override
@@ -132,7 +132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
                 db.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT");
             case 2:
-                AlaramsDataHelper.getInstance().upgradeAlarms(db);
+                AlarmsDataHelper.getInstance().upgradeAlarms(db);
 
         }
         isUpgrading = false;

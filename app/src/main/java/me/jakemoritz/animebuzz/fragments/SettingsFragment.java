@@ -26,6 +26,7 @@ import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
@@ -271,7 +272,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         App.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
-        DatabaseHelper.getInstance(App.getInstance()).deleteAllAlarms(App.getInstance().getDatabase());
+        AlarmsDataHelper.getInstance().deleteAllAlarms(App.getInstance().getDatabase());
 
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         if (!username.isEmpty()) {
