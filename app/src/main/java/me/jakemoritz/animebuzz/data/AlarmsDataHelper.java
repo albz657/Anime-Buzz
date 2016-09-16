@@ -12,13 +12,14 @@ import me.jakemoritz.animebuzz.models.AlarmHolder;
 
 public class AlarmsDataHelper {
 
-    private static String TABLE_ALARMS = "TABLE_ALARMS";
+    private static String TABLE_ALARMS_1 = "TABLE_ALARMS";
+    private static String TABLE_ALARMS = "TABLE_ALARMS_2";
 
     // Alarm columns
     private static final String KEY_ALARM_ID = "alarmid";
     private static final String KEY_ALARM_NAME = "alarmname";
     private static final String KEY_ALARM_TIME = "alarmtime";
-    private static final String KEY_ALARM_MALID ="alarmmalid";
+    private static final String KEY_ALARM_MALID = "alarmmalid";
 
     private static AlarmsDataHelper mInstance;
 
@@ -41,21 +42,8 @@ public class AlarmsDataHelper {
     public void upgradeAlarms(SQLiteDatabase database) {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
-        database.beginTransactionNonExclusive();
-        try{
-            database.execSQL("ALTER TABLE " + TABLE_ALARMS + " RENAME TO " + "TABLE_ALARMS_OLD");
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
-        }
-
-        database.beginTransactionNonExclusive();
-        try{
-            database.execSQL(buildAlarmTable());
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
-        }
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS_1);
+        database.execSQL(buildAlarmTable());
 
         DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
 
@@ -63,13 +51,10 @@ public class AlarmsDataHelper {
 
         for (AlarmHolder alarm : oldAlarms) {
             alarm.setMALID(alarm.getId());
-            alarm.setId(-1);
             insertAlarm(alarm, database);
         }
 
         List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
-
-        database.execSQL("DROP TABLE IF EXISTS " + "TABLE_ALARMS_OLD");
 
         App.getInstance().setAlarms(upgradedAlarms);
 
@@ -123,7 +108,7 @@ public class AlarmsDataHelper {
         String name = res.getString(res.getColumnIndex(KEY_ALARM_NAME));
         int MALID = -1;
 
-        if (!DatabaseHelper.getInstance(App.getInstance()).isUpgrading()){
+        if (!DatabaseHelper.getInstance(App.getInstance()).isUpgrading()) {
             MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
         }
 
