@@ -6,12 +6,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.AnimeDataHelper;
-import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
-import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -40,10 +38,6 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
 
             for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
                 AlarmsDataHelper.getInstance().saveAlarm(alarmHolder);
-            }
-
-            for (BacklogItem backlogItem : App.getInstance().getBacklog()){
-                BacklogDataHelper.getInstance().insertBacklogItem(backlogItem, App.getInstance().getDatabase());
             }
 
             App.getInstance().getDatabase().setTransactionSuccessful();
