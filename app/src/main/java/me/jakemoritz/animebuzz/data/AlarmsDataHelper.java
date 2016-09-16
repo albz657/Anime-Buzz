@@ -12,8 +12,7 @@ import me.jakemoritz.animebuzz.models.AlarmHolder;
 
 public class AlarmsDataHelper {
 
-    private static String TABLE_ALARMS_1 = "TABLE_ALARMS";
-    private static String TABLE_ALARMS = "TABLE_ALARMS_2";
+    private static String TABLE_ALARMS = "TABLE_ALARMS";
 
     // Alarm columns
     private static final String KEY_ALARM_ID = "alarmid";
@@ -42,7 +41,7 @@ public class AlarmsDataHelper {
     public void upgradeAlarms(SQLiteDatabase database) {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS_1);
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
         database.execSQL(buildAlarmTable());
 
         DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
