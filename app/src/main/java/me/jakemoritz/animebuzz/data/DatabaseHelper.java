@@ -69,7 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String KEY_ALARM_ID = "alarmid";
     private static final String KEY_ALARM_NAME = "alarmname";
     private static final String KEY_ALARM_TIME = "alarmtime";
-    private static final String KEY_ALARM_MALID =" alarmmalid";
+    private static final String KEY_ALARM_MALID ="alarmmalid";
 
     private static DatabaseHelper mInstance;
 
