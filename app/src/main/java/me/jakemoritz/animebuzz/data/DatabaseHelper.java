@@ -154,6 +154,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
         database.execSQL(buildAlarmTable());
 
+        isUpdating = false;
+
         App.getInstance().cancelAllAlarms(oldAlarms);
 
         for (AlarmHolder alarm : oldAlarms.values()) {
