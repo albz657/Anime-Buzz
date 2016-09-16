@@ -148,8 +148,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Map<Integer, AlarmHolder> oldAlarms = getAllAlarms(database);
 
         deleteAllAlarms(database);
+        database.execSQL(buildAlarmTable());
 
-        App.getInstance().cancelAllAlarms();
+        App.getInstance().cancelAllAlarms(oldAlarms);
 
         for (AlarmHolder alarm : oldAlarms.values()) {
             insertAlarm(alarm, database);

@@ -405,7 +405,7 @@ public class App extends Application {
         return PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
     }
 
-    public void cancelAllAlarms(){
+    public void cancelAllAlarms(Map<Integer, AlarmHolder> alarms){
         for (AlarmHolder alarmHolder : alarms.values()){
             alarmManager.cancel(createPendingIntent(alarmHolder.getId()));
         }

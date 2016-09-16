@@ -268,7 +268,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         App.getInstance().getBacklog().clear();
 
-        App.getInstance().cancelAllAlarms();
+        App.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
         DatabaseHelper.getInstance(App.getInstance()).deleteAllAlarms(App.getInstance().getDatabase());
