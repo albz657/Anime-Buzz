@@ -17,7 +17,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         int intentExtra = intent.getIntExtra("id", -1);
 
         AlarmHolder thisAlarm = null;
-        for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
+        for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
             if (alarmHolder.getId() == intentExtra){
                 thisAlarm = alarmHolder;
                 break;
@@ -39,6 +39,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 helper.createNewEpisodeNotification(series);
 
                 App.getInstance().setNotificationReceived(true);
+
+                App.getInstance().getAlarms().remove(thisAlarm);
 
                 series.getBacklog().add(thisAlarm.getAlarmTime());
                 App.getInstance().getBacklog().add(new BacklogItem(series, thisAlarm.getAlarmTime()));

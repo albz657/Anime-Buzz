@@ -11,10 +11,8 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.helpers.App;
@@ -149,7 +147,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void upgradeAlarms(SQLiteDatabase database) {
-        Map<Integer, AlarmHolder> oldAlarms = getAllAlarms(database);
+        List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
         database.execSQL(buildAlarmTable());
@@ -158,13 +156,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         App.getInstance().cancelAllAlarms(oldAlarms);
 
-        for (AlarmHolder alarm : oldAlarms.values()) {
+        for (AlarmHolder alarm : oldAlarms) {
             alarm.setMALID(alarm.getId());
             alarm.setId(-1);
             insertAlarm(alarm, database);
         }
 
-        Map<Integer, AlarmHolder> upgradedAlarms = getAllAlarms(database);
+        List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
 
         App.getInstance().setAlarms(upgradedAlarms);
 
@@ -363,14 +361,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return seasonList;
     }
 
-    public Map<Integer, AlarmHolder> getAllAlarms(SQLiteDatabase database) {
-        Map<Integer, AlarmHolder> alarms = new HashMap<>();
+    public List<AlarmHolder> getAllAlarms(SQLiteDatabase database) {
+        List<AlarmHolder> alarms = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
-            alarms.put(tempAlarm.getId(), tempAlarm);
+            alarms.add(tempAlarm);
             cursor.moveToNext();
         }
 

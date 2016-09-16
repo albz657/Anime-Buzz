@@ -27,7 +27,7 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
             databaseHelper.saveSeasonMetadata(metadata);
         }
 
-        for (AlarmHolder alarmHolder : App.getInstance().getAlarms().values()){
+        for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
             databaseHelper.saveAlarm(alarmHolder);
         }
 

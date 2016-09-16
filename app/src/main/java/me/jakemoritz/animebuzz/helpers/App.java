@@ -25,12 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
@@ -62,7 +60,7 @@ public class App extends Application {
     private SeasonList allAnimeSeasons;
     private Set<SeasonMetadata> seasonsList;
     private ObservableArrayList<BacklogItem> backlog;
-    private Map<Integer, AlarmHolder> alarms;
+    private List<AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean initializingGotImages = false;
@@ -90,7 +88,7 @@ public class App extends Application {
         userAnimeList = new SeriesList();
         seasonsList = new HashSet<>();
         backlog = new ObservableArrayList<>();
-        alarms = new HashMap<>();
+        alarms = new ArrayList<>();
         alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
 
         database = DatabaseHelper.getInstance(this).getWritableDatabase();
@@ -101,7 +99,7 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
             rescheduleAlarms();
         }
@@ -112,7 +110,7 @@ public class App extends Application {
             long time = System.currentTimeMillis();
             time += 5000L;
 //            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
-            ((AlarmHolder) alarms.values().toArray()[0]).setAlarmTime(time);
+            alarms.get(0).setAlarmTime(time);
 
             /*time += 5000L;
             alarms.get(1).setAlarmTime(time);
@@ -309,7 +307,7 @@ public class App extends Application {
     /* ALARMS */
 
     public void rescheduleAlarms() {
-        for (AlarmHolder alarm : App.getInstance().getAlarms().values()) {
+        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
             setAlarm(alarm);
         }
     }
@@ -405,24 +403,20 @@ public class App extends Application {
         return PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
     }
 
-    public void cancelAllAlarms(Map<Integer, AlarmHolder> alarms){
-        for (AlarmHolder alarmHolder : alarms.values()){
+    public void cancelAllAlarms(List<AlarmHolder> alarms){
+        for (AlarmHolder alarmHolder : alarms){
             alarmManager.cancel(createPendingIntent(alarmHolder.getId()));
         }
     }
 
     public void removeAlarm(Series series) {
-        int id = -1;
-        for (AlarmHolder alarmHolder : alarms.values()){
+        int id;
+        for (AlarmHolder alarmHolder : alarms){
             if (alarmHolder.getMALID() == series.getMALID()){
                 id = alarmHolder.getId();
-                break;
+                alarmManager.cancel(createPendingIntent(id));
+                removeAlarmFromStructure(id);
             }
-        }
-
-        if (id != -1){
-            alarmManager.cancel(createPendingIntent(id));
-            removeAlarmFromStructure(id);
         }
     }
 
@@ -566,7 +560,7 @@ public class App extends Application {
         this.justLaunchedMyShows = justLaunchedMyShows;
     }
 
-    public Map<Integer, AlarmHolder> getAlarms() {
+    public List<AlarmHolder> getAlarms() {
         return alarms;
     }
 
@@ -622,7 +616,7 @@ public class App extends Application {
         this.postInitializing = postInitializing;
     }
 
-    public void setAlarms(Map<Integer, AlarmHolder> alarms) {
+    public void setAlarms(List<AlarmHolder> alarms) {
         this.alarms = alarms;
     }
 
