@@ -323,6 +323,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public void saveSeriesList(SeriesList seriesList) {
+
         Cursor cursor = null;
         for (Series series : seriesList) {
             cursor = getSeriesCursor(series.getMALID());

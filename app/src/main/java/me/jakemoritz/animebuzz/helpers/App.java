@@ -476,6 +476,9 @@ public class App extends Application {
 
     public void loadData() {
         DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
+
+        database.beginTransaction();
+
         seasonsList = databaseHelper.getAllSeasonMetadata();
 //        setCurrentOrNewer();
         setCurrent();
@@ -492,6 +495,9 @@ public class App extends Application {
         userAnimeList = loadUserList();
         backlog = loadBacklog();
         alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
+
+        database.setTransactionSuccessful();
+        database.endTransaction();
     }
 
     private SeriesList loadUserList() {
