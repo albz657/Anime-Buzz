@@ -153,6 +153,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         App.getInstance().cancelAllAlarms(oldAlarms);
 
         for (AlarmHolder alarm : oldAlarms.values()) {
+            alarm.setMALID(alarm.getId());
+            alarm.setId(-1);
             insertAlarm(alarm, database);
         }
 

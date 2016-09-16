@@ -369,7 +369,7 @@ public class App extends Application {
 
         Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
 
-        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID());
+        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), -1, series.getMALID());
 
         setAlarm(newAlarm);
 
