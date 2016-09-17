@@ -72,7 +72,12 @@ public class NotificationHelper {
         String ringtonePref = sharedPreferences.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
         Uri ringtoneUri = Uri.parse(ringtonePref);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
-        String name = ringtone.getTitle(App.getInstance());
+        String ringtoneName = "Silent";
+        if (ringtone != null){
+            if (ringtone.getTitle(App.getInstance()) != null){
+                ringtoneName = ringtone.getTitle(App.getInstance());
+            }
+        }
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
@@ -95,7 +100,7 @@ public class NotificationHelper {
         mBuilder.setContentIntent(resultPendingIntent);
         NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (!name.equals("Silent")){
+        if (!ringtoneName.equals("Silent")){
             mBuilder.setSound(ringtoneUri);
         }
         Notification notification = mBuilder.build();
