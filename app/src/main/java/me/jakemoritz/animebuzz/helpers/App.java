@@ -103,7 +103,7 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-            dummyAlarm();
+//            dummyAlarm();
 
             rescheduleAlarms();
         }

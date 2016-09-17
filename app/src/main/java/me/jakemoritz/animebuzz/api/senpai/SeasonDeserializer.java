@@ -116,6 +116,9 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                 final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
 
                 if (seasonName.equals(App.getInstance().getLatestSeasonName())){
+                    if (series.getMALID() == 32171){
+                        Log.d(TAG, "x");
+                    }
                     App.getInstance().generateNextEpisodeTimes(series, true);
                     App.getInstance().generateNextEpisodeTimes(series, false);
 
