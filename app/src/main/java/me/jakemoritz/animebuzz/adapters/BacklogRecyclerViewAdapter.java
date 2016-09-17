@@ -23,6 +23,7 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.data.AnimeDataHelper;
+import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -147,7 +148,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            App.getInstance().getBacklog().remove(backlogItems.remove(position));
+            BacklogItem removedItem = backlogItems.remove(position);
+            App.getInstance().getBacklog().remove(removedItem);
+            BacklogDataHelper.getInstance().deleteBacklogItem(removedItem.getId());
             AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
 
             notifyDataSetChanged();
@@ -165,7 +168,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             editor.apply();
         }
 
-        App.getInstance().getBacklog().remove(backlogItems.remove(position));
+        BacklogItem removedItem = backlogItems.remove(position);
+        App.getInstance().getBacklog().remove(removedItem);
+        BacklogDataHelper.getInstance().deleteBacklogItem(removedItem.getId());
         AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
 
         notifyDataSetChanged();
