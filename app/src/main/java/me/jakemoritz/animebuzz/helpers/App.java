@@ -105,7 +105,7 @@ public class App extends Application {
             //            backlogDummyData();
 //            dummyAlarm();
 
-            rescheduleAlarms();
+            setAlarmsAfterClosed();
         }
     }
 
@@ -310,8 +310,26 @@ public class App extends Application {
 
     /* ALARMS */
 
-    public void rescheduleAlarms() {
-        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+    public void resetAlarms(){
+        cancelAllAlarms(alarms);
+
+        alarms.clear();
+
+        database.beginTransaction();
+        try {
+            AlarmsDataHelper.getInstance().deleteAllAlarms(database);
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+
+        for (Series series : userAnimeList){
+            makeAlarm(series);
+        }
+    }
+
+    public void setAlarmsAfterClosed() {
+        for (AlarmHolder alarm : alarms) {
             setAlarm(alarm);
         }
     }

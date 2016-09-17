@@ -98,6 +98,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             if (isLoggedIn) {
                 getMalApiClient().getUserList();
             } else {
+                App.getInstance().resetAlarms();
+                loadUserSortingPreference();
                 stopRefreshing();
             }
         }
@@ -106,6 +108,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     @Override
     public void malDataImported(boolean received) {
         super.malDataImported(received);
+
+        App.getInstance().resetAlarms();
 
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializingGotImages(false);

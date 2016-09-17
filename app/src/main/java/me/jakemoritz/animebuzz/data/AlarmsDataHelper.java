@@ -137,6 +137,6 @@ public class AlarmsDataHelper {
 
         App.getInstance().setAlarms(upgradedAlarms);
 
-        App.getInstance().rescheduleAlarms();
+        App.getInstance().setAlarmsAfterClosed();
     }
 }

@@ -57,7 +57,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            App.getInstance().rescheduleAlarms();
+            App.getInstance().setAlarmsAfterClosed();
         }
     }
 
