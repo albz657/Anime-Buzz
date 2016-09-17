@@ -103,9 +103,9 @@ public class App extends Application {
 
             updateFormattedTimes();
             //            backlogDummyData();
-//            dummyAlarm();
+            dummyAlarm();
 
-            setAlarmsAfterClosed();
+            setAlarmsOnBoot();
         }
     }
 
@@ -328,7 +328,7 @@ public class App extends Application {
         }
     }
 
-    public void setAlarmsAfterClosed() {
+    public void setAlarmsOnBoot() {
         for (AlarmHolder alarm : alarms) {
             setAlarm(alarm);
         }
@@ -420,7 +420,7 @@ public class App extends Application {
     private PendingIntent createPendingIntent(int id){
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         notificationIntent.putExtra("id", id);
-        return PendingIntent.getBroadcast(this, id, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
+        return PendingIntent.getBroadcast(this, id, notificationIntent, 0);
     }
 
     public void cancelAllAlarms(List<AlarmHolder> alarms){

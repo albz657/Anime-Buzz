@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.Calendar;
+
 import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
 import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -37,27 +39,35 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
 
             if (series != null){
-                NotificationHelper helper = new NotificationHelper();
-                helper.createNewEpisodeNotification(series);
+                Calendar currentTime = Calendar.getInstance();
+                Calendar lastNotificationTime = Calendar.getInstance();
+                lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
-                App.getInstance().setNotificationReceived(true);
+                if (currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
+                    NotificationHelper helper = new NotificationHelper();
+                    helper.createNewEpisodeNotification(series);
 
-                App.getInstance().getAlarms().remove(thisAlarm);
-                AlarmsDataHelper.getInstance().deleteAlarm(thisAlarm.getId());
+                    App.getInstance().setNotificationReceived(true);
 
-                BacklogItem backlogItem = new BacklogItem(series, thisAlarm.getAlarmTime());
-                BacklogDataHelper.getInstance().insertBacklogItem(backlogItem, App.getInstance().getDatabase());
-                App.getInstance().getBacklog().add(backlogItem);
-                App.getInstance().makeAlarm(series);
+                    App.getInstance().getAlarms().remove(thisAlarm);
+                    AlarmsDataHelper.getInstance().deleteAlarm(thisAlarm.getId());
 
-                if (App.getInstance().getMainActivity() != null){
-                    App.getInstance().getMainActivity().episodeNotificationReceived();
+                    BacklogItem backlogItem = new BacklogItem(series, thisAlarm.getAlarmTime());
+                    BacklogDataHelper.getInstance().insertBacklogItem(backlogItem, App.getInstance().getDatabase());
+                    App.getInstance().getBacklog().add(backlogItem);
+                    App.getInstance().makeAlarm(series);
+
+                    if (App.getInstance().getMainActivity() != null){
+                        App.getInstance().getMainActivity().episodeNotificationReceived();
+                    }
+
+                    series.setLastNotificationTime(currentTime.getTimeInMillis());
                 }
             }
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            App.getInstance().setAlarmsAfterClosed();
+            App.getInstance().setAlarmsOnBoot();
         }
     }
 

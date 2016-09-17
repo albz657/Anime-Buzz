@@ -40,6 +40,7 @@ public class AnimeDataHelper {
     private static final String KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED = "nextepisodesimulcastairtimeformatted";
     private static final String KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 = "nextepisodeairtimeformatted_twofour";
     private static final String KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 = "nextepisodesimulcastairtimeformatted_twofour";
+    private static final String KEY_LAST_NOTIFICATION_TIME = "lastnotificationtime";
 
     private static AnimeDataHelper mInstance;
 
@@ -68,7 +69,8 @@ public class AnimeDataHelper {
                 KEY_NEXT_EPISODE_AIRTIME_FORMATTED + " TEXT, " +
                 KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED + " TEXT, " +
                 KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT, " +
-                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT" +
+                KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT, " +
+                KEY_LAST_NOTIFICATION_TIME + " DOUBLE," +
                 ")";
     }
 
@@ -93,6 +95,7 @@ public class AnimeDataHelper {
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED, series.getNextEpisodeSimulcastTimeFormatted());
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24, series.getNextEpisodeAirtimeFormatted24());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24, series.getNextEpisodeSimulcastTimeFormatted24());
+        contentValues.put(KEY_LAST_NOTIFICATION_TIME, series.getLastNotificationTime());
 
         database.insert(TABLE_ANIME, null, contentValues);
         return true;
@@ -117,6 +120,7 @@ public class AnimeDataHelper {
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED, series.getNextEpisodeSimulcastTimeFormatted());
         contentValues.put(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24, series.getNextEpisodeAirtimeFormatted24());
         contentValues.put(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24, series.getNextEpisodeSimulcastTimeFormatted24());
+        contentValues.put(KEY_LAST_NOTIFICATION_TIME, series.getLastNotificationTime());
 
         App.getInstance().getDatabase().update(TABLE_ANIME, contentValues, KEY_MALID + " = ? ", new String[]{String.valueOf(series.getMALID())});
         return true;
@@ -190,6 +194,7 @@ public class AnimeDataHelper {
         String nextEpisodeSimulcastAirtimeFormatted = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED));
         String nextEpisodeAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
         String nextEpisodeSimulcastAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
+        long lastNotificationTime = 0;
 
         if (MALID == 32171){
             Log.d("s", "x");
@@ -203,6 +208,9 @@ public class AnimeDataHelper {
             List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(KEY_BACKLOG)), type);
 
             series.setBacklog(backlog);
+        } else {
+            lastNotificationTime = res.getLong(res.getColumnIndex(KEY_LAST_NOTIFICATION_TIME));
+            series.setLastNotificationTime(lastNotificationTime);
         }
 
         return series;

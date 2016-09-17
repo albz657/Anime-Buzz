@@ -29,6 +29,15 @@ public class Series {
     private String nextEpisodeSimulcastTimeFormatted;
     private String nextEpisodeAirtimeFormatted24;
     private String nextEpisodeSimulcastTimeFormatted24;
+    private long lastNotificationTime;
+
+    public long getLastNotificationTime() {
+        return lastNotificationTime;
+    }
+
+    public void setLastNotificationTime(long lastNotificationTime) {
+        this.lastNotificationTime = lastNotificationTime;
+    }
 
     public String getNextEpisodeSimulcastTimeFormatted24() {
         return nextEpisodeSimulcastTimeFormatted24;
@@ -216,6 +225,7 @@ public class Series {
         this.nextEpisodeSimulcastTimeFormatted = "";
         this.nextEpisodeAirtimeFormatted24 = "";
         this.nextEpisodeSimulcastTimeFormatted24 = "";
+        this.lastNotificationTime = 0;
     }
 
     public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24) {
@@ -237,6 +247,7 @@ public class Series {
         this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
+        this.lastNotificationTime = 0;
     }
 
     public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24) {
@@ -257,6 +268,28 @@ public class Series {
         this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
+        this.lastNotificationTime = 0;
+    }
+
+    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime) {
+        this.airdate = airdate;
+        this.name = name;
+        this.MALID = MALID;
+        this.simulcast = simulcast;
+        this.simulcast_airdate = simulcast_airdate;
+        this.season = season;
+        this.ANNID = ANNID;
+        this.simulcast_delay = simulcast_delay;
+        this.isInUserList = isInUserList;
+        this.currentlyAiring = currentlyAiring;
+        this.nextEpisodeAirtime = nextEpisodeAirtime;
+        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
+        this.episodesWatched = episodesWatched;
+        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
+        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
+        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
+        this.lastNotificationTime = lastNotificationTime;
     }
 
     public void setBacklog(List<Long> backlog) {
