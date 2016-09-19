@@ -25,9 +25,9 @@ public class AlarmsDataHelper {
     public String buildAlarmTable() {
         return "CREATE TABLE IF NOT EXISTS " + TABLE_ALARMS +
                 "(" + KEY_ALARM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                KEY_ALARM_NAME + " TEXT," +
-                KEY_ALARM_TIME + " INTEGER," +
-                KEY_ALARM_MALID + " INTEGER" +
+                KEY_ALARM_NAME + " TEXT NOT NULL," +
+                KEY_ALARM_TIME + " INTEGER NOT NULL," +
+                KEY_ALARM_MALID + " INTEGER NOT NULL" +
                 ")";
     }
 
@@ -99,7 +99,10 @@ public class AlarmsDataHelper {
         int MALID = -1;
 
         if (!DatabaseHelper.getInstance(App.getInstance()).isUpgrading()) {
-            MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
+            if (res.getColumnIndex(KEY_ALARM_MALID) != -1) {
+                MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
+
+            }
         }
 
         return new AlarmHolder(name, time, id, MALID);
@@ -118,25 +121,28 @@ public class AlarmsDataHelper {
 
     // misc
 
+
     public void upgradeAlarms(SQLiteDatabase database) {
         List<AlarmHolder> oldAlarms = getAllAlarms(database);
 
         database.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
+
         database.execSQL(buildAlarmTable());
+
+        for (AlarmHolder alarmHolder : oldAlarms) {
+            alarmHolder.setMALID(alarmHolder.getId());
+            insertAlarm(alarmHolder, database);
+        }
 
         DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
 
         App.getInstance().cancelAllAlarms(oldAlarms);
-
-        for (AlarmHolder alarm : oldAlarms) {
-            alarm.setMALID(alarm.getId());
-            insertAlarm(alarm, database);
-        }
 
         List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
 
         App.getInstance().setAlarms(upgradedAlarms);
 
         App.getInstance().setAlarmsOnBoot();
+
     }
 }

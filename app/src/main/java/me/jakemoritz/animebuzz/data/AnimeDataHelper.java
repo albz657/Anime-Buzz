@@ -70,7 +70,7 @@ public class AnimeDataHelper {
                 KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED + " TEXT, " +
                 KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT, " +
                 KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT, " +
-                KEY_LAST_NOTIFICATION_TIME + " DOUBLE," +
+                KEY_LAST_NOTIFICATION_TIME + " DOUBLE" +
                 ")";
     }
 
@@ -244,6 +244,10 @@ public class AnimeDataHelper {
 
         List<BacklogItem> oldBacklogItems = new ArrayList<>();
 
+        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
+
+        database.execSQL(buildAnimeTable());
+
         for (Series series : allSeries) {
             if (!series.getBacklog().isEmpty()) {
                 for (Long backlogTime : series.getBacklog()) {
@@ -252,8 +256,8 @@ public class AnimeDataHelper {
             }
         }
 
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
-        database.execSQL(buildAnimeTable());
+//        database.execSQL("DROP TABLE IF EXISTS " + TABLE_ANIME);
+//        database.execSQL(buildAnimeTable());
 
         saveSeriesList(allSeries, database);
 

@@ -1,8 +1,12 @@
 package me.jakemoritz.animebuzz.data;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -45,6 +49,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionThree(db);
         }
         isUpgrading = false;
+    }
+
+    public List<String> getTableColumns(String tableName, SQLiteDatabase database) {
+        ArrayList<String> columns = new ArrayList<String>();
+        String cmd = "pragma table_info(" + tableName + ");";
+        Cursor cur = database.rawQuery(cmd, null);
+
+        while (cur.moveToNext()) {
+            columns.add(cur.getString(cur.getColumnIndex("name")));
+        }
+        cur.close();
+
+        return columns;
     }
 
     public boolean isUpgrading() {
