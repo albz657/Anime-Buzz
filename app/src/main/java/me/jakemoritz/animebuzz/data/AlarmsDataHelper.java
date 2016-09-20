@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.data;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,6 +75,12 @@ public class AlarmsDataHelper {
     public List<AlarmHolder> getAllAlarms(SQLiteDatabase database) {
         List<AlarmHolder> alarms = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+        if (cursor.getColumnIndex(KEY_ALARM_MALID) == -1 && !DatabaseHelper.getInstance(App.getInstance()).isUpgrading()) {
+            cursor.close();
+//            database.close();
+//            database = DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase();
+            cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+        }
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -100,12 +105,7 @@ public class AlarmsDataHelper {
         int MALID = -1;
 
         if (!DatabaseHelper.getInstance(App.getInstance()).isUpgrading()) {
-            if (res.getColumnIndex(KEY_ALARM_MALID) != -1) {
-                MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
-
-            }else {
-                Log.d("TAG", "broken");
-            }
+            MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
         }
 
         return new AlarmHolder(name, time, id, MALID);
@@ -137,9 +137,9 @@ public class AlarmsDataHelper {
             insertAlarm(alarmHolder, database);
         }
 
-        DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
-
         App.getInstance().cancelAllAlarms(oldAlarms);
+
+        DatabaseHelper.getInstance(App.getInstance()).setUpgrading(false);
 
         List<AlarmHolder> upgradedAlarms = getAllAlarms(database);
 
