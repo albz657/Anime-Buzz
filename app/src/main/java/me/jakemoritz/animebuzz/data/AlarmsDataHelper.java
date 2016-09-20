@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.data;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,8 @@ public class AlarmsDataHelper {
             if (res.getColumnIndex(KEY_ALARM_MALID) != -1) {
                 MALID = res.getInt(res.getColumnIndex(KEY_ALARM_MALID));
 
+            }else {
+                Log.d("TAG", "broken");
             }
         }
 
