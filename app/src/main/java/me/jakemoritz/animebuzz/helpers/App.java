@@ -1,12 +1,10 @@
 package me.jakemoritz.animebuzz.helpers;
 
 import android.app.AlarmManager;
-import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -17,12 +15,14 @@ import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.Spinner;
 
+import com.orm.SugarApp;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashSet;
@@ -33,11 +33,7 @@ import java.util.Set;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
-import me.jakemoritz.animebuzz.data.AnimeDataHelper;
-import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.data.SeasonDataHelper;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
@@ -54,7 +50,7 @@ import me.jakemoritz.animebuzz.tasks.SaveAllDataTask;
 import me.jakemoritz.animebuzz.tasks.SaveNewSeasonTask;
 import me.jakemoritz.animebuzz.tasks.SaveSeasonsListTask;
 
-public class App extends Application {
+public class App extends SugarApp {
 
     private final static String TAG = App.class.getSimpleName();
 
@@ -75,7 +71,6 @@ public class App extends Application {
     private boolean justLaunchedMyShows = false;
     private boolean justLaunchedSeasons = false;
     private boolean justRemoved = false;
-    private SQLiteDatabase database;
     private List<SeasonMetadata> syncingSeasons;
     private boolean appVisible = false;
     private boolean notificationReceived = false;
@@ -95,18 +90,25 @@ public class App extends Application {
         alarms = new ArrayList<>();
         alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
 
-        database = DatabaseHelper.getInstance(this).getWritableDatabase();
+        if (doesOldDatabaseExist()) {
+            DatabaseHelper.getInstance(this).getWritableDatabase();
+        }
 
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
         if (completedSetup && !initializing) {
             loadData();
 
             updateFormattedTimes();
-            //            backlogDummyData();
+//            backlogDummyData();
 //            dummyAlarm();
 
             setAlarmsOnBoot();
         }
+    }
+
+    private boolean doesOldDatabaseExist() {
+        File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
+        return dbFile.exists();
     }
 
     private void dummyAlarm() {
@@ -194,7 +196,7 @@ public class App extends Application {
     }
 
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
-        SimpleDateFormat format = new SimpleDateFormat("MMMM d");
+        SimpleDateFormat format = new SimpleDateFormat("MMMM d", Locale.getDefault());
         SimpleDateFormat hourFormat;
 
         String formattedTime = "";
@@ -206,13 +208,13 @@ public class App extends Application {
         //DEBUG
 //        calendar.setTimeInMillis(1473047450000L);
 
-        if (currentTime.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)){
+        if (currentTime.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)) {
             int dayDiff = calendar.get(Calendar.DAY_OF_YEAR) - currentTime.get(Calendar.DAY_OF_YEAR);
 
-            if (dayDiff <= 1){
+            if (dayDiff <= 1) {
                 // yesterday, today, tomorrow OR x days ago
                 formattedTime = DateUtils.getRelativeTimeSpanString(calendar.getTimeInMillis(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS).toString();
-            } else if (dayDiff >= 2 && dayDiff <= 6){
+            } else if (dayDiff >= 2 && dayDiff <= 6) {
                 // day of week
                 formattedTime = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
             } else if (dayDiff == 7) {
@@ -231,13 +233,13 @@ public class App extends Application {
         formattedTime = DateUtils.getRelativeTimeSpanString(1473220250000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();*/
 
         if (prefers24hour) {
-            hourFormat = new SimpleDateFormat(", kk:mm");
+            hourFormat = new SimpleDateFormat(", kk:mm", Locale.getDefault());
             formattedTime += hourFormat.format(calendar.getTime());
 
         } else {
-            hourFormat = new SimpleDateFormat(", h:mm");
+            hourFormat = new SimpleDateFormat(", h:mm", Locale.getDefault());
             formattedTime += hourFormat.format(calendar.getTime());
-            formattedTime += new SimpleDateFormat(" a").format(calendar.getTime());
+            formattedTime += new SimpleDateFormat(" a", Locale.getDefault()).format(calendar.getTime());
         }
 
         return formattedTime;
@@ -296,34 +298,32 @@ public class App extends Application {
     }
 
     public void removeOlderShows() {
+        SeriesList removedShows = new SeriesList();
+
         String latestSeasonName = getLatestSeasonName();
         for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext(); ) {
             Series series = (Series) iterator.next();
             if (!series.getSeason().equals(latestSeasonName)) {
                 removeAlarm(series);
                 series.setInUserList(false);
-                AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
+                removedShows.add(series);
                 iterator.remove();
             }
         }
+
+        Series.saveInTx(removedShows);
     }
 
     /* ALARMS */
 
-    public void resetAlarms(){
+    public void resetAlarms() {
         cancelAllAlarms(alarms);
 
         alarms.clear();
 
-        database.beginTransaction();
-        try {
-            AlarmsDataHelper.getInstance().deleteAllAlarms(database);
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
-        }
+        AlarmHolder.deleteAll(AlarmHolder.class);
 
-        for (Series series : userAnimeList){
+        for (Series series : userAnimeList) {
             makeAlarm(series);
         }
     }
@@ -335,7 +335,7 @@ public class App extends Application {
     }
 
     private void setAlarm(AlarmHolder alarm) {
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(alarm.getId()));
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(alarm.getId().intValue()));
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
@@ -389,55 +389,47 @@ public class App extends Application {
 
         Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
 
-        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID());
-        newAlarm.setId((int) AlarmsDataHelper.getInstance().insertAlarm(newAlarm, database));
+        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
+        newAlarm.save();
 
         setAlarm(newAlarm);
 
         alarms.add(newAlarm);
 
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
-        // debug code
-//        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy HH:mm");
-//        String formattedNext = format.format(nextEpisode.getTime());
-//        Log.d(TAG, "Alarm for '" + series.getName() + "' set for: " + nextEpisode.getTimeInMillis());
-
+        series.save();
     }
 
     public void switchAlarmTiming() {
         alarms.clear();
-        AlarmsDataHelper.getInstance().deleteAllAlarms(App.getInstance().getDatabase());
+
+        AlarmHolder.deleteAll(AlarmHolder.class);
 
         for (Series series : userAnimeList) {
             makeAlarm(series);
         }
     }
 
-    public void removeAlarmFromStructure(int id) {
-        AlarmsDataHelper.getInstance().deleteAlarm(id);
-    }
-
-    private PendingIntent createPendingIntent(int id){
+    private PendingIntent createPendingIntent(int id) {
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         notificationIntent.putExtra("id", id);
         return PendingIntent.getBroadcast(this, id, notificationIntent, 0);
     }
 
-    public void cancelAllAlarms(List<AlarmHolder> alarms){
-        for (AlarmHolder alarmHolder : alarms){
-            alarmManager.cancel(createPendingIntent(alarmHolder.getId()));
+    public void cancelAllAlarms(List<AlarmHolder> alarms) {
+        for (AlarmHolder alarmHolder : alarms) {
+            alarmManager.cancel(createPendingIntent(alarmHolder.getId().intValue()));
         }
     }
 
     public void removeAlarm(Series series) {
         int id;
         AlarmHolder alarmHolder;
-        for (Iterator iterator = alarms.iterator(); iterator.hasNext();){
+        for (Iterator iterator = alarms.iterator(); iterator.hasNext(); ) {
             alarmHolder = (AlarmHolder) iterator.next();
-            if (alarmHolder.getMALID() == series.getMALID()){
-                id = alarmHolder.getId();
+            if (alarmHolder.getMALID() == series.getMALID()) {
+                id = alarmHolder.getId().intValue();
                 alarmManager.cancel(createPendingIntent(id));
-                removeAlarmFromStructure(id);
+                alarmHolder.delete();
                 iterator.remove();
             }
         }
@@ -497,32 +489,30 @@ public class App extends Application {
     /* LOADING */
 
     public void loadData() {
-        DatabaseHelper databaseHelper = DatabaseHelper.getInstance(this);
+        seasonsList = new HashSet<>(SeasonMetadata.listAll(SeasonMetadata.class));
+        setCurrent();
 
-        database.beginTransaction();
-        try {
-            seasonsList = SeasonDataHelper.getInstance().getAllSeasonMetadata();
-//        setCurrentOrNewer();
-            setCurrent();
-            allAnimeSeasons = SeasonDataHelper.getInstance().getAllAnimeSeasons();
+        SeasonList allAnime = new SeasonList();
+        for (SeasonMetadata seasonMetadata : seasonsList){
+            SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
 
-            String currentlyBrowsingSeasonName = getLatestSeasonName();
-
-            for (Season season : allAnimeSeasons) {
-                if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
-                    currentlyBrowsingSeason = season;
-                }
+            if (!seasonSeries.isEmpty()){
+                allAnime.add(new Season(seasonSeries, seasonMetadata));
             }
+        }
+        allAnimeSeasons = allAnime;
 
-            userAnimeList = loadUserList();
-            backlog = loadBacklog();
-            alarms = AlarmsDataHelper.getInstance().getAllAlarms(database);
+        String currentlyBrowsingSeasonName = getLatestSeasonName();
 
-            database.setTransactionSuccessful();
-        } finally {
-            database.endTransaction();
+        for (Season season : allAnimeSeasons) {
+            if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
+                currentlyBrowsingSeason = season;
+            }
         }
 
+        userAnimeList = loadUserList();
+        backlog = loadBacklog();
+        alarms = AlarmHolder.listAll(AlarmHolder.class);
     }
 
     private SeriesList loadUserList() {
@@ -538,21 +528,13 @@ public class App extends Application {
     private ObservableArrayList<BacklogItem> loadBacklog() {
         ObservableArrayList<BacklogItem> backlog = new ObservableArrayList<>();
 
-        backlog.addAll(BacklogDataHelper.getInstance().getAllBacklogItems());
+        backlog.addAll(BacklogItem.listAll(BacklogItem.class));
 
         Collections.sort(backlog, new BacklogItemComparator());
         return backlog;
     }
 
     /* ACCESSORS */
-
-    public SQLiteDatabase getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(SQLiteDatabase database) {
-        this.database = database;
-    }
 
     public String getLatestSeasonName() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -650,7 +632,7 @@ public class App extends Application {
     }
 
     public MainActivity getMainActivity() {
-        if (mainActivity == null){
+        if (mainActivity == null) {
             mainActivity = new MainActivity();
         }
         return mainActivity;

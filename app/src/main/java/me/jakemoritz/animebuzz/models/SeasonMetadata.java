@@ -1,12 +1,18 @@
 package me.jakemoritz.animebuzz.models;
 
-public class SeasonMetadata {
+import com.orm.SugarRecord;
+
+public class SeasonMetadata extends SugarRecord{
 
     private String name;
     private String start_timestamp;
     private String key;
     private boolean currentOrNewer;
     private boolean latest;
+
+    public SeasonMetadata(){
+
+    }
 
     public SeasonMetadata(String name, String start_timestamp, String key) {
         this.name = name;
@@ -22,15 +28,6 @@ public class SeasonMetadata {
         this.latest = latest;
     }
 
-
-    public boolean isLatest() {
-        return latest;
-    }
-
-    public void setLatest(boolean latest) {
-        this.latest = latest;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,7 +36,6 @@ public class SeasonMetadata {
         SeasonMetadata metadata = (SeasonMetadata) o;
 
         return key.equals(metadata.key);
-
     }
 
     public boolean isCurrentOrNewer() {

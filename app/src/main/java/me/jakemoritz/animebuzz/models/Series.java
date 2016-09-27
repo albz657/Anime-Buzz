@@ -3,17 +3,18 @@ package me.jakemoritz.animebuzz.models;
 import android.content.SharedPreferences;
 import android.support.v7.preference.PreferenceManager;
 
-import java.util.ArrayList;
+import com.orm.SugarRecord;
+
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 
-public class Series {
+public class Series extends SugarRecord{
 
     private int airdate;
     private String name;
-    private int MALID;
+    private Long id;
     private boolean currentlyAiring;
     private String simulcast;
     private int simulcast_airdate;
@@ -30,6 +31,67 @@ public class Series {
     private String nextEpisodeAirtimeFormatted24;
     private String nextEpisodeSimulcastTimeFormatted24;
     private long lastNotificationTime;
+
+    public Series(){
+
+    }
+
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
+        this.airdate = airdate;
+        this.name = name;
+        this.id = MALID;
+        this.simulcast = simulcast;
+        this.simulcast_airdate = simulcast_airdate;
+        this.season = season;
+        this.ANNID = ANNID;
+        this.simulcast_delay = simulcast_delay;
+        this.isInUserList = false;
+        this.currentlyAiring = false;
+        this.nextEpisodeAirtime = 0;
+        this.nextEpisodeSimulcastTime = 0;
+        this.episodesWatched = 0;
+        this.nextEpisodeAirtimeFormatted = "";
+        this.nextEpisodeSimulcastTimeFormatted = "";
+        this.nextEpisodeAirtimeFormatted24 = "";
+        this.nextEpisodeSimulcastTimeFormatted24 = "";
+        this.lastNotificationTime = 0;
+    }
+
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime) {
+        this.airdate = airdate;
+        this.name = name;
+        this.id = MALID;
+        this.simulcast = simulcast;
+        this.simulcast_airdate = simulcast_airdate;
+        this.season = season;
+        this.ANNID = ANNID;
+        this.simulcast_delay = simulcast_delay;
+        this.isInUserList = isInUserList;
+        this.currentlyAiring = currentlyAiring;
+        this.nextEpisodeAirtime = nextEpisodeAirtime;
+        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
+        this.episodesWatched = episodesWatched;
+        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
+        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
+        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
+        this.lastNotificationTime = lastNotificationTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Series series = (Series) o;
+
+        return (id.compareTo(series.id)) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.intValue();
+    }
 
     public long getLastNotificationTime() {
         return lastNotificationTime;
@@ -147,8 +209,8 @@ public class Series {
         return name;
     }
 
-    public int getMALID() {
-        return MALID;
+    public Long getMALID() {
+        return id;
     }
 
     public int getAirdate() {
@@ -189,107 +251,6 @@ public class Series {
                 return nextEpisodeAirtimeFormatted;
             }
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Series series = (Series) o;
-
-        return (MALID == series.MALID);
-    }
-
-    @Override
-    public int hashCode() {
-        return MALID;
-    }
-
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
-        this.airdate = airdate;
-        this.name = name;
-        this.MALID = MALID;
-        this.simulcast = simulcast;
-        this.simulcast_airdate = simulcast_airdate;
-        this.season = season;
-        this.ANNID = ANNID;
-        this.simulcast_delay = simulcast_delay;
-        this.isInUserList = false;
-        this.currentlyAiring = false;
-        this.backlog = new ArrayList<>();
-        this.nextEpisodeAirtime = 0;
-        this.nextEpisodeSimulcastTime = 0;
-        this.episodesWatched = 0;
-        this.nextEpisodeAirtimeFormatted = "";
-        this.nextEpisodeSimulcastTimeFormatted = "";
-        this.nextEpisodeAirtimeFormatted24 = "";
-        this.nextEpisodeSimulcastTimeFormatted24 = "";
-        this.lastNotificationTime = 0;
-    }
-
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, List<Long> backlog, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24) {
-        this.airdate = airdate;
-        this.name = name;
-        this.MALID = MALID;
-        this.simulcast = simulcast;
-        this.simulcast_airdate = simulcast_airdate;
-        this.season = season;
-        this.ANNID = ANNID;
-        this.simulcast_delay = simulcast_delay;
-        this.isInUserList = isInUserList;
-        this.currentlyAiring = currentlyAiring;
-        this.backlog = backlog;
-        this.nextEpisodeAirtime = nextEpisodeAirtime;
-        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
-        this.episodesWatched = episodesWatched;
-        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
-        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
-        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
-        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
-        this.lastNotificationTime = 0;
-    }
-
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24) {
-        this.airdate = airdate;
-        this.name = name;
-        this.MALID = MALID;
-        this.simulcast = simulcast;
-        this.simulcast_airdate = simulcast_airdate;
-        this.season = season;
-        this.ANNID = ANNID;
-        this.simulcast_delay = simulcast_delay;
-        this.isInUserList = isInUserList;
-        this.currentlyAiring = currentlyAiring;
-        this.nextEpisodeAirtime = nextEpisodeAirtime;
-        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
-        this.episodesWatched = episodesWatched;
-        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
-        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
-        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
-        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
-        this.lastNotificationTime = 0;
-    }
-
-    public Series(int airdate, String name, int MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime) {
-        this.airdate = airdate;
-        this.name = name;
-        this.MALID = MALID;
-        this.simulcast = simulcast;
-        this.simulcast_airdate = simulcast_airdate;
-        this.season = season;
-        this.ANNID = ANNID;
-        this.simulcast_delay = simulcast_delay;
-        this.isInUserList = isInUserList;
-        this.currentlyAiring = currentlyAiring;
-        this.nextEpisodeAirtime = nextEpisodeAirtime;
-        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
-        this.episodesWatched = episodesWatched;
-        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
-        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
-        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
-        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
-        this.lastNotificationTime = lastNotificationTime;
     }
 
     public void setBacklog(List<Long> backlog) {

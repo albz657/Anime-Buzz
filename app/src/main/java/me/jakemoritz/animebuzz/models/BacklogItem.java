@@ -1,10 +1,21 @@
 package me.jakemoritz.animebuzz.models;
 
-public class BacklogItem {
+import com.orm.SugarRecord;
+
+public class BacklogItem extends SugarRecord{
 
     private Series series;
     private Long alarmTime;
-    private int id;
+    private Long id;
+
+    public BacklogItem(){
+
+    }
+
+    public BacklogItem(Series series, Long alarmTime) {
+        this.series = series;
+        this.alarmTime = alarmTime;
+    }
 
     public Series getSeries() {
         return series;
@@ -14,22 +25,11 @@ public class BacklogItem {
         return alarmTime;
     }
 
-    public BacklogItem(Series series, Long alarmTime) {
-        this.series = series;
-        this.alarmTime = alarmTime;
-    }
-
-    public BacklogItem(Series series, Long alarmTime, int id) {
-        this.series = series;
-        this.alarmTime = alarmTime;
-        this.id = id;
-    }
-
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 }

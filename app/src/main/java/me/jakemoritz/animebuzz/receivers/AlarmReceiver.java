@@ -6,8 +6,6 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
-import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
-import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -50,10 +48,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                     App.getInstance().setNotificationReceived(true);
 
                     App.getInstance().getAlarms().remove(thisAlarm);
-                    AlarmsDataHelper.getInstance().deleteAlarm(thisAlarm.getId());
+                    thisAlarm.delete();
 
                     BacklogItem backlogItem = new BacklogItem(series, thisAlarm.getAlarmTime());
-                    BacklogDataHelper.getInstance().insertBacklogItem(backlogItem, App.getInstance().getDatabase());
+                    backlogItem.save();
                     App.getInstance().getBacklog().add(backlogItem);
                     App.getInstance().makeAlarm(series);
 

@@ -31,7 +31,6 @@ import java.util.Iterator;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
@@ -201,9 +200,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if (!App.getInstance().getDatabase().isOpen()) {
-            App.getInstance().setDatabase(DatabaseHelper.getInstance(App.getInstance()).getWritableDatabase());
-        }
 
         if (openRingtones) {
             final Fragment fragment = getCurrentFragment();

@@ -26,14 +26,12 @@ import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.data.AlarmsDataHelper;
-import me.jakemoritz.animebuzz.data.AnimeDataHelper;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
+import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
@@ -245,7 +243,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             for (Series series : App.getInstance().getUserAnimeList()) {
                 series.setInUserList(false);
             }
-            AnimeDataHelper.getInstance().saveSeriesList(App.getInstance().getUserAnimeList(), App.getInstance().getDatabase());
+            Series.saveInTx(App.getInstance().getUserAnimeList());
             App.getInstance().getUserAnimeList().clear();
         } else {
             for (Series series : App.getInstance().getUserAnimeList()) {
@@ -273,7 +271,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         App.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
-        AlarmsDataHelper.getInstance().deleteAllAlarms(App.getInstance().getDatabase());
+        AlarmHolder.deleteAll(AlarmHolder.class);
 
         String username = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
         if (!username.isEmpty()) {

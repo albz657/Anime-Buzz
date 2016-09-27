@@ -40,12 +40,12 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         Matcher monthMatcher = monthPattern.matcher(seasonName);
         String seasonMonth = "";
         String seasonYear = "";
-        if (monthMatcher.find()){
+        if (monthMatcher.find()) {
             seasonMonth = monthMatcher.group().toLowerCase();
 
             Pattern yearPattern = Pattern.compile("(\\d)+");
             Matcher yearMatcher = yearPattern.matcher(seasonName);
-            if (yearMatcher.find()){
+            if (yearMatcher.find()) {
                 seasonYear = yearMatcher.group();
             }
         }
@@ -54,7 +54,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
         App.getInstance().getSeasonsList().add(seasonMetadata);
 
-        if (App.getInstance().isInitializing() && App.getInstance().getLatestSeasonName().isEmpty()){
+        if (App.getInstance().isInitializing() && App.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             SharedPreferences.Editor editor = settings.edit();
             editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), seasonMetadata.getName());
@@ -65,60 +65,59 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
 
         SeriesList seasonSeries = new SeriesList();
-        for (JsonElement seriesElement : seriesArray){
+        for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
             String seriesName = seriesObject.get("name").getAsString();
-            int MALID;
+            Long MALID;
             try {
-                MALID = seriesObject.get("MALID").getAsInt();
-            } catch (NumberFormatException e){
-                MALID = -1;
-                Log.d(TAG, "'" + seriesName +  "' has no MALID.");
-            }
-            int ANNID;
-            try {
-                ANNID = seriesObject.get("ANNID").getAsInt();
-            } catch (NumberFormatException e){
-                ANNID = -1;
-                Log.d(TAG, "'" + seriesName +  "' has no ANNID.");
+                MALID = seriesObject.get("MALID").getAsLong();
+            } catch (NumberFormatException e) {
+                MALID = -1L;
+                Log.d(TAG, "'" + seriesName + "' has no MALID, ignoring");
             }
 
-            boolean missingAirdate = seriesObject.get("missingAirdate").getAsBoolean();
-            int airdate;
-            int simulcast_airdate;
-            if (missingAirdate){
-                airdate = -1;
-                simulcast_airdate = -1;
-                Log.d(TAG, "'" + seriesName +  "' is missing its airdate.");
-            } else {
-                airdate = seriesObject.get("airdate_u").getAsInt();
-                simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
-            }
-            String simulcast;
-            try {
-                simulcast = seriesObject.get("simulcast").getAsString();
-            } catch (ClassCastException e){
-                simulcast = "";
-                Log.d(TAG, "'" + seriesName +  "' is not simulcast.");
-            }
-            double simulcast_delay;
-            try {
-                simulcast_delay = seriesObject.get("simulcast_delay").getAsDouble();
-            } catch (NumberFormatException e){
-                simulcast_delay = 0;
-                if (simulcast.length() == 0){
-                    Log.d(TAG, "'" + seriesName + "' is not simulcast).");
+            if (MALID > 0) {
+                int ANNID;
+                try {
+                    ANNID = seriesObject.get("ANNID").getAsInt();
+                } catch (NumberFormatException e) {
+                    ANNID = -1;
+                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
                 }
-            }
 
-            if (MALID > 0){
-                final Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
-
-                if (seasonName.equals(App.getInstance().getLatestSeasonName())){
-                    if (series.getMALID() == 32171){
-                        Log.d(TAG, "x");
+                boolean missingAirdate = seriesObject.get("missingAirdate").getAsBoolean();
+                int airdate;
+                int simulcast_airdate;
+                if (missingAirdate) {
+                    airdate = -1;
+                    simulcast_airdate = -1;
+                    Log.d(TAG, "'" + seriesName + "' is missing its airdate.");
+                } else {
+                    airdate = seriesObject.get("airdate_u").getAsInt();
+                    simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
+                }
+                String simulcast;
+                try {
+                    simulcast = seriesObject.get("simulcast").getAsString();
+                } catch (ClassCastException e) {
+                    simulcast = "";
+                    Log.d(TAG, "'" + seriesName + "' is not simulcast.");
+                }
+                double simulcast_delay;
+                try {
+                    simulcast_delay = seriesObject.get("simulcast_delay").getAsDouble();
+                } catch (NumberFormatException e) {
+                    simulcast_delay = 0;
+                    if (simulcast.length() == 0) {
+                        Log.d(TAG, "'" + seriesName + "' is not simulcast).");
                     }
+                }
+
+                Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
+
+                if (seasonName.equals(App.getInstance().getLatestSeasonName())) {
+
                     App.getInstance().generateNextEpisodeTimes(series, true);
                     App.getInstance().generateNextEpisodeTimes(series, false);
 

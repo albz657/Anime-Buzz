@@ -53,7 +53,7 @@ dependencies {
     compile 'com.google.firebase:firebase-core:9.4.0'
     compile 'com.google.firebase:firebase-crash:9.4.0'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-
+    compile 'com.github.satyan:sugar:1.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

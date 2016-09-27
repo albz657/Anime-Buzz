@@ -16,20 +16,16 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.data.AnimeDataHelper;
-import me.jakemoritz.animebuzz.data.BacklogDataHelper;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
@@ -150,9 +146,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         } else {
             BacklogItem removedItem = backlogItems.remove(position);
             App.getInstance().getBacklog().remove(removedItem);
-            BacklogDataHelper.getInstance().deleteBacklogItem(removedItem.getId());
-            AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
-
+            removedItem.delete();
+            series.save();
             notifyDataSetChanged();
         }
     }
@@ -161,7 +156,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     public void incrementDialogClosed(int response, Series series, int position) {
         if (response == 1) {
             malApiClient.updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
-        } else if (response == -1){
+        } else if (response == -1) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean(App.getInstance().getString(R.string.pref_increment_key), false);
@@ -170,8 +165,8 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         BacklogItem removedItem = backlogItems.remove(position);
         App.getInstance().getBacklog().remove(removedItem);
-        BacklogDataHelper.getInstance().deleteBacklogItem(removedItem.getId());
-        AnimeDataHelper.getInstance().saveSeriesList(new SeriesList(Arrays.asList(series)), App.getInstance().getDatabase());
+        removedItem.delete();
+        series.save();
 
         notifyDataSetChanged();
     }

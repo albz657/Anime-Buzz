@@ -94,7 +94,7 @@ public class NotificationHelper {
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
 //        stackBuilder.addParentStack(MainActivity.class);
         stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(series.getMALID(), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(series.getMALID().intValue(), PendingIntent.FLAG_UPDATE_CURRENT);
         resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         mBuilder.setContentIntent(resultPendingIntent);
@@ -133,7 +133,7 @@ public class NotificationHelper {
 //        notification.flags |= Notification.FLAG_NO_CLEAR;
 
 
-        mNotificationManager.notify(series.getMALID(), notification);
+        mNotificationManager.notify(series.getMALID().intValue(), notification);
     }
 
 }

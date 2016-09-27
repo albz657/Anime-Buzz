@@ -1,10 +1,12 @@
 package me.jakemoritz.animebuzz.models;
 
-public class AlarmHolder {
+import com.orm.SugarRecord;
+
+public class AlarmHolder extends SugarRecord{
 
     private String seriesName;
     private long alarmTime;
-    private int id;
+    private Long id;
     private int MALID;
 
     public String getSeriesName() {
@@ -15,7 +17,7 @@ public class AlarmHolder {
         return alarmTime;
     }
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
@@ -23,7 +25,11 @@ public class AlarmHolder {
         this.alarmTime = alarmTime;
     }
 
-    public AlarmHolder(String seriesName, long alarmTime, int id, int MALID) {
+    public AlarmHolder(){
+
+    }
+
+    public AlarmHolder(String seriesName, long alarmTime, Long id, int MALID) {
         this.seriesName = seriesName;
         this.alarmTime = alarmTime;
         this.id = id;
@@ -36,7 +42,7 @@ public class AlarmHolder {
         this.MALID = MALID;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
