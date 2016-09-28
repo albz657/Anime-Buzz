@@ -8,7 +8,6 @@ public class SeasonMetadata extends SugarRecord{
     private String start_timestamp;
     private String key;
     private boolean currentOrNewer;
-    private boolean latest;
 
     public SeasonMetadata(){
 
@@ -18,14 +17,6 @@ public class SeasonMetadata extends SugarRecord{
         this.name = name;
         this.start_timestamp = start_timestamp;
         this.key = key;
-        this.latest = false;
-    }
-
-    public SeasonMetadata(String name, String start_timestamp, String key, boolean latest) {
-        this.name = name;
-        this.start_timestamp = start_timestamp;
-        this.key = key;
-        this.latest = latest;
     }
 
     @Override
@@ -38,17 +29,17 @@ public class SeasonMetadata extends SugarRecord{
         return key.equals(metadata.key);
     }
 
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
+
     public boolean isCurrentOrNewer() {
         return currentOrNewer;
     }
 
     public void setCurrentOrNewer(boolean currentOrNewer) {
         this.currentOrNewer = currentOrNewer;
-    }
-
-    @Override
-    public int hashCode() {
-        return key.hashCode();
     }
 
     public String getName() {

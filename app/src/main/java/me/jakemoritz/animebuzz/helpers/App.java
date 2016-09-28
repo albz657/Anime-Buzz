@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
@@ -91,7 +92,9 @@ public class App extends SugarApp {
         alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
 
         if (doesOldDatabaseExist()) {
-            DatabaseHelper.getInstance(this).getWritableDatabase();
+            SQLiteDatabase database = DatabaseHelper.getInstance(this).getWritableDatabase();
+            database.close();
+            deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
         }
 
         boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);

@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
@@ -194,9 +193,6 @@ public class SenpaiExportHelper {
 
                     response.body().getSeasonMetadata().setCurrentOrNewer(true);
                     App.getInstance().setCurrentlyBrowsingSeason(response.body());
-
-                    DatabaseHelper databaseHelper = DatabaseHelper.getInstance(App.getInstance());
-                    response.body().getSeasonMetadata().save();
 
                     fragment.seasonDataRetrieved(response.body());
                 } else {

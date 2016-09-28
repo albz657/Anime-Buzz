@@ -52,7 +52,9 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         String seasonKey = seasonMonth + seasonYear;
 
         final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
-        App.getInstance().getSeasonsList().add(seasonMetadata);
+        if (App.getInstance().getSeasonsList().add(seasonMetadata)){
+            seasonMetadata.save();
+        }
 
         if (App.getInstance().isInitializing() && App.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());

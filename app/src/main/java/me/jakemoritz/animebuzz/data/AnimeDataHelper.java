@@ -42,6 +42,8 @@ public class AnimeDataHelper {
 
     private static AnimeDataHelper mInstance;
 
+    private List<BacklogItem> oldBacklogItems;
+
     public static synchronized AnimeDataHelper getInstance() {
         if (mInstance == null) {
             mInstance = new AnimeDataHelper();
@@ -76,7 +78,9 @@ public class AnimeDataHelper {
         }.getType();
         List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(KEY_BACKLOG)), type);
 
-        series.setBacklog(backlog);
+        for (long backlogTime : backlog){
+            oldBacklogItems.add(new BacklogItem(series, backlogTime));
+        }
 
         return series;
     }
@@ -105,17 +109,9 @@ public class AnimeDataHelper {
     }
 
     void upgradeDatabaseVersionToVersionThree(SQLiteDatabase database) {
+        oldBacklogItems = new ArrayList<>();
+
         SeriesList allSeries = getAllSeries(database);
-
-        List<BacklogItem> oldBacklogItems = new ArrayList<>();
-
-        for (Series series : allSeries) {
-            if (!series.getBacklog().isEmpty()) {
-                for (Long backlogTime : series.getBacklog()) {
-                    oldBacklogItems.add(new BacklogItem(series, backlogTime));
-                }
-            }
-        }
 
         Series.saveInTx(allSeries);
 

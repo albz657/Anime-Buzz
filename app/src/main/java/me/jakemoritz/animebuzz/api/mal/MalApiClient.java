@@ -15,7 +15,6 @@ import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
@@ -100,7 +99,6 @@ public class MalApiClient {
         String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
         String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
 
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(App.getInstance());
         Series series = Series.findById(Series.class, Long.valueOf(MALID));
 
         if (series != null) {

@@ -5,8 +5,6 @@ import android.support.v7.preference.PreferenceManager;
 
 import com.orm.SugarRecord;
 
-import java.util.List;
-
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 
@@ -14,7 +12,6 @@ public class Series extends SugarRecord{
 
     private int airdate;
     private String name;
-    private Long id;
     private boolean currentlyAiring;
     private String simulcast;
     private int simulcast_airdate;
@@ -24,7 +21,6 @@ public class Series extends SugarRecord{
     private double simulcast_delay;
     private long nextEpisodeAirtime;
     private long nextEpisodeSimulcastTime;
-    private List<Long> backlog;
     private int episodesWatched;
     private String nextEpisodeAirtimeFormatted;
     private String nextEpisodeSimulcastTimeFormatted;
@@ -39,7 +35,7 @@ public class Series extends SugarRecord{
     public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay) {
         this.airdate = airdate;
         this.name = name;
-        this.id = MALID;
+        this.setId(MALID);
         this.simulcast = simulcast;
         this.simulcast_airdate = simulcast_airdate;
         this.season = season;
@@ -60,7 +56,7 @@ public class Series extends SugarRecord{
     public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime) {
         this.airdate = airdate;
         this.name = name;
-        this.id = MALID;
+        this.setId(MALID);
         this.simulcast = simulcast;
         this.simulcast_airdate = simulcast_airdate;
         this.season = season;
@@ -85,12 +81,16 @@ public class Series extends SugarRecord{
 
         Series series = (Series) o;
 
-        return (id.compareTo(series.id)) == 0;
+        return (getMALID().compareTo(series.getMALID())) == 0;
     }
 
     @Override
     public int hashCode() {
-        return id.intValue();
+        return getMALID().intValue();
+    }
+
+    public Long getMALID() {
+        return super.getId();
     }
 
     public long getLastNotificationTime() {
@@ -101,7 +101,7 @@ public class Series extends SugarRecord{
         this.lastNotificationTime = lastNotificationTime;
     }
 
-    public String getNextEpisodeSimulcastTimeFormatted24() {
+    String getNextEpisodeSimulcastTimeFormatted24() {
         return nextEpisodeSimulcastTimeFormatted24;
     }
 
@@ -109,7 +109,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
     }
 
-    public String getNextEpisodeAirtimeFormatted24() {
+    String getNextEpisodeAirtimeFormatted24() {
         return nextEpisodeAirtimeFormatted24;
     }
 
@@ -117,7 +117,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
     }
 
-    public String getNextEpisodeSimulcastTimeFormatted() {
+    String getNextEpisodeSimulcastTimeFormatted() {
         return nextEpisodeSimulcastTimeFormatted;
     }
 
@@ -125,7 +125,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
     }
 
-    public String getNextEpisodeAirtimeFormatted() {
+    String getNextEpisodeAirtimeFormatted() {
         return nextEpisodeAirtimeFormatted;
     }
 
@@ -133,7 +133,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
     }
 
-    public void setAirdate(int airdate) {
+    void setAirdate(int airdate) {
         this.airdate = airdate;
     }
 
@@ -141,15 +141,15 @@ public class Series extends SugarRecord{
         this.currentlyAiring = currentlyAiring;
     }
 
-    public void setSimulcast(String simulcast) {
+    void setSimulcast(String simulcast) {
         this.simulcast = simulcast;
     }
 
-    public void setSimulcast_airdate(int simulcast_airdate) {
+    void setSimulcast_airdate(int simulcast_airdate) {
         this.simulcast_airdate = simulcast_airdate;
     }
 
-    public void setANNID(int ANNID) {
+    void setANNID(int ANNID) {
         this.ANNID = ANNID;
     }
 
@@ -169,11 +169,11 @@ public class Series extends SugarRecord{
         this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
     }
 
-    public double getSimulcast_delay() {
+    double getSimulcast_delay() {
         return simulcast_delay;
     }
 
-    public void setSimulcast_delay(double simulcast_delay) {
+    void setSimulcast_delay(double simulcast_delay) {
         this.simulcast_delay = simulcast_delay;
     }
 
@@ -209,20 +209,12 @@ public class Series extends SugarRecord{
         return name;
     }
 
-    public Long getMALID() {
-        return id;
-    }
-
     public int getAirdate() {
         return airdate;
     }
 
     public String getSimulcast() {
         return simulcast;
-    }
-
-    public List<Long> getBacklog() {
-        return backlog;
     }
 
     public int getEpisodesWatched() {
@@ -251,9 +243,5 @@ public class Series extends SugarRecord{
                 return nextEpisodeAirtimeFormatted;
             }
         }
-    }
-
-    public void setBacklog(List<Long> backlog) {
-        this.backlog = backlog;
     }
 }

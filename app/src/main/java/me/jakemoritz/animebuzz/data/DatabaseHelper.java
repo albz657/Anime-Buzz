@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import me.jakemoritz.animebuzz.helpers.App;
-
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TAG = DatabaseHelper.class.getSimpleName();
@@ -40,8 +38,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 AlarmsDataHelper.getInstance().upgradeAlarms(db);
                 AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionThree(db);
                 SeasonDataHelper.getInstance().upgradeToSugar(db);
-                db.close();
-                App.getInstance().deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
         }
     }
 }
