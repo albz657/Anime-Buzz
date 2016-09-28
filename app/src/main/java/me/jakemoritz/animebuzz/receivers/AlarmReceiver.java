@@ -53,6 +53,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                     BacklogItem backlogItem = new BacklogItem(series, thisAlarm.getAlarmTime());
                     backlogItem.save();
                     App.getInstance().getBacklog().add(backlogItem);
+
+                    series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
                     App.getInstance().makeAlarm(series);
 
                     if (App.getInstance().getMainActivity() != null){

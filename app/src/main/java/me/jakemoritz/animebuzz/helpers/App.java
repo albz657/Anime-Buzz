@@ -118,13 +118,7 @@ public class App extends SugarApp {
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
             time += 5000L;
-//            alarms.get(Integer.valueOf("31771")).setAlarmTime(time);
             alarms.get(0).setAlarmTime(time);
-
-            /*time += 5000L;
-            alarms.get(1).setAlarmTime(time);
-            time += 5000L;
-            alarms.get(2).setAlarmTime(time);*/
         }
     }
 
