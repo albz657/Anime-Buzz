@@ -22,6 +22,8 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeasonsFragment extends SeriesFragment {
 
@@ -88,6 +90,18 @@ public class SeasonsFragment extends SeriesFragment {
 
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
+        if (currentlyBrowsingSeason == null){
+            SeriesList currentSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonName));
+
+            for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()){
+                if (seasonMetadata.getName().equals(seasonName)){
+                    currentlyBrowsingSeason = new Season(currentSeries, seasonMetadata);
+                    App.getInstance().getAllAnimeSeasons().add(currentlyBrowsingSeason);
+                    break;
+                }
+            }
+        }
+
         getmAdapter().getAllSeries().clear();
         getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
         getmAdapter().getVisibleSeries().clear();
@@ -130,18 +144,14 @@ public class SeasonsFragment extends SeriesFragment {
     private List<String> getSpinnerItems() {
         List<String> seasonNames = new ArrayList<>();
 
-        List<SeasonMetadata> metadataList = new ArrayList<>();
-        for (Season season : App.getInstance().getAllAnimeSeasons()) {
-            metadataList.add(season.getSeasonMetadata());
-        }
+        List<SeasonMetadata> seasonMetadataList = new ArrayList<>(App.getInstance().getSeasonsList());
+        Collections.sort(seasonMetadataList, new SeasonMetadataComparator());
 
-        Collections.sort(metadataList, new SeasonMetadataComparator());
+        for (SeasonMetadata seasonMetadata : seasonMetadataList){
+            seasonNames.add(seasonMetadata.getName());
 
-        for (SeasonMetadata metadata : metadataList) {
-            seasonNames.add(metadata.getName());
-
-            if (metadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
-                previousSpinnerIndex = metadataList.indexOf(metadata);
+            if (seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
+                previousSpinnerIndex = seasonMetadataList.indexOf(seasonMetadata);
             }
         }
 
