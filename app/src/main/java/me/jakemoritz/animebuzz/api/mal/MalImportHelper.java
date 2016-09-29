@@ -7,6 +7,7 @@ import me.jakemoritz.animebuzz.api.ann.GetImageTask;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
@@ -71,7 +72,7 @@ class MalImportHelper {
             for (Series series : App.getInstance().getUserAnimeList()){
                 if (!matchedSeries.contains(series)){
                     series.setInUserList(false);
-                    App.getInstance().removeAlarm(series);
+                    AlarmHelper.getInstance().removeAlarm(series);
                     removedSeries.add(series);
                 }
             }
@@ -87,7 +88,7 @@ class MalImportHelper {
 
         for (Series series : App.getInstance().getUserAnimeList()) {
             if (series.getAirdate() > 0 && series.getSimulcast_airdate() > 0) {
-                App.getInstance().makeAlarm(series);
+                AlarmHelper.getInstance().makeAlarm(series);
             }
         }
 

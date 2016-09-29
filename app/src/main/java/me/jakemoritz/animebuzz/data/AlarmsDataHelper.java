@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 
@@ -67,13 +68,13 @@ public class AlarmsDataHelper {
             alarmHolder.save();
         }
 
-        App.getInstance().cancelAllAlarms(oldAlarms);
+        AlarmHelper.getInstance().cancelAllAlarms(oldAlarms);
 
         List<AlarmHolder> upgradedAlarms = AlarmHolder.listAll(AlarmHolder.class);
 
 
         App.getInstance().setAlarms(upgradedAlarms);
 
-        App.getInstance().setAlarmsOnBoot();
+        AlarmHelper.getInstance().setAlarmsOnBoot();
     }
 }

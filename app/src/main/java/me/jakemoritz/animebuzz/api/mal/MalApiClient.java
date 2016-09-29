@@ -13,6 +13,7 @@ import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
@@ -163,7 +164,7 @@ public class MalApiClient {
                         for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
                             series = (Series) iterator.next();
                             series.setInUserList(false);
-                            App.getInstance().removeAlarm(series);
+                            AlarmHelper.getInstance().removeAlarm(series);
                             iterator.remove();
                         }
 

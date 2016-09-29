@@ -14,6 +14,7 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
@@ -115,8 +116,8 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
 
-                    App.getInstance().generateNextEpisodeTimes(series, true);
-                    App.getInstance().generateNextEpisodeTimes(series, false);
+                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, true);
+                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, false);
 
                     SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
                 }

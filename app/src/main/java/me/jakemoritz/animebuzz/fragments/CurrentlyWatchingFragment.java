@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
@@ -96,7 +97,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
-                App.getInstance().resetAlarms();
+                AlarmHelper.getInstance().resetAlarms();
                 loadUserSortingPreference();
                 stopRefreshing();
             }
@@ -107,7 +108,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     public void malDataImported(boolean received) {
         super.malDataImported(received);
 
-        App.getInstance().resetAlarms();
+        AlarmHelper.getInstance().resetAlarms();
 
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializingGotImages(false);

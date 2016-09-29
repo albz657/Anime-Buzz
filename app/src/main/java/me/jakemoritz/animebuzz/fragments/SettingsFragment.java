@@ -28,6 +28,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
@@ -173,7 +174,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))) {
-            App.getInstance().switchAlarmTiming();
+            AlarmHelper.getInstance().switchAlarmTiming();
         } else if (s.equals(getString(R.string.pref_24hour_key))) {
             if (format24hourPreference.isChecked()) {
                 format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
@@ -266,7 +267,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         App.getInstance().getBacklog().clear();
 
-        App.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
+        AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
         AlarmHolder.deleteAll(AlarmHolder.class);

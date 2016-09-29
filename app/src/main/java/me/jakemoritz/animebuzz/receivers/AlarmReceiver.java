@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
@@ -55,7 +56,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     App.getInstance().getBacklog().add(backlogItem);
 
                     series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
-                    App.getInstance().makeAlarm(series);
+                    AlarmHelper.getInstance().makeAlarm(series);
 
                     if (App.getInstance().getMainActivity() != null){
                         App.getInstance().getMainActivity().episodeNotificationReceived();
@@ -67,7 +68,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            App.getInstance().setAlarmsOnBoot();
+            AlarmHelper.getInstance().setAlarmsOnBoot();
         }
     }
 

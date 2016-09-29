@@ -30,6 +30,7 @@ import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -255,7 +256,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         getmAdapter().notifyDataSetChanged();
 
         if (item.getAirdate() > 0 && item.getSimulcast_airdate() > 0) {
-            App.getInstance().makeAlarm(item);
+            AlarmHelper.getInstance().makeAlarm(item);
         }
 
         if (swipeRefreshLayout != null)
@@ -278,7 +279,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
         getmAdapter().notifyDataSetChanged();
 
-        App.getInstance().removeAlarm(item);
+        AlarmHelper.getInstance().removeAlarm(item);
 
         if (swipeRefreshLayout != null)
         Snackbar.make(swipeRefreshLayout, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
