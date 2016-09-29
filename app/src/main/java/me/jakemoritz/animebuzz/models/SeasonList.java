@@ -7,7 +7,7 @@ public class SeasonList extends ArrayList<Season> {
 
     @Override
     public boolean add(Season season) {
-        if (contains(season)){
+        if (contains(season)) {
             int index = indexOf(season);
             Season currentEntry = get(index);
 

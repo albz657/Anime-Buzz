@@ -81,10 +81,18 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
+
         holder.series = visibleSeries.get(position);
+
+        boolean prefersEnglish = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_english_key), false);
+        if (prefersEnglish && !holder.series.getEnglishTitle().isEmpty()){
+            holder.mTitle.setText(holder.series.getEnglishTitle());
+        } else {
+            holder.mTitle.setText(holder.series.getName());
+        }
         holder.mTitle.setText(visibleSeries.get(position).getName());
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
         boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
         if ((mParent instanceof CurrentlyWatchingFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {

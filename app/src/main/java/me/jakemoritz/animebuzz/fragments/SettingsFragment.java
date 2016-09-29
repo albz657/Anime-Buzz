@@ -57,77 +57,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         setCorrectSummaries();
     }
 
-    private void setCorrectSummaries() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
-
-        if (prefersSimulcast) {
-            simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
-        } else {
-            simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
-        }
-
-        boolean prefers24Hour = sharedPreferences.getBoolean(getString(R.string.pref_24hour_key), false);
-
-        if (prefers24Hour) {
-            format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
-        } else {
-            format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
-        }
-
-        boolean promptIncrement = sharedPreferences.getBoolean(getString(R.string.pref_increment_key), false);
-        if (promptIncrement) {
-            incrementPreference.setSummary(getString(R.string.pref_increment_summary));
-        } else {
-            incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
-        }
-    }
-
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-        if (s.equals(getString(R.string.pref_simulcast_key))) {
-            App.getInstance().switchAlarmTiming();
-        } else if (s.equals(getString(R.string.pref_24hour_key))) {
-            if (format24hourPreference.isChecked()) {
-                format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
-            } else {
-                format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
-            }
-        } else if (s.equals(getString(R.string.pref_increment_key))) {
-            if (incrementPreference.isChecked()) {
-                incrementPreference.setSummary(getString(R.string.pref_increment_summary));
-            } else {
-                incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
-            }
-        } else if (s.equals(getString(R.string.pref_ringtone_key))) {
-            setRingtoneSummary();
-        } else if (s.equals(getString(R.string.pref_firebase_key))) {
-            FirebaseAnalytics.getInstance(App.getInstance()).setAnalyticsCollectionEnabled(firebasePreference.isChecked());
-        }
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        container.removeAllViews();
+        container.clearDisappearingChildren();
+        return super.onCreateView(inflater, container, savedInstanceState);
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        final RecyclerView listView = getListView();
-        listView.setFocusable(false);
-        listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
-        setDivider(null);
-
-        App.getInstance().fixToolbar(this.getClass().getSimpleName());
-    }
-
-    private void setRingtoneSummary() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String ringtoneKey = sharedPreferences.getString(getString(R.string.pref_ringtone_key), "Silent");
-
-        Uri ringtoneUri = Uri.parse(ringtoneKey);
-        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
-        if (ringtone != null) {
-            String name = ringtone.getTitle(App.getInstance());
-            ringtonePreference.setSummary(name);
-        }
     }
 
     @Override
@@ -197,6 +132,91 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        final RecyclerView listView = getListView();
+        listView.setFocusable(false);
+        listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
+        setDivider(null);
+
+        App.getInstance().fixToolbar(this.getClass().getSimpleName());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    private void setCorrectSummaries() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        boolean prefersSimulcast = sharedPreferences.getBoolean(getString(R.string.pref_simulcast_key), false);
+
+        if (prefersSimulcast) {
+            simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
+        } else {
+            simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
+        }
+
+        boolean prefers24Hour = sharedPreferences.getBoolean(getString(R.string.pref_24hour_key), false);
+
+        if (prefers24Hour) {
+            format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
+        } else {
+            format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
+        }
+
+        boolean promptIncrement = sharedPreferences.getBoolean(getString(R.string.pref_increment_key), false);
+        if (promptIncrement) {
+            incrementPreference.setSummary(getString(R.string.pref_increment_summary));
+        } else {
+            incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
+        }
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        if (s.equals(getString(R.string.pref_simulcast_key))) {
+            App.getInstance().switchAlarmTiming();
+        } else if (s.equals(getString(R.string.pref_24hour_key))) {
+            if (format24hourPreference.isChecked()) {
+                format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
+            } else {
+                format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
+            }
+        } else if (s.equals(getString(R.string.pref_increment_key))) {
+            if (incrementPreference.isChecked()) {
+                incrementPreference.setSummary(getString(R.string.pref_increment_summary));
+            } else {
+                incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
+            }
+        } else if (s.equals(getString(R.string.pref_ringtone_key))) {
+            setRingtoneSummary();
+        } else if (s.equals(getString(R.string.pref_firebase_key))) {
+            FirebaseAnalytics.getInstance(App.getInstance()).setAnalyticsCollectionEnabled(firebasePreference.isChecked());
+        }
+    }
+
+    private void setRingtoneSummary() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        String ringtoneKey = sharedPreferences.getString(getString(R.string.pref_ringtone_key), "Silent");
+
+        Uri ringtoneUri = Uri.parse(ringtoneKey);
+        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+        if (ringtone != null) {
+            String name = ringtone.getTitle(App.getInstance());
+            ringtonePreference.setSummary(name);
+        }
+    }
+
     public void signOut(Preference preference) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -225,14 +245,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private void importExistingSeries() {
         ImportFragment importFragment = ImportFragment.newInstance(this);
         importFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "");
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        container.removeAllViews();
-        container.clearDisappearingChildren();
-        return super.onCreateView(inflater, container, savedInstanceState);
-
     }
 
     public void addToMAL(boolean add) {
@@ -299,20 +311,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         incrementPreference.setChecked(true);
 
     }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-    }
-
 
     @Override
     public void verified(boolean verified) {

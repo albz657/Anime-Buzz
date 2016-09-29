@@ -101,7 +101,6 @@ public class ANNSearchHelper {
                     .addConverterFactory(factory)
                     .build();
 
-
             String queries = "";
             for (Series series : seriesList) {
                 queries = queries.concat(series.getANNID() + "/");

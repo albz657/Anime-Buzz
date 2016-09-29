@@ -66,8 +66,6 @@
     <string name="fragment_about">About</string>
 
     <!--File names-->
-    <string name="file_alarms">alarms</string>
-    <string name="season_list_file">seasonslist</string>
     <string name="file_avatar">malavatar</string>
 
     <!--Notifications-->
@@ -103,6 +101,9 @@
     <string name="pref_category_misc_title">Miscellaneous</string>
     <string name="pref_category_misc_key">categorymisckey</string>
 
+    <string name="pref_english_key">englishkey</string>
+    <string name="pref_english_title">Display English titles</string>
+
     <string name="pref_24hour_key">24hour</string>
     <string name="pref_24hour_title">Display time in 24-hour format</string>
     <string name="pref_24hour_off_summary">Time will be displayed in 12-hour format (AM/PM).</string>
@@ -135,6 +136,6 @@
     <string name="about_mal"><b>MyAnimeList</b> allows users to sign in with their MAL accounts to access and update the anime they\'re currently watching.</string>
     <string name="about_mal_url">http://myanimelist.net</string>
 
-    <string name="about_ann"><b>Anime News Network</b> provides the anime images used in this app.</string>
+    <string name="about_ann"><b>Anime News Network</b> provides the anime images and English titles used in this app.</string>
     <string name="about_ann_url">http://www.animenewsnetwork.com</string>
 </resources>

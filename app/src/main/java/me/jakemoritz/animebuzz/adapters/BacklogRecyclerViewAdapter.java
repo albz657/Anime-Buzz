@@ -48,8 +48,16 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+
         holder.backlogItem = backlogItems.get(position);
-        holder.mTitle.setText(holder.backlogItem.getSeries().getName());
+
+        boolean prefersEnglish = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_english_key), false);
+        if (prefersEnglish && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()){
+            holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
+        } else {
+            holder.mTitle.setText(holder.backlogItem.getSeries().getName());
+        }
 
 /*        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getMainActivity().getDir(("cache"), Context.MODE_PRIVATE);
@@ -85,7 +93,6 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             }
         }
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
         if (prefersSimulcast) {
