@@ -31,15 +31,13 @@ public class InfoHolder {
                 }
             } else {
                 while (node != null){
-                    if (node.getAttribute("lang") != null){
-                        if (node.getAttribute("lang").getValue().equals("EN")){
+                    if (node.getAttribute("lang") != null && node.getAttribute("type") != null){
+                        if (node.getAttribute("lang").getValue().equals("EN") && node.getAttribute("type").getValue().equals("Main title")){
                             infoHolder.englishTitle = value;
-                            break;
                         }
                     }
                     node = node.getNext();
                 }
-
             }
 
             return infoHolder;

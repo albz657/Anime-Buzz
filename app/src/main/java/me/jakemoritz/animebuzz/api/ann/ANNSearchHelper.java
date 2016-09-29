@@ -129,7 +129,6 @@ public class ANNSearchHelper {
                                                     series.save();
                                                 }
                                             }
-
                                         }
 
                                         if (infoHolder.getImageURL() != null) {
