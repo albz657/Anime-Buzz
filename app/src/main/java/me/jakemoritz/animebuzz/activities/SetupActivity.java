@@ -2,12 +2,10 @@ package me.jakemoritz.animebuzz.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.SwitchCompat;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,6 +22,7 @@ import com.redbooth.WelcomeCoordinatorLayout;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
@@ -98,10 +97,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(getString(R.string.pref_24hour_key), b);
-                editor.apply();
+                SharedPrefsHelper.getInstance().setPrefers24hour(b);
             }
         });
 
@@ -109,10 +105,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(getString(R.string.pref_simulcast_key), b);
-                editor.apply();
+                SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
             }
         });
 
@@ -139,12 +132,8 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             ImageView signInCheckmark = (ImageView) findViewById(R.id.sign_in_checkmark);
             signInCheckmark.setVisibility(View.VISIBLE);
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(getString(R.string.credentials_username), usernameField.getText().toString().trim());
-            editor.putString(getString(R.string.credentials_password), passwordField.getText().toString());
-            editor.putBoolean(getString(R.string.shared_prefs_logged_in), true);
-            editor.apply();
+            SharedPrefsHelper.getInstance().setUsername(usernameField.getText().toString().trim());
+            SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
 
             if (findViewById(R.id.coordinator) != null)
                 Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();

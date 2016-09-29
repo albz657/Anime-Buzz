@@ -2,11 +2,9 @@ package me.jakemoritz.animebuzz.dialogs;
 
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v7.preference.PreferenceManager;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,6 +19,7 @@ import android.widget.TextView;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SignInFragment extends DialogFragment implements VerifyCredentialsResponse {
@@ -122,13 +121,10 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
     @Override
     public void verifyCredentialsResponseReceived(boolean verified) {
         if (verified) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(App.getInstance().getString(R.string.mal_username_formatted), usernameField.getText().toString());
-            editor.putString(getString(R.string.credentials_username), usernameField.getText().toString().trim());
-            editor.putString(getString(R.string.credentials_password), passwordField.getText().toString());
-            editor.putBoolean(getString(R.string.shared_prefs_logged_in), true);
-            editor.apply();
+            SharedPrefsHelper.getInstance().setMalUsernameFormatted(usernameField.getText().toString());
+            SharedPrefsHelper.getInstance().setUsername(usernameField.getText().toString().trim());
+            SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
+            SharedPrefsHelper.getInstance().setLoggedIn(true);
 
             listener.verified(true);
 

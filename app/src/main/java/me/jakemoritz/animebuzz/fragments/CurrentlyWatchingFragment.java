@@ -1,10 +1,8 @@
 package me.jakemoritz.animebuzz.fragments;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v7.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,6 +14,7 @@ import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
@@ -80,7 +79,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         if (App.getInstance().isInitializingGotImages()) {
             App.getInstance().setInitializing(false);
 
-            if (App.getInstance().getLoggedIn()){
+            if (SharedPrefsHelper.getInstance().isLoggedIn()){
                 getMalApiClient().getUserList();
             } else {
                 stopRefreshing();
@@ -94,10 +93,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         }
 
         if (isUpdating()) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            boolean isLoggedIn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.shared_prefs_logged_in), false);
-
-            if (isLoggedIn) {
+            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
                 App.getInstance().resetAlarms();
@@ -135,10 +131,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         if (!isAdded()) {
             return;
         }
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        String sortPref = sharedPref.getString(getString(R.string.shared_prefs_sorting), "");
 
-        if (sortPref.equals("name")) {
+        if (SharedPrefsHelper.getInstance().getSortingPreference().equals("name")) {
             sortByName();
         } else {
             sortByDate();
@@ -146,10 +140,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     private void sortByDate() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.shared_prefs_sorting), "date");
-        editor.apply();
+        SharedPrefsHelper.getInstance().setSortingPreference("date");
 
         SeriesList noDateList = new SeriesList();
         SeriesList hasDateList = new SeriesList();
@@ -161,9 +152,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
-
-        if (prefersSimulcast) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
         } else {
             Collections.sort(hasDateList, new NextEpisodeAiringTimeComparator());
@@ -180,10 +169,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     private void sortByName() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.shared_prefs_sorting), "name");
-        editor.apply();
+        SharedPrefsHelper.getInstance().setSortingPreference("name");
 
         Collections.sort(getmAdapter().getAllSeries(), new SeriesNameComparator());
         getmAdapter().getVisibleSeries().clear();

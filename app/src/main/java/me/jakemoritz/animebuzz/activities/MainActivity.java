@@ -1,7 +1,6 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +11,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,6 +35,7 @@ import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 
 public class MainActivity extends AppCompatActivity
@@ -89,12 +88,8 @@ public class MainActivity extends AppCompatActivity
 
         App.getInstance().setMainActivity(this);
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
-        if (!sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false)) {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(getString(R.string.shared_prefs_completed_setup), true);
-            editor.apply();
+        if (!SharedPrefsHelper.getInstance().hasCompletedSetup()) {
+            SharedPrefsHelper.getInstance().setCompletedSetup(true);
 
             App.getInstance().setInitializing(true);
 
@@ -131,7 +126,7 @@ public class MainActivity extends AppCompatActivity
         loadDrawerUserInfo();
 
         if (App.getInstance().isInitializing()) {
-            if (App.getInstance().getLoggedIn()) {
+            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 CurrentlyWatchingFragment currentlyWatchingFragment = new CurrentlyWatchingFragment();
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
                 senpaiExportHelper.getLatestSeasonData();
@@ -279,9 +274,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String malUsername = sharedPreferences.getString(getString(R.string.mal_username_formatted), "");
-        drawerUsername.setText(malUsername);
+        drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());
     }
 
     @Override

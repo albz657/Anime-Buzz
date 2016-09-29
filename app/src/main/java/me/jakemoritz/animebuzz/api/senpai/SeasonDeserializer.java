@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
-import android.content.SharedPreferences;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -16,8 +14,8 @@ import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -56,11 +54,8 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
             seasonMetadata.save();
         }
 
-        if (App.getInstance().isInitializing() && App.getInstance().getLatestSeasonName().isEmpty()) {
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), seasonMetadata.getName());
-            editor.apply();
+        if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
+            SharedPrefsHelper.getInstance().setLatestSeasonName(seasonMetadata.getName());
         }
 
         // Parse Series
@@ -118,15 +113,12 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
 
                 Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
 
-                if (seasonName.equals(App.getInstance().getLatestSeasonName())) {
+                if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
 
                     App.getInstance().generateNextEpisodeTimes(series, true);
                     App.getInstance().generateNextEpisodeTimes(series, false);
 
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putLong(App.getInstance().getString(R.string.last_update_time), Calendar.getInstance().getTimeInMillis());
-                    editor.apply();
+                    SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
                 }
 
                 seasonSeries.add(series);

@@ -4,14 +4,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v4.app.Fragment;
-import android.support.v7.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.Spinner;
@@ -81,8 +79,6 @@ public class App extends SugarApp {
     public void onCreate() {
         super.onCreate();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         mInstance = this;
         allAnimeSeasons = new SeasonList();
         userAnimeList = new SeriesList();
@@ -97,14 +93,11 @@ public class App extends SugarApp {
             deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
         }
 
-        boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
-        if (completedSetup && !initializing) {
+        if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !initializing) {
             loadData();
-
             updateFormattedTimes();
 //            backlogDummyData();
 //            dummyAlarm();
-
             setAlarmsOnBoot();
         }
     }
@@ -124,8 +117,7 @@ public class App extends SugarApp {
 
     /* HELPERS */
     public void updateFormattedTimes() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        long lastUpdatedTime = sharedPreferences.getLong(getString(R.string.last_update_time), 0L);
+        long lastUpdatedTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
 
         Calendar currentCalendar = Calendar.getInstance();
 
@@ -140,9 +132,7 @@ public class App extends SugarApp {
                 generateNextEpisodeTimes(series, false);
             }
 
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putLong(getString(R.string.last_update_time), currentCalendar.getTimeInMillis());
-            editor.apply();
+            SharedPrefsHelper.getInstance().setLastUpdateTime(currentCalendar.getTimeInMillis());
         }
     }
 
@@ -247,7 +237,7 @@ public class App extends SugarApp {
         Collections.sort(metadataList, new SeasonMetadataComparator());
         SeasonMetadata latestSeason = null;
 
-        String latestSeasonName = getLatestSeasonName();
+        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
         for (SeasonMetadata metadata : metadataList) {
             if (metadata.getName().equals(latestSeasonName)) {
                 latestSeason = metadata;
@@ -267,7 +257,7 @@ public class App extends SugarApp {
 
     private void setCurrent() {
         for (SeasonMetadata seasonMetadata : seasonsList) {
-            if (seasonMetadata.getName().equals(getLatestSeasonName())) {
+            if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                 seasonMetadata.setCurrentOrNewer(true);
                 break;
             }
@@ -297,7 +287,7 @@ public class App extends SugarApp {
     public void removeOlderShows() {
         SeriesList removedShows = new SeriesList();
 
-        String latestSeasonName = getLatestSeasonName();
+        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
         for (Iterator iterator = userAnimeList.iterator(); iterator.hasNext(); ) {
             Series series = (Series) iterator.next();
             if (!series.getSeason().equals(latestSeasonName)) {
@@ -381,10 +371,7 @@ public class App extends SugarApp {
     }
 
     public void makeAlarm(Series series) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean prefersSimulcast = sharedPref.getBoolean(getString(R.string.pref_simulcast_key), false);
-
-        Calendar nextEpisode = generateNextEpisodeTimes(series, prefersSimulcast);
+        Calendar nextEpisode = generateNextEpisodeTimes(series, SharedPrefsHelper.getInstance().prefersSimulcast());
 
         AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
         newAlarm.save();
@@ -499,7 +486,7 @@ public class App extends SugarApp {
         }
         allAnimeSeasons = allAnime;
 
-        String currentlyBrowsingSeasonName = getLatestSeasonName();
+        String currentlyBrowsingSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
 
         for (Season season : allAnimeSeasons) {
             if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
@@ -532,16 +519,6 @@ public class App extends SugarApp {
     }
 
     /* ACCESSORS */
-
-    public String getLatestSeasonName() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return sharedPreferences.getString(getString(R.string.shared_prefs_latest_season), "");
-    }
-
-    public boolean getLoggedIn() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        return sharedPreferences.getBoolean(getString(R.string.shared_prefs_logged_in), false);
-    }
 
     public Season getSeasonFromName(String seasonName) {
         for (Season season : allAnimeSeasons) {

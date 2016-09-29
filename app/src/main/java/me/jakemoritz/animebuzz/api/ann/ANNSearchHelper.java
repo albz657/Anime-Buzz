@@ -15,6 +15,7 @@ import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.ANNEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -85,7 +86,7 @@ public class ANNSearchHelper {
                 }
             }, 1000);
         } else {
-            if (App.getInstance().isInitializing() && App.getInstance().getLoggedIn()) {
+            if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().isLoggedIn()) {
                 App.getInstance().setInitializingGotImages(true);
             }
         }

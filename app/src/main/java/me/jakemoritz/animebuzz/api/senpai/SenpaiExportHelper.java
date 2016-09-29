@@ -4,10 +4,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -20,6 +18,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -184,10 +183,7 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
 
-                    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-                    SharedPreferences.Editor editor = settings.edit();
-                    editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), response.body().getSeasonMetadata().getName());
-                    editor.apply();
+                    SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonMetadata().getName());
 
                     App.getInstance().removeOlderShows();
 

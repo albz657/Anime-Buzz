@@ -2,14 +2,12 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,6 +32,7 @@ import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
@@ -303,12 +302,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private void itemStatusChangeHelper(Series item) {
         itemToBeChanged = item;
 
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        if (App.getInstance().getLoggedIn()) {
+        if (SharedPrefsHelper.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {
-                String username = sharedPref.getString(App.getInstance().getString(R.string.credentials_username), "");
-                String password = sharedPref.getString(App.getInstance().getString(R.string.credentials_password), "");
+                String username = SharedPrefsHelper.getInstance().getUsername();
+                String password = SharedPrefsHelper.getInstance().getPassword();
 
                 malApiClient.verify(username, password);
             } else {

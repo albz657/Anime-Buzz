@@ -1,9 +1,7 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -23,6 +21,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -48,36 +47,13 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
         holder.backlogItem = backlogItems.get(position);
 
-        boolean prefersEnglish = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_english_key), false);
-        if (prefersEnglish && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()){
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()){
             holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
         } else {
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
-
-/*        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
-        File cacheDirectory = App.getInstance().getMainActivity().getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-        File bitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
-        if (bitmapFile.exists()) {
-            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
-        } else {
-            File MALbitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getMALID() + "_MAL.jpg");
-            if (MALbitmapFile.exists()) {
-                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
-            } else {
-                File bitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + ".jpg");
-                if (bitmapFile.exists()) {
-                    picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
-                } else {
-                    picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-                }
-            }
-        }*/
 
         Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();
@@ -93,9 +69,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             }
         }
 
-        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
-
-        if (prefersSimulcast) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
             if (!holder.backlogItem.getSeries().getSimulcast().equals("false")) {
@@ -141,11 +115,9 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         }
 
-        boolean prefers24hour = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_24hour_key), false);
-
         Calendar backlogCalendar = Calendar.getInstance();
         backlogCalendar.setTimeInMillis(holder.backlogItem.getAlarmTime());
-        holder.mDate.setText(App.getInstance().formatAiringTime(backlogCalendar, prefers24hour));
+        holder.mDate.setText(App.getInstance().formatAiringTime(backlogCalendar, SharedPrefsHelper.getInstance().prefers24hour()));
     }
 
     @Override
@@ -157,10 +129,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     public void onItemDismiss(int position) {
         Series series = backlogItems.get(position).getSeries();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean displayPrompt = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_increment_key), true);
-
-        if (displayPrompt && App.getInstance().getLoggedIn()) {
+        if (SharedPrefsHelper.getInstance().prefersIncrementDialog() && SharedPrefsHelper.getInstance().isLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
@@ -177,10 +146,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         if (response == 1) {
             malApiClient.updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
         } else if (response == -1) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(App.getInstance().getString(R.string.pref_increment_key), false);
-            editor.apply();
+            SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }
 
         BacklogItem removedItem = backlogItems.remove(position);
@@ -191,18 +157,18 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
 
-        public final TextView mTitle;
-        public final ImageView mPoster;
-        public final TextView mDate;
-        public final ImageView mWatch;
-        public final TextView mSimulcast;
+        final TextView mTitle;
+        final ImageView mPoster;
+        final TextView mDate;
+        final ImageView mWatch;
+        final TextView mSimulcast;
 
-        public BacklogItem backlogItem;
+        BacklogItem backlogItem;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);

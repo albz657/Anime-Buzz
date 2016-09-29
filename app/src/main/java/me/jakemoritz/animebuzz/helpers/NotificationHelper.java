@@ -5,13 +5,11 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.preference.PreferenceManager;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -67,9 +65,7 @@ public class NotificationHelper {
     }
 
     public void createNewEpisodeNotification(Series series) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        String ringtonePref = sharedPreferences.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
+        String ringtonePref = SharedPrefsHelper.getInstance().getRingtone();
         Uri ringtoneUri = Uri.parse(ringtonePref);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
         String ringtoneName = "Silent";
@@ -105,20 +101,16 @@ public class NotificationHelper {
         }
         Notification notification = mBuilder.build();
 
-        boolean vibrateOn = sharedPreferences.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), true);
-
-        if (vibrateOn) {
+        if (SharedPrefsHelper.getInstance().prefersVibrate()) {
             notification.defaults |= Notification.DEFAULT_VIBRATE;
         }
 
-        String ledOn = sharedPreferences.getString(App.getInstance().getString(R.string.pref_led_key), "-1");
-
-        if (!ledOn.equals("-1")) {
+        if (!SharedPrefsHelper.getInstance().getLed().equals("-1")) {
 //            notification.defaults |= Notification.DEFAULT_LIGHTS;
             notification.flags = Notification.FLAG_SHOW_LIGHTS;
             notification.ledOnMS = 1000;
             notification.ledOffMS = 1000;
-            notification.ledARGB = Integer.parseInt(ledOn, 16);
+            notification.ledARGB = Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16);
         }
 
 

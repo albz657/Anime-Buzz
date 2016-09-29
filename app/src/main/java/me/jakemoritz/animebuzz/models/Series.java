@@ -1,12 +1,8 @@
 package me.jakemoritz.animebuzz.models;
 
-import android.content.SharedPreferences;
-import android.support.v7.preference.PreferenceManager;
-
 import com.orm.SugarRecord;
 
-import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
 public class Series extends SugarRecord{
 
@@ -229,18 +225,14 @@ public class Series extends SugarRecord{
     }
 
     public String getNextEpisodeTimeFormatted(){
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean prefers24Hour = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_24hour_key), false);
-        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
-
-        if (prefersSimulcast) {
-            if (prefers24Hour){
+        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
+            if (SharedPrefsHelper.getInstance().prefers24hour()){
                 return nextEpisodeSimulcastTimeFormatted24;
             } else {
                 return nextEpisodeSimulcastTimeFormatted;
             }
         } else {
-            if (prefers24Hour){
+            if (SharedPrefsHelper.getInstance().prefers24hour()){
                 return nextEpisodeAirtimeFormatted24;
             } else {
                 return nextEpisodeAirtimeFormatted;

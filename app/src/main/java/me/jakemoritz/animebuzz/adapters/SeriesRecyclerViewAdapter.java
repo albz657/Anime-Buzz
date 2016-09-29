@@ -1,9 +1,7 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +22,7 @@ import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
@@ -46,20 +45,20 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         modifyListener = listener;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
 
-        public final TextView mTitle;
-        public final ImageView mPoster;
-        public final TextView mDate;
-        public final TextView mSimulcast;
-        public final ImageButton mAddButton;
-        public final ImageButton mMinusButton;
-        public final ImageView mWatch;
+        final TextView mTitle;
+        final ImageView mPoster;
+        final TextView mDate;
+        final TextView mSimulcast;
+        final ImageButton mAddButton;
+        final ImageButton mMinusButton;
+        final ImageView mWatch;
 
         public Series series;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mTitle = (TextView) view.findViewById(R.id.series_title);
@@ -81,19 +80,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mParent.getContext());
-
         holder.series = visibleSeries.get(position);
 
-        boolean prefersEnglish = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_english_key), false);
-        if (prefersEnglish && !holder.series.getEnglishTitle().isEmpty()){
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()){
             holder.mTitle.setText(holder.series.getEnglishTitle());
         } else {
             holder.mTitle.setText(holder.series.getName());
         }
         holder.mTitle.setText(visibleSeries.get(position).getName());
-
-        boolean prefersSimulcast = sharedPref.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
 
         if ((mParent instanceof CurrentlyWatchingFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
             if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
@@ -123,7 +117,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 //            holder.mWatch.setVisibility(View.INVISIBLE);
         }
 
-        if (prefersSimulcast) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
             if (!holder.series.getSimulcast().equals("false")) {
@@ -167,26 +161,6 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
-
-/*        Picasso picasso = Picasso.with(mParent.getContext());
-        File cacheDirectory = mParent.getContext().getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-        File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
-        if (smallBitmapFile.exists()) {
-            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
-        } else {
-            File MALbitmapFile = new File(imageCacheDirectory, holder.series.getMALID() + "_MAL.jpg");
-            if (MALbitmapFile.exists()) {
-                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
-            } else {
-                File bitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + ".jpg");
-                if (bitmapFile.exists()) {
-                    picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
-                } else {
-                    picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-                }
-            }
-        }*/
 
         Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();

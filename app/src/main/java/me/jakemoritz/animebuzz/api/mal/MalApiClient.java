@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.api.mal;
 
-import android.content.SharedPreferences;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -10,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
@@ -67,12 +65,7 @@ public class MalApiClient {
     }
 
     public void addAnime(String MALID) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
-
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -94,15 +87,10 @@ public class MalApiClient {
     }
 
     public void updateAnimeEpisodeCount(String MALID) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
-
         Series series = Series.findById(Series.class, Long.valueOf(MALID));
 
         if (series != null) {
-            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
             Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + (series.getEpisodesWatched() + 1) + "</episode></entry>", MALID);
             call.enqueue(new Callback<Void>() {
                 @Override
@@ -121,12 +109,7 @@ public class MalApiClient {
     }
 
     public void deleteAnime(String MALID) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
-
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.deleteAnime(MALID);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -147,19 +130,14 @@ public class MalApiClient {
         });
     }
 
-    public void getUserAvatar() {
+    private void getUserAvatar() {
         GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask();
         getUserAvatarTask.execute();
     }
 
     public void getUserList() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-
-        String username = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_username), "");
-        String password = sharedPreferences.getString(App.getInstance().getString(R.string.credentials_password), "");
-
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
-        Call<UserListHolder> call = malEndpointInterface.getUserList(username, "all", "anime");
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
 
         call.enqueue(new Callback<UserListHolder>() {
             @Override
@@ -211,7 +189,7 @@ public class MalApiClient {
         return createService(serviceClass, null, null);
     }
 
-    public static <S> S createService(Class<S> serviceClass, String username, String password) {
+    private static <S> S createService(Class<S> serviceClass, String username, String password) {
         if (username != null && password != null) {
             String credentials = username + ":" + password;
             final String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
@@ -250,15 +228,12 @@ public class MalApiClient {
                 if (response.isSuccessful()) {
                     verifyListener.verifyCredentialsResponseReceived(true);
 
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
                     if (response.body().getUsername() != null) {
-                        editor.putString(App.getInstance().getString(R.string.mal_username_formatted), response.body().getUsername());
+                        SharedPrefsHelper.getInstance().setMalUsernameFormatted(response.body().getUsername());
                     }
                     if (response.body().getUserID() != null) {
-                        editor.putString(App.getInstance().getString(R.string.mal_userid), response.body().getUserID());
+                        SharedPrefsHelper.getInstance().setMalId(response.body().getUserID());
                     }
-                    editor.apply();
                 } else {
                     verifyListener.verifyCredentialsResponseReceived(false);
                 }

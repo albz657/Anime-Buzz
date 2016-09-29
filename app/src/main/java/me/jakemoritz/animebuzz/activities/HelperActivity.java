@@ -1,13 +1,11 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.preference.PreferenceManager;
 
-import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
 public class HelperActivity extends AppCompatActivity {
 
@@ -16,10 +14,8 @@ public class HelperActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check sign-in state
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean completedSetup = sharedPreferences.getBoolean(getString(R.string.shared_prefs_completed_setup), false);
 
-        if (completedSetup){
+        if (SharedPrefsHelper.getInstance().hasCompletedSetup()){
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {
