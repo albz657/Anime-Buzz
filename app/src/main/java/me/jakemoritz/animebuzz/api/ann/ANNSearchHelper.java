@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.api.ann;
 
 import android.os.Handler;
+import android.support.v4.util.LongSparseArray;
 
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.core.Persister;
@@ -117,18 +118,20 @@ public class ANNSearchHelper {
                     if (response.isSuccessful()) {
                         if (response.body().getAnimeList() != null) {
                             List<ImageRequestHolder> getImageBatch = new ArrayList<>();
+                            LongSparseArray<String> englishTitles = new LongSparseArray<String>();
                             for (AnimeHolder animeHolder : response.body().getAnimeList()) {
                                 if (animeHolder.getInfoList() != null) {
                                     for (InfoHolder infoHolder : animeHolder.getInfoList()) {
                                         if (infoHolder.getEnglishTitle() != null) {
-                                            List<Series> foundSeries = Series.find(Series.class, "ANNID = ?", animeHolder.getANNID());
+                                            englishTitles.put(Long.valueOf(animeHolder.getANNID()), infoHolder.getEnglishTitle());
+/*                                            List<Series> foundSeries = Series.find(Series.class, "ANNID = ?", animeHolder.getANNID());
                                             if (!foundSeries.isEmpty()){
                                                 Series series = foundSeries.get(0);
                                                 if (series != null) {
                                                     series.setEnglishTitle(infoHolder.getEnglishTitle());
                                                     series.save();
                                                 }
-                                            }
+                                            }*/
                                         }
 
                                         if (infoHolder.getImageURL() != null) {
@@ -141,6 +144,14 @@ public class ANNSearchHelper {
                                     }
                                 }
                             }
+
+                            for (Series series : App.getInstance().getAllAnimeSeasons().get(App.getInstance().indexOfCurrentSeason()).getSeasonSeries()) {
+                                if (englishTitles.get(series.getANNID()) != null){
+                                    series.setEnglishTitle(englishTitles.get(series.getANNID()));
+                                    series.save();
+                                }
+                            }
+
                             getImageFromURL(getImageBatch);
                         }
                     }

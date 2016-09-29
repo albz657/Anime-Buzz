@@ -301,6 +301,17 @@ public class App extends SugarApp {
         Series.saveInTx(removedShows);
     }
 
+    public int indexOfCurrentSeason(){
+        Collections.sort(allAnimeSeasons, new SeasonComparator());
+
+        for (Season season : allAnimeSeasons){
+            if (season.getSeasonMetadata().getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+                return allAnimeSeasons.indexOf(season);
+            }
+        }
+        return -1;
+    }
+
     /* ALARMS */
 
     public void resetAlarms() {
@@ -485,6 +496,7 @@ public class App extends SugarApp {
             }
         }
         allAnimeSeasons = allAnime;
+        Collections.sort(allAnimeSeasons, new SeasonComparator());
 
         String currentlyBrowsingSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
 

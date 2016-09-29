@@ -3,7 +3,13 @@ package me.jakemoritz.animebuzz.models;
 public class Season {
     @Override
     public boolean equals(Object o) {
-        return seasonMetadata.equals(o);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Season season = (Season) o;
+
+        return seasonMetadata.equals(season.seasonMetadata);
+
     }
 
     @Override
