@@ -2,6 +2,10 @@ package me.jakemoritz.animebuzz.api.ann;
 
 import android.os.Handler;
 
+import org.simpleframework.xml.convert.AnnotationStrategy;
+import org.simpleframework.xml.core.Persister;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +39,7 @@ public class ANNSearchHelper {
         this.getImageURLBatch = new ArrayList<>();
     }
 
-    public void   getImages(SeriesList seriesList) {
+    public void getImages(SeriesList seriesList) {
         SeriesList cleanedList = new SeriesList();
         for (Series series : seriesList) {
             if (series.getANNID() > 0) {
@@ -81,7 +85,7 @@ public class ANNSearchHelper {
                 }
             }, 1000);
         } else {
-            if (App.getInstance().isInitializing() && App.getInstance().getLoggedIn()){
+            if (App.getInstance().isInitializing() && App.getInstance().getLoggedIn()) {
                 App.getInstance().setInitializingGotImages(true);
             }
         }
@@ -89,16 +93,14 @@ public class ANNSearchHelper {
 
     private void getPictureUrlBatch(SeriesList seriesList) {
         if (!seriesList.isEmpty()) {
-/*            OkHttpClient client = new OkHttpClient.Builder()
-                    .connectTimeout(1, TimeUnit.MINUTES)
-                    .readTimeout(1, TimeUnit.MINUTES)
-                    .build();*/
+            SimpleXmlConverterFactory factory = SimpleXmlConverterFactory.create(new Persister(new AnnotationStrategy()));
 
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(new OkHttpClient())
-                    .addConverterFactory(SimpleXmlConverterFactory.create())
+                    .addConverterFactory(factory)
                     .build();
+
 
             String queries = "";
             for (Series series : seriesList) {
@@ -112,21 +114,29 @@ public class ANNSearchHelper {
             call.enqueue(new Callback<ANNXMLHolder>() {
                 @Override
                 public void onResponse(Call<ANNXMLHolder> call, Response<ANNXMLHolder> response) {
-/*                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel("image".hashCode());*/
-
                     if (response.isSuccessful()) {
                         if (response.body().getAnimeList() != null) {
                             List<ImageRequestHolder> getImageBatch = new ArrayList<>();
                             for (AnimeHolder animeHolder : response.body().getAnimeList()) {
                                 if (animeHolder.getInfoList() != null) {
                                     for (InfoHolder infoHolder : animeHolder.getInfoList()) {
-                                        if (infoHolder.getImgList() != null) {
-                                            if (infoHolder.getImgList().size() > 1) {
-                                                getImageBatch.add(new ImageRequestHolder(infoHolder.getImgList().get(0).getURL(), animeHolder.getANNID(), "small"));
-                                                //getImageBatch.add(new ImageRequestHolder(infoHolder.getImgList().get(infoHolder.getImgList().size() - 1).getURL(), animeHolder.getANNID(), "big"));
-                                            } else {
-                                                getImageBatch.add(new ImageRequestHolder(infoHolder.getImgList().get(0).getURL(), animeHolder.getANNID(), "big"));
+                                        if (infoHolder.getEnglishTitle() != null) {
+                                            List<Series> foundSeries = Series.find(Series.class, "ANNID = ?", animeHolder.getANNID());
+                                            if (!foundSeries.isEmpty()){
+                                                Series series = foundSeries.get(0);
+                                                if (series != null) {
+                                                    series.setEnglishTitle(infoHolder.getEnglishTitle());
+                                                    series.save();
+                                                }
+                                            }
+
+                                        }
+
+                                        if (infoHolder.getImageURL() != null) {
+                                            File cacheDirectory = App.getInstance().getCacheDir();
+                                            File bitmapFile = new File(cacheDirectory, animeHolder.getANNID() + ".jpg");
+                                            if (!bitmapFile.exists()) {
+                                                getImageBatch.add(new ImageRequestHolder(infoHolder.getImageURL(), animeHolder.getANNID(), ""));
                                             }
                                         }
                                     }
@@ -140,9 +150,6 @@ public class ANNSearchHelper {
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
-/*                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel("image".hashCode());*/
-
                     seriesFragment.seasonPostersImported(false);
                 }
             });

@@ -77,7 +77,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     @Override
     public void episodeCountIncremented(boolean incremented) {
-        if (!incremented) {
+        if (!incremented && backlogLayout != null) {
             Snackbar.make(backlogLayout, App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
         }
     }

@@ -27,6 +27,7 @@ public class Series extends SugarRecord{
     private String nextEpisodeAirtimeFormatted24;
     private String nextEpisodeSimulcastTimeFormatted24;
     private long lastNotificationTime;
+    private String englishTitle;
 
     public Series(){
 
@@ -51,9 +52,10 @@ public class Series extends SugarRecord{
         this.nextEpisodeAirtimeFormatted24 = "";
         this.nextEpisodeSimulcastTimeFormatted24 = "";
         this.lastNotificationTime = 0;
+        this.englishTitle = "";
     }
 
-    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime) {
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle) {
         this.airdate = airdate;
         this.name = name;
         this.setId(MALID);
@@ -72,6 +74,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
         this.lastNotificationTime = lastNotificationTime;
+        this.englishTitle = englishTitle;
     }
 
     @Override
@@ -243,5 +246,13 @@ public class Series extends SugarRecord{
                 return nextEpisodeAirtimeFormatted;
             }
         }
+    }
+
+    public String getEnglishTitle() {
+        return englishTitle;
+    }
+
+    public void setEnglishTitle(String englishTitle) {
+        this.englishTitle = englishTitle;
     }
 }

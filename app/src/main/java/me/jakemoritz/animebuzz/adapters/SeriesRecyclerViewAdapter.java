@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
@@ -161,7 +160,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
 
-        Picasso picasso = Picasso.with(mParent.getContext());
+/*        Picasso picasso = Picasso.with(mParent.getContext());
         File cacheDirectory = mParent.getContext().getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
         File smallBitmapFile = new File(imageCacheDirectory, holder.series.getANNID() + "_small.jpg");
@@ -178,6 +177,20 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                 } else {
                     picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
                 }
+            }
+        }*/
+
+        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
+        File cacheDirectory = App.getInstance().getCacheDir();
+        File bitmapFile = new File(cacheDirectory, holder.series.getANNID() + ".jpg");
+        if (bitmapFile.exists()) {
+            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+        } else {
+            File MALbitmapFile = new File(cacheDirectory, holder.series.getMALID() + "_MAL.jpg");
+            if (MALbitmapFile.exists()) {
+                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
+            } else {
+                picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
             }
         }
 

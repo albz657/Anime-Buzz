@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
@@ -52,12 +51,12 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         holder.backlogItem = backlogItems.get(position);
         holder.mTitle.setText(holder.backlogItem.getSeries().getName());
 
-        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
+/*        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getMainActivity().getDir(("cache"), Context.MODE_PRIVATE);
         File imageCacheDirectory = new File(cacheDirectory, "images");
-        File smallBitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
-        if (smallBitmapFile.exists()) {
-            picasso.load(smallBitmapFile).fit().centerCrop().into(holder.mPoster);
+        File bitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getANNID() + "_small.jpg");
+        if (bitmapFile.exists()) {
+            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         } else {
             File MALbitmapFile = new File(imageCacheDirectory, holder.backlogItem.getSeries().getMALID() + "_MAL.jpg");
             if (MALbitmapFile.exists()) {
@@ -69,6 +68,20 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
                 } else {
                     picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
                 }
+            }
+        }*/
+
+        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
+        File cacheDirectory = App.getInstance().getCacheDir();
+        File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getANNID() + ".jpg");
+        if (bitmapFile.exists()) {
+            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+        } else {
+            File MALbitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + "_MAL.jpg");
+            if (MALbitmapFile.exists()) {
+                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
+            } else {
+                picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
             }
         }
 

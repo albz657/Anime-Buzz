@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.api.ann;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -49,28 +48,21 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void
         return null;
     }
 
-    private File getCachedPosterFile(String ANNID, String size) {
-        File cacheDirectory = App.getInstance().getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
+    private File getCachedPosterFile(String ANNID, String type) {
+        File cacheDirectory = App.getInstance().getCacheDir();
 
-        if (!(!cacheDirectory.exists() && !cacheDirectory.mkdir())) {
-            if (!(!imageCacheDirectory.exists() && !imageCacheDirectory.mkdir())) {
-                if (size.equals("circle")) {
-                    return new File(imageCacheDirectory, ANNID + "_circle.jpg");
-                } else if (size.equals("small")) {
-                    return new File(imageCacheDirectory, ANNID + "_small.jpg");
-                } else if (size.equals("MAL")) {
-                    return new File(imageCacheDirectory, ANNID + "_MAL.jpg");
-                } else {
-                    return new File(imageCacheDirectory, ANNID + ".jpg");
-                }
+        if (cacheDirectory.exists()) {
+            if (type.isEmpty()) {
+                return new File(cacheDirectory, ANNID + ".jpg");
+            } else if (type.equals("MAL")) {
+                return new File(cacheDirectory, ANNID + "_MAL.jpg");
             }
         }
         return null;
     }
 
 
-    public void cachePosters(List<ImageResponseHolder> imageResponses) {
+    private void cachePosters(List<ImageResponseHolder> imageResponses) {
         for (ImageResponseHolder imageResponse : imageResponses) {
             try {
                 File file = getCachedPosterFile(imageResponse.getANNID(), imageResponse.getSize());

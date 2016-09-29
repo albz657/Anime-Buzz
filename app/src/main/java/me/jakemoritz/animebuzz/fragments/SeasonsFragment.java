@@ -80,7 +80,9 @@ public class SeasonsFragment extends SeriesFragment {
             setUpdating(true);
         } else {
             stopRefreshing();
-            Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            if (getSwipeRefreshLayout() != null){
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 

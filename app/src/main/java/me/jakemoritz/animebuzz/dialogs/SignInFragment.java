@@ -77,7 +77,10 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
                         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
                         params.gravity = Gravity.TOP;
                         view.setLayoutParams(params);
-                        failSnackbar.show();
+
+                        if (dialogView != null){
+                            failSnackbar.show();
+                        }
                     }
                 }
                 return false;
@@ -110,7 +113,9 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            Snackbar.make(App.getInstance().getMainActivity().getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
+            if (App.getInstance().getMainActivity().getNavigationView() != null){
+                Snackbar.make(App.getInstance().getMainActivity().getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -134,6 +139,8 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
             params.gravity = Gravity.TOP;
             view.setLayoutParams(params);
+
+            if (dialogView != null)
             failSnackbar.show();
         }
     }

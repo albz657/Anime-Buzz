@@ -170,7 +170,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                     SignInFragment signInFragment = SignInFragment.newInstance(self);
                     signInFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "");
                 } else {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                    if (getView() != null)
+                        Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
 
                 return false;
@@ -212,7 +213,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
         App.getInstance().getMainActivity().loadDrawerUserInfo();
 
-        Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_LONG).show();
+        if (getView() != null)
+            Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_LONG).show();
 
         preference.setVisible(false);
         signInPreference.setVisible(true);
@@ -255,8 +257,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         malApiClient.getUserList();
 
-
-        Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+        if (App.getInstance().getMainActivity().findViewById(R.id.nav_view) != null)
+            Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
     }
 
     public void signIn() {
@@ -287,7 +289,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             App.getInstance().getMainActivity().startFragment(currentlyWatchingFragment);
             new MalApiClient(currentlyWatchingFragment).getUserList();
 
-            Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+            if (App.getInstance().getMainActivity().findViewById(R.id.nav_view) != null)
+                Snackbar.make(App.getInstance().getMainActivity().findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         }
 
         App.getInstance().getMainActivity().loadDrawerUserInfo();

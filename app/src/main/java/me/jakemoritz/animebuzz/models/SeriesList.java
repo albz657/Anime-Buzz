@@ -1,7 +1,6 @@
 package me.jakemoritz.animebuzz.models;
 
 import android.databinding.ObservableArrayList;
-import android.util.Log;
 
 import java.util.Collection;
 
@@ -49,6 +48,10 @@ public class SeriesList extends ObservableArrayList<Series> {
             }
             if (!series.getNextEpisodeSimulcastTimeFormatted24().isEmpty()){
                 currentEntry.setNextEpisodeSimulcastTimeFormatted24(series.getNextEpisodeSimulcastTimeFormatted24());
+            }
+
+            if (!series.getEnglishTitle().isEmpty() && currentEntry.getEnglishTitle().isEmpty()){
+                currentEntry.setEnglishTitle(series.getEnglishTitle());
             }
 
             return true;
