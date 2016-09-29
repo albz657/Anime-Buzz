@@ -18,6 +18,7 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.ANNEndpointInterface;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.OkHttpClient;
@@ -124,14 +125,6 @@ public class ANNSearchHelper {
                                     for (InfoHolder infoHolder : animeHolder.getInfoList()) {
                                         if (infoHolder.getEnglishTitle() != null) {
                                             englishTitles.put(Long.valueOf(animeHolder.getANNID()), infoHolder.getEnglishTitle());
-/*                                            List<Series> foundSeries = Series.find(Series.class, "ANNID = ?", animeHolder.getANNID());
-                                            if (!foundSeries.isEmpty()){
-                                                Series series = foundSeries.get(0);
-                                                if (series != null) {
-                                                    series.setEnglishTitle(infoHolder.getEnglishTitle());
-                                                    series.save();
-                                                }
-                                            }*/
                                         }
 
                                         if (infoHolder.getImageURL() != null) {
@@ -145,7 +138,18 @@ public class ANNSearchHelper {
                                 }
                             }
 
-                            for (Series series : App.getInstance().getAllAnimeSeasons().get(App.getInstance().indexOfCurrentSeason()).getSeasonSeries()) {
+                            int indexOfCurrentSeason = App.getInstance().indexOfCurrentSeason();
+                            Season currentSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason);
+                            SeriesList localSeries = currentSeason.getSeasonSeries();
+                            Season nextSeason;
+                            if (indexOfCurrentSeason + 1 <= App.getInstance().getAllAnimeSeasons().size() - 1){
+                                nextSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason + 1);
+                                localSeries.addAll(nextSeason.getSeasonSeries());
+                            }
+                            Season previousSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason - 1);
+                            localSeries.addAll(previousSeason.getSeasonSeries());
+
+                            for (Series series : localSeries) {
                                 if (englishTitles.get(series.getANNID()) != null){
                                     series.setEnglishTitle(englishTitles.get(series.getANNID()));
                                     series.save();
