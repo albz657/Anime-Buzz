@@ -128,6 +128,16 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
+    public String getPreviousSeasonName(){
+        return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_previous_season), "");
+    }
+
+    public void setPreviousSeasonName(String previousSeasonName){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(App.getInstance().getString(R.string.shared_prefs_previous_season), previousSeasonName);
+        editor.apply();
+    }
+
     public String getRingtone(){
         return sharedPrefs.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
     }

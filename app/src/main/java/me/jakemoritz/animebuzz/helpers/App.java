@@ -195,11 +195,11 @@ public class App extends SugarApp {
         Series.saveInTx(removedShows);
     }
 
-    public int indexOfCurrentSeason(){
+    public int indexOfCurrentSeason() {
         Collections.sort(allAnimeSeasons, new SeasonComparator());
 
-        for (Season season : allAnimeSeasons){
-            if (season.getSeasonMetadata().getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+        for (Season season : allAnimeSeasons) {
+            if (season.getSeasonMetadata().getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                 return allAnimeSeasons.indexOf(season);
             }
         }
@@ -259,25 +259,53 @@ public class App extends SugarApp {
 
     /* LOADING */
 
+    private void findPreviousSeason() {
+        int indexOfCurrentSeason = indexOfCurrentSeason();
+        int indexOfPreviousSeason = indexOfCurrentSeason - 1;
+        if (indexOfPreviousSeason >= 0){
+            Season season = allAnimeSeasons.get(indexOfPreviousSeason);
+            SharedPrefsHelper.getInstance().setPreviousSeasonName(season.getSeasonMetadata().getName());
+        }
+    }
+
     public void loadData() {
         seasonsList = new HashSet<>(SeasonMetadata.listAll(SeasonMetadata.class));
         setCurrent();
 
         SeasonList allAnime = new SeasonList();
-        for (SeasonMetadata seasonMetadata : seasonsList){
-            SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
 
-            if (!seasonSeries.isEmpty()){
-                allAnime.add(new Season(seasonSeries, seasonMetadata));
+        String previousSeasonName = SharedPrefsHelper.getInstance().getPreviousSeasonName();
+        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+
+        if (!previousSeasonName.isEmpty()) {
+            for (SeasonMetadata seasonMetadata : seasonsList) {
+                if (seasonMetadata.getName().equals(latestSeasonName) || seasonMetadata.getName().equals(previousSeasonName)){
+                    SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
+
+                    if (!seasonSeries.isEmpty()) {
+                        allAnime.add(new Season(seasonSeries, seasonMetadata));
+                    }
+                }
+            }
+        } else {
+            for (SeasonMetadata seasonMetadata : seasonsList) {
+                SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
+
+                if (!seasonSeries.isEmpty()) {
+                    allAnime.add(new Season(seasonSeries, seasonMetadata));
+                }
             }
         }
+
         allAnimeSeasons = allAnime;
         Collections.sort(allAnimeSeasons, new SeasonComparator());
 
-        String currentlyBrowsingSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+        if (previousSeasonName.isEmpty()) {
+            findPreviousSeason();
+        }
 
         for (Season season : allAnimeSeasons) {
-            if (season.getSeasonMetadata().getName().equals(currentlyBrowsingSeasonName)) {
+            if (season.getSeasonMetadata().getName().equals(latestSeasonName)) {
                 currentlyBrowsingSeason = season;
             }
         }

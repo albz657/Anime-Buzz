@@ -141,11 +141,6 @@ public class ANNSearchHelper {
                             int indexOfCurrentSeason = App.getInstance().indexOfCurrentSeason();
                             Season currentSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason);
                             SeriesList localSeries = currentSeason.getSeasonSeries();
-                            Season nextSeason;
-                            if (indexOfCurrentSeason + 1 <= App.getInstance().getAllAnimeSeasons().size() - 1){
-                                nextSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason + 1);
-                                localSeries.addAll(nextSeason.getSeasonSeries());
-                            }
                             Season previousSeason = App.getInstance().getAllAnimeSeasons().get(indexOfCurrentSeason - 1);
                             localSeries.addAll(previousSeason.getSeasonSeries());
 
