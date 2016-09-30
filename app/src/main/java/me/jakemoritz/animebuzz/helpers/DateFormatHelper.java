@@ -9,6 +9,15 @@ import java.util.Date;
 
 public class DateFormatHelper {
 
+    private static DateFormatHelper dateFormatHelper;
+
+    public synchronized static DateFormatHelper getInstance(){
+        if (dateFormatHelper == null){
+            dateFormatHelper = new DateFormatHelper();
+        }
+        return dateFormatHelper;
+    }
+
     public String getLocalFormattedDateFromStringDate(String stringDate) {
         try {
             SimpleDateFormat originalFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");

@@ -10,7 +10,7 @@ public class SharedPrefsHelper {
     private static SharedPrefsHelper prefsHelper;
     private SharedPreferences sharedPrefs;
 
-    public static SharedPrefsHelper getInstance(){
+    public synchronized static SharedPrefsHelper getInstance(){
         if (prefsHelper == null){
             prefsHelper = new SharedPrefsHelper();
             prefsHelper.sharedPrefs = PreferenceManager.getDefaultSharedPreferences(App.getInstance());

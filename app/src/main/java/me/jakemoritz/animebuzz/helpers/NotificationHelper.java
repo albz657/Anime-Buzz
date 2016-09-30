@@ -17,8 +17,13 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class NotificationHelper {
 
+    private static NotificationHelper notificationHelper;
 
-    public NotificationHelper() {
+    public synchronized static NotificationHelper getInstance(){
+        if (notificationHelper == null){
+            notificationHelper = new NotificationHelper();
+        }
+        return notificationHelper;
     }
 
     public void createUpdatingSeasonDataNotification(String seasonName) {

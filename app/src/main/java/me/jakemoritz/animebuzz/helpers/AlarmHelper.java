@@ -20,7 +20,7 @@ public class AlarmHelper {
     private static AlarmHelper alarmHelper;
     private AlarmManager alarmManager;
 
-    public static AlarmHelper getInstance(){
+    public synchronized static AlarmHelper getInstance(){
         if (alarmHelper == null){
             alarmHelper = new AlarmHelper();
             alarmHelper.alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
