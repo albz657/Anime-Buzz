@@ -46,13 +46,36 @@ public class NotificationHelper {
         mNotificationManager.notify(100, mBuilder.build());
     }
 
-    public void createImagesNotification(){
+    public void createImagesNotification(int max){
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
                         .setAutoCancel(true)
-                        .setProgress(0, 0, true)
-                        .setContentTitle("Downloading anime images");
+                        .setProgress(max, 0, false)
+                        .setContentTitle("Downloading images");
+
+        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent("image".hashCode(), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notification = mBuilder.build();
+
+        mNotificationManager.notify("image".hashCode(), notification);
+    }
+
+    public void updateImagesNotification(int max, int progress){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(App.getInstance())
+                        .setSmallIcon(R.drawable.bolt_copy)
+                        .setAutoCancel(true)
+                        .setProgress(max, progress, false)
+                        .setContentTitle("Downloading images");
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
 

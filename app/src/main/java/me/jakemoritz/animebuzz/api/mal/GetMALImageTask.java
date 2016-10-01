@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.api.mal;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -15,8 +17,9 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 
-public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Void, Void> {
+public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, Void> {
 
     private static final String TAG = GetMALImageTask.class.getSimpleName();
 
@@ -29,10 +32,25 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Void, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         seriesFragment.seasonPostersImported(true);
+
+        if (App.getInstance().isInitializing()){
+            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel("image".hashCode());
+        }
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        super.onProgressUpdate(values);
     }
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
+        int max = imageRequests[0].size();
+        if (max != 0 && App.getInstance().isInitializing()){
+            NotificationHelper.getInstance().createImagesNotification(max);
+        }
+
         for (MALImageRequest imageRequest : imageRequests[0]) {
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();
@@ -41,6 +59,8 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Void, Void
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            NotificationHelper.getInstance().updateImagesNotification(max, imageRequests[0].indexOf(imageRequest) + 1);
         }
         return null;
     }

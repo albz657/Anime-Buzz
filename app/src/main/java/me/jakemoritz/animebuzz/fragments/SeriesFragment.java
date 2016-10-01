@@ -125,6 +125,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().getAllAnimeSeasons().add(season);
             App.getInstance().saveNewSeasonData(season);
 
+            if (App.getInstance().isInitializing()){
+                seasonPostersImported(false);
+            }
+
             if (App.getInstance().isNetworkAvailable()){
 /*
                 if (annHelper == null){
