@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.api.hummingbird;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
 
@@ -38,16 +39,20 @@ public class HummingbirdApiClient {
         httpBuilder.addInterceptor(interceptor);
         OkHttpClient client = httpBuilder.build();
 
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
         Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create(new Gson()))
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         return retrofit.create(serviceClass);
     }
 
     public void getAnimeData() {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = createService(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData("32182");
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData("21");
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
