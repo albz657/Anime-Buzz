@@ -449,28 +449,12 @@ public class App extends SugarApp {
         this.initializingGotImages = initializingGotImages;
     }
 
-    public boolean isJustRemoved() {
-        return justRemoved;
-    }
-
     public void setJustRemoved(boolean justRemoved) {
         this.justRemoved = justRemoved;
     }
 
-    public boolean isJustSignedInFromSettings() {
-        return justSignedInFromSettings;
-    }
-
     public void setJustSignedInFromSettings(boolean justSignedInFromSettings) {
         this.justSignedInFromSettings = justSignedInFromSettings;
-    }
-
-    public boolean isAppVisible() {
-        return appVisible;
-    }
-
-    public void setAppVisible(boolean appVisible) {
-        this.appVisible = appVisible;
     }
 
     public boolean isNotificationReceived() {

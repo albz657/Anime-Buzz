@@ -154,26 +154,20 @@ public class MainActivity extends AppCompatActivity
 
     public void startFragment(Fragment fragment) {
         String id = "";
-        int menuIndex = 1;
 
         if (fragment instanceof BacklogFragment) {
             id = getString(R.string.fragment_watching_queue);
-            menuIndex = 0;
         } else if (fragment instanceof CurrentlyWatchingFragment) {
             id = getString(R.string.fragment_myshows);
-            menuIndex = 1;
         } else if (fragment instanceof SeasonsFragment) {
             id = getString(R.string.fragment_seasons);
-            menuIndex = 2;
         } else if (fragment instanceof SettingsFragment) {
             id = getString(R.string.action_settings);
-            menuIndex = 3;
         } else if (fragment instanceof AboutFragment) {
             id = "About";
-            menuIndex = 4;
         }
 
-        navigationView.getMenu().getItem(menuIndex).setChecked(true);
+        setNavPositions(fragment);
 
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, fragment, id)
@@ -188,16 +182,20 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
         App.getInstance().saveData();
-        App.getInstance().setAppVisible(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
 
+        final Fragment fragment = getCurrentFragment();
         if (openRingtones) {
-            final Fragment fragment = getCurrentFragment();
             if (fragment instanceof SettingsFragment) {
                 SettingsFragment settingsFragment = (SettingsFragment) fragment;
                 CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
@@ -206,7 +204,28 @@ public class MainActivity extends AppCompatActivity
             }
             openRingtones = false;
         }
-        App.getInstance().setAppVisible(true);
+
+        setNavPositions(fragment);
+    }
+
+    private void setNavPositions(Fragment fragment){
+        int menuIndex = -1;
+
+        if (fragment instanceof BacklogFragment) {
+            menuIndex = 0;
+        } else if (fragment instanceof CurrentlyWatchingFragment) {
+            menuIndex = 1;
+        } else if (fragment instanceof SeasonsFragment) {
+            menuIndex = 2;
+        } else if (fragment instanceof SettingsFragment) {
+            menuIndex = 3;
+        } else if (fragment instanceof AboutFragment) {
+            menuIndex = 4;
+        }
+
+        if (navigationView != null && menuIndex != -1){
+            navigationView.getMenu().getItem(menuIndex).setChecked(true);
+        }
     }
 
     @Override
@@ -315,7 +334,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 
     @Override
     protected void onNewIntent(Intent intent) {
