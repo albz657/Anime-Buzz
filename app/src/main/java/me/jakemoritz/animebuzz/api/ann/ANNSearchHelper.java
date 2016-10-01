@@ -14,7 +14,6 @@ import me.jakemoritz.animebuzz.api.ann.models.ANNXMLHolder;
 import me.jakemoritz.animebuzz.api.ann.models.AnimeHolder;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.ann.models.InfoHolder;
-import me.jakemoritz.animebuzz.api.mal.MalScraper;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -140,8 +139,6 @@ public class ANNSearchHelper {
                             }
 
                             SeriesList localSeries = new SeriesList();
-
-                            MalScraper scraper = new MalScraper();
 
                             if (App.getInstance().isInitializing() || App.getInstance().isPostInitializing()){
                                 for (Season season : App.getInstance().getAllAnimeSeasons()){
