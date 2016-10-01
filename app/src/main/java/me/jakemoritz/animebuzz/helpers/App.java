@@ -63,6 +63,7 @@ public class App extends SugarApp {
     private boolean appVisible = false;
     private boolean notificationReceived = false;
     private MainActivity mainActivity;
+    private boolean gettingInitialImages = false;
 
     @Override
     public void onCreate() {
@@ -478,6 +479,14 @@ public class App extends SugarApp {
 
     public void setNotificationReceived(boolean notificationReceived) {
         this.notificationReceived = notificationReceived;
+    }
+
+    public boolean isGettingInitialImages() {
+        return gettingInitialImages;
+    }
+
+    public void setGettingInitialImages(boolean gettingInitialImages) {
+        this.gettingInitialImages = gettingInitialImages;
     }
 }
 

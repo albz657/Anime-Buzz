@@ -125,10 +125,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().getAllAnimeSeasons().add(season);
             App.getInstance().saveNewSeasonData(season);
 
-            if (App.getInstance().isInitializing()){
-                seasonPostersImported(false);
-            }
-
             if (App.getInstance().isNetworkAvailable()){
 /*
                 if (annHelper == null){
@@ -136,6 +132,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 }
                 annHelper.getImages(season.getSeasonSeries());
 */
+                if (App.getInstance().isInitializing()){
+                    App.getInstance().setGettingInitialImages(true);
+                    seasonPostersImported(false);
+                }
+
                 MalScraperTask malScraperTask = new MalScraperTask(this);
                 malScraperTask.execute(season.getSeasonSeries());
 

@@ -17,7 +17,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 
 public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, Void> {
 
@@ -46,10 +45,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, V
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
-        int max = imageRequests[0].size();
-        if (max != 0 && App.getInstance().isInitializing()){
-            NotificationHelper.getInstance().createImagesNotification(max);
-        }
+
 
         for (MALImageRequest imageRequest : imageRequests[0]) {
             try {
@@ -60,7 +56,6 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, V
                 e.printStackTrace();
             }
 
-            NotificationHelper.getInstance().updateImagesNotification(max, imageRequests[0].indexOf(imageRequest) + 1);
         }
         return null;
     }

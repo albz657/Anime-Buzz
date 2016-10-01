@@ -1,12 +1,20 @@
 package me.jakemoritz.animebuzz.api.mal;
 
+import android.app.NotificationManager;
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
+
+import com.squareup.picasso.Picasso;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,16 +24,19 @@ import java.util.regex.Pattern;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
+public class MalScraperTask extends AsyncTask<SeriesList, MALImageRequest, Void> {
 
     private static final String TAG = MalScraperTask.class.getSimpleName();
 
     private List<MALImageRequest> imageRequests;
     private SeriesFragment callback;
+    private boolean initial = false;
+    private int max = 0;
 
     public MalScraperTask(SeriesFragment seriesFragment) {
         this.callback = seriesFragment;
@@ -39,22 +50,32 @@ public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
             App.getInstance().setInitializingGotImages(true);
         }
 
-        GetMALImageTask getMALImageTask = new GetMALImageTask(callback);
-        getMALImageTask.execute(imageRequests);
+        if (initial){
+            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel("image".hashCode());
+        }
     }
 
     @Override
     protected Void doInBackground(SeriesList... params) {
-        imageRequests = new ArrayList<>();
-        for (Series series : params[0]){
-            scrape(series);
+        max = params[0].size();
+
+        if (max != 0 && App.getInstance().isGettingInitialImages()){
+            NotificationHelper.getInstance().createImagesNotification(max);
+            initial = true;
+            App.getInstance().setGettingInitialImages(false);
         }
 
+        imageRequests = new ArrayList<>();
+        int index = 0;
+        for (Series series : params[0]){
+            index = params[0].indexOf(series) + 1;
+            scrape(series, index);
+        }
         return null;
     }
 
-
-    private void scrape(Series series) {
+    private void scrape(Series series, int index) {
         try {
             MALImageRequest malImageRequest = new MALImageRequest(series.getMALID().toString());
 
@@ -82,6 +103,20 @@ public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
                     imageURL = itemPropElements.get(0).attr("content");
                     malImageRequest.setURL(imageURL);
                     imageRequests.add(malImageRequest);
+                    publishProgress(malImageRequest);
+
+                    try {
+                        Bitmap bitmap = Picasso.with(App.getInstance()).load(malImageRequest.getURL()).get();
+                        malImageRequest.setBitmap(bitmap);
+                        cachePoster(malImageRequest);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (initial){
+                        NotificationHelper.getInstance().updateImagesNotification(max, index);
+                    }
+
                 }
             }
 
@@ -107,5 +142,32 @@ public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
             e.printStackTrace();
         }
 
+    }
+
+    private File getCachedPosterFile(String MALID) {
+        File cacheDirectory = App.getInstance().getCacheDir();
+
+        if (cacheDirectory.exists()) {
+            return new File(cacheDirectory, MALID + ".jpg");
+        }
+        return null;
+    }
+
+    private void cachePoster(MALImageRequest imageRequest) {
+        try {
+            File file = getCachedPosterFile(imageRequest.getMALID());
+            if (file != null) {
+                FileOutputStream fos = new FileOutputStream(file);
+                imageRequest.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.close();
+            } else {
+                Log.d(TAG, "null file");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        imageRequest.getBitmap().recycle();
     }
 }
