@@ -64,6 +64,15 @@ public class SeriesList extends ObservableArrayList<Series> {
         }
     }
 
+    public Series getAnime(Long MALID){
+        for (Series series : this){
+            if (series.getMALID().equals(MALID)){
+                return series;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean addAll(Collection<? extends Series> c) {
         for (Series series : c) {

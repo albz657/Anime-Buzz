@@ -5,11 +5,17 @@ public class HummingbirdAnimeHolder {
     private String englishTitle;
     private String imageURL;
     private String finishedAiringDate;
+    private String startedAiringDate;
 
-    public HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate) {
+    public HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate) {
         this.englishTitle = englishTitle;
         this.imageURL = imageURL;
         this.finishedAiringDate = finishedAiringDate;
+        this.startedAiringDate = startedAiringDate;
+    }
+
+    public String getStartedAiringDate() {
+        return startedAiringDate;
     }
 
     public String getEnglishTitle() {

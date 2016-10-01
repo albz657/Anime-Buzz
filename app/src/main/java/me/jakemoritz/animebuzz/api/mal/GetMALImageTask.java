@@ -45,8 +45,6 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, V
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
-
-
         for (MALImageRequest imageRequest : imageRequests[0]) {
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();

@@ -18,6 +18,7 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
     public HummingbirdAnimeHolder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         String englishTitle = "";
         String finishedAiringDate = "";
+        String startedAiringDate = "";
         String imageURL = "";
 
         final JsonObject responseObject = json.getAsJsonObject();
@@ -27,10 +28,18 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         JsonPrimitive englishPrimitive = null;
         JsonPrimitive posterImagePrimitive = null;
         JsonPrimitive finishedAiringDatePrimitive = null;
+        JsonPrimitive startedAiringDatePrimitive = null;
 
         try {
             finishedAiringDatePrimitive = animeObject.getAsJsonPrimitive("finished_airing_date");
             finishedAiringDate = finishedAiringDatePrimitive.getAsString();
+        } catch (ClassCastException e){
+
+        }
+
+        try {
+            startedAiringDatePrimitive = animeObject.getAsJsonPrimitive("started_airing_date");
+            startedAiringDate = startedAiringDatePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
@@ -54,6 +63,6 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
 
         }
 
-        return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate);
+        return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate);
     }
 }

@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 
 public class DateFormatHelper {
@@ -16,6 +17,21 @@ public class DateFormatHelper {
             dateFormatHelper = new DateFormatHelper();
         }
         return dateFormatHelper;
+    }
+
+    public Calendar getCalFromHB(String dateString){
+        SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        Date date = null;
+        try {
+            date = originalFormat.parse(dateString);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return calendar;
+        } catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     public String getLocalFormattedDateFromStringDate(String stringDate) {

@@ -6,8 +6,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
+import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
+import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
+import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -21,6 +30,14 @@ public class HummingbirdApiClient {
     private final static String TAG = HummingbirdApiClient.class.getSimpleName();
 
     private static final String BASE_URL = "https://hummingbird.me/";
+    private SeriesFragment callback;
+    private SeriesList seriesList;
+    private int finishedCount = 0;
+    private List<MALImageRequest> imageRequests;
+
+    public HummingbirdApiClient(SeriesFragment callback) {
+        this.callback = callback;
+    }
 
     private static <S> S createService(Class<S> serviceClass) {
         OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
@@ -50,18 +67,72 @@ public class HummingbirdApiClient {
         return retrofit.create(serviceClass);
     }
 
-    public void getAnimeData() {
+    public void processSeriesList(SeriesList seriesList) {
+        this.seriesList = seriesList;
+        imageRequests = new ArrayList<>();
+        for (Series series : seriesList) {
+            getAnimeData(series);
+        }
+    }
+
+    private void finishedCheck() {
+        finishedCount++;
+        if (finishedCount == seriesList.size()) {
+            GetMALImageTask getMALImageTask = new GetMALImageTask(callback);
+            getMALImageTask.execute(imageRequests);
+        }
+    }
+
+    private void getAnimeData(Series series) {
+        final Series currSeries = series;
         HummingbirdEndpointInterface hummingbirdEndpointInterface = createService(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData("21");
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
-                Log.d(TAG, "failed");
+                if (response.isSuccessful()) {
+                    HummingbirdAnimeHolder holder = response.body();
 
+                    currSeries.setEnglishTitle(holder.getEnglishTitle());
+
+                    if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
+                        currSeries.setAiringStatus("Not yet aired");
+                    } else {
+                        Calendar currentCalendar = Calendar.getInstance();
+                        Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
+
+                        if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
+                            if (currentCalendar.compareTo(startedCalendar) > 0) {
+                                currSeries.setAiringStatus("Airing");
+                            } else {
+                                currSeries.setAiringStatus("Not yet aired");
+                            }
+                        } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
+                            Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
+
+                            if (currentCalendar.compareTo(finishedCalendar) > 0) {
+                                currSeries.setAiringStatus("Finished airing");
+                            }
+                        }
+                    }
+
+                    if (!holder.getImageURL().isEmpty()) {
+                        MALImageRequest malImageRequest = new MALImageRequest(currSeries.getMALID().toString());
+                        malImageRequest.setURL(holder.getImageURL());
+                        imageRequests.add(malImageRequest);
+                    }
+
+                    currSeries.save();
+                } else {
+                    Log.d(TAG, "failed");
+                }
+                finishedCheck();
             }
 
             @Override
             public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
+                finishedCheck();
+
                 Log.d(TAG, "failed");
             }
         });
