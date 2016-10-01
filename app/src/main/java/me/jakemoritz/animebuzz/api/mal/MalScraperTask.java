@@ -93,6 +93,11 @@ public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
                 }
             }
 
+
+            if (series.getMALID().intValue() == 32182){
+                Log.d(TAG, "mob");
+            }
+
             File cacheDirectory = App.getInstance().getCacheDir();
             File bitmapFile = new File(cacheDirectory, series.getMALID().toString() + ".jpg");
             if (!bitmapFile.exists()) {

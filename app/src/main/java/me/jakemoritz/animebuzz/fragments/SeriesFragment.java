@@ -23,6 +23,7 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalScraperTask;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
@@ -117,6 +118,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void onRefresh() {
         App.getInstance().updateFormattedTimes();
         getmAdapter().notifyDataSetChanged();
+
+        HummingbirdApiClient hac = new HummingbirdApiClient();
+        hac.getAnimeData();
     }
 
     @Override
@@ -134,11 +138,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 */
                 if (App.getInstance().isInitializing()){
                     App.getInstance().setGettingInitialImages(true);
-                    seasonPostersImported(false);
+                    seasonPostersImported(true);
                 }
 
-                MalScraperTask malScraperTask = new MalScraperTask(this);
-                malScraperTask.execute(season.getSeasonSeries());
+  /*              MalScraperTask malScraperTask = new MalScraperTask(this);
+                malScraperTask.execute(season.getSeasonSeries());*/
 
             } else {
                 stopRefreshing();
