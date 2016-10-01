@@ -24,6 +24,7 @@ public class Series extends SugarRecord{
     private String nextEpisodeSimulcastTimeFormatted24;
     private long lastNotificationTime;
     private String englishTitle;
+    private String airingStatus;
 
     public Series(){
 
@@ -49,9 +50,10 @@ public class Series extends SugarRecord{
         this.nextEpisodeSimulcastTimeFormatted24 = "";
         this.lastNotificationTime = 0;
         this.englishTitle = "";
+        this.airingStatus = "";
     }
 
-    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle) {
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus) {
         this.airdate = airdate;
         this.name = name;
         this.setId(MALID);
@@ -71,6 +73,7 @@ public class Series extends SugarRecord{
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
         this.lastNotificationTime = lastNotificationTime;
         this.englishTitle = englishTitle;
+        this.airingStatus = airingStatus;
     }
 
     @Override
@@ -246,5 +249,13 @@ public class Series extends SugarRecord{
 
     public void setEnglishTitle(String englishTitle) {
         this.englishTitle = englishTitle;
+    }
+
+    public String getAiringStatus() {
+        return airingStatus;
+    }
+
+    public void setAiringStatus(String airingStatus) {
+        this.airingStatus = airingStatus;
     }
 }

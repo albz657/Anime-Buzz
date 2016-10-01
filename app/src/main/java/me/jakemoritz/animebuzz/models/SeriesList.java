@@ -54,6 +54,10 @@ public class SeriesList extends ObservableArrayList<Series> {
                 currentEntry.setEnglishTitle(series.getEnglishTitle());
             }
 
+            if (!series.getAiringStatus().isEmpty()){
+                currentEntry.setAiringStatus(series.getAiringStatus());
+            }
+
             return true;
         } else {
             return super.add(series);

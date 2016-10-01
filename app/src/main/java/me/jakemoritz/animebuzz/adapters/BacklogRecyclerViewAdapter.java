@@ -58,16 +58,11 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();
-        File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getANNID() + ".jpg");
+        File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + ".jpg");
         if (bitmapFile.exists()) {
             picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         } else {
-            File MALbitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + "_MAL.jpg");
-            if (MALbitmapFile.exists()) {
-                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
-            } else {
-                picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-            }
+            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {

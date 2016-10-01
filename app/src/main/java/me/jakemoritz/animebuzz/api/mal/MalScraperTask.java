@@ -6,27 +6,58 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MalScraper {
+public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
 
-    private static final String TAG = MalScraper.class.getSimpleName();
-    private List<String> imageURLs;
+    private static final String TAG = MalScraperTask.class.getSimpleName();
 
-    public MalScraper() {
-        ScraperTask scraperTask = new ScraperTask();
-        scraperTask.execute();
+    private List<MALImageRequest> imageRequests;
+    private SeriesFragment callback;
+
+    public MalScraperTask(SeriesFragment seriesFragment) {
+        this.callback = seriesFragment;
     }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+
+        if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().isLoggedIn()) {
+            App.getInstance().setInitializingGotImages(true);
+        }
+
+        GetMALImageTask getMALImageTask = new GetMALImageTask(callback);
+        getMALImageTask.execute(imageRequests);
+    }
+
+    @Override
+    protected Void doInBackground(SeriesList... params) {
+        imageRequests = new ArrayList<>();
+        for (Series series : params[0]){
+            scrape(series);
+        }
+
+        return null;
+    }
+
 
     private void scrape(Series series) {
         try {
+            MALImageRequest malImageRequest = new MALImageRequest(series.getMALID().toString());
+
             String BASE_URL = "https://myanimelist.net/anime/";
             String URL = BASE_URL.concat(String.valueOf(series.getMALID()) + "/");
 
@@ -42,11 +73,16 @@ public class MalScraper {
                 }
             }
 
-            String imageURL = "";
-            Elements itemPropElements = doc.select("[itemprop=\"image\"]");
-            if (!itemPropElements.isEmpty()){
-                imageURL = itemPropElements.get(0).attr("content");
-                imageURLs.add(imageURL);
+            File cacheDirectory = App.getInstance().getCacheDir();
+            File bitmapFile = new File(cacheDirectory, series.getMALID().toString() + ".jpg");
+            if (!bitmapFile.exists()) {
+                String imageURL = "";
+                Elements itemPropElements = doc.select("[itemprop=\"image\"]");
+                if (!itemPropElements.isEmpty()){
+                    imageURL = itemPropElements.get(0).attr("content");
+                    malImageRequest.setURL(imageURL);
+                    imageRequests.add(malImageRequest);
+                }
             }
 
             String englishTitle = "";
@@ -72,16 +108,4 @@ public class MalScraper {
         }
 
     }
-
-    private class ScraperTask extends AsyncTask<SeriesList, Void, Void> {
-        @Override
-        protected Void doInBackground(SeriesList... params) {
-            imageURLs = new ArrayList<>();
-            for (Series series : params[0]){
-                scrape(series);
-            }
-            return null;
-        }
-    }
-
 }

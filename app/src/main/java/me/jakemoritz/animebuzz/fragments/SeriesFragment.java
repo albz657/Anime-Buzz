@@ -23,8 +23,8 @@ import java.util.List;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.api.ann.ANNSearchHelper;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.api.mal.MalScraperTask;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
@@ -53,7 +53,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     private SeriesRecyclerViewAdapter mAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private ANNSearchHelper annHelper;
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
     private MalApiClient malApiClient;
@@ -64,7 +63,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        annHelper = new ANNSearchHelper(this);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
     }
@@ -128,10 +126,15 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().saveNewSeasonData(season);
 
             if (App.getInstance().isNetworkAvailable()){
+/*
                 if (annHelper == null){
                     annHelper = new ANNSearchHelper(this);
                 }
                 annHelper.getImages(season.getSeasonSeries());
+*/
+                MalScraperTask malScraperTask = new MalScraperTask(this);
+                malScraperTask.execute(season.getSeasonSeries());
+
             } else {
                 stopRefreshing();
                 if (swipeRefreshLayout != null){
@@ -363,10 +366,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         return swipeRefreshLayout;
     }
 
-    public ANNSearchHelper getAnnHelper() {
-        return annHelper;
-    }
-
     public boolean isUpdating() {
         return updating;
     }
@@ -381,10 +380,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     public void setUpdating(boolean updating) {
         this.updating = updating;
-    }
-
-    public void setAnnHelper(ANNSearchHelper annHelper) {
-        this.annHelper = annHelper;
     }
 
     public void setAdding(boolean adding) {

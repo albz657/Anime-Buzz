@@ -82,7 +82,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.series = visibleSeries.get(position);
 
-        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()){
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.series.getEnglishTitle());
         } else {
             holder.mTitle.setText(holder.series.getName());
@@ -163,16 +163,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();
-        File bitmapFile = new File(cacheDirectory, holder.series.getANNID() + ".jpg");
+        File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
         if (bitmapFile.exists()) {
             picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         } else {
-            File MALbitmapFile = new File(cacheDirectory, holder.series.getMALID() + "_MAL.jpg");
-            if (MALbitmapFile.exists()) {
-                picasso.load(MALbitmapFile).fit().centerCrop().into(holder.mPoster);
-            } else {
-                picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-            }
+            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
