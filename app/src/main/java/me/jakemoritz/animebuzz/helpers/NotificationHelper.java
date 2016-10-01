@@ -32,7 +32,7 @@ public class NotificationHelper {
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle(App.getInstance().getString(R.string.notification_list_update))
                         .setContentText(seasonName)
-                        .setAutoCancel(true)
+                        .setAutoCancel(false)
                         .setProgress(0, 0, true);
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
@@ -50,7 +50,7 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
-                        .setAutoCancel(true)
+                        .setAutoCancel(false)
                         .setProgress(max, 0, false)
                         .setContentTitle("Downloading images");
 
@@ -73,7 +73,7 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
-                        .setAutoCancel(true)
+                        .setAutoCancel(false)
                         .setProgress(max, progress, false)
                         .setContentTitle("Downloading images");
 

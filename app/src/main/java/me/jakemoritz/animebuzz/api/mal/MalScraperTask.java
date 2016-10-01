@@ -16,8 +16,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,11 +27,10 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class MalScraperTask extends AsyncTask<SeriesList, MALImageRequest, Void> {
+public class MalScraperTask extends AsyncTask<SeriesList, Void, Void> {
 
     private static final String TAG = MalScraperTask.class.getSimpleName();
 
-    private List<MALImageRequest> imageRequests;
     private SeriesFragment callback;
     private boolean initial = false;
     private int max = 0;
@@ -66,13 +63,15 @@ public class MalScraperTask extends AsyncTask<SeriesList, MALImageRequest, Void>
             App.getInstance().setGettingInitialImages(false);
         }
 
-        imageRequests = new ArrayList<>();
-        int index = 0;
         for (Series series : params[0]){
-            index = params[0].indexOf(series) + 1;
-            scrape(series, index);
+            scrape(series, params[0].indexOf(series) + 1);
         }
         return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(Void... values) {
+        callback.getmAdapter().notifyDataSetChanged();
     }
 
     private void scrape(Series series, int index) {
@@ -102,8 +101,6 @@ public class MalScraperTask extends AsyncTask<SeriesList, MALImageRequest, Void>
                 if (!itemPropElements.isEmpty()){
                     imageURL = itemPropElements.get(0).attr("content");
                     malImageRequest.setURL(imageURL);
-                    imageRequests.add(malImageRequest);
-                    publishProgress(malImageRequest);
 
                     try {
                         Bitmap bitmap = Picasso.with(App.getInstance()).load(malImageRequest.getURL()).get();
@@ -115,6 +112,7 @@ public class MalScraperTask extends AsyncTask<SeriesList, MALImageRequest, Void>
 
                     if (initial){
                         NotificationHelper.getInstance().updateImagesNotification(max, index);
+                        publishProgress();
                     }
 
                 }
