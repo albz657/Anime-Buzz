@@ -9,12 +9,14 @@ import android.util.AttributeSet;
 
 import net.xpece.android.support.preference.RingtonePreference;
 
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.helpers.App;
 
 public class CustomRingtonePreference extends RingtonePreference {
 
     private boolean openList = false;
+    private MainActivity mainActivity;
 
     public CustomRingtonePreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
@@ -46,7 +48,7 @@ public class CustomRingtonePreference extends RingtonePreference {
         int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(App.getInstance().getMainActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, constants.READ_EXTERNAL_STORAGE_REQUEST);
+            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, constants.READ_EXTERNAL_STORAGE_REQUEST);
         } else {
             openList = true;
             onClick();
@@ -55,5 +57,9 @@ public class CustomRingtonePreference extends RingtonePreference {
 
     public void setOpenList(boolean openList) {
         this.openList = openList;
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 }

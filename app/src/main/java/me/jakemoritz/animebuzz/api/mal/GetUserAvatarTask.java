@@ -9,6 +9,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
@@ -17,6 +18,12 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
     private final static String TAG = GetUserAvatarTask.class.getSimpleName();
 
     private final static String BASE_URL = "http://cdn.myanimelist.net/images/userimages/";
+
+    private MainActivity mainActivity;
+
+    public GetUserAvatarTask(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
 
     @Override
     protected Bitmap doInBackground(Void... voids) {
@@ -43,7 +50,7 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         if (bitmap != null){
-            App.getInstance().cacheUserAvatar(bitmap);
+            mainActivity.cacheUserAvatar(bitmap);
         }
     }
 

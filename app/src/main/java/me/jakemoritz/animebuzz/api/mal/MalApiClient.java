@@ -132,7 +132,7 @@ public class MalApiClient {
     }
 
     private void getUserAvatar() {
-        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask();
+        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(seriesFragment.getMainActivity());
         getUserAvatarTask.execute();
     }
 

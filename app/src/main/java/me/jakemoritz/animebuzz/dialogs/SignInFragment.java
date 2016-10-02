@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -28,13 +29,15 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
     private View dialogView;
     private EditText passwordField;
     private EditText usernameField;
+    private MainActivity mainActivity;
 
     public SignInFragment() {
     }
 
-    public static SignInFragment newInstance(SignInFragmentListener listener) {
+    public static SignInFragment newInstance(SignInFragmentListener listener, MainActivity mainActivity) {
         SignInFragment fragment = new SignInFragment();
         fragment.listener = listener;
+        fragment.mainActivity = mainActivity;
         return fragment;
     }
 
@@ -42,19 +45,6 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
         listener.verified(false);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-/*        DisplayMetrics metrics = new DisplayMetrics();
-        App.getInstance().getMainActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        float logicalDensity = metrics.density;
-        int px = (int) Math.ceil(400 * logicalDensity);
-        Dialog dialog = getDialog();
-
-        dialog.getWindow().setLayout(px, dialog.getWindow().getAttributes().height);*/
     }
 
     @Nullable
@@ -112,8 +102,8 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            if (App.getInstance().getMainActivity().getNavigationView() != null){
-                Snackbar.make(App.getInstance().getMainActivity().getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
+            if (mainActivity.getNavigationView() != null){
+                Snackbar.make(mainActivity.getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
             }
         }
     }

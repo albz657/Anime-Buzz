@@ -78,6 +78,16 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
+    public boolean getActivityRunning(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.activity_running), false);
+    }
+
+    public void setActivityRunning(boolean running){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.activity_running), running);
+        editor.apply();
+    }
+
     boolean prefersVibrate(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), false);
     }
@@ -158,7 +168,7 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
-    Long getLastUpdateTime(){
+    public Long getLastUpdateTime(){
         return sharedPrefs.getLong(App.getInstance().getString(R.string.last_update_time), 0L);
     }
 

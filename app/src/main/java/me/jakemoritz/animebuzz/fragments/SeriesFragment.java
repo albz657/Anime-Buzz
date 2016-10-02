@@ -64,6 +64,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private HummingbirdApiClient hummingbirdApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
+    private MainActivity mainActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,8 +132,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
+    }
+
+    @Override
     public void onRefresh() {
-        if (App.getInstance().updateFormattedTimes()){
+        if (mainActivity.updateFormattedTimes()){
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -141,7 +148,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void senpaiSeasonRetrieved(Season season) {
         if (season != null){
             App.getInstance().getAllAnimeSeasons().add(season);
-            App.getInstance().saveNewSeasonData(season);
+            mainActivity.saveNewSeasonData(season);
 
             if (App.getInstance().isNetworkAvailable()){
                 int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
@@ -165,7 +172,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 stopRefreshing();
             } else {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-                failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+                failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
             }
         }
     }
@@ -177,7 +184,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
 
         GetMALImageTask getMALImageTask = new GetMALImageTask(this);
-        getMALImageTask.execute(new ArrayList<MALImageRequest>());
+        getMALImageTask.execute(malImageRequests);
     }
 
     @Override
@@ -204,7 +211,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             senpaiExportHelper.getSeasonData(seasonMetadata);
         } else {
             FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-            failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+            failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
         }
     }
 
@@ -273,11 +280,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     public void stopInitialSpinner(){
-        if (App.getInstance().getMainActivity().getProgressViewHolder() != null){
-            App.getInstance().getMainActivity().getProgressViewHolder().setVisibility(View.GONE);
+        if (mainActivity.getProgressViewHolder() != null){
+            mainActivity.getProgressViewHolder().setVisibility(View.GONE);
         }
-        if (App.getInstance().getMainActivity().getProgressView() != null){
-            App.getInstance().getMainActivity().getProgressView().stopAnimation();
+        if (mainActivity.getProgressView() != null){
+            mainActivity.getProgressView().stopAnimation();
         }
     }
 
@@ -382,8 +389,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void signInAgain(boolean wantsToSignIn) {
         if (wantsToSignIn){
-            SignInFragment signInFragment = SignInFragment.newInstance(this);
-            signInFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+            SignInFragment signInFragment = SignInFragment.newInstance(this, mainActivity);
+            signInFragment.show(mainActivity.getFragmentManager(), TAG);
         }
     }
 
@@ -397,8 +404,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             }
         } else {
             adding = false;
-            VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this);
-            dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "SeriesRecyclerViewAdapter");
+            VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this, mainActivity);
+            dialogFragment.show(mainActivity.getFragmentManager(), "SeriesRecyclerViewAdapter");
         }
     }
 
@@ -439,5 +446,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         this.adding = adding;
     }
 
-
+    public MainActivity getMainActivity() {
+        return mainActivity;
+    }
 }

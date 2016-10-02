@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.api.mal;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,7 +16,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 
 public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void> {
 
@@ -34,11 +31,11 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
     @Override
     protected void onPostExecute(Void aVoid) {
         seriesFragment.hummingbirdSeasonImagesReceived(true);
-
+/*
         if (initial){
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("image".hashCode());
-        }
+        }*/
     }
 
     @Override
@@ -68,7 +65,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
                 cachePoster(imageRequest);
 
                 if (initial){
-                    NotificationHelper.getInstance().createImagesNotification(max, imageRequests[0].indexOf(imageRequest));
+//                    NotificationHelper.getInstance().createImagesNotification(max, imageRequests[0].indexOf(imageRequest));
                     publishProgress(Long.valueOf(imageRequest.getMALID()));
                 }
             } catch (IOException e) {

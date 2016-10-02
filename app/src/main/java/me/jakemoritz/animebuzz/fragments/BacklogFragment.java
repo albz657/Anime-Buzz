@@ -16,6 +16,7 @@ import android.widget.TextView;
 import java.util.Collections;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.databinding.FragmentBacklogBinding;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -28,6 +29,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     private BacklogRecyclerViewAdapter mAdapter;
     private View backlogLayout;
+    private MainActivity mainActivity;
 
     public BacklogRecyclerViewAdapter getmAdapter() {
         return mAdapter;
@@ -42,10 +44,16 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        App.getInstance().fixToolbar(this.getClass().getSimpleName());
+        mainActivity.fixToolbar(this.getClass().getSimpleName());
     }
 
     @Override
@@ -80,5 +88,9 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         if (!incremented && backlogLayout != null) {
             Snackbar.make(backlogLayout, App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
     }
 }

@@ -29,6 +29,8 @@
 
     <string name="simulcast_anime_network">Anime Network</string>
     <string name="season_not_found">Sorry, that season hasn\'t been loaded yet!</string>
+    <string name="activity_running">activityrunning</string>
+
     <!-- ===================== Welcome strings ===================== -->
 
     <!--Welcome Page 1 -->

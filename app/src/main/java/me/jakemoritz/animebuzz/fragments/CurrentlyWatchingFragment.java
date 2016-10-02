@@ -35,7 +35,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        App.getInstance().fixToolbar(this.getClass().getSimpleName());
+        getMainActivity().fixToolbar(this.getClass().getSimpleName());
 
         loadUserSortingPreference();
     }
@@ -72,8 +72,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 stopRefreshing();
             }
 
-            if (App.getInstance().getMainActivity() != null && App.getInstance().getMainActivity().getProgressViewHolder() != null) {
-                TextView loadingText = (TextView) App.getInstance().getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
+            if (getMainActivity() != null && getMainActivity().getProgressViewHolder() != null) {
+                TextView loadingText = (TextView) getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
                 loadingText.setText(getString(R.string.initial_loading_myshows));
             }
 
@@ -167,7 +167,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
-        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
+        getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
     }
 
     @Override

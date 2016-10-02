@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.fragments;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,19 +12,27 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 
 public class AboutFragment extends Fragment {
+
+    private MainActivity mainActivity;
 
     public AboutFragment() {
         // Required empty public constructor
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        App.getInstance().fixToolbar(this.getClass().getSimpleName());
+        mainActivity.fixToolbar(this.getClass().getSimpleName());
     }
 
     @Override

@@ -176,7 +176,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             @Override
             public void onClick(View v) {
                 RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
-                dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
+                dialogFragment.show(mParent.getMainActivity().getFragmentManager(), TAG);
             }
         });
     }

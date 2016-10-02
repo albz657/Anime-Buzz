@@ -53,8 +53,8 @@ public class SenpaiExportHelper {
             public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
                 if (response.isSuccessful()) {
                     App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
-                    App.getInstance().saveSeasonsList();
-                    App.getInstance().setSeasonsStatus();
+                    fragment.getMainActivity().saveSeasonsList();
+                    fragment.getMainActivity().setSeasonsStatus();
 
                     fragment.senpaiSeasonListReceived(response.body().getMetadataList());
 
@@ -162,7 +162,7 @@ public class SenpaiExportHelper {
                         int version = packageInfo.versionCode;
 
                         if (version < 5){
-                            App.getInstance().removeOlderShows();
+                            fragment.getMainActivity().removeOlderShows();
                         }
                     } catch (PackageManager.NameNotFoundException e){
                         e.printStackTrace();

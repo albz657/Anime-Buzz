@@ -31,10 +31,12 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     private final List<BacklogItem> backlogItems;
     public ItemTouchHelper touchHelper;
     private MalApiClient malApiClient;
+    private BacklogFragment fragment;
 
     public BacklogRecyclerViewAdapter(BacklogFragment parent, List<BacklogItem> backlogItems) {
         this.backlogItems = backlogItems;
         this.malApiClient = new MalApiClient(parent);
+        this.fragment =  parent;
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
         touchHelper = new ItemTouchHelper(callback);
     }
@@ -126,7 +128,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
         if (SharedPrefsHelper.getInstance().prefersIncrementDialog() && SharedPrefsHelper.getInstance().isLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
-            dialogFragment.show(App.getInstance().getMainActivity().getFragmentManager(), "BacklogRecycler");
+            dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
             BacklogItem removedItem = backlogItems.remove(position);
             App.getInstance().getBacklog().remove(removedItem);

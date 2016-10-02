@@ -38,7 +38,7 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // initialize views
-        toolbarSpinner = (Spinner) App.getInstance().getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
+        toolbarSpinner = (Spinner) getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -120,11 +120,11 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     public void refreshToolbar() {
-        if (App.getInstance().getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
+        if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
             List<String> seasons = getSpinnerItems();
 
             if (seasons.isEmpty()) {
-                App.getInstance().fixToolbar(this.getClass().getSimpleName());
+                getMainActivity().fixToolbar(this.getClass().getSimpleName());
             } else {
                 if (searchView != null) {
                     if (!searchView.isIconified()) {
@@ -136,7 +136,7 @@ public class SeasonsFragment extends SeriesFragment {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
 
-                App.getInstance().getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
+                getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 
                 seasonsSpinnerAdapter.getSeasonNames().clear();
                 seasonsSpinnerAdapter.getSeasonNames().addAll(seasons);
@@ -182,7 +182,7 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        App.getInstance().getMainActivity().getMenuInflater().inflate(R.menu.seasons_menu, menu);
+        getMainActivity().getMenuInflater().inflate(R.menu.seasons_menu, menu);
 
         final MenuItem item = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
