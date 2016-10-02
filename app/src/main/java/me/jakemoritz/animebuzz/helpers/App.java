@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.helpers;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.Spinner;
 
 import com.orm.SugarApp;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,6 +30,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.AlarmHolder;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
@@ -55,15 +58,10 @@ public class App extends SugarApp {
     private boolean initializingGotImages = false;
     private boolean tryingToVerify = false;
     private Season currentlyBrowsingSeason;
-    private boolean justSignedInFromSettings = false;
-    private boolean justLaunchedMyShows = false;
-    private boolean justLaunchedSeasons = false;
-    private boolean justRemoved = false;
+    private boolean justLaunched = false;
     private List<SeasonMetadata> syncingSeasons;
-    private boolean appVisible = false;
     private boolean notificationReceived = false;
     private MainActivity mainActivity;
-    private boolean gettingInitialImages = false;
 
     @Override
     public void onCreate() {
@@ -75,6 +73,7 @@ public class App extends SugarApp {
         seasonsList = new HashSet<>();
         backlog = new ObservableArrayList<>();
         alarms = new ArrayList<>();
+        Picasso picasso = Picasso.with(this);
 
         if (doesOldDatabaseExist()) {
             SQLiteDatabase database = DatabaseHelper.getInstance(this).getWritableDatabase();
@@ -82,13 +81,24 @@ public class App extends SugarApp {
             deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
         }
 
-        if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !initializing) {
+        if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !initializing && !isCrashProcess()) {
             loadData();
             updateFormattedTimes();
 //            backlogDummyData();
 //            dummyAlarm();
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
+    }
+
+    private boolean isCrashProcess(){
+        int pid = android.os.Process.myPid();
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningAppProcessInfo processInfo : manager.getRunningAppProcesses()){
+            if (processInfo.pid == pid && processInfo.processName.contains("background_crash")){
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean doesOldDatabaseExist() {
@@ -98,7 +108,7 @@ public class App extends SugarApp {
 
 
     /* HELPERS */
-    public void updateFormattedTimes() {
+    public boolean updateFormattedTimes() {
         long lastUpdatedTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
 
         Calendar currentCalendar = Calendar.getInstance();
@@ -116,6 +126,8 @@ public class App extends SugarApp {
 
             SharedPrefsHelper.getInstance().setLastUpdateTime(currentCalendar.getTimeInMillis());
         }
+
+        return sameDay;
     }
 
     public void fixToolbar(String fragment) {
@@ -164,12 +176,25 @@ public class App extends SugarApp {
         }
     }
 
-    private void setCurrent() {
-        for (SeasonMetadata seasonMetadata : seasonsList) {
-            if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
+    public void setSeasonsStatus() {
+        List<SeasonMetadata> seasonMetadataList = new ArrayList<>();
+        seasonMetadataList.addAll(seasonsList);
+
+        Collections.sort(seasonMetadataList, new SeasonMetadataComparator());
+
+        boolean currentFound = false;
+        for (SeasonMetadata seasonMetadata : seasonMetadataList) {
+            if (currentFound){
                 seasonMetadata.setCurrentOrNewer(true);
-                break;
+            } else {
+                if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
+                    currentFound = true;
+                    seasonMetadata.setCurrentOrNewer(true);
+                } else {
+                    seasonMetadata.setCurrentOrNewer(false);
+                }
             }
+            seasonMetadata.save();
         }
     }
 
@@ -271,7 +296,7 @@ public class App extends SugarApp {
 
     public void loadData() {
         seasonsList = new HashSet<>(SeasonMetadata.listAll(SeasonMetadata.class));
-        setCurrent();
+        setSeasonsStatus();
 
         SeasonList allAnime = new SeasonList();
 
@@ -346,20 +371,12 @@ public class App extends SugarApp {
         return null;
     }
 
-    public boolean isJustLaunchedSeasons() {
-        return justLaunchedSeasons;
+    public boolean isJustLaunched() {
+        return justLaunched;
     }
 
-    public void setJustLaunchedSeasons(boolean justLaunchedSeasons) {
-        this.justLaunchedSeasons = justLaunchedSeasons;
-    }
-
-    public boolean isJustLaunchedMyShows() {
-        return justLaunchedMyShows;
-    }
-
-    public void setJustLaunchedMyShows(boolean justLaunchedMyShows) {
-        this.justLaunchedMyShows = justLaunchedMyShows;
+    public void setJustLaunched(boolean justLaunched) {
+        this.justLaunched = justLaunched;
     }
 
     public List<AlarmHolder> getAlarms() {
@@ -449,14 +466,6 @@ public class App extends SugarApp {
         this.initializingGotImages = initializingGotImages;
     }
 
-    public void setJustRemoved(boolean justRemoved) {
-        this.justRemoved = justRemoved;
-    }
-
-    public void setJustSignedInFromSettings(boolean justSignedInFromSettings) {
-        this.justSignedInFromSettings = justSignedInFromSettings;
-    }
-
     public boolean isNotificationReceived() {
         return notificationReceived;
     }
@@ -464,55 +473,4 @@ public class App extends SugarApp {
     public void setNotificationReceived(boolean notificationReceived) {
         this.notificationReceived = notificationReceived;
     }
-
-    public boolean isGettingInitialImages() {
-        return gettingInitialImages;
-    }
-
-    public void setGettingInitialImages(boolean gettingInitialImages) {
-        this.gettingInitialImages = gettingInitialImages;
-    }
 }
-
-  /*
-    public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
-        for (CircleBitmapHolder holder : holderList){
-            if (holder.getBitmap() != null){
-                try {
-                    File file = getCachedPosterFile(holder.getANNID(), "circle");
-                    if (file != null) {
-                        FileOutputStream fos = new FileOutputStream(file);
-                        holder.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                        fos.close();
-                    } else {
-                        Log.d(TAG, "null file");
-                    }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                holder.getBitmap().recycle();
-            }
-        }
-
-    }
-
-    public void getCircleBitmap(Series series) {
-        List<CircleBitmapHolder> holderList = new ArrayList<>();
-
-        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
-        File imageCacheDirectory = new File(cacheDirectory, "images");
-
-            File smallBitmapFile = new File(imageCacheDirectory, series.getANNID() + "_small.jpg");
-
-            if (smallBitmapFile.exists()) {
-                CircleBitmapHolder bitmapHolder = new CircleBitmapHolder(String.valueOf(series.getANNID()), null, smallBitmapFile);
-                holderList.add(bitmapHolder);
-            }
-
-
-        CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
-        circleBitmapTask.execute(holderList);
-    }
-*/

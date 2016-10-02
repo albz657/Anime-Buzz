@@ -89,11 +89,12 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
 
         if ((mParent instanceof CurrentlyWatchingFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
-            if (holder.series.getAirdate() > 0 && holder.series.getSimulcast_airdate() > 0) {
+            if (holder.series.getAiringStatus().equals("Airing")) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
-                holder.mDate.setText("TBA");
+                holder.mDate.setText(holder.series.getAiringStatus());
             }
+
             holder.mWatch.setVisibility(View.VISIBLE);
 
             if (holder.series.isInUserList()) {
@@ -112,16 +113,12 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         } else {
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.GONE);
-            holder.mDate.setText("Not airing");
-//            holder.mWatch.setVisibility(View.INVISIBLE);
+            holder.mDate.setText(holder.series.getAiringStatus());
         }
 
-        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast() && !holder.series.getSimulcast().equals("false")) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
-
-            if (!holder.series.getSimulcast().equals("false")) {
-                holder.mSimulcast.setText(holder.series.getSimulcast());
-            }
+            holder.mSimulcast.setText(holder.series.getSimulcast());
 
             GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
 
@@ -147,7 +144,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                     break;
                 case "The Anime Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                    holder.mSimulcast.setText("Anime Network");
+                    holder.mSimulcast.setText(mParent.getString(R.string.simulcast_anime_network));
                     break;
                 case "Viewster":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
@@ -161,13 +158,12 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
 
-        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();
         File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
         if (bitmapFile.exists()) {
-            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+            Picasso.with(App.getInstance()).load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         } else {
-            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {

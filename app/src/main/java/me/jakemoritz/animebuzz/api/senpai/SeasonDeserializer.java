@@ -81,7 +81,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                     ANNID = seriesObject.get("ANNID").getAsInt();
                 } catch (NumberFormatException e) {
                     ANNID = -1;
-                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
+//                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
                 }
 
                 boolean missingAirdate = seriesObject.get("missingAirdate").getAsBoolean();
@@ -90,7 +90,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                 if (missingAirdate) {
                     airdate = -1;
                     simulcast_airdate = -1;
-                    Log.d(TAG, "'" + seriesName + "' is missing its airdate.");
+//                    Log.d(TAG, "'" + seriesName + "' is missing its airdate.");
                 } else {
                     airdate = seriesObject.get("airdate_u").getAsInt();
                     simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();

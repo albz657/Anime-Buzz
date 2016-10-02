@@ -1,23 +1,18 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.util.concurrent.TimeUnit;
-
-import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
@@ -33,7 +28,6 @@ public class SenpaiExportHelper {
     private final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
     private final static String BASE_URL = "http://www.senpai.moe/";
-
     private SeriesFragment fragment;
 
     public SenpaiExportHelper(SeriesFragment fragment) {
@@ -60,19 +54,20 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
                     App.getInstance().saveSeasonsList();
-                    fragment.seasonListReceived(response.body().getMetadataList());
+                    App.getInstance().setSeasonsStatus();
+
+                    fragment.senpaiSeasonListReceived(response.body().getMetadataList());
 
                     Log.d(TAG, "Got season list");
                 } else {
-                    fragment.seasonListReceived(null);
-
+                    fragment.senpaiSeasonListReceived(null);
                 }
             }
 
             @Override
             public void onFailure(Call<AllSeasonsMetadata> call, Throwable t) {
                 Log.d(TAG, "Failed getting season list");
-                fragment.seasonListReceived(null);
+                fragment.senpaiSeasonListReceived(null);
             }
         });
     }
@@ -81,21 +76,21 @@ public class SenpaiExportHelper {
         Log.d(TAG, "Getting season data for: '" + metadata.getName() + "'");
 
         if (App.getInstance().isPostInitializing()) {
-            updateNotification(metadata.getName());
+            NotificationHelper.getInstance().createSeasonDataNotification((metadata.getName()));
         }
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
-        OkHttpClient client = new OkHttpClient.Builder()
+/*        OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(10, TimeUnit.SECONDS)
                 .readTimeout(10, TimeUnit.SECONDS)
-                .build();
+                .build();*/
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(client)
+                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
@@ -116,46 +111,28 @@ public class SenpaiExportHelper {
                         }
                     }
 
-                    fragment.seasonDataRetrieved(response.body());
+                    fragment.senpaiSeasonRetrieved(response.body());
                 } else {
                     NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    manager.cancel(metadata.getName().hashCode());
+                    manager.cancel(100);
                     Log.d(TAG, "Failed getting season data for: '" + metadata.getName() + "'");
 
-                    fragment.seasonDataRetrieved(null);
+                    fragment.senpaiSeasonRetrieved(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Season> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(metadata.getName().hashCode());
+                manager.cancel(100);
                 Log.d(TAG, "Failed getting season data for: '" + metadata.getName() + "'");
 
-                fragment.seasonDataRetrieved(null);
+                fragment.senpaiSeasonRetrieved(null);
             }
         });
     }
 
-    private void updateNotification(String seasonName) {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(App.getInstance())
-                        .setSmallIcon(R.drawable.ic_sync)
-                        .setContentTitle(App.getInstance().getString(R.string.notification_list_update))
-                        .setContentText(seasonName)
-                        .setAutoCancel(true)
-                        .setProgress(0, 0, true);
 
-        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(100, mBuilder.build());
-    }
 
     public void getLatestSeasonData() {
         Log.d(TAG, "Getting latest season data");
@@ -163,11 +140,6 @@ public class SenpaiExportHelper {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
-
-   /*     OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.MINUTES)
-                .readTimeout(1, TimeUnit.MINUTES)
-                .build();*/
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
@@ -185,16 +157,25 @@ public class SenpaiExportHelper {
 
                     SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonMetadata().getName());
 
-                    App.getInstance().removeOlderShows();
+                    try {
+                        PackageInfo packageInfo = App.getInstance().getPackageManager().getPackageInfo(App.getInstance().getPackageName(), 0);
+                        int version = packageInfo.versionCode;
+
+                        if (version < 5){
+                            App.getInstance().removeOlderShows();
+                        }
+                    } catch (PackageManager.NameNotFoundException e){
+                        e.printStackTrace();
+                    }
 
                     response.body().getSeasonMetadata().setCurrentOrNewer(true);
                     App.getInstance().setCurrentlyBrowsingSeason(response.body());
 
-                    fragment.seasonDataRetrieved(response.body());
+                    fragment.senpaiSeasonRetrieved(response.body());
                 } else {
                     Log.d(TAG, "Failed getting latest season data");
 
-                    fragment.seasonDataRetrieved(null);
+                    fragment.senpaiSeasonRetrieved(null);
                 }
             }
 
@@ -202,7 +183,7 @@ public class SenpaiExportHelper {
             public void onFailure(Call<Season> call, Throwable t) {
                 Log.d(TAG, "Failed getting latest season data");
 
-                fragment.seasonDataRetrieved(null);
+                fragment.senpaiSeasonRetrieved(null);
             }
         });
     }

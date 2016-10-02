@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
@@ -37,6 +36,12 @@ public class HummingbirdApiClient {
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
+        this.imageRequests = new ArrayList<>();
+    }
+
+
+    void setSeriesList(SeriesList seriesList) {
+        this.seriesList = seriesList;
     }
 
     private static <S> S createService(Class<S> serviceClass) {
@@ -69,22 +74,28 @@ public class HummingbirdApiClient {
 
     public void processSeriesList(SeriesList seriesList) {
         this.seriesList = seriesList;
-        imageRequests = new ArrayList<>();
-        for (Series series : seriesList) {
-            getAnimeData(series);
+        this.imageRequests = new ArrayList<>();
+
+        if (seriesList.isEmpty()){
+            callback.hummingbirdSeasonReceived(imageRequests);
+        } else {
+            for (Series series : seriesList) {
+                getAnimeData(series);
+            }
         }
     }
 
     private void finishedCheck() {
         finishedCount++;
         if (finishedCount == seriesList.size()) {
-            GetMALImageTask getMALImageTask = new GetMALImageTask(callback);
-            getMALImageTask.execute(imageRequests);
+            Series.saveInTx(seriesList);
+            callback.hummingbirdSeasonReceived(imageRequests);
         }
     }
 
-    private void getAnimeData(Series series) {
+    void getAnimeData(Series series) {
         final Series currSeries = series;
+
         HummingbirdEndpointInterface hummingbirdEndpointInterface = createService(HummingbirdEndpointInterface.class);
         Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
@@ -122,9 +133,9 @@ public class HummingbirdApiClient {
                         imageRequests.add(malImageRequest);
                     }
 
-                    currSeries.save();
+//                    currSeries.save();
                 } else {
-                    Log.d(TAG, "failed");
+                    Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
                 }
                 finishedCheck();
             }
@@ -133,7 +144,7 @@ public class HummingbirdApiClient {
             public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
                 finishedCheck();
 
-                Log.d(TAG, "failed");
+                Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
             }
         });
     }

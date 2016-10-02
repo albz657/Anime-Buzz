@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.api.mal;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.api.ann.GetImageTask;
 import me.jakemoritz.animebuzz.api.ann.models.ImageRequestHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -60,8 +59,8 @@ class MalImportHelper {
         }
 
         if (!imageRequests.isEmpty()){
-            GetImageTask task = new GetImageTask(fragment);
-            task.execute(imageRequests);
+//            GetImageTask task = new GetImageTask(fragment);
+//            task.execute(imageRequests);
         }
 
         SeriesList remainingSeries = new SeriesList();

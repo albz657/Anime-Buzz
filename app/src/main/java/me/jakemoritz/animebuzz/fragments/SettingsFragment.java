@@ -262,8 +262,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setVisible(false);
         signOutPreference.setVisible(true);
 
-        App.getInstance().setJustLaunchedMyShows(true);
-        App.getInstance().setJustSignedInFromSettings(true);
+        App.getInstance().setJustLaunched(true);
 
         App.getInstance().getBacklog().clear();
 

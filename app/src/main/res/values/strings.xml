@@ -21,13 +21,14 @@
     <string name="add_failed">There was a problem adding this anime to your MAL list. Please try again later.</string>
     <string name="user_list_failed">There was a problem getting your MAL list. Please try again later.</string>
     <string name="increment_failed">There was a problem incrementing the episode count.</string>
-    <string name="senpai_failed">There was a problem downloading anime airing times.</string>
+    <string name="senpai_failed">There was a problem updating anime data.</string>
 
     <string name="empty_text_myshows">You aren\'t following any shows. Why not check the season browser?</string>
     <string name="empty_text_backlog">You\'re all caught up!</string>
     <string name="empty_text_season">No anime was found.</string>
 
-
+    <string name="simulcast_anime_network">Anime Network</string>
+    <string name="season_not_found">Sorry, that season hasn\'t been loaded yet!</string>
     <!-- ===================== Welcome strings ===================== -->
 
     <!--Welcome Page 1 -->

@@ -38,20 +38,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         App.getInstance().fixToolbar(this.getClass().getSimpleName());
 
         loadUserSortingPreference();
-
-        if (App.getInstance().isJustLaunchedMyShows()) {
-            onRefresh();
-            getSwipeRefreshLayout().post(new Runnable() {
-                @Override
-                public void run() {
-                    getSwipeRefreshLayout().setRefreshing(true);
-                }
-            });
-
-        }
-
-        App.getInstance().setJustLaunchedMyShows(false);
-        App.getInstance().setJustLaunchedSeasons(false);
     }
 
     @Override
@@ -70,8 +56,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     @Override
-    public void seasonPostersImported(boolean imported) {
-        super.seasonPostersImported(imported);
+    public void hummingbirdSeasonImagesReceived(boolean imported) {
+        super.hummingbirdSeasonImagesReceived(imported);
 
         if (!imported){
             stopRefreshing();

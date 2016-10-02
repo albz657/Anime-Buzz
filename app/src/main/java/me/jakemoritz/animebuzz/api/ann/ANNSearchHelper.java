@@ -73,7 +73,7 @@ public class ANNSearchHelper {
 
             getPictureUrlBatch(getImageURLBatch.remove(0));
         } else {
-            seriesFragment.seasonPostersImported(false);
+            seriesFragment.hummingbirdSeasonImagesReceived(false);
         }
     }
 
@@ -167,7 +167,7 @@ public class ANNSearchHelper {
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
-                    seriesFragment.seasonPostersImported(false);
+                    seriesFragment.hummingbirdSeasonImagesReceived(false);
                 }
             });
         }

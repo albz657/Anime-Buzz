@@ -10,12 +10,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,8 +26,9 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdApiClient;
+import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.api.mal.MalScraperTask;
+import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
@@ -37,6 +40,7 @@ import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
@@ -48,7 +52,7 @@ import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
-public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener {
+public abstract class SeriesFragment extends Fragment implements SeasonPostersImportResponse, ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -107,43 +111,44 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         super.onViewCreated(view, savedInstanceState);
 
         swipeRefreshLayout.setOnRefreshListener(this);
+
+        if (App.getInstance().isJustLaunched()) {
+            onRefresh();
+            getSwipeRefreshLayout().post(new Runnable() {
+                @Override
+                public void run() {
+                    getSwipeRefreshLayout().setRefreshing(true);
+                }
+            });
+            App.getInstance().setJustLaunched(false);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-
         stopRefreshing();
     }
 
     @Override
     public void onRefresh() {
-        App.getInstance().updateFormattedTimes();
-        getmAdapter().notifyDataSetChanged();
+        if (App.getInstance().updateFormattedTimes()){
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     @Override
-    public void seasonDataRetrieved(Season season) {
+    public void senpaiSeasonRetrieved(Season season) {
         if (season != null){
             App.getInstance().getAllAnimeSeasons().add(season);
             App.getInstance().saveNewSeasonData(season);
 
             if (App.getInstance().isNetworkAvailable()){
-/*
-                if (annHelper == null){
-                    annHelper = new ANNSearchHelper(this);
-                }
-                annHelper.getImages(season.getSeasonSeries());
-*/
-                if (App.getInstance().isInitializing()){
-                    App.getInstance().setGettingInitialImages(true);
-                    seasonPostersImported(true);
-                }
+                int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
+                hummingbirdApiClient.processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
 
-                hummingbirdApiClient.processSeriesList(season.getSeasonSeries());
-  /*              MalScraperTask malScraperTask = new MalScraperTask(this);
-                malScraperTask.execute(season.getSeasonSeries());*/
-
+//                HummingbirdTask task = new HummingbirdTask(this);
+//                task.execute(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
             } else {
                 stopRefreshing();
                 if (swipeRefreshLayout != null){
@@ -151,12 +156,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 }
             }
         } else {
-            stopRefreshing();
-
             if (!App.getInstance().isInitializing()){
-                if (getSwipeRefreshLayout() != null){
-                    Snackbar.make(getSwipeRefreshLayout(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
+                if (swipeRefreshLayout != null){
+                    Snackbar.make(swipeRefreshLayout, getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
                 }
+
+                stopRefreshing();
             } else {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
                 failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
@@ -165,15 +170,24 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void seasonPostersImported(boolean imported) {
-        if (imported){
+    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests) {
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
             mAdapter.notifyDataSetChanged();
         }
+
+        GetMALImageTask getMALImageTask = new GetMALImageTask(this);
+        getMALImageTask.execute(malImageRequests);
     }
 
     @Override
-    public void seasonListReceived(List<SeasonMetadata> seasonMetaList) {
-        if (App.getInstance().isPostInitializing() && seasonMetaList!= null) {
+    public void hummingbirdSeasonImagesReceived(boolean imported) {
+        stopRefreshing();
+    }
+
+    @Override
+    public void senpaiSeasonListReceived(List<SeasonMetadata> seasonMetaList) {
+        if (seasonMetaList!= null) {
+            NotificationHelper.getInstance().createSeasonDataNotification("Getting list of seasons...");
 
             App.getInstance().setSyncingSeasons(new ArrayList<SeasonMetadata>());
 
@@ -185,12 +199,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonMetadataComparator());
             SeasonMetadata seasonMetadata = App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1);
-            new NotificationHelper().createUpdatingSeasonDataNotification(seasonMetadata.getName());
+            NotificationHelper.getInstance().createSeasonDataNotification(seasonMetadata.getName());
             senpaiExportHelper.getSeasonData(seasonMetadata);
-        }
-
-        if (seasonMetaList == null && swipeRefreshLayout != null){
-            Snackbar.make(swipeRefreshLayout, getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+        } else {
+            FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+            failedInitializationFragment.show(App.getInstance().getMainActivity().getFragmentManager(), TAG);
         }
     }
 
@@ -205,9 +218,39 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
     }
 
+    private void clearAppData() {
+        File cache = App.getInstance().getCacheDir();
+        File appDir = new File(cache.getParent());
+        if (appDir.exists()) {
+            String[] children = appDir.list();
+            for (String s : children) {
+                if (!s.equals("lib")) {
+                    deleteDir(new File(appDir, s));
+                    Log.i(TAG, "File /data/data/me.jakemoritz.tasking/" + s + " DELETED");
+                }
+            }
+        }
+    }
+
+    private static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        return dir.delete();
+    }
+
     @Override
     public void failedInitializationResponse(boolean retryNow) {
         if (retryNow){
+            clearAppData();
+
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
             startActivity(intent);
@@ -277,7 +320,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     private void removeSeries(Series item) {
-        App.getInstance().setJustRemoved(true);
+//        App.getInstance().setJustRemoved(true);
 
         item.setInUserList(false);
         App.getInstance().getUserAnimeList().remove(item);
@@ -394,5 +437,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void setAdding(boolean adding) {
         this.adding = adding;
     }
+
 
 }

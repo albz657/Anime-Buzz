@@ -56,13 +56,12 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
-        Picasso picasso = Picasso.with(App.getInstance().getMainActivity());
         File cacheDirectory = App.getInstance().getCacheDir();
         File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + ".jpg");
         if (bitmapFile.exists()) {
-            picasso.load(bitmapFile).fit().centerCrop().into(holder.mPoster);
+            Picasso.with(App.getInstance()).load(bitmapFile).fit().centerCrop().into(holder.mPoster);
         } else {
-            picasso.load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {

@@ -77,3 +77,46 @@ public class CircleBitmapTask extends AsyncTask<List<CircleBitmapHolder> , Void,
         }
     }
 }
+
+  /*
+    public void cacheCircleBitmaps(List<CircleBitmapHolder> holderList){
+        for (CircleBitmapHolder holder : holderList){
+            if (holder.getBitmap() != null){
+                try {
+                    File file = getCachedPosterFile(holder.getANNID(), "circle");
+                    if (file != null) {
+                        FileOutputStream fos = new FileOutputStream(file);
+                        holder.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                    } else {
+                        Log.d(TAG, "null file");
+                    }
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                holder.getBitmap().recycle();
+            }
+        }
+
+    }
+
+    public void getCircleBitmap(Series series) {
+        List<CircleBitmapHolder> holderList = new ArrayList<>();
+
+        File cacheDirectory = getDir(("cache"), Context.MODE_PRIVATE);
+        File imageCacheDirectory = new File(cacheDirectory, "images");
+
+            File smallBitmapFile = new File(imageCacheDirectory, series.getANNID() + "_small.jpg");
+
+            if (smallBitmapFile.exists()) {
+                CircleBitmapHolder bitmapHolder = new CircleBitmapHolder(String.valueOf(series.getANNID()), null, smallBitmapFile);
+                holderList.add(bitmapHolder);
+            }
+
+
+        CircleBitmapTask circleBitmapTask = new CircleBitmapTask();
+        circleBitmapTask.execute(holderList);
+    }
+*/

@@ -50,37 +50,6 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private boolean openRingtones = false;
 
-    private Fragment getCurrentFragment() {
-        if (!getSupportFragmentManager().getFragments().isEmpty()) {
-            Iterator iterator = getSupportFragmentManager().getFragments().iterator();
-            Fragment fragment = (Fragment) iterator.next();
-            Fragment previousFragment = fragment;
-
-            while (iterator.hasNext()) {
-                fragment = (Fragment) iterator.next();
-
-                if (fragment == null) {
-                    fragment = previousFragment;
-                } else {
-                    previousFragment = fragment;
-                }
-            }
-
-            return fragment;
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
-            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
-                openRingtones = true;
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,10 +67,8 @@ public class MainActivity extends AppCompatActivity
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
-            App.getInstance().setJustLaunchedMyShows(true);
-            App.getInstance().setJustLaunchedSeasons(true);
+            App.getInstance().setJustLaunched(true);
         }
-
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -139,7 +106,6 @@ public class MainActivity extends AppCompatActivity
 
                 startFragment(seasonsFragment);
             }
-
         } else {
             Intent startupIntent = getIntent();
             if (startupIntent != null) {
@@ -148,6 +114,44 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     startFragment(new CurrentlyWatchingFragment());
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        final Fragment fragment = getCurrentFragment();
+        if (openRingtones) {
+            if (fragment instanceof SettingsFragment) {
+                SettingsFragment settingsFragment = (SettingsFragment) fragment;
+                CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
+                customRingtonePreference.setOpenList(true);
+                customRingtonePreference.performClick();
+            }
+            openRingtones = false;
+        }
+
+        setNavPositions(fragment);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        App.getInstance().saveData();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
+            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
+                openRingtones = true;
             }
         }
     }
@@ -179,35 +183,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        App.getInstance().saveData();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        final Fragment fragment = getCurrentFragment();
-        if (openRingtones) {
-            if (fragment instanceof SettingsFragment) {
-                SettingsFragment settingsFragment = (SettingsFragment) fragment;
-                CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
-                customRingtonePreference.setOpenList(true);
-                customRingtonePreference.performClick();
-            }
-            openRingtones = false;
-        }
-
-        setNavPositions(fragment);
-    }
-
     private void setNavPositions(Fragment fragment){
         int menuIndex = -1;
 
@@ -225,22 +200,6 @@ public class MainActivity extends AppCompatActivity
 
         if (navigationView != null && menuIndex != -1){
             navigationView.getMenu().getItem(menuIndex).setChecked(true);
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        App.getInstance().getDatabase().close();
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
         }
     }
 
@@ -287,13 +246,35 @@ public class MainActivity extends AppCompatActivity
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
         if (avatarFile.exists()) {
-            Picasso.with(this).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+            Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
         } else {
-            Picasso.with(this).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+            Picasso.with(App.getInstance()).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
         }
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
         drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());
+    }
+
+    private Fragment getCurrentFragment() {
+        if (!getSupportFragmentManager().getFragments().isEmpty()) {
+            Iterator iterator = getSupportFragmentManager().getFragments().iterator();
+            Fragment fragment = (Fragment) iterator.next();
+            Fragment previousFragment = fragment;
+
+            while (iterator.hasNext()) {
+                fragment = (Fragment) iterator.next();
+
+                if (fragment == null) {
+                    fragment = previousFragment;
+                } else {
+                    previousFragment = fragment;
+                }
+            }
+
+            return fragment;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -303,22 +284,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             return super.dispatchTouchEvent(ev);
         }
-    }
-
-    public RelativeLayout getProgressViewHolder() {
-        return progressViewHolder;
-    }
-
-    public CircularProgressView getProgressView() {
-        return progressView;
-    }
-
-    public NavigationView getNavigationView() {
-        return navigationView;
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
     }
 
     public void episodeNotificationReceived() {
@@ -332,6 +297,16 @@ public class MainActivity extends AppCompatActivity
                     ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
                 }
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
         }
     }
 
@@ -353,4 +328,21 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+    public RelativeLayout getProgressViewHolder() {
+        return progressViewHolder;
+    }
+
+    public CircularProgressView getProgressView() {
+        return progressView;
+    }
+
+    public NavigationView getNavigationView() {
+        return navigationView;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
 }

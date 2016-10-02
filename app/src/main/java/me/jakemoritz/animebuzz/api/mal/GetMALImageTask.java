@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -17,12 +18,14 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 
-public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, Void> {
+public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void> {
 
     private static final String TAG = GetMALImageTask.class.getSimpleName();
 
     private SeriesFragment seriesFragment;
+    private boolean initial = false;
 
     public GetMALImageTask(SeriesFragment seriesFragment) {
         this.seriesFragment = seriesFragment;
@@ -30,26 +33,41 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, V
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        seriesFragment.seasonPostersImported(true);
+        seriesFragment.hummingbirdSeasonImagesReceived(true);
 
-        if (App.getInstance().isInitializing()){
+        if (initial){
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("image".hashCode());
         }
     }
 
     @Override
-    protected void onProgressUpdate(Integer... values) {
+    protected void onProgressUpdate(Long... values) {
+        seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(seriesFragment.getmAdapter().getVisibleSeries().getAnime(values[0])));
         super.onProgressUpdate(values);
     }
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
+        int max = imageRequests[0].size();
+
+        if (max != 0 && App.getInstance().isPostInitializing()){
+//            NotificationHelper.getInstance().createImagesNotification(max, 0);
+            initial = true;
+
+//            App.getInstance().setGettingInitialImages(false);
+        }
+
         for (MALImageRequest imageRequest : imageRequests[0]) {
             try {
-                Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).get();
+                Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).get();
                 imageRequest.setBitmap(bitmap);
                 cachePoster(imageRequest);
+
+                if (initial){
+                    NotificationHelper.getInstance().createImagesNotification(max, imageRequests[0].indexOf(imageRequest));
+                    publishProgress(Long.valueOf(imageRequest.getMALID()));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -68,20 +86,27 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Integer, V
     }
 
     private void cachePoster(MALImageRequest imageRequest) {
+        FileOutputStream fos = null;
         try {
             File file = getCachedPosterFile(imageRequest.getMALID());
             if (file != null) {
-                FileOutputStream fos = new FileOutputStream(file);
+                fos = new FileOutputStream(file);
                 imageRequest.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                fos.close();
             } else {
                 Log.d(TAG, "null file");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null){
+                    fos.close();
+                }
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         }
+
         imageRequest.getBitmap().recycle();
     }
 

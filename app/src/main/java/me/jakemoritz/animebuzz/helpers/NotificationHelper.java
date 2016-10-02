@@ -26,7 +26,7 @@ public class NotificationHelper {
         return notificationHelper;
     }
 
-    public void createUpdatingSeasonDataNotification(String seasonName) {
+    public void createSeasonDataNotification(String seasonName) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.ic_sync)
@@ -46,30 +46,7 @@ public class NotificationHelper {
         mNotificationManager.notify(100, mBuilder.build());
     }
 
-    public void createImagesNotification(int max){
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(App.getInstance())
-                        .setSmallIcon(R.drawable.bolt_copy)
-                        .setAutoCancel(false)
-                        .setProgress(max, 0, false)
-                        .setContentTitle("Downloading images");
-
-        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
-        stackBuilder.addParentStack(MainActivity.class);
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent("image".hashCode(), PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Notification notification = mBuilder.build();
-
-        mNotificationManager.notify("image".hashCode(), notification);
-    }
-
-    public void updateImagesNotification(int max, int progress){
+    public void createImagesNotification(int max, int progress){
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)

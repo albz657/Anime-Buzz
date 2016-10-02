@@ -5,6 +5,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public interface ReadSeasonListResponse {
-    void seasonListReceived(List<SeasonMetadata> seasonMetaList);
+    void senpaiSeasonListReceived(List<SeasonMetadata> seasonMetaList);
 
 }

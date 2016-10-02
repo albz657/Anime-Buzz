@@ -18,6 +18,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
+import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
@@ -36,8 +37,7 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
+        // initialize views
         toolbarSpinner = (Spinner) App.getInstance().getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
         seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
@@ -54,23 +54,14 @@ public class SeasonsFragment extends SeriesFragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
             loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
         }
 
-        if (App.getInstance().isJustLaunchedSeasons()) {
-            onRefresh();
-            getSwipeRefreshLayout().post(new Runnable() {
-                @Override
-                public void run() {
-                    getSwipeRefreshLayout().setRefreshing(true);
-                }
-            });
-            App.getInstance().setJustLaunchedSeasons(false);
-            App.getInstance().setJustLaunchedMyShows(false);
-        }
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -90,7 +81,7 @@ public class SeasonsFragment extends SeriesFragment {
 
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
-        if (currentlyBrowsingSeason == null){
+        if (currentlyBrowsingSeason == null && !App.getInstance().isInitializing()){
             SeriesList currentSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonName));
 
             for (SeasonMetadata seasonMetadata : App.getInstance().getSeasonsList()){
@@ -102,16 +93,30 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        getmAdapter().getAllSeries().clear();
-        getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
-        getmAdapter().getVisibleSeries().clear();
-        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
-        getmAdapter().notifyDataSetChanged();
+        if (currentlyBrowsingSeason == null) {
+            if (getSwipeRefreshLayout() != null){
+                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            getmAdapter().getAllSeries().clear();
+            getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
+            getmAdapter().getVisibleSeries().clear();
+            getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+            getmAdapter().notifyDataSetChanged();
 
-        getmAdapter().setSeriesFilter(null);
+            getmAdapter().setSeriesFilter(null);
 
-        App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
+            App.getInstance().setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
+        }
+    }
 
+    @Override
+    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests) {
+        super.hummingbirdSeasonReceived(malImageRequests);
+
+        if (isVisible() && !App.getInstance().isInitializing()) {
+            refreshToolbar();
+        }
     }
 
     public void refreshToolbar() {
@@ -159,14 +164,8 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void seasonPostersImported(boolean imported) {
-        super.seasonPostersImported(imported);
-
-        stopRefreshing();
-
-        if (isVisible()) {
-            refreshToolbar();
-        }
+    public void hummingbirdSeasonImagesReceived(boolean imported) {
+        super.hummingbirdSeasonImagesReceived(imported);
 
         if (App.getInstance().isInitializing()) {
             App.getInstance().setInitializing(false);
