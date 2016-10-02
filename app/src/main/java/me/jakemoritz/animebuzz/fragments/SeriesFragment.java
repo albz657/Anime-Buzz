@@ -145,6 +145,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             if (App.getInstance().isNetworkAvailable()){
                 int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
+//                hummingbirdApiClient.processSeriesList(new SeriesList());
                 hummingbirdApiClient.processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
 
 //                HummingbirdTask task = new HummingbirdTask(this);
@@ -176,7 +177,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
 
         GetMALImageTask getMALImageTask = new GetMALImageTask(this);
-        getMALImageTask.execute(malImageRequests);
+        getMALImageTask.execute(new ArrayList<MALImageRequest>());
     }
 
     @Override

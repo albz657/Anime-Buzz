@@ -51,10 +51,13 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
         int max = imageRequests[0].size();
 
-        if (max != 0 && App.getInstance().isPostInitializing()){
+        if (max == 0) {
+            return null;
+        }
+
+        if (App.getInstance().isPostInitializing()){
 //            NotificationHelper.getInstance().createImagesNotification(max, 0);
             initial = true;
-
 //            App.getInstance().setGettingInitialImages(false);
         }
 

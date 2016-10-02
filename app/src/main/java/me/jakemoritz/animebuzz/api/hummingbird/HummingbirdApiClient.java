@@ -33,10 +33,33 @@ public class HummingbirdApiClient {
     private SeriesList seriesList;
     private int finishedCount = 0;
     private List<MALImageRequest> imageRequests;
+    private OkHttpClient okHttpClient;
+    private Interceptor interceptor;
+    private Retrofit retrofit;
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
         this.imageRequests = new ArrayList<>();
+        this.interceptor = new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+                final Request request = chain.request().newBuilder()
+                        .addHeader("X-Client-Id", "683b6ab4486e5a7c612e")
+                        .build();
+
+                return chain.proceed(request);
+            }
+        };
+        this.okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        this.retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
     }
 
 
@@ -59,14 +82,14 @@ public class HummingbirdApiClient {
         };
 
         httpBuilder.addInterceptor(interceptor);
-        OkHttpClient client = httpBuilder.build();
+//        okHttpClient = httpBuilder.build();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
-                .client(client)
+                .client(new OkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
         return retrofit.create(serviceClass);
@@ -96,7 +119,8 @@ public class HummingbirdApiClient {
     void getAnimeData(Series series) {
         final Series currSeries = series;
 
-        HummingbirdEndpointInterface hummingbirdEndpointInterface = createService(HummingbirdEndpointInterface.class);
+        HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
+                //createService(HummingbirdEndpointInterface.class);
         Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
