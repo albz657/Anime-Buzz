@@ -56,14 +56,14 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(boolean imported) {
-        super.hummingbirdSeasonImagesReceived(imported);
+    public void hummingbirdSeasonImagesReceived(String seasonName) {
+        super.hummingbirdSeasonImagesReceived(seasonName);
 
-        if (!imported){
+        if (!true){
             stopRefreshing();
         }
 
-        if (App.getInstance().isInitializingGotImages()) {
+        if (App.getInstance().isGettingInitialImages()) {
             App.getInstance().setInitializing(false);
 
             if (SharedPrefsHelper.getInstance().isLoggedIn()){
@@ -96,8 +96,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
         AlarmHelper.getInstance().resetAlarms();
 
-        if (App.getInstance().isInitializingGotImages()) {
-            App.getInstance().setInitializingGotImages(false);
+        if (App.getInstance().isGettingInitialImages()) {
+            App.getInstance().setGettingInitialImages(false);
             App.getInstance().setPostInitializing(true);
 
             stopInitialSpinner();

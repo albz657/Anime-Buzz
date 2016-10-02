@@ -30,7 +30,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequestHolder>, Void, Void
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        seriesFragment.hummingbirdSeasonImagesReceived(true);
+        seriesFragment.hummingbirdSeasonImagesReceived("");
     }
 
     @Override

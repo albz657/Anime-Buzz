@@ -111,11 +111,18 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests) {
-        super.hummingbirdSeasonReceived(malImageRequests);
+    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
+        super.hummingbirdSeasonReceived(malImageRequests, seriesList);
 
-        if (isVisible() && !App.getInstance().isInitializing()) {
+        if (isVisible()) {
             refreshToolbar();
+        }
+
+        if (App.getInstance().isInitializing()){
+            stopInitialSpinner();
+            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
+            App.getInstance().setInitializing(false);
+            App.getInstance().setGettingInitialImages(true);
         }
     }
 
@@ -164,15 +171,11 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(boolean imported) {
-        super.hummingbirdSeasonImagesReceived(imported);
+    public void hummingbirdSeasonImagesReceived(String seasonName) {
+        super.hummingbirdSeasonImagesReceived(seasonName);
 
-        if (App.getInstance().isInitializing()) {
-            App.getInstance().setInitializing(false);
-
-            stopInitialSpinner();
-
-            loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
+        if (App.getInstance().isGettingInitialImages()) {
+            App.getInstance().setGettingInitialImages(false);
             App.getInstance().setPostInitializing(true);
 
             getSenpaiExportHelper().getSeasonList();

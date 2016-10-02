@@ -2,24 +2,26 @@ package me.jakemoritz.animebuzz.api.mal.models;
 
 import android.graphics.Bitmap;
 
+import me.jakemoritz.animebuzz.models.Series;
+
 public class MALImageRequest {
 
-    private String MALID;
+    private Series series;
     private String URL;
     private Bitmap bitmap;
 
-    public MALImageRequest(String MALID) {
-        this.MALID = MALID;
+    public MALImageRequest(Series series) {
+        this.series = series;
         this.URL = "";
         this.bitmap = null;
     }
 
-    public String getMALID() {
-        return MALID;
+    public Series getSeries() {
+        return series;
     }
 
-    public void setMALID(String MALID) {
-        this.MALID = MALID;
+    public void setSeries(Series series) {
+        this.series = series;
     }
 
     public String getURL() {

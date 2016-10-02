@@ -31,7 +31,7 @@ public class App extends SugarApp {
     private List<AlarmHolder> alarms;
     private boolean initializing = false;
     private boolean postInitializing = false;
-    private boolean initializingGotImages = false;
+    private boolean gettingInitialImages = false;
     private boolean tryingToVerify = false;
     private Season currentlyBrowsingSeason;
     private boolean justLaunched = false;
@@ -139,12 +139,12 @@ public class App extends SugarApp {
         this.syncingSeasons = syncingSeasons;
     }
 
-    public boolean isInitializingGotImages() {
-        return initializingGotImages;
+    public boolean isGettingInitialImages() {
+        return gettingInitialImages;
     }
 
-    public void setInitializingGotImages(boolean initializingGotImages) {
-        this.initializingGotImages = initializingGotImages;
+    public void setGettingInitialImages(boolean gettingInitialImages) {
+        this.gettingInitialImages = gettingInitialImages;
     }
 
     public boolean isNotificationReceived() {

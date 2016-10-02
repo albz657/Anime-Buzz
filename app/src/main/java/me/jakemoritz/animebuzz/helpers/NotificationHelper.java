@@ -19,6 +19,9 @@ public class NotificationHelper {
 
     private static NotificationHelper notificationHelper;
 
+    private int maxOther = 0;
+    private int progressOther = 0;
+
     public synchronized static NotificationHelper getInstance(){
         if (notificationHelper == null){
             notificationHelper = new NotificationHelper();
@@ -67,6 +70,29 @@ public class NotificationHelper {
         Notification notification = mBuilder.build();
 
         mNotificationManager.notify("image".hashCode(), notification);
+    }
+
+    public void createOtherImagesNotification(){
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(App.getInstance())
+                        .setSmallIcon(R.drawable.bolt_copy)
+                        .setOngoing(true)
+                        .setProgress(maxOther, progressOther, false)
+                        .setContentTitle("Downloading other images");
+
+        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
+
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(App.getInstance());
+        stackBuilder.addParentStack(MainActivity.class);
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent("otherimages".hashCode(), PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification notification = mBuilder.build();
+
+        mNotificationManager.notify("otherimages".hashCode(), notification);
     }
 
     public void createNewEpisodeNotification(Series series) {
@@ -133,4 +159,19 @@ public class NotificationHelper {
         mNotificationManager.notify(series.getMALID().intValue(), notification);
     }
 
+    public int getMaxOther() {
+        return maxOther;
+    }
+
+    public void setMaxOther(int maxOther) {
+        this.maxOther = maxOther;
+    }
+
+    public int getProgressOther() {
+        return progressOther;
+    }
+
+    public void setProgressOther(int progressOther) {
+        this.progressOther = progressOther;
+    }
 }

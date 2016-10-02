@@ -73,7 +73,7 @@ public class ANNSearchHelper {
 
             getPictureUrlBatch(getImageURLBatch.remove(0));
         } else {
-            seriesFragment.hummingbirdSeasonImagesReceived(false);
+            seriesFragment.hummingbirdSeasonImagesReceived("");
         }
     }
 
@@ -89,7 +89,7 @@ public class ANNSearchHelper {
             }, 1000);
         } else {
             if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().isLoggedIn()) {
-                App.getInstance().setInitializingGotImages(true);
+                App.getInstance().setGettingInitialImages(true);
             }
         }
     }
@@ -167,7 +167,7 @@ public class ANNSearchHelper {
 
                 @Override
                 public void onFailure(Call<ANNXMLHolder> call, Throwable t) {
-                    seriesFragment.hummingbirdSeasonImagesReceived(false);
+                    seriesFragment.hummingbirdSeasonImagesReceived("");
                 }
             });
         }

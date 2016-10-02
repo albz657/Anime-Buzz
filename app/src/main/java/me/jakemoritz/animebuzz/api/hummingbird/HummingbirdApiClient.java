@@ -100,7 +100,7 @@ public class HummingbirdApiClient {
         this.imageRequests = new ArrayList<>();
 
         if (seriesList.isEmpty()){
-            callback.hummingbirdSeasonReceived(imageRequests);
+            callback.hummingbirdSeasonReceived(imageRequests, seriesList);
         } else {
             for (Series series : seriesList) {
                 getAnimeData(series);
@@ -112,7 +112,8 @@ public class HummingbirdApiClient {
         finishedCount++;
         if (finishedCount == seriesList.size()) {
             Series.saveInTx(seriesList);
-            callback.hummingbirdSeasonReceived(imageRequests);
+            callback.hummingbirdSeasonReceived(imageRequests, seriesList);
+            finishedCount = 0;
         }
     }
 
@@ -120,7 +121,6 @@ public class HummingbirdApiClient {
         final Series currSeries = series;
 
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-                //createService(HummingbirdEndpointInterface.class);
         Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
@@ -152,7 +152,7 @@ public class HummingbirdApiClient {
                     }
 
                     if (!holder.getImageURL().isEmpty()) {
-                        MALImageRequest malImageRequest = new MALImageRequest(currSeries.getMALID().toString());
+                        MALImageRequest malImageRequest = new MALImageRequest(currSeries);
                         malImageRequest.setURL(holder.getImageURL());
                         imageRequests.add(malImageRequest);
                     }

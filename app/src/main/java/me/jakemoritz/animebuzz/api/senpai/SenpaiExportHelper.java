@@ -105,7 +105,7 @@ public class SenpaiExportHelper {
                             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotificationManager.cancel(100);
 
-                            App.getInstance().setPostInitializing(false);
+//                            App.getInstance().setPostInitializing(false);
                         } else {
                             getSeasonData(App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1));
                         }

@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.api.mal;
 
+import android.app.NotificationManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -16,46 +18,69 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void> {
+public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRequest, Void> {
 
     private static final String TAG = GetMALImageTask.class.getSimpleName();
 
     private SeriesFragment seriesFragment;
-    private boolean initial = false;
+    private SeriesList seriesList;
+    private List<MALImageRequest> malImageRequests;
+    private int max;
 
-    public GetMALImageTask(SeriesFragment seriesFragment) {
+    public GetMALImageTask(SeriesFragment seriesFragment, SeriesList seriesList) {
         this.seriesFragment = seriesFragment;
+        this.seriesList = seriesList;
     }
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        seriesFragment.hummingbirdSeasonImagesReceived(true);
-/*
-        if (initial){
+        String seasonName = "";
+        if (!seriesList.isEmpty()){
+            seasonName = seriesList.get(0).getSeason();
+        }
+
+        seriesFragment.hummingbirdSeasonImagesReceived(seasonName);
+
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("image".hashCode());
-        }*/
+//            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+//            mNotificationManager.cancel("otherimages".hashCode());
+
+
     }
 
     @Override
-    protected void onProgressUpdate(Long... values) {
-        seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(seriesFragment.getmAdapter().getVisibleSeries().getAnime(values[0])));
+    protected void onProgressUpdate(MALImageRequest... values) {
+        seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
+
+        if (!App.getInstance().isGettingInitialImages()){
+//            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
+//            NotificationHelper.getInstance().createOtherImagesNotification();
+        } else {
+            NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
+        }
+
         super.onProgressUpdate(values);
     }
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
-        int max = imageRequests[0].size();
+        malImageRequests = imageRequests[0];
+
+        max = imageRequests[0].size();
 
         if (max == 0) {
             return null;
         }
 
-        if (App.getInstance().isPostInitializing()){
-//            NotificationHelper.getInstance().createImagesNotification(max, 0);
-            initial = true;
-//            App.getInstance().setGettingInitialImages(false);
+        if (App.getInstance().isGettingInitialImages()) {
+            NotificationHelper.getInstance().createImagesNotification(max, 0);
+        } else {
+//            NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + max);
+//            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         for (MALImageRequest imageRequest : imageRequests[0]) {
@@ -64,10 +89,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
                 imageRequest.setBitmap(bitmap);
                 cachePoster(imageRequest);
 
-                if (initial){
-//                    NotificationHelper.getInstance().createImagesNotification(max, imageRequests[0].indexOf(imageRequest));
-                    publishProgress(Long.valueOf(imageRequest.getMALID()));
-                }
+                publishProgress(imageRequest);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -80,7 +102,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
         File cacheDirectory = App.getInstance().getCacheDir();
 
         if (cacheDirectory.exists()) {
-                return new File(cacheDirectory, MALID + ".jpg");
+            return new File(cacheDirectory, MALID + ".jpg");
         }
         return null;
     }
@@ -88,7 +110,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
     private void cachePoster(MALImageRequest imageRequest) {
         FileOutputStream fos = null;
         try {
-            File file = getCachedPosterFile(imageRequest.getMALID());
+            File file = getCachedPosterFile(imageRequest.getSeries().getMALID().toString());
             if (file != null) {
                 fos = new FileOutputStream(file);
                 imageRequest.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);
@@ -99,10 +121,10 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, Long, Void
             e.printStackTrace();
         } finally {
             try {
-                if (fos != null){
+                if (fos != null) {
                     fos.close();
                 }
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }

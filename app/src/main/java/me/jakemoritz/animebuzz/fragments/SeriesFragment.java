@@ -152,11 +152,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
             if (App.getInstance().isNetworkAvailable()){
                 int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
-//                hummingbirdApiClient.processSeriesList(new SeriesList());
-                hummingbirdApiClient.processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
-
-//                HummingbirdTask task = new HummingbirdTask(this);
-//                task.execute(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
+                new HummingbirdApiClient(this).processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
             } else {
                 stopRefreshing();
                 if (swipeRefreshLayout != null){
@@ -178,17 +174,20 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests) {
+    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
             mAdapter.notifyDataSetChanged();
         }
 
-        GetMALImageTask getMALImageTask = new GetMALImageTask(this);
+        GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
         getMALImageTask.execute(malImageRequests);
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(boolean imported) {
+    public void hummingbirdSeasonImagesReceived(String seasonName) {
+        if (seasonName.equals("Summer 2013")){
+            App.getInstance().setPostInitializing(false);
+        }
         stopRefreshing();
     }
 
