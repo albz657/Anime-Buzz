@@ -85,33 +85,32 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/series_title"
                     android:id="@+id/pill_holder">
-
-                    <TextView
-                        android:id="@+id/series_simulcast"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_marginTop="5dp"
-                        android:background="@drawable/simulcast_shape"
-                        android:paddingRight="4dp"
-                        android:text="Crunchyroll"
-                        android:textColor="#FFFFFF"/>
-
                     <TextView
                         android:id="@+id/series_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="5dp"
-                        android:layout_toRightOf="@id/series_simulcast"
+                        android:layout_marginRight="5dp"
                         android:background="@drawable/simulcast_shape"
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:text="OVA"
                         android:textColor="#FFFFFF"/>
-                </RelativeLayout>
 
+                    <TextView
+                        android:id="@+id/series_simulcast"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/simulcast_shape"
+                        android:layout_toRightOf="@id/series_type"
+                        android:paddingLeft="4dp"
+                        android:paddingRight="4dp"
+                        android:text="Crunchyroll"
+                        android:textColor="#FFFFFF"/>
+                </RelativeLayout>
 
                 <LinearLayout
                     android:layout_width="wrap_content"

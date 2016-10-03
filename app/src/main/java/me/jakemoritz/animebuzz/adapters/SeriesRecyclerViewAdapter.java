@@ -188,16 +188,16 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             }
             background.setColor(colorId);
         } else {
-            holder.mSimulcast.setVisibility(View.GONE);
+            holder.mSimulcast.setVisibility(View.INVISIBLE);
         }
 
         holder.mShowType.setText(holder.series.getShowType());
-        if (holder.series.getShowType().isEmpty()){
+        if (!holder.series.getShowType().isEmpty()){
             holder.mShowType.setVisibility(View.VISIBLE);
             GradientDrawable background = (GradientDrawable) holder.mShowType.getBackground();
             background.setColor(ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal));
         } else {
-            holder.mShowType.setVisibility(View.INVISIBLE);
+            holder.mShowType.setVisibility(View.GONE);
         }
 
 
