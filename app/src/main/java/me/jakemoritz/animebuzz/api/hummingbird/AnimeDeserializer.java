@@ -8,8 +8,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Type;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolder> {
@@ -47,11 +45,13 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         try {
             englishPrimitive = titlesObject.getAsJsonPrimitive("english");
 
-            Pattern englishPattern = Pattern.compile("([\"'])(?:(?=(\\\\?))\\2.)*?\\1");
+            englishTitle = englishPrimitive.getAsString();
+
+/*            Pattern englishPattern = Pattern.compile("([\"'])(?:(?=(\\\\?))\\2.)*?\\1");
             Matcher englishMatcher = englishPattern.matcher(englishPrimitive.getAsString());
             if (englishMatcher.find()){
                 englishTitle = englishMatcher.group();
-            }
+            }*/
         } catch (ClassCastException e){
 
         }
@@ -64,5 +64,5 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         }
 
         return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate);
-    }
+    }/**/
 }
