@@ -29,6 +29,7 @@ public class App extends SugarApp {
     private Set<SeasonMetadata> seasonsList;
     private ObservableArrayList<BacklogItem> backlog;
     private List<AlarmHolder> alarms;
+    private SeriesList airingList;
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean gettingInitialImages = false;
@@ -169,5 +170,13 @@ public class App extends SugarApp {
 
     public void setBacklog(ObservableArrayList<BacklogItem> backlog) {
         this.backlog = backlog;
+    }
+
+    public SeriesList getAiringList() {
+        return airingList;
+    }
+
+    public void setAiringList(SeriesList airingList) {
+        this.airingList = airingList;
     }
 }

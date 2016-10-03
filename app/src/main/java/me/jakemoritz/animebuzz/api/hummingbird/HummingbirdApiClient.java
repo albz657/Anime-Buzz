@@ -15,6 +15,7 @@ import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -154,6 +155,13 @@ public class HummingbirdApiClient {
                                     currSeries.setAiringStatus("Finished airing");
                                 } else {
                                     currSeries.setAiringStatus("Airing");
+
+                                    String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+                                    if (!currSeries.getSeason().equals(latestSeasonName)){
+                                        App.getInstance().getAiringList().add(currSeries);
+                                        currSeries.setSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
+                                        currSeries.setShifted(true);
+                                    }
                                 }
                             } else {
                                 currSeries.setAiringStatus("Not yet aired");
@@ -164,7 +172,19 @@ public class HummingbirdApiClient {
                             if (currentCalendar.compareTo(finishedCalendar) > 0) {
                                 currSeries.setAiringStatus("Finished airing");
                             } else {
-                                currSeries.setAiringStatus("Airing");
+                                if (currentCalendar.compareTo(startedCalendar) > 0){
+                                    currSeries.setAiringStatus("Airing");
+
+                                    String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+                                    if (!currSeries.getSeason().equals(latestSeasonName)){
+                                        App.getInstance().getAiringList().add(currSeries);
+                                        currSeries.setSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
+                                        currSeries.setShifted(true);
+                                    }
+                                } else {
+                                    currSeries.setAiringStatus("Not yet aired");
+                                }
+
                             }
                         }
                     }

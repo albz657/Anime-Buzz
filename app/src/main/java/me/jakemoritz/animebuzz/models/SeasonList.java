@@ -18,6 +18,15 @@ public class SeasonList extends ArrayList<Season> {
         }
     }
 
+    public Season getSeason(String seasonName){
+        for (Season season : this){
+            if (season.getSeasonMetadata().getName().equals(seasonName)){
+                return season;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean addAll(Collection<? extends Season> c) {
         return super.addAll(c);

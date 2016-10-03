@@ -150,6 +150,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().getAllAnimeSeasons().add(season);
             mainActivity.saveNewSeasonData(season);
 
+            if (App.getInstance().isInitializing()){
+                App.getInstance().setAiringList(season.getSeasonSeries());
+            }
+
             if (App.getInstance().isNetworkAvailable()){
                 int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
                 new HummingbirdApiClient(this).processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());

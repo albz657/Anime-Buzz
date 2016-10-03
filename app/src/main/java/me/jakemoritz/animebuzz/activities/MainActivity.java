@@ -81,13 +81,20 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
     private boolean openRingtones = false;
+    private AlarmReceiver alarmReceiver;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(alarmReceiver);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver = new AlarmReceiver();
         alarmReceiver.setMainActivity(this);
         IntentFilter callIntercepterIntentFilter = new IntentFilter("android.intent.action.ANY_ACTION");
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
@@ -98,6 +105,7 @@ public class MainActivity extends AppCompatActivity
             App.getInstance().setSeasonsList(new HashSet<SeasonMetadata>());
             App.getInstance().setBacklog(new ObservableArrayList<BacklogItem>());
             App.getInstance().setAlarms(new ArrayList<AlarmHolder>());
+            App.getInstance().setAiringList(new SeriesList());
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);
 
@@ -375,12 +383,14 @@ public class MainActivity extends AppCompatActivity
         App.getInstance().setSeasonsList(seasonsList);
         setSeasonsStatus();
 
+        SeriesList airingList = new SeriesList();
+
         SeasonList allAnime = new SeasonList();
 
         String previousSeasonName = SharedPrefsHelper.getInstance().getPreviousSeasonName();
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
 
-        if (!previousSeasonName.isEmpty()) {
+        if (!previousSeasonName.isEmpty() && false) {
             for (SeasonMetadata seasonMetadata : seasonsList) {
                 if (seasonMetadata.getName().equals(latestSeasonName) || seasonMetadata.getName().equals(previousSeasonName)){
                     SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
@@ -396,9 +406,22 @@ public class MainActivity extends AppCompatActivity
 
                 if (!seasonSeries.isEmpty()) {
                     allAnime.add(new Season(seasonSeries, seasonMetadata));
+
+                    if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
+                        airingList.addAll(seasonSeries);
+                    } else {
+                        for (Series series : seasonSeries){
+                            if (series.getAiringStatus().equals("Airing")){
+                                airingList.add(series);
+                            }
+                        }
+                    }
+
                 }
             }
         }
+
+        App.getInstance().setAiringList(airingList);
 
         App.getInstance().setAllAnimeSeasons(allAnime);
         Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());

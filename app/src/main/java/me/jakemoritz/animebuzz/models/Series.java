@@ -29,6 +29,7 @@ public class Series extends SugarRecord{
     private boolean single;
     private String startedAiringDate;
     private String finishedAiringDate;
+    private boolean shifted;
 
     public Series(){
 
@@ -59,9 +60,10 @@ public class Series extends SugarRecord{
         this.single = false;
         this.startedAiringDate = "";
         this.finishedAiringDate = "";
+        this.shifted = false;
     }
 
-    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate) {
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate, boolean shifted) {
         this.airdate = airdate;
         this.name = name;
         this.setId(MALID);
@@ -86,6 +88,7 @@ public class Series extends SugarRecord{
         this.single = single;
         this.startedAiringDate = startedAiringDate;
         this.finishedAiringDate = finishedAiringDate;
+        this.shifted = shifted;
     }
 
     @Override
@@ -129,6 +132,14 @@ public class Series extends SugarRecord{
 
     public void setFinishedAiringDate(String finishedAiringDate) {
         this.finishedAiringDate = finishedAiringDate;
+    }
+
+    public boolean isShifted() {
+        return shifted;
+    }
+
+    public void setShifted(boolean shifted) {
+        this.shifted = shifted;
     }
 
     public String getStartedAiringDate() {

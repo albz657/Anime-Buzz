@@ -92,7 +92,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mTitle.setText(holder.series.getName());
         }
 
-        Drawable dateImage = null;
+        Drawable dateImage;
         int dateImageColorId;
         if (holder.series.getAiringStatus().equals("Airing")){
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_watch_later, null);
@@ -113,7 +113,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             } else {
                 String dateText;
                 if (holder.series.isSingle()){
-                    dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
+                    if (!holder.series.getNextEpisodeTimeFormatted().isEmpty()){
+                        dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
+                    } else {
+                        dateText = holder.series.getAiringStatus();
+                    }
                 } else {
                     dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
                 }

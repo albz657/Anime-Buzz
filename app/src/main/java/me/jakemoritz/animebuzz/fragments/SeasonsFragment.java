@@ -20,6 +20,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
@@ -80,7 +81,13 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void loadSeason(String seasonName) {
-        Season currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
+        Season currentlyBrowsingSeason;
+        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+            currentlyBrowsingSeason = new Season(App.getInstance().getAiringList(), App.getInstance().getAllAnimeSeasons().getSeason(SharedPrefsHelper.getInstance().getLatestSeasonName()).getSeasonMetadata());
+        } else {
+            currentlyBrowsingSeason = App.getInstance().getSeasonFromName(seasonName);
+        }
+
         if (currentlyBrowsingSeason == null && !App.getInstance().isInitializing()){
             SeriesList currentSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonName));
 

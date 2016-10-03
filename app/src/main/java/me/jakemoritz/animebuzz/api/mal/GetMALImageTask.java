@@ -54,9 +54,8 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
     @Override
     protected void onProgressUpdate(MALImageRequest... values) {
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
-            seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
-        }
+
+        seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
 
         if (!App.getInstance().isGettingInitialImages()){
 //            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
@@ -85,7 +84,8 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 //            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
-        for (MALImageRequest imageRequest : imageRequests[0]) {
+        for (Object imageRequestObject : imageRequests[0].toArray()) {
+            MALImageRequest imageRequest = (MALImageRequest) imageRequestObject;
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).get();
                 imageRequest.setBitmap(bitmap);

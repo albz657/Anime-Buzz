@@ -4,6 +4,8 @@ import android.databinding.ObservableArrayList;
 
 import java.util.Collection;
 
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+
 public class SeriesList extends ObservableArrayList<Series> {
 
     public SeriesList(Collection<? extends Series> c) {
@@ -20,14 +22,25 @@ public class SeriesList extends ObservableArrayList<Series> {
             int index = indexOf(series);
             Series currentEntry = get(index);
 
+            if (currentEntry.isShifted() && currentEntry.getSeason().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+//                return false;
+            }
+
             currentEntry.setAirdate(series.getAirdate());
             currentEntry.setSimulcast(series.getSimulcast());
             currentEntry.setAirdate(series.getAirdate());
             currentEntry.setSimulcast_airdate(series.getSimulcast_airdate());
             currentEntry.setANNID(series.getANNID());
             currentEntry.setSimulcast_delay(series.getSimulcast_delay());
-            currentEntry.setSeason(series.getSeason());
             currentEntry.setEpisodesWatched(series.getEpisodesWatched());
+            currentEntry.setFinishedAiringDate(series.getFinishedAiringDate());
+            currentEntry.setStartedAiringDate(series.getStartedAiringDate());
+            currentEntry.setSingle(series.isSingle());
+            currentEntry.setShowType(series.getShowType());
+
+            if (currentEntry.getSeason().isEmpty()){
+                currentEntry.setSeason(series.getSeason());
+            }
 
             if (series.getNextEpisodeAirtime() != 0){
                 currentEntry.setNextEpisodeAirtime(series.getNextEpisodeAirtime());
@@ -57,6 +70,8 @@ public class SeriesList extends ObservableArrayList<Series> {
             if (!series.getAiringStatus().isEmpty()){
                 currentEntry.setAiringStatus(series.getAiringStatus());
             }
+
+
 
             return true;
         } else {
