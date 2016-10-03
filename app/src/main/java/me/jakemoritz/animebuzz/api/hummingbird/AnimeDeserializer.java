@@ -18,6 +18,8 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         String finishedAiringDate = "";
         String startedAiringDate = "";
         String imageURL = "";
+        String showType = "";
+        int episodeCount = 0;
 
         final JsonObject responseObject = json.getAsJsonObject();
         JsonObject animeObject = responseObject.getAsJsonObject("anime");
@@ -27,6 +29,8 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         JsonPrimitive posterImagePrimitive = null;
         JsonPrimitive finishedAiringDatePrimitive = null;
         JsonPrimitive startedAiringDatePrimitive = null;
+        JsonPrimitive showTypePrimitive = null;
+        JsonPrimitive episodeCountPrimitive = null;
 
         try {
             finishedAiringDatePrimitive = animeObject.getAsJsonPrimitive("finished_airing_date");
@@ -36,8 +40,22 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
         }
 
         try {
+            episodeCountPrimitive = animeObject.getAsJsonPrimitive("episode_count");
+            episodeCount = episodeCountPrimitive.getAsInt();
+        } catch (ClassCastException e){
+
+        }
+
+        try {
             startedAiringDatePrimitive = animeObject.getAsJsonPrimitive("started_airing_date");
             startedAiringDate = startedAiringDatePrimitive.getAsString();
+        } catch (ClassCastException e){
+
+        }
+
+        try {
+            showTypePrimitive = animeObject.getAsJsonPrimitive("show_type");
+            showType = showTypePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
@@ -63,6 +81,6 @@ public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolde
 
         }
 
-        return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate);
+        return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate, showType, episodeCount);
     }/**/
 }

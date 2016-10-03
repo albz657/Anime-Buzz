@@ -72,7 +72,7 @@ public class AnimeDataHelper {
         String nextEpisodeAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
         String nextEpisodeSimulcastAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
 
-        Series series = new Series(airdate, name, (long) MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24, 0, "", "");
+        Series series = new Series(airdate, name, (long) MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24, 0, "", "", "", false, "", "");
 
         Type type = new TypeToken<ArrayList<Long>>() {
         }.getType();

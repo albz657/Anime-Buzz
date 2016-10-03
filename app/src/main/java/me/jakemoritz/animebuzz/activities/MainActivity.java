@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -444,7 +445,7 @@ public class MainActivity extends AppCompatActivity
     /* Saving */
     public void saveData() {
         SaveAllDataTask saveAllDataTask = new SaveAllDataTask();
-        saveAllDataTask.execute();
+        saveAllDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void saveNewSeasonData(Season season) {

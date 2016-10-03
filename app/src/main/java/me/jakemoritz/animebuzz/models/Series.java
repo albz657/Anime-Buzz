@@ -25,6 +25,10 @@ public class Series extends SugarRecord{
     private long lastNotificationTime;
     private String englishTitle;
     private String airingStatus;
+    private String showType;
+    private boolean single;
+    private String startedAiringDate;
+    private String finishedAiringDate;
 
     public Series(){
 
@@ -51,9 +55,13 @@ public class Series extends SugarRecord{
         this.lastNotificationTime = 0;
         this.englishTitle = "";
         this.airingStatus = "";
+        this.showType = "";
+        this.single = false;
+        this.startedAiringDate = "";
+        this.finishedAiringDate = "";
     }
 
-    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus) {
+    public Series(int airdate, String name, Long MALID, String simulcast, int simulcast_airdate, String season, int ANNID, double simulcast_delay, boolean isInUserList, boolean currentlyAiring, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, int episodesWatched, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate) {
         this.airdate = airdate;
         this.name = name;
         this.setId(MALID);
@@ -74,6 +82,10 @@ public class Series extends SugarRecord{
         this.lastNotificationTime = lastNotificationTime;
         this.englishTitle = englishTitle;
         this.airingStatus = airingStatus;
+        this.showType = showType;
+        this.single = single;
+        this.startedAiringDate = startedAiringDate;
+        this.finishedAiringDate = finishedAiringDate;
     }
 
     @Override
@@ -109,6 +121,22 @@ public class Series extends SugarRecord{
 
     public void setNextEpisodeSimulcastTimeFormatted24(String nextEpisodeSimulcastTimeFormatted24) {
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+    }
+
+    public String getFinishedAiringDate() {
+        return finishedAiringDate;
+    }
+
+    public void setFinishedAiringDate(String finishedAiringDate) {
+        this.finishedAiringDate = finishedAiringDate;
+    }
+
+    public String getStartedAiringDate() {
+        return startedAiringDate;
+    }
+
+    public void setStartedAiringDate(String startedAiringDate) {
+        this.startedAiringDate = startedAiringDate;
     }
 
     String getNextEpisodeAirtimeFormatted24() {
@@ -241,6 +269,22 @@ public class Series extends SugarRecord{
                 return nextEpisodeAirtimeFormatted;
             }
         }
+    }
+
+    public String getShowType() {
+        return showType;
+    }
+
+    public void setShowType(String showType) {
+        this.showType = showType;
+    }
+
+    public boolean isSingle() {
+        return single;
+    }
+
+    public void setSingle(boolean single) {
+        this.single = single;
     }
 
     public String getEnglishTitle() {

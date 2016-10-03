@@ -1,7 +1,11 @@
 package me.jakemoritz.animebuzz.adapters;
 
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +22,6 @@ import java.io.File;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
-import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -54,7 +56,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         final TextView mSimulcast;
         final ImageButton mAddButton;
         final ImageButton mMinusButton;
-        final ImageView mWatch;
+        final ImageView mDateImage;
+        final TextView mShowType;
 
         public Series series;
 
@@ -64,10 +67,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             mTitle = (TextView) view.findViewById(R.id.series_title);
             mPoster = (ImageView) view.findViewById(R.id.series_poster);
             mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
+            mShowType = (TextView) view.findViewById(R.id.series_type);
             mDate = (TextView) view.findViewById(R.id.series_date);
             mAddButton = (ImageButton) view.findViewById(R.id.add_button);
             mMinusButton = (ImageButton) view.findViewById(R.id.minus_button);
-            mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
+            mDateImage = (ImageView) view.findViewById(R.id.watch_imageview);
         }
     }
 
@@ -88,14 +92,35 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mTitle.setText(holder.series.getName());
         }
 
-        if ((mParent instanceof CurrentlyWatchingFragment) || (mParent instanceof SeasonsFragment && App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().isCurrentOrNewer())) {
+        Drawable dateImage = null;
+        int dateImageColorId;
+        if (holder.series.getAiringStatus().equals("Airing")){
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_watch_later, null);
+            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal);
+        } else if (holder.series.getAiringStatus().equals("Not yet aired")){
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_event, null);
+            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.calendar_blue);
+        } else {
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_done, null);
+            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.check_green);
+        }
+        dateImage.setColorFilter(new PorterDuffColorFilter(dateImageColorId, PorterDuff.Mode.SRC_IN));
+        holder.mDateImage.setImageDrawable(dateImage);
+
+        if (!holder.series.getAiringStatus().equals("Finished airing")) {
             if (holder.series.getAiringStatus().equals("Airing")) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
-                holder.mDate.setText(holder.series.getAiringStatus());
+                String dateText;
+                if (holder.series.isSingle()){
+                    dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
+                } else {
+                    dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
+                }
+                holder.mDate.setText(dateText);
             }
 
-            holder.mWatch.setVisibility(View.VISIBLE);
+            holder.mDateImage.setVisibility(View.VISIBLE);
 
             if (holder.series.isInUserList()) {
                 holder.mAddButton.setVisibility(View.GONE);
@@ -113,7 +138,15 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         } else {
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.GONE);
-            holder.mDate.setText(holder.series.getAiringStatus());
+
+            String dateText;
+            if (holder.series.isSingle()){
+                dateText = "Aired on " + holder.series.getStartedAiringDate();
+            } else {
+                dateText = holder.series.getAiringStatus();
+            }
+            holder.mDate.setText(dateText);
+
         }
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast() && !holder.series.getSimulcast().equals("false")) {
@@ -155,8 +188,18 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             }
             background.setColor(colorId);
         } else {
-            holder.mSimulcast.setVisibility(View.INVISIBLE);
+            holder.mSimulcast.setVisibility(View.GONE);
         }
+
+        holder.mShowType.setText(holder.series.getShowType());
+        if (holder.series.getShowType().isEmpty()){
+            holder.mShowType.setVisibility(View.VISIBLE);
+            GradientDrawable background = (GradientDrawable) holder.mShowType.getBackground();
+            background.setColor(ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal));
+        } else {
+            holder.mShowType.setVisibility(View.INVISIBLE);
+        }
+
 
         File cacheDirectory = App.getInstance().getCacheDir();
         File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
