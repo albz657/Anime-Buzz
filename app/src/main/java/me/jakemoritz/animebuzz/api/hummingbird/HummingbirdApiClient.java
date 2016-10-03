@@ -144,7 +144,8 @@ public class HummingbirdApiClient {
                         currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
                         if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                             if (currentCalendar.compareTo(startedCalendar) > 0) {
-                                if (holder.getShowType().equals("Movie") || holder.getShowType().equals("Special") || holder.getShowType().equals("OVA") || holder.getShowType().equals("ONA")) {
+//                                holder.getShowType().equals("Movie") || holder.getShowType().equals("Special") || holder.getShowType().equals("OVA") || holder.getShowType().equals("ONA")
+                                if (currSeries.isSingle()) {
                                     currSeries.setAiringStatus("Finished airing");
                                 } else {
                                     currSeries.setAiringStatus("Airing");

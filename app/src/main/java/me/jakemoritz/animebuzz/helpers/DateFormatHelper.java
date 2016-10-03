@@ -21,7 +21,7 @@ public class DateFormatHelper {
 
     public Calendar getCalFromHB(String dateString) {
         SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = null;
+        Date date;
         try {
             date = originalFormat.parse(dateString);
             Calendar calendar = Calendar.getInstance();
