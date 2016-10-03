@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
@@ -135,6 +137,9 @@ public class HummingbirdApiClient {
                         currSeries.setSingle(true);
                     }
 
+                    if (currSeries.getMALID().equals(33046L))
+                        Log.d(TAG, "d");
+
                     if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
                         currSeries.setAiringStatus("Not yet aired");
                     } else {
@@ -165,9 +170,13 @@ public class HummingbirdApiClient {
                     }
 
                     if (!holder.getImageURL().isEmpty()) {
-                        MALImageRequest malImageRequest = new MALImageRequest(currSeries);
-                        malImageRequest.setURL(holder.getImageURL());
-                        imageRequests.add(malImageRequest);
+                        File cacheDirectory = App.getInstance().getCacheDir();
+                        File bitmapFile = new File(cacheDirectory, currSeries.getMALID() + ".jpg");
+                        if (!bitmapFile.exists()) {
+                            MALImageRequest malImageRequest = new MALImageRequest(currSeries);
+                            malImageRequest.setURL(holder.getImageURL());
+                            imageRequests.add(malImageRequest);
+                        }
                     }
 
 //                    currSeries.save();
