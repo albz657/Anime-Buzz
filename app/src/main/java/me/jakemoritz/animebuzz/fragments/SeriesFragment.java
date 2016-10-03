@@ -61,7 +61,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
     private MalApiClient malApiClient;
-    private HummingbirdApiClient hummingbirdApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
     private MainActivity mainActivity;
@@ -72,7 +71,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
-        hummingbirdApiClient = new HummingbirdApiClient(this);
     }
 
     @Override
@@ -151,7 +149,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             mainActivity.saveNewSeasonData(season);
 
             if (App.getInstance().isInitializing()){
-                App.getInstance().setAiringList(season.getSeasonSeries());
+                App.getInstance().setAiringList(new SeriesList(season.getSeasonSeries()));
             }
 
             if (App.getInstance().isNetworkAvailable()){

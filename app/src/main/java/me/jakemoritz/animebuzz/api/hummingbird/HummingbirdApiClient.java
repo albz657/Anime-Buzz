@@ -13,6 +13,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -120,6 +121,18 @@ public class HummingbirdApiClient {
         }
     }
 
+    private void checkForSeasonSwitch(Series currSeries) {
+        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+        if (!currSeries.getSeason().equals(latestSeasonName) && !App.getInstance().getAllAnimeSeasons().getSeason(SharedPrefsHelper.getInstance().getLatestSeasonName()).getSeasonSeries().contains(currSeries)) {
+            App.getInstance().getAiringList().add(currSeries);
+            AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, true);
+            AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, false);
+            currSeries.setShifted(true);
+            callback.getmAdapter().resetData();
+            callback.getmAdapter().notifyDataSetChanged();
+        }
+    }
+
     void getAnimeData(Series series) {
         final Series currSeries = series;
 
@@ -138,9 +151,6 @@ public class HummingbirdApiClient {
                         currSeries.setSingle(true);
                     }
 
-                    if (currSeries.getMALID().equals(33046L))
-                        Log.d(TAG, "d");
-
                     if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
                         currSeries.setAiringStatus("Not yet aired");
                     } else {
@@ -156,12 +166,7 @@ public class HummingbirdApiClient {
                                 } else {
                                     currSeries.setAiringStatus("Airing");
 
-                                    String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-                                    if (!currSeries.getSeason().equals(latestSeasonName)){
-                                        App.getInstance().getAiringList().add(currSeries);
-                                        currSeries.setSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
-                                        currSeries.setShifted(true);
-                                    }
+                                    checkForSeasonSwitch(currSeries);
                                 }
                             } else {
                                 currSeries.setAiringStatus("Not yet aired");
@@ -172,15 +177,10 @@ public class HummingbirdApiClient {
                             if (currentCalendar.compareTo(finishedCalendar) > 0) {
                                 currSeries.setAiringStatus("Finished airing");
                             } else {
-                                if (currentCalendar.compareTo(startedCalendar) > 0){
+                                if (currentCalendar.compareTo(startedCalendar) > 0) {
                                     currSeries.setAiringStatus("Airing");
 
-                                    String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-                                    if (!currSeries.getSeason().equals(latestSeasonName)){
-                                        App.getInstance().getAiringList().add(currSeries);
-                                        currSeries.setSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
-                                        currSeries.setShifted(true);
-                                    }
+                                    checkForSeasonSwitch(currSeries);
                                 } else {
                                     currSeries.setAiringStatus("Not yet aired");
                                 }

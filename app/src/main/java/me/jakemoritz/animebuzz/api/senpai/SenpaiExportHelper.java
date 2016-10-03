@@ -169,7 +169,10 @@ public class SenpaiExportHelper {
                     }
 
                     response.body().getSeasonMetadata().setCurrentOrNewer(true);
-                    App.getInstance().setCurrentlyBrowsingSeason(response.body());
+
+                    if (App.getInstance().isInitializing()){
+                        App.getInstance().setCurrentlyBrowsingSeason(response.body());
+                    }
 
                     fragment.senpaiSeasonRetrieved(response.body());
                 } else {

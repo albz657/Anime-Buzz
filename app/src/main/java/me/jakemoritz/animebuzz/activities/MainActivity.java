@@ -433,6 +433,7 @@ public class MainActivity extends AppCompatActivity
         for (Season season : App.getInstance().getAllAnimeSeasons()) {
             if (season.getSeasonMetadata().getName().equals(latestSeasonName)) {
                 App.getInstance().setCurrentlyBrowsingSeason(season);
+                break;
             }
         }
 
