@@ -13,7 +13,6 @@ import java.util.List;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
@@ -142,7 +141,7 @@ public class HummingbirdApiClient {
                         Calendar currentCalendar = Calendar.getInstance();
                         Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
 
-                        currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, !currSeries.getSeason().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())));
+                        currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
                         if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                             if (currentCalendar.compareTo(startedCalendar) > 0) {
                                 if (holder.getShowType().equals("Movie") || holder.getShowType().equals("Special") || holder.getShowType().equals("OVA") || holder.getShowType().equals("ONA")) {
@@ -155,9 +154,11 @@ public class HummingbirdApiClient {
                             }
                         } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                             Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
-                            currSeries.setFinishedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, !currSeries.getSeason().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())));
+                            currSeries.setFinishedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
                             if (currentCalendar.compareTo(finishedCalendar) > 0) {
                                 currSeries.setAiringStatus("Finished airing");
+                            } else {
+                                currSeries.setAiringStatus("Airing");
                             }
                         }
                     }
