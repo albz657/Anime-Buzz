@@ -52,7 +52,9 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
     @Override
     protected void onProgressUpdate(MALImageRequest... values) {
-        seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
+        if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()){
+            seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
+        }
 
         if (App.getInstance().isPostInitializing()) {
             NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
