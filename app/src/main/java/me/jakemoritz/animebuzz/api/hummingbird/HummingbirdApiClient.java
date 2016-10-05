@@ -160,7 +160,11 @@ public class HummingbirdApiClient {
                     }
 
                     if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
-                        currSeries.setAiringStatus("Not yet aired");
+                        if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()){
+                            currSeries.setAiringStatus("Finished airing");
+                        } else {
+                            currSeries.setAiringStatus("Not yet aired");
+                        }
                     } else {
                         Calendar currentCalendar = Calendar.getInstance();
                         Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
@@ -168,7 +172,6 @@ public class HummingbirdApiClient {
                         currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
                         if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                             if (currentCalendar.compareTo(startedCalendar) > 0) {
-//                                holder.getShowType().equals("Movie") || holder.getShowType().equals("Special") || holder.getShowType().equals("OVA") || holder.getShowType().equals("ONA")
                                 if (currSeries.isSingle()) {
                                     currSeries.setAiringStatus("Finished airing");
                                 } else {

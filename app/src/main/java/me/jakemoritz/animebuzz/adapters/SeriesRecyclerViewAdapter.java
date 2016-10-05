@@ -119,7 +119,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                         dateText = holder.series.getAiringStatus();
                     }
                 } else {
-                    dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
+                    if (holder.series.getStartedAiringDate().isEmpty()){
+                        dateText = holder.series.getAiringStatus();
+                    } else {
+                        dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
+                    }
                 }
                 holder.mDate.setText(dateText);
             }
