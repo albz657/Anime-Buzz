@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -52,7 +53,9 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
     @Override
     protected void onProgressUpdate(MALImageRequest... values) {
-        if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()){
+        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().isGettingInitialImages() && App.getInstance().getUserAnimeList().contains(values[0].getSeries())){
+            seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(values[0].getSeries()));
+        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()){
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
         }
 
