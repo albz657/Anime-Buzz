@@ -94,10 +94,13 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         Drawable dateImage;
         int dateImageColorId;
-        if (holder.series.getAiringStatus().equals("Airing")){
+        if (holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_close, null);
+            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.x_red);
+        } else if (holder.series.getAiringStatus().equals("Airing")) {
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_watch_later, null);
             dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal);
-        } else if (holder.series.getAiringStatus().equals("Not yet aired")){
+        } else if (holder.series.getAiringStatus().equals("Not yet aired")) {
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_event, null);
             dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.calendar_blue);
         } else {
@@ -108,18 +111,20 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         holder.mDateImage.setImageDrawable(dateImage);
 
         if (!holder.series.getAiringStatus().equals("Finished airing")) {
-            if (holder.series.getAiringStatus().equals("Airing")) {
+            if (holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
+                holder.mDate.setText("No airing times available");
+            } else if (holder.series.getAiringStatus().equals("Airing")) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
                 String dateText;
-                if (holder.series.isSingle()){
-                    if (!holder.series.getNextEpisodeTimeFormatted().isEmpty()){
+                if (holder.series.isSingle()) {
+                    if (!holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
                         dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
                     } else {
                         dateText = holder.series.getAiringStatus();
                     }
                 } else {
-                    if (holder.series.getStartedAiringDate().isEmpty()){
+                    if (holder.series.getStartedAiringDate().isEmpty()) {
                         dateText = holder.series.getAiringStatus();
                     } else {
                         dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
@@ -130,7 +135,11 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
             holder.mDateImage.setVisibility(View.VISIBLE);
 
-            if (holder.series.isInUserList()) {
+            if (holder.series.getNextEpisodeTimeFormatted().isEmpty()){
+                holder.mAddButton.setVisibility(View.GONE);
+                holder.mMinusButton.setVisibility(View.GONE);
+            }
+            else if (holder.series.isInUserList()) {
                 holder.mAddButton.setVisibility(View.GONE);
                 holder.mMinusButton.setVisibility(View.VISIBLE);
 
@@ -148,7 +157,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mMinusButton.setVisibility(View.GONE);
 
             String dateText;
-            if (holder.series.isSingle()){
+            if (holder.series.isSingle()) {
                 dateText = "Aired on " + holder.series.getStartedAiringDate();
             } else {
                 dateText = holder.series.getAiringStatus();
@@ -200,7 +209,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         }
 
         holder.mShowType.setText(holder.series.getShowType());
-        if (!holder.series.getShowType().isEmpty()){
+        if (!holder.series.getShowType().isEmpty()) {
             holder.mShowType.setVisibility(View.VISIBLE);
             GradientDrawable background = (GradientDrawable) holder.mShowType.getBackground();
             background.setColor(ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal));

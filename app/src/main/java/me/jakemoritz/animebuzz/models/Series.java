@@ -267,18 +267,20 @@ public class Series extends SugarRecord{
     }
 
     public String getNextEpisodeTimeFormatted(){
-        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast() && simulcast_airdate > 0) {
             if (SharedPrefsHelper.getInstance().prefers24hour()){
                 return nextEpisodeSimulcastTimeFormatted24;
             } else {
                 return nextEpisodeSimulcastTimeFormatted;
             }
-        } else {
+        } else if (airdate > 0){
             if (SharedPrefsHelper.getInstance().prefers24hour()){
                 return nextEpisodeAirtimeFormatted24;
             } else {
                 return nextEpisodeAirtimeFormatted;
             }
+        } else {
+            return "";
         }
     }
 

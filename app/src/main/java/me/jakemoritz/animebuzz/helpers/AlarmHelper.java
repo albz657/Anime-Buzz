@@ -51,6 +51,10 @@ public class AlarmHelper {
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
+        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0)){
+        return null;
+        }
+
         DateFormatHelper dateFormatHelper = new DateFormatHelper();
 
         Calendar initialAirTime;
