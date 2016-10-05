@@ -75,7 +75,7 @@ public class SenpaiExportHelper {
     public void getSeasonData(final SeasonMetadata metadata) {
         Log.d(TAG, "Getting season data for: '" + metadata.getName() + "'");
 
-        if (App.getInstance().isPostInitializing()) {
+        if (App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().createSeasonDataNotification((metadata.getName()));
         }
 
