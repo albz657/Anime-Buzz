@@ -84,7 +84,7 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
 //                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
                 }
 
-                boolean missingAirdate = seriesObject.get("missingAirdate").getAsBoolean();
+                boolean missingAirdate = seriesObject.get("missingAirtime").getAsBoolean();
                 int airdate;
                 int simulcast_airdate;
                 if (missingAirdate) {

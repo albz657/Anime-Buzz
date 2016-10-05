@@ -153,7 +153,11 @@ public class HummingbirdApiClient {
                     HummingbirdAnimeHolder holder = response.body();
 
                     currSeries.setEnglishTitle(holder.getEnglishTitle());
-                    currSeries.setShowType(holder.getShowType());
+                    if (holder.getShowType().isEmpty()){
+                        currSeries.setShowType("TV");
+                    } else {
+                        currSeries.setShowType(holder.getShowType());
+                    }
 
                     if (holder.getEpisodeCount() == 1) {
                         currSeries.setSingle(true);

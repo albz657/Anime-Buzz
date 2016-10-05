@@ -109,6 +109,14 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             }
         });
 
+        SwitchCompat englishPrefSwitch = (SwitchCompat) findViewById(R.id.switch_english);
+        englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                SharedPrefsHelper.getInstance().setPrefersEnglish(b);
+            }
+        });
+
     }
 
     private void attemptVerification(String username, String password) {

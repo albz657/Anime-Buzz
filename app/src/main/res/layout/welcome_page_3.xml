@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.redbooth.WelcomePageLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorPrimary">
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@color/colorPrimary">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -15,12 +15,12 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="10dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginTop="100dp"
             android:gravity="center"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:text="@string/setup_settings_text"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"/>
 
         <RelativeLayout
             android:id="@+id/setup_settings_container"
@@ -45,7 +45,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true"/>
 
 
                 <TextView
@@ -57,7 +57,7 @@
                     android:layout_marginRight="10dp"
                     android:layout_toLeftOf="@id/switch_simulcast"
                     android:text="@string/pref_simulcast_title"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"/>
             </RelativeLayout>
 
             <RelativeLayout
@@ -65,14 +65,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/setup_settings_simulcast_container">
+                android:layout_below="@id/setup_settings_simulcast_container"
+                android:layout_marginBottom="20dp">
 
                 <android.support.v7.widget.SwitchCompat
                     android:id="@+id/switch_24hour"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_centerVertical="true"/>
 
                 <TextView
                     android:id="@+id/label_switch_24hour"
@@ -83,7 +84,34 @@
                     android:layout_marginRight="10dp"
                     android:layout_toLeftOf="@id/switch_24hour"
                     android:text="@string/pref_24hour_title"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/setup_settings_english_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/setup_settings_24hour_container">
+
+                <android.support.v7.widget.SwitchCompat
+                    android:id="@+id/switch_english"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"/>
+
+                <TextView
+                    android:id="@+id/label_switch_english"
+                    style="@style/Base.TextAppearance.AppCompat.Subhead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@id/switch_english"
+                    android:text="@string/pref_english_title"
+                    android:textColor="#FFFFFF"/>
 
             </RelativeLayout>
         </RelativeLayout>
@@ -97,7 +125,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="60dp"
             android:text="@string/change_later_text"
-            android:textColor="#80FFFFFF" />
+            android:textColor="#80FFFFFF"/>
 
         <Button
             android:id="@+id/start_button"
@@ -106,7 +134,7 @@
             android:layout_above="@id/change_later"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="20dp"
-            android:text="@string/start_button_text" />
+            android:text="@string/start_button_text"/>
 
 
     </RelativeLayout>

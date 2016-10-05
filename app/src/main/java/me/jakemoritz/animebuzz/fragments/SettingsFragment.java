@@ -48,6 +48,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     private SwitchPreference simulcastPreference;
     private SwitchPreference format24hourPreference;
+    private SwitchPreference englishPreference;
     private SwitchPreference incrementPreference;
     private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
@@ -88,6 +89,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         setRingtoneSummary();
 
         simulcastPreference = (SwitchPreference) findPreference(getString(R.string.pref_simulcast_key));
+        englishPreference = (SwitchPreference) findPreference(getString(R.string.pref_english_key));
         format24hourPreference = (SwitchPreference) findPreference(getString(R.string.pref_24hour_key));
         incrementPreference = (SwitchPreference) findPreference(getString(R.string.pref_increment_key));
 

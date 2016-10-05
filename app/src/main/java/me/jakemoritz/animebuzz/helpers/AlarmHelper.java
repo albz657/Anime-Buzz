@@ -20,8 +20,8 @@ public class AlarmHelper {
     private static AlarmHelper alarmHelper;
     private AlarmManager alarmManager;
 
-    public synchronized static AlarmHelper getInstance(){
-        if (alarmHelper == null){
+    public synchronized static AlarmHelper getInstance() {
+        if (alarmHelper == null) {
             alarmHelper = new AlarmHelper();
             alarmHelper.alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
         }
@@ -51,8 +51,8 @@ public class AlarmHelper {
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
-        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0)){
-        return null;
+        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0) || !series.getShowType().equals("TV")) {
+            return null;
         }
 
         DateFormatHelper dateFormatHelper = new DateFormatHelper();

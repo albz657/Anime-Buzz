@@ -307,7 +307,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
 
-        if (!sameDay) {
+        if (!sameDay || true) {
             for (Series series : App.getInstance().getCurrentlyBrowsingSeason().getSeasonSeries()) {
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, true);
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, false);

@@ -94,7 +94,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         Drawable dateImage;
         int dateImageColorId;
-        if (holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
+        if (holder.series.getNextEpisodeTimeFormatted().isEmpty() || (!holder.series.getShowType().equals("TV") && !holder.series.isSingle())) {
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_close, null);
             dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.x_red);
         } else if (holder.series.getAiringStatus().equals("Airing")) {
@@ -110,9 +110,12 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         dateImage.setColorFilter(new PorterDuffColorFilter(dateImageColorId, PorterDuff.Mode.SRC_IN));
         holder.mDateImage.setImageDrawable(dateImage);
 
-        if (!holder.series.getAiringStatus().equals("Finished airing")) {
+        if (!holder.series.getShowType().equals("TV") && !holder.series.isSingle()) {
+            holder.mDate.setText("No airing times available");
+            holder.mAddButton.setVisibility(View.GONE);
+            holder.mMinusButton.setVisibility(View.GONE);
+        } else if (!holder.series.getAiringStatus().equals("Finished airing")) {
             if (holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
-                holder.mDate.setText("No airing times available");
             } else if (holder.series.getAiringStatus().equals("Airing")) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
@@ -135,11 +138,10 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
             holder.mDateImage.setVisibility(View.VISIBLE);
 
-            if (holder.series.getNextEpisodeTimeFormatted().isEmpty()){
+            if (holder.series.getNextEpisodeTimeFormatted().isEmpty() || holder.series.isSingle()) {
                 holder.mAddButton.setVisibility(View.GONE);
                 holder.mMinusButton.setVisibility(View.GONE);
-            }
-            else if (holder.series.isInUserList()) {
+            } else if (holder.series.isInUserList()) {
                 holder.mAddButton.setVisibility(View.GONE);
                 holder.mMinusButton.setVisibility(View.VISIBLE);
 
