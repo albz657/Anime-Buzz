@@ -142,6 +142,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
             SharedPrefsHelper.getInstance().setUsername(usernameField.getText().toString().trim());
             SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
+            SharedPrefsHelper.getInstance().setLoggedIn(true);
 
             if (findViewById(R.id.coordinator) != null)
                 Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
