@@ -51,7 +51,7 @@ public class AlarmHelper {
     }
 
     public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
-        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0) || !series.getShowType().equals("TV")) {
+        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0) || (!series.getShowType().equals("TV") && !series.getShowType().isEmpty())) {
             return null;
         }
 
