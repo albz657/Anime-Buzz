@@ -16,6 +16,7 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
@@ -118,18 +119,24 @@ public class HummingbirdApiClient {
             Series.saveInTx(seriesList);
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
             finishedCount = 0;
+
+            if (App.getInstance().isPostInitializing()){
+                NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + imageRequests.size());
+            }
         }
     }
 
     private void checkForSeasonSwitch(Series currSeries) {
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
         if (!currSeries.getSeason().equals(latestSeasonName) && !App.getInstance().getAllAnimeSeasons().getSeason(SharedPrefsHelper.getInstance().getLatestSeasonName()).getSeasonSeries().contains(currSeries)) {
-            App.getInstance().getAiringList().add(currSeries);
             AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, true);
             AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, false);
             currSeries.setShifted(true);
-            callback.getmAdapter().resetData();
-            callback.getmAdapter().notifyDataSetChanged();
+
+            App.getInstance().getAiringList().add(currSeries);
+            callback.getmAdapter().getVisibleSeries().add(currSeries);
+            callback.getRecyclerView().getRecycledViewPool().clear();
+            callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
         }
     }
 

@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -64,6 +65,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private boolean adding = false;
     private Series itemToBeChanged;
     private MainActivity mainActivity;
+    private RecyclerView recyclerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,7 +84,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         FragmentSeriesListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_list, container, false);
 
         swipeRefreshLayout = (SwipeRefreshLayout) binding.getRoot();
-        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
+        recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
         RelativeLayout emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
@@ -91,7 +93,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         if (this instanceof SeasonsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(new SeriesList(), this);
+            mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getAiringList(), this);
             emptyText.setText(getString(R.string.empty_text_season));
         } else if (this instanceof CurrentlyWatchingFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(App.getInstance().getUserAnimeList(), this);
@@ -149,7 +151,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             mainActivity.saveNewSeasonData(season);
 
             if (App.getInstance().isInitializing()){
-                App.getInstance().setAiringList(new SeriesList(season.getSeasonSeries()));
+                App.getInstance().getAiringList().addAll(season.getSeasonSeries());
+                getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+//                getmAdapter().addToDataset();
+                getmAdapter().notifyDataSetChanged();
             }
 
             if (App.getInstance().isNetworkAvailable()){
@@ -177,8 +182,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()){
             mAdapter.notifyDataSetChanged();
+        }
+
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
+            App.getInstance().setGettingPostInitialImages(true);
         }
 
         GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
@@ -188,7 +197,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void hummingbirdSeasonImagesReceived(String seasonName) {
         if (seasonName.equals("Summer 2013")){
-            App.getInstance().setPostInitializing(false);
+            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel("otherimages".hashCode());
         }
         stopRefreshing();
     }
@@ -449,5 +459,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     public MainActivity getMainActivity() {
         return mainActivity;
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 }

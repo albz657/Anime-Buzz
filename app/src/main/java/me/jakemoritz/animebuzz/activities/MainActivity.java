@@ -537,6 +537,7 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, fragment, id)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .addToBackStack(id)
                 .commit();
 
         if (getSupportActionBar() != null) {

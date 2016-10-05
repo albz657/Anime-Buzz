@@ -33,6 +33,7 @@ public class App extends SugarApp {
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean gettingInitialImages = false;
+    private boolean gettingPostInitialImages = false;
     private boolean tryingToVerify = false;
     private Season currentlyBrowsingSeason;
     private boolean justLaunched = false;
@@ -178,5 +179,13 @@ public class App extends SugarApp {
 
     public void setAiringList(SeriesList airingList) {
         this.airingList = airingList;
+    }
+
+    public boolean isGettingPostInitialImages() {
+        return gettingPostInitialImages;
+    }
+
+    public void setGettingPostInitialImages(boolean gettingPostInitialImages) {
+        this.gettingPostInitialImages = gettingPostInitialImages;
     }
 }

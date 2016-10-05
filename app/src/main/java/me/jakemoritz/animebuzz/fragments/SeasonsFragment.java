@@ -105,8 +105,11 @@ public class SeasonsFragment extends SeriesFragment {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
         } else {
-            getmAdapter().getAllSeries().clear();
-            getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
+            if (!getmAdapter().getAllSeries().equals(currentlyBrowsingSeason.getSeasonSeries())){
+                getmAdapter().getAllSeries().clear();
+                getmAdapter().getAllSeries().addAll(currentlyBrowsingSeason.getSeasonSeries());
+            }
+
             getmAdapter().getVisibleSeries().clear();
             getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
             getmAdapter().notifyDataSetChanged();

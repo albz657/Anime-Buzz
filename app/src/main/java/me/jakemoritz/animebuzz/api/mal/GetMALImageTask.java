@@ -38,30 +38,30 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
     @Override
     protected void onPostExecute(Void aVoid) {
         String seasonName = "";
-        if (!seriesList.isEmpty()){
+        if (!seriesList.isEmpty()) {
             seasonName = seriesList.get(0).getSeason();
         }
 
-        seriesFragment.hummingbirdSeasonImagesReceived(seasonName);
-
+        if (!App.getInstance().isPostInitializing()) {
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("image".hashCode());
-//            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-//            mNotificationManager.cancel("otherimages".hashCode());
+        }
 
-
+        seriesFragment.hummingbirdSeasonImagesReceived(seasonName);
     }
 
     @Override
     protected void onProgressUpdate(MALImageRequest... values) {
-
         seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
 
-        if (!App.getInstance().isGettingInitialImages()){
-//            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
-//            NotificationHelper.getInstance().createOtherImagesNotification();
+        if (App.getInstance().isPostInitializing()) {
+            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
         } else {
             NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
+        }
+
+        if (App.getInstance().isGettingPostInitialImages()) {
+            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         super.onProgressUpdate(values);
@@ -77,11 +77,12 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
             return null;
         }
 
-        if (App.getInstance().isGettingInitialImages()) {
+        if (!App.getInstance().isPostInitializing()) {
             NotificationHelper.getInstance().createImagesNotification(max, 0);
-        } else {
-//            NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + max);
-//            NotificationHelper.getInstance().createOtherImagesNotification();
+        }
+
+        if (App.getInstance().isGettingPostInitialImages()) {
+            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         for (Object imageRequestObject : imageRequests[0].toArray()) {
