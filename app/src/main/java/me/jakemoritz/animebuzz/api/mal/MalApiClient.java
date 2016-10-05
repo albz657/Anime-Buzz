@@ -35,7 +35,7 @@ public class MalApiClient {
 
     private final static String TAG = MalApiClient.class.getSimpleName();
 
-    private static final String BASE_URL = "http://myanimelist.net/anime/";
+    private static final String BASE_URL = "https://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
     private VerifyCredentialsResponse verifyListener;
