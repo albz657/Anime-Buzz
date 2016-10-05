@@ -134,6 +134,7 @@ public class HummingbirdApiClient {
             currSeries.setShifted(true);
 
             App.getInstance().getAiringList().add(currSeries);
+            callback.getmAdapter().getAllSeries().add(currSeries);
             callback.getmAdapter().getVisibleSeries().add(currSeries);
             callback.getRecyclerView().getRecycledViewPool().clear();
             callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);

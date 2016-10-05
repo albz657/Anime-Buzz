@@ -172,6 +172,7 @@ public class SenpaiExportHelper {
 
                     if (App.getInstance().isInitializing()){
                         App.getInstance().setCurrentlyBrowsingSeason(response.body());
+                        App.getInstance().getAiringList().addAll(response.body().getSeasonSeries());
                     }
 
                     fragment.senpaiSeasonRetrieved(response.body());

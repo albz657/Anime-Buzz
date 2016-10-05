@@ -261,9 +261,12 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
         return allSeries;
     }
 
-    public void addToDataset(){
-        visibleSeries.clear();
-        visibleSeries.addAll(visibleSeries);
+    public void setVisibleSeries(SeriesList visibleSeries) {
+        this.visibleSeries = visibleSeries;
+    }
+
+    public void setAllSeries(SeriesList allSeries) {
+        this.allSeries = allSeries;
     }
 
     public void setSeriesFilter(SeriesFilter seriesFilter) {
