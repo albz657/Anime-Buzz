@@ -27,7 +27,6 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdApiClient;
-import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
@@ -39,6 +38,7 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
@@ -149,6 +149,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (season != null){
             App.getInstance().getAllAnimeSeasons().add(season);
             mainActivity.saveNewSeasonData(season);
+            Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
 
             if (App.getInstance().isNetworkAvailable()){
                 int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
@@ -175,22 +176,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
-        if (App.getInstance().isInitializing()){
-            getmAdapter().getVisibleSeries().addAll(App.getInstance().getAiringList());
-            getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
-            getmAdapter().notifyDataSetChanged();
-        }
-
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()){
             mAdapter.notifyDataSetChanged();
         }
-
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
-            App.getInstance().setGettingPostInitialImages(true);
-        }
-
-        GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
-        getMALImageTask.execute(malImageRequests);
     }
 
     @Override

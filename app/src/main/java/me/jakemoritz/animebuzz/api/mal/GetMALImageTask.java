@@ -58,7 +58,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
         if (App.getInstance().isPostInitializing()) {
             NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
-        } else {
+        } else if (!App.getInstance().isGettingPostInitialImages()){
             NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
         }
 
@@ -79,7 +79,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
             return null;
         }
 
-        if (!App.getInstance().isPostInitializing()) {
+        if (!App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().createImagesNotification(max, 0);
         }
 

@@ -94,7 +94,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         Drawable dateImage;
         int dateImageColorId;
-        if (holder.series.getNextEpisodeTimeFormatted().isEmpty() || (!holder.series.getShowType().equals("TV") && !holder.series.isSingle())) {
+        if ((holder.series.getNextEpisodeTimeFormatted().isEmpty() && holder.series.getStartedAiringDate().isEmpty()) || (!holder.series.getShowType().equals("TV") && !holder.series.isSingle())) {
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_close, null);
             dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.x_red);
         } else if (holder.series.getAiringStatus().equals("Airing")) {

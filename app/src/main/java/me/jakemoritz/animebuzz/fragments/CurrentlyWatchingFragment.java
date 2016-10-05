@@ -11,8 +11,11 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.Collections;
+import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
+import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -26,6 +29,9 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     private static final String TAG = CurrentlyWatchingFragment.class.getSimpleName();
 
+    private List<MALImageRequest> imageRequests;
+    private SeriesList seriesList;
+
     public static CurrentlyWatchingFragment newInstance() {
         CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
         return fragment;
@@ -33,11 +39,13 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
 
         loadUserSortingPreference();
+
+        super.onViewCreated(view, savedInstanceState);
+
+
     }
 
     @Override
@@ -56,28 +64,20 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(String seasonName) {
-        super.hummingbirdSeasonImagesReceived(seasonName);
+    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
+        super.hummingbirdSeasonReceived(malImageRequests, seriesList);
 
-        if (!true){
-            stopRefreshing();
-        }
-
-        if (App.getInstance().isGettingInitialImages()) {
-            App.getInstance().setInitializing(false);
-
-            if (SharedPrefsHelper.getInstance().isLoggedIn()){
-                getMalApiClient().getUserList();
-            } else {
-                stopRefreshing();
-            }
+        if (App.getInstance().isInitializing()){
+            getMalApiClient().getUserList();
 
             if (getMainActivity() != null && getMainActivity().getProgressViewHolder() != null) {
                 TextView loadingText = (TextView) getMainActivity().getProgressViewHolder().findViewById(R.id.loading_text);
                 loadingText.setText(getString(R.string.initial_loading_myshows));
             }
-
         }
+
+        imageRequests = malImageRequests;
+        this.seriesList = seriesList;
 
         if (isUpdating()) {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
@@ -85,8 +85,22 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             } else {
                 AlarmHelper.getInstance().resetAlarms();
                 loadUserSortingPreference();
-                stopRefreshing();
+
+                GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
+                getMALImageTask.execute(imageRequests);
             }
+        }
+    }
+
+    @Override
+    public void hummingbirdSeasonImagesReceived(String seasonName) {
+        super.hummingbirdSeasonImagesReceived(seasonName);
+
+        if (App.getInstance().isGettingInitialImages()){
+            App.getInstance().setGettingInitialImages(false);
+            App.getInstance().setPostInitializing(true);
+
+            getSenpaiExportHelper().getSeasonList();
         }
     }
 
@@ -96,13 +110,16 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
         AlarmHelper.getInstance().resetAlarms();
 
-        if (App.getInstance().isGettingInitialImages()) {
-            App.getInstance().setGettingInitialImages(false);
-            App.getInstance().setPostInitializing(true);
-
+        if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
 
-            getSenpaiExportHelper().getSeasonList();
+            App.getInstance().setGettingInitialImages(true);
+            App.getInstance().setInitializing(false);
+        }
+
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
+            App.getInstance().setGettingPostInitialImages(true);
+            App.getInstance().setPostInitializing(false);
         }
 
         if (getmAdapter() != null) {
@@ -110,6 +127,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 getmAdapter().getVisibleSeries().clear();
             }
         }
+        GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
+        getMALImageTask.execute(imageRequests);
 
         loadUserSortingPreference();
     }

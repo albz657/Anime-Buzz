@@ -18,6 +18,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
+import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -100,7 +101,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (currentlyBrowsingSeason == null) {
+        if (currentlyBrowsingSeason == null || currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
             if (getSwipeRefreshLayout() != null){
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
@@ -124,23 +125,41 @@ public class SeasonsFragment extends SeriesFragment {
     public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
         super.hummingbirdSeasonReceived(malImageRequests, seriesList);
 
-        if (isVisible()) {
-            refreshToolbar();
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
+            App.getInstance().setPostInitializing(false);
+            App.getInstance().setGettingPostInitialImages(true);
+        }
+
+        if (App.getInstance().isPostInitializing()){
+            if (isVisible()) {
+                refreshToolbar();
+            }
         }
 
         if (App.getInstance().isInitializing()){
+            getmAdapter().getVisibleSeries().addAll(App.getInstance().getAiringList());
+            getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+            getmAdapter().notifyDataSetChanged();
+
+            if (isVisible()) {
+                refreshToolbar();
+            }
+
             stopInitialSpinner();
             loadSeason(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName());
             App.getInstance().setInitializing(false);
             App.getInstance().setGettingInitialImages(true);
         }
+
+        GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
+        getMALImageTask.execute(malImageRequests);
     }
 
     public void refreshToolbar() {
         if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
-            List<String> seasons = getSpinnerItems();
+            refreshSpinnerItems();
 
-            if (seasons.isEmpty()) {
+            if (seasonsSpinnerAdapter.isEmpty()) {
                 getMainActivity().fixToolbar(this.getClass().getSimpleName());
             } else {
                 if (searchView != null) {
@@ -155,29 +174,28 @@ public class SeasonsFragment extends SeriesFragment {
 
                 getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-                seasonsSpinnerAdapter.getSeasonNames().clear();
-                seasonsSpinnerAdapter.getSeasonNames().addAll(seasons);
-                seasonsSpinnerAdapter.notifyDataSetChanged();
                 toolbarSpinner.setSelection(previousSpinnerIndex);
             }
         }
     }
 
-    private List<String> getSpinnerItems() {
-        List<String> seasonNames = new ArrayList<>();
+    private void refreshSpinnerItems() {
+        seasonsSpinnerAdapter.getSeasonNames().clear();
 
         List<SeasonMetadata> seasonMetadataList = new ArrayList<>(App.getInstance().getSeasonsList());
         Collections.sort(seasonMetadataList, new SeasonMetadataComparator());
 
-        for (SeasonMetadata seasonMetadata : seasonMetadataList){
-            seasonNames.add(seasonMetadata.getName());
+        for (Season season : App.getInstance().getAllAnimeSeasons()){
+            seasonsSpinnerAdapter.getSeasonNames().add(season.getSeasonMetadata().getName());
 
-            if (seasonMetadata.getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
-                previousSpinnerIndex = seasonMetadataList.indexOf(seasonMetadata);
+            if (season.getSeasonMetadata().getName().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())) {
+                previousSpinnerIndex = App.getInstance().getAllAnimeSeasons().indexOf(season);
             }
         }
 
-        return seasonNames;
+        toolbarSpinner.setSelection(previousSpinnerIndex);
+
+        seasonsSpinnerAdapter.notifyDataSetChanged();
     }
 
     @Override
