@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -120,7 +121,7 @@ public class HummingbirdApiClient {
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
             finishedCount = 0;
 
-            if (App.getInstance().isPostInitializing()){
+            if (App.getInstance().isPostInitializing()) {
                 NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + imageRequests.size());
             }
         }
@@ -134,10 +135,13 @@ public class HummingbirdApiClient {
             currSeries.setShifted(true);
 
             App.getInstance().getAiringList().add(currSeries);
-            callback.getmAdapter().getAllSeries().add(currSeries);
-            callback.getmAdapter().getVisibleSeries().add(currSeries);
-            callback.getRecyclerView().getRecycledViewPool().clear();
-            callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
+
+            if (callback instanceof SeasonsFragment) {
+                callback.getmAdapter().getAllSeries().add(currSeries);
+                callback.getmAdapter().getVisibleSeries().add(currSeries);
+                callback.getRecyclerView().getRecycledViewPool().clear();
+                callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
+            }
         }
     }
 
@@ -153,7 +157,7 @@ public class HummingbirdApiClient {
                     HummingbirdAnimeHolder holder = response.body();
 
                     currSeries.setEnglishTitle(holder.getEnglishTitle());
-                    if (holder.getShowType().isEmpty()){
+                    if (holder.getShowType().isEmpty()) {
                         currSeries.setShowType("TV");
                     } else {
                         currSeries.setShowType(holder.getShowType());
@@ -164,7 +168,7 @@ public class HummingbirdApiClient {
                     }
 
                     if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
-                        if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()){
+                        if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()) {
                             currSeries.setAiringStatus("Finished airing");
                         } else {
                             currSeries.setAiringStatus("Not yet aired");
