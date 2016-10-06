@@ -592,7 +592,7 @@ public class MainActivity extends AppCompatActivity
 
         for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
             Series series = (Series) iterator.next();
-            if (!series.getShowType().equals("TV") && !series.getShowType().isEmpty()) {
+            if (!series.getShowType().equals("TV")) {
                 AlarmHelper.getInstance().removeAlarm(series);
                 series.setInUserList(false);
                 removedShows.add(series);

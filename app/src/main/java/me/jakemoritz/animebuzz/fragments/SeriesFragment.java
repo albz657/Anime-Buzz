@@ -3,6 +3,8 @@ package me.jakemoritz.animebuzz.fragments;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -176,6 +178,17 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
+        try {
+            PackageInfo packageInfo = App.getInstance().getPackageManager().getPackageInfo(App.getInstance().getPackageName(), 0);
+            int version = packageInfo.versionCode;
+
+            if (version <= 8){
+                mainActivity.removeOlderShows();
+            }
+        } catch (PackageManager.NameNotFoundException e){
+            e.printStackTrace();
+        }
+
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()){
             mAdapter.notifyDataSetChanged();
         }

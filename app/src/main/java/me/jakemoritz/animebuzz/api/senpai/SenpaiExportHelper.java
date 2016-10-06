@@ -2,8 +2,6 @@ package me.jakemoritz.animebuzz.api.senpai;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -156,17 +154,6 @@ public class SenpaiExportHelper {
                     Log.d(TAG, "Got latest season data");
 
                     SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonMetadata().getName());
-
-                    try {
-                        PackageInfo packageInfo = App.getInstance().getPackageManager().getPackageInfo(App.getInstance().getPackageName(), 0);
-                        int version = packageInfo.versionCode;
-
-                        if (version <= 8){
-                            fragment.getMainActivity().removeOlderShows();
-                        }
-                    } catch (PackageManager.NameNotFoundException e){
-                        e.printStackTrace();
-                    }
 
                     response.body().getSeasonMetadata().setCurrentOrNewer(true);
 

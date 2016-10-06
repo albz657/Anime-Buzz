@@ -19,10 +19,8 @@ import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeAiringTimeComparator;
-import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeSimulcastTimeComparator;
+import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
-import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class CurrentlyWatchingFragment extends SeriesFragment {
@@ -57,7 +55,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             setUpdating(true);
         } else {
             stopRefreshing();
-            if (getSwipeRefreshLayout() != null){
+            if (getSwipeRefreshLayout() != null) {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         }
@@ -67,7 +65,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
         super.hummingbirdSeasonReceived(malImageRequests, seriesList);
 
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             getMalApiClient().getUserList();
 
             if (getMainActivity() != null && getMainActivity().getProgressViewHolder() != null) {
@@ -79,12 +77,12 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         imageRequests = malImageRequests;
         this.seriesList = seriesList;
 
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")) {
             App.getInstance().setPostInitializing(false);
             App.getInstance().setGettingPostInitialImages(true);
         }
 
-        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()){
+        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
             GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
             getMALImageTask.execute(imageRequests);
         }
@@ -106,7 +104,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     public void hummingbirdSeasonImagesReceived() {
         super.hummingbirdSeasonImagesReceived();
 
-        if (App.getInstance().isGettingInitialImages()){
+        if (App.getInstance().isGettingInitialImages()) {
             App.getInstance().setGettingInitialImages(false);
             App.getInstance().setPostInitializing(true);
 
@@ -128,7 +126,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         }
 
         if (getmAdapter() != null) {
-            if (getmAdapter().getAllSeries().isEmpty()){
+            if (getmAdapter().getAllSeries().isEmpty()) {
                 getmAdapter().getVisibleSeries().clear();
             }
         }
@@ -154,28 +152,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     private void sortByDate() {
         SharedPrefsHelper.getInstance().setSortingPreference("date");
 
-        SeriesList noDateList = new SeriesList();
-        SeriesList hasDateList = new SeriesList();
-        for (Series series : getmAdapter().getVisibleSeries()) {
-            if (series.getSimulcast_airdate() < 0 || series.getAirdate() < 0) {
-                noDateList.add(series);
-            } else {
-                hasDateList.add(series);
-            }
-        }
+        Collections.sort(getmAdapter().getAllSeries(), new NextEpisodeTimeComparator());
 
-        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
-            Collections.sort(hasDateList, new NextEpisodeSimulcastTimeComparator());
-        } else {
-            Collections.sort(hasDateList, new NextEpisodeAiringTimeComparator());
-        }
-
-        for (Series series : noDateList) {
-            hasDateList.add(series);
-        }
-
-        getmAdapter().getAllSeries().clear();
-        getmAdapter().getAllSeries().addAll(hasDateList);
         getmAdapter().getVisibleSeries().clear();
         getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }
