@@ -590,10 +590,9 @@ public class MainActivity extends AppCompatActivity
     public void removeOlderShows() {
         SeriesList removedShows = new SeriesList();
 
-        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
         for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
             Series series = (Series) iterator.next();
-            if (!series.getSeason().equals(latestSeasonName)) {
+            if (!series.getShowType().equals("TV")) {
                 AlarmHelper.getInstance().removeAlarm(series);
                 series.setInUserList(false);
                 removedShows.add(series);

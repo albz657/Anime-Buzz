@@ -69,6 +69,10 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
     @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
+        if (imageRequests == null){
+            return null;
+        }
+
         malImageRequests = imageRequests[0];
 
         max = imageRequests[0].size();
