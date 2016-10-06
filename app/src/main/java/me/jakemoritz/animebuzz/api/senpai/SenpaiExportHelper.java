@@ -161,7 +161,7 @@ public class SenpaiExportHelper {
                         PackageInfo packageInfo = App.getInstance().getPackageManager().getPackageInfo(App.getInstance().getPackageName(), 0);
                         int version = packageInfo.versionCode;
 
-                        if (version < 8){
+                        if (version <= 8){
                             fragment.getMainActivity().removeOlderShows();
                         }
                     } catch (PackageManager.NameNotFoundException e){
