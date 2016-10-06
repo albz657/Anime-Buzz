@@ -43,7 +43,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
             mNotificationManager.cancel("image".hashCode());
         }
 
-        if (!App.getInstance().isGettingInitialImages()) {
+        if (!App.getInstance().isGettingInitialImages() && App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
             NotificationHelper.getInstance().createOtherImagesNotification();
         }
@@ -59,15 +59,10 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
         }
 
-        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
-//            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
-        } else if (!App.getInstance().isGettingPostInitialImages()) {
+        if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
             NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
         }
 
-        if (App.getInstance().isGettingPostInitialImages()) {
-//            NotificationHelper.getInstance().createOtherImagesNotification([v]);
-        }
 
         super.onProgressUpdate(values);
     }

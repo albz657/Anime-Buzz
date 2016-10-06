@@ -153,14 +153,18 @@ public class AlarmHelper {
     public void makeAlarm(Series series) {
         Calendar nextEpisode = generateNextEpisodeTimes(series, SharedPrefsHelper.getInstance().prefersSimulcast());
 
-        AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
-        newAlarm.save();
+        if (nextEpisode != null){
+            AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
+            newAlarm.save();
 
-        setAlarm(newAlarm);
+            setAlarm(newAlarm);
 
-        App.getInstance().getAlarms().add(newAlarm);
+            App.getInstance().getAlarms().add(newAlarm);
 
-        series.save();
+            series.save();
+        } else {
+            removeAlarm(series);
+        }
     }
 
     public void switchAlarmTiming() {
