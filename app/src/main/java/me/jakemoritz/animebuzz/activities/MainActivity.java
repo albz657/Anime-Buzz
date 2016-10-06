@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity
                 SQLiteDatabase database = DatabaseHelper.getInstance(this).getWritableDatabase();
                 database.close();
                 deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
+                App.getInstance().setJustUpdated(true);
             }
 
             // load data
@@ -587,7 +588,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void removeOlderShows() {
+    public SeriesList removeOlderShows() {
         SeriesList removedShows = new SeriesList();
 
         for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
@@ -601,6 +602,8 @@ public class MainActivity extends AppCompatActivity
         }
 
         Series.saveInTx(removedShows);
+
+        return removedShows;
     }
 
     private void findPreviousSeason() {

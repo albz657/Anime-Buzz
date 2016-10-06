@@ -39,6 +39,7 @@ public class App extends SugarApp {
     private boolean justLaunched = false;
     private List<SeasonMetadata> syncingSeasons;
     private boolean notificationReceived = false;
+    private boolean justUpdated = false;
 
     @Override
     public void onCreate() {
@@ -187,5 +188,13 @@ public class App extends SugarApp {
 
     public void setGettingPostInitialImages(boolean gettingPostInitialImages) {
         this.gettingPostInitialImages = gettingPostInitialImages;
+    }
+
+    public boolean isJustUpdated() {
+        return justUpdated;
+    }
+
+    public void setJustUpdated(boolean justUpdated) {
+        this.justUpdated = justUpdated;
     }
 }
