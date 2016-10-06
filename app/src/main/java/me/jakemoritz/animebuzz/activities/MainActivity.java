@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity
 
     private SeriesList loadUserList() {
         SeriesList userList = new SeriesList();
-        for (Series series : App.getInstance().getCurrentlyBrowsingSeason().getSeasonSeries()) {
+        for (Series series : App.getInstance().getAiringList()) {
             if (series.isInUserList()) {
                 userList.add(series);
             }

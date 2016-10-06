@@ -72,7 +72,6 @@ public class AlarmsDataHelper {
 
         List<AlarmHolder> upgradedAlarms = AlarmHolder.listAll(AlarmHolder.class);
 
-
         App.getInstance().setAlarms(upgradedAlarms);
 
         AlarmHelper.getInstance().setAlarmsOnBoot();

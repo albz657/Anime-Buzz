@@ -184,7 +184,7 @@ public class AlarmHelper {
     }
 
     public void cancelAllAlarms(List<AlarmHolder> alarms) {
-        for (AlarmHolder alarmHolder : App.getInstance().getAlarms()) {
+        for (AlarmHolder alarmHolder : alarms) {
             alarmManager.cancel(createPendingIntent(alarmHolder.getId().intValue()));
         }
     }
