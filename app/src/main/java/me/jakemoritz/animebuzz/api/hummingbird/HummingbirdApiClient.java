@@ -17,7 +17,6 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
@@ -121,8 +120,8 @@ public class HummingbirdApiClient {
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
             finishedCount = 0;
 
-            if (App.getInstance().isPostInitializing()) {
-                NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + imageRequests.size());
+            if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
+//                NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + imageRequests.size());
             }
         }
     }

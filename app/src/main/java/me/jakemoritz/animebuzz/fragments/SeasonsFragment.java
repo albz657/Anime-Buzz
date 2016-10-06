@@ -199,8 +199,8 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(String seasonName) {
-        super.hummingbirdSeasonImagesReceived(seasonName);
+    public void hummingbirdSeasonImagesReceived() {
+        super.hummingbirdSeasonImagesReceived();
 
         if (App.getInstance().isGettingInitialImages()) {
             App.getInstance().setGettingInitialImages(false);

@@ -182,10 +182,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(String seasonName) {
-        if (seasonName.equals("Summer 2013")){
+    public void hummingbirdSeasonImagesReceived() {
+        if (NotificationHelper.getInstance().getTotalSyncingSeasons() == NotificationHelper.getInstance().getCurrentSyncingSeasons() && !App.getInstance().isGettingInitialImages()){
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("otherimages".hashCode());
+            App.getInstance().setGettingPostInitialImages(false);
         }
         stopRefreshing();
     }
@@ -202,6 +203,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                     App.getInstance().getSyncingSeasons().add(seasonMetadata);
                 }
             }
+
+            NotificationHelper.getInstance().setTotalSyncingSeasons(App.getInstance().getSyncingSeasons().size());
 
             Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonMetadataComparator());
             SeasonMetadata seasonMetadata = App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1);

@@ -38,35 +38,35 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        String seasonName = "";
-        if (!seriesList.isEmpty()) {
-            seasonName = seriesList.get(0).getSeason();
-        }
-
         if (!App.getInstance().isPostInitializing()) {
             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.cancel("image".hashCode());
         }
 
-        seriesFragment.hummingbirdSeasonImagesReceived(seasonName);
+        if (!App.getInstance().isGettingInitialImages()) {
+            NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
+            NotificationHelper.getInstance().createOtherImagesNotification();
+        }
+
+        seriesFragment.hummingbirdSeasonImagesReceived();
     }
 
     @Override
     protected void onProgressUpdate(MALImageRequest... values) {
-        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserAnimeList().contains(values[0].getSeries())){
+        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserAnimeList().contains(values[0].getSeries())) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(values[0].getSeries()));
-        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()){
+        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
         }
 
-        if (App.getInstance().isPostInitializing()) {
-            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
-        } else if (!App.getInstance().isGettingPostInitialImages()){
+        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
+//            NotificationHelper.getInstance().setProgressOther(NotificationHelper.getInstance().getProgressOther() + 1);
+        } else if (!App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
         }
 
         if (App.getInstance().isGettingPostInitialImages()) {
-            NotificationHelper.getInstance().createOtherImagesNotification();
+//            NotificationHelper.getInstance().createOtherImagesNotification([v]);
         }
 
         super.onProgressUpdate(values);

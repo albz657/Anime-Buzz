@@ -21,13 +21,13 @@ public class NotificationHelper {
 
     private static NotificationHelper notificationHelper;
 
-    private int maxOther = 0;
-    private int progressOther = 0;
     private NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
 
+    private int totalSyncingSeasons;
+    private int currentSyncingSeasons;
 
-    public synchronized static NotificationHelper getInstance(){
-        if (notificationHelper == null){
+    public synchronized static NotificationHelper getInstance() {
+        if (notificationHelper == null) {
             notificationHelper = new NotificationHelper();
         }
         return notificationHelper;
@@ -49,7 +49,7 @@ public class NotificationHelper {
         mNotificationManager.notify(100, mBuilder.build());
     }
 
-    public void createImagesNotification(int max, int progress){
+    public void createImagesNotification(int max, int progress) {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
@@ -64,13 +64,15 @@ public class NotificationHelper {
         mNotificationManager.notify("image".hashCode(), mBuilder.build());
     }
 
-    public void createOtherImagesNotification(){
+    public void createOtherImagesNotification() {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
                         .setOngoing(true)
-                        .setProgress(maxOther, progressOther, false)
-                        .setContentTitle("Downloading other images");
+//                        .setProgress(maxOther, progressOther, false)
+                        .setProgress(0, 0, true)
+                        .setContentTitle("Downloading other season images")
+                        .setContentText("Season " + currentSyncingSeasons + "/" + totalSyncingSeasons);
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
@@ -84,8 +86,8 @@ public class NotificationHelper {
         Uri ringtoneUri = Uri.parse(ringtonePref);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
         String ringtoneName = "Silent";
-        if (ringtone != null){
-            if (ringtone.getTitle(App.getInstance()) != null){
+        if (ringtone != null) {
+            if (ringtone.getTitle(App.getInstance()) != null) {
                 ringtoneName = ringtone.getTitle(App.getInstance());
             }
         }
@@ -102,7 +104,7 @@ public class NotificationHelper {
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(resultPendingIntent);
 
-        if (!ringtoneName.equals("Silent")){
+        if (!ringtoneName.equals("Silent")) {
             mBuilder.setSound(ringtoneUri);
         }
 
@@ -122,19 +124,19 @@ public class NotificationHelper {
         mNotificationManager.notify(series.getMALID().intValue(), notification);
     }
 
-    public int getMaxOther() {
-        return maxOther;
+    public int getTotalSyncingSeasons() {
+        return totalSyncingSeasons;
     }
 
-    public void setMaxOther(int maxOther) {
-        this.maxOther = maxOther;
+    public void setTotalSyncingSeasons(int totalSyncingSeasons) {
+        this.totalSyncingSeasons = totalSyncingSeasons;
     }
 
-    public int getProgressOther() {
-        return progressOther;
+    public int getCurrentSyncingSeasons() {
+        return currentSyncingSeasons;
     }
 
-    public void setProgressOther(int progressOther) {
-        this.progressOther = progressOther;
+    public void setCurrentSyncingSeasons(int currentSyncingSeasons) {
+        this.currentSyncingSeasons = currentSyncingSeasons;
     }
 }

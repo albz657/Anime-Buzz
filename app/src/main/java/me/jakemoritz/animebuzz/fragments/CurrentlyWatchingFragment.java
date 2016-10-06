@@ -79,6 +79,16 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         imageRequests = malImageRequests;
         this.seriesList = seriesList;
 
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
+            App.getInstance().setPostInitializing(false);
+            App.getInstance().setGettingPostInitialImages(true);
+        }
+
+        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()){
+            GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
+            getMALImageTask.execute(imageRequests);
+        }
+
         if (isUpdating()) {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
@@ -93,8 +103,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonImagesReceived(String seasonName) {
-        super.hummingbirdSeasonImagesReceived(seasonName);
+    public void hummingbirdSeasonImagesReceived() {
+        super.hummingbirdSeasonImagesReceived();
 
         if (App.getInstance().isGettingInitialImages()){
             App.getInstance().setGettingInitialImages(false);
@@ -117,16 +127,12 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             App.getInstance().setInitializing(false);
         }
 
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")){
-            App.getInstance().setGettingPostInitialImages(true);
-            App.getInstance().setPostInitializing(false);
-        }
-
         if (getmAdapter() != null) {
             if (getmAdapter().getAllSeries().isEmpty()){
                 getmAdapter().getVisibleSeries().clear();
             }
         }
+
         GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
         getMALImageTask.execute(imageRequests);
 
