@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.data;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -81,10 +80,6 @@ public class AnimeDataHelper {
 
         for (long backlogTime : backlog){
             oldBacklogItems.add(new BacklogItem(series, backlogTime));
-        }
-
-        if (isInUserList){
-            Log.d(TAG,"s");
         }
 
         return series;
