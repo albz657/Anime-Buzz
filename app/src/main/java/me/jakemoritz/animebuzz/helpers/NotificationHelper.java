@@ -68,7 +68,7 @@ public class NotificationHelper {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
-                        .setOngoing(true)
+                        .setOngoing(false)
 //                        .setProgress(maxOther, progressOther, false)
                         .setProgress(0, 0, true)
                         .setContentTitle("Downloading other season images")

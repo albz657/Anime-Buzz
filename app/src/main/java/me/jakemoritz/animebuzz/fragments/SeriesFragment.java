@@ -186,6 +186,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             App.getInstance().setPostInitializing(true);
             App.getInstance().setJustUpdated(false);
 
+            NotificationHelper.getInstance().setTotalSyncingSeasons(0);
+            NotificationHelper.getInstance().setCurrentSyncingSeasons(0);
+
             senpaiExportHelper.getSeasonList();
         }
 
