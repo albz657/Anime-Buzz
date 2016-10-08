@@ -36,16 +36,14 @@ public class HummingbirdApiClient {
     private static final String BASE_URL = "https://hummingbird.me/";
     private SeriesFragment callback;
     private SeriesList seriesList;
-    private int finishedCount = 0;
     private List<MALImageRequest> imageRequests;
-    private OkHttpClient okHttpClient;
-    private Interceptor interceptor;
     private Retrofit retrofit;
+    private int finishedCount = 0;
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
         this.imageRequests = new ArrayList<>();
-        this.interceptor = new Interceptor() {
+        Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
                 final Request request = chain.request().newBuilder()
@@ -55,7 +53,7 @@ public class HummingbirdApiClient {
                 return chain.proceed(request);
             }
         };
-        this.okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
@@ -67,37 +65,8 @@ public class HummingbirdApiClient {
                 .build();
     }
 
-
     void setSeriesList(SeriesList seriesList) {
         this.seriesList = seriesList;
-    }
-
-    private static <S> S createService(Class<S> serviceClass) {
-        OkHttpClient.Builder httpBuilder = new OkHttpClient.Builder();
-
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                final Request request = chain.request().newBuilder()
-                        .addHeader("X-Client-Id", "683b6ab4486e5a7c612e")
-                        .build();
-
-                return chain.proceed(request);
-            }
-        };
-
-        httpBuilder.addInterceptor(interceptor);
-//        okHttpClient = httpBuilder.build();
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
-                .client(new OkHttpClient())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-        return retrofit.create(serviceClass);
     }
 
     public void processSeriesList(SeriesList seriesList) {
@@ -108,20 +77,96 @@ public class HummingbirdApiClient {
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
         } else {
             for (Series series : seriesList) {
-                getAnimeData(series);
+                getSeriesData(series);
             }
         }
     }
 
-    private void finishedCheck() {
-        finishedCount++;
-        if (finishedCount == seriesList.size()) {
-            Series.saveInTx(seriesList);
-            callback.hummingbirdSeasonReceived(imageRequests, seriesList);
-            finishedCount = 0;
+    void getSeriesData(Series series) {
+        final Series currSeries = series;
 
-            if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
-//                NotificationHelper.getInstance().setMaxOther(NotificationHelper.getInstance().getMaxOther() + imageRequests.size());
+        HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
+        call.enqueue(new Callback<HummingbirdAnimeHolder>() {
+            @Override
+            public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
+                if (response.isSuccessful()) {
+                    processSeries(currSeries, response.body());
+                } else {
+                    Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
+                }
+                finishedCheck();
+            }
+
+            @Override
+            public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
+                finishedCheck();
+                Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
+            }
+        });
+    }
+
+    private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
+        currSeries.setEnglishTitle(holder.getEnglishTitle());
+
+        if (holder.getShowType().isEmpty()) {
+            currSeries.setShowType("TV");
+        } else {
+            currSeries.setShowType(holder.getShowType());
+        }
+
+        if (holder.getEpisodeCount() == 1) {
+            currSeries.setSingle(true);
+        }
+
+        if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
+            if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()) {
+                currSeries.setAiringStatus("Finished airing");
+            } else {
+                currSeries.setAiringStatus("Not yet aired");
+            }
+        } else {
+            Calendar currentCalendar = Calendar.getInstance();
+            Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
+
+            currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
+            if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
+                if (currentCalendar.compareTo(startedCalendar) > 0) {
+                    if (currSeries.isSingle()) {
+                        currSeries.setAiringStatus("Finished airing");
+                    } else {
+                        currSeries.setAiringStatus("Airing");
+
+                        checkForSeasonSwitch(currSeries);
+                    }
+                } else {
+                    currSeries.setAiringStatus("Not yet aired");
+                }
+            } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
+                Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
+                currSeries.setFinishedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
+                if (currentCalendar.compareTo(finishedCalendar) > 0) {
+                    currSeries.setAiringStatus("Finished airing");
+                } else {
+                    if (currentCalendar.compareTo(startedCalendar) > 0) {
+                        currSeries.setAiringStatus("Airing");
+
+                        checkForSeasonSwitch(currSeries);
+                    } else {
+                        currSeries.setAiringStatus("Not yet aired");
+                    }
+
+                }
+            }
+        }
+
+        if (!holder.getImageURL().isEmpty()) {
+            File cacheDirectory = App.getInstance().getCacheDir();
+            File bitmapFile = new File(cacheDirectory, currSeries.getMALID() + ".jpg");
+            if (!bitmapFile.exists()) {
+                MALImageRequest malImageRequest = new MALImageRequest(currSeries);
+                malImageRequest.setURL(holder.getImageURL());
+                imageRequests.add(malImageRequest);
             }
         }
     }
@@ -144,92 +189,12 @@ public class HummingbirdApiClient {
         }
     }
 
-    void getAnimeData(Series series) {
-        final Series currSeries = series;
-
-        HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
-        call.enqueue(new Callback<HummingbirdAnimeHolder>() {
-            @Override
-            public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
-                if (response.isSuccessful()) {
-                    HummingbirdAnimeHolder holder = response.body();
-
-                    currSeries.setEnglishTitle(holder.getEnglishTitle());
-                    if (holder.getShowType().isEmpty()) {
-                        currSeries.setShowType("TV");
-                    } else {
-                        currSeries.setShowType(holder.getShowType());
-                    }
-
-                    if (holder.getEpisodeCount() == 1) {
-                        currSeries.setSingle(true);
-                    }
-
-                    if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
-                        if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()) {
-                            currSeries.setAiringStatus("Finished airing");
-                        } else {
-                            currSeries.setAiringStatus("Not yet aired");
-                        }
-                    } else {
-                        Calendar currentCalendar = Calendar.getInstance();
-                        Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
-
-                        currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
-                        if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
-                            if (currentCalendar.compareTo(startedCalendar) > 0) {
-                                if (currSeries.isSingle()) {
-                                    currSeries.setAiringStatus("Finished airing");
-                                } else {
-                                    currSeries.setAiringStatus("Airing");
-
-                                    checkForSeasonSwitch(currSeries);
-                                }
-                            } else {
-                                currSeries.setAiringStatus("Not yet aired");
-                            }
-                        } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
-                            Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
-                            currSeries.setFinishedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
-                            if (currentCalendar.compareTo(finishedCalendar) > 0) {
-                                currSeries.setAiringStatus("Finished airing");
-                            } else {
-                                if (currentCalendar.compareTo(startedCalendar) > 0) {
-                                    currSeries.setAiringStatus("Airing");
-
-                                    checkForSeasonSwitch(currSeries);
-                                } else {
-                                    currSeries.setAiringStatus("Not yet aired");
-                                }
-
-                            }
-                        }
-                    }
-
-                    if (!holder.getImageURL().isEmpty()) {
-                        File cacheDirectory = App.getInstance().getCacheDir();
-                        File bitmapFile = new File(cacheDirectory, currSeries.getMALID() + ".jpg");
-                        if (!bitmapFile.exists()) {
-                            MALImageRequest malImageRequest = new MALImageRequest(currSeries);
-                            malImageRequest.setURL(holder.getImageURL());
-                            imageRequests.add(malImageRequest);
-                        }
-                    }
-
-//                    currSeries.save();
-                } else {
-                    Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
-                }
-                finishedCheck();
-            }
-
-            @Override
-            public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
-                finishedCheck();
-
-                Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
-            }
-        });
+    private void finishedCheck() {
+        finishedCount++;
+        if (finishedCount == seriesList.size()) {
+            Series.saveInTx(seriesList);
+            finishedCount = 0;
+            callback.hummingbirdSeasonReceived(imageRequests, seriesList);
+        }
     }
 }

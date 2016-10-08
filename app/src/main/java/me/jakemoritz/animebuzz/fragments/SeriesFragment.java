@@ -40,7 +40,7 @@ import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
-import me.jakemoritz.animebuzz.interfaces.ann.SeasonPostersImportResponse;
+import me.jakemoritz.animebuzz.interfaces.hummingbird.SeasonPostersImportResponse;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;

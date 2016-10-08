@@ -22,6 +22,12 @@ public class AboutFragment extends Fragment {
         // Required empty public constructor
     }
 
+    public static AboutFragment newInstance() {
+        AboutFragment fragment = new AboutFragment();
+
+        return fragment;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

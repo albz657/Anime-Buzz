@@ -53,6 +53,15 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
 
+    public SettingsFragment() {
+
+    }
+
+    public static SettingsFragment newInstance() {
+        SettingsFragment fragment = new SettingsFragment();
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -245,7 +254,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     public void addToMAL(boolean add) {
-        CurrentlyWatchingFragment currentlyWatchingFragment = new CurrentlyWatchingFragment();
+        CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
 
         MalApiClient malApiClient = new MalApiClient(currentlyWatchingFragment);
 
@@ -292,7 +301,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (!App.getInstance().getUserAnimeList().isEmpty()) {
             importExistingSeries();
         } else {
-            CurrentlyWatchingFragment currentlyWatchingFragment = new CurrentlyWatchingFragment();
+            CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
 
             mainActivity.startFragment(currentlyWatchingFragment);
             new MalApiClient(currentlyWatchingFragment).getUserList();

@@ -3,6 +3,7 @@ package me.jakemoritz.animebuzz.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,8 +32,14 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     private List<MALImageRequest> imageRequests;
     private SeriesList seriesList;
 
+    public CurrentlyWatchingFragment() {
+
+    }
+
     public static CurrentlyWatchingFragment newInstance() {
         CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
+        fragment.seriesList = new SeriesList();
+        fragment.imageRequests = new ArrayList<>();
         return fragment;
     }
 
@@ -42,8 +50,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         loadUserSortingPreference();
 
         super.onViewCreated(view, savedInstanceState);
-
-
     }
 
     @Override
@@ -74,7 +80,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        imageRequests = malImageRequests;
+        this.imageRequests = malImageRequests;
         this.seriesList = seriesList;
 
         if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")) {
@@ -84,7 +90,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
         if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
             GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
-            getMALImageTask.execute(imageRequests);
+            getMALImageTask.execute(malImageRequests);
         }
 
         if (isUpdating()) {
@@ -114,6 +120,11 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void malDataImported(boolean received) {
+        if (imageRequests == null) {
+            imageRequests = new ArrayList<>();
+            seriesList = new SeriesList();
+            Log.d(TAG, "crash happened here. why null?");
+        }
         super.malDataImported(received);
 
         AlarmHelper.getInstance().resetAlarms();

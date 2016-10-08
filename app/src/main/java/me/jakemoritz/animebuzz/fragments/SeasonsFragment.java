@@ -37,11 +37,20 @@ public class SeasonsFragment extends SeriesFragment {
     private int previousSpinnerIndex = 0;
     private SearchView searchView;
 
+    public SeasonsFragment() {
+
+    }
+
+    public static SeasonsFragment newInstance() {
+        SeasonsFragment fragment = new SeasonsFragment();
+        fragment.seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(App.getInstance(), new ArrayList<String>());
+        return fragment;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         // initialize views
         toolbarSpinner = (Spinner) getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
-        seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(getContext(), new ArrayList<String>());
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

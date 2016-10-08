@@ -160,20 +160,20 @@ public class MainActivity extends AppCompatActivity
 
         if (App.getInstance().isInitializing()) {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                CurrentlyWatchingFragment currentlyWatchingFragment = new CurrentlyWatchingFragment();
+                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
                 startFragment(currentlyWatchingFragment);
             } else {
-                SeasonsFragment seasonsFragment = new SeasonsFragment();
+                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
                 senpaiExportHelper.getLatestSeasonData();
 
                 startFragment(seasonsFragment);
             }
         } else {
-            startFragment(new CurrentlyWatchingFragment());
+            startFragment(CurrentlyWatchingFragment.newInstance());
         }
     }
 
@@ -229,15 +229,15 @@ public class MainActivity extends AppCompatActivity
 
         if (previousItemId != id) {
             if (id == R.id.nav_my_shows) {
-                newFragment = new CurrentlyWatchingFragment();
+                newFragment = CurrentlyWatchingFragment.newInstance();
             } else if (id == R.id.nav_seasons) {
-                newFragment = new SeasonsFragment();
+                newFragment = SeasonsFragment.newInstance();
             } else if (id == R.id.nav_watching_queue) {
-                newFragment = new BacklogFragment();
+                newFragment = BacklogFragment.newInstance();
             } else if (id == R.id.nav_settings) {
-                newFragment = new SettingsFragment();
+                newFragment = SettingsFragment.newInstance();
             } else if (id == R.id.nav_about) {
-                newFragment = new AboutFragment();
+                newFragment = AboutFragment.newInstance();
             }
         }
 
@@ -373,7 +373,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             if (!backlogVisible) {
-                startFragment(new BacklogFragment());
+                startFragment(BacklogFragment.newInstance());
             }
         }
     }

@@ -20,7 +20,7 @@ public class HummingbirdTask extends AsyncTask<SeriesList, Void, Void> {
         this.hummingbirdApiClient.setSeriesList(params[0]);
 
         for (Series series : params[0]) {
-            this.hummingbirdApiClient.getAnimeData(series);
+            this.hummingbirdApiClient.getSeriesData(series);
         }
         return null;
     }

@@ -37,45 +37,9 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        if (!App.getInstance().isPostInitializing()) {
-            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.cancel("image".hashCode());
-        }
-
-        if (!App.getInstance().isGettingInitialImages() && App.getInstance().isGettingPostInitialImages()) {
-            NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
-            NotificationHelper.getInstance().createOtherImagesNotification();
-        }
-
-        seriesFragment.hummingbirdSeasonImagesReceived();
-    }
-
-    @Override
-    protected void onProgressUpdate(MALImageRequest... values) {
-        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserAnimeList().contains(values[0].getSeries())) {
-            seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(values[0].getSeries()));
-        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()) {
-            seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
-        }
-
-        if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
-            NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
-        }
-
-
-        super.onProgressUpdate(values);
-    }
-
-    @Override
     protected Void doInBackground(List<MALImageRequest>... imageRequests) {
-        if (imageRequests == null){
-            return null;
-        }
-
         malImageRequests = imageRequests[0];
-
-        max = imageRequests[0].size();
+        max = malImageRequests.size();
 
         if (max == 0) {
             return null;
@@ -104,6 +68,38 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
         }
         return null;
     }
+
+    @Override
+    protected void onProgressUpdate(MALImageRequest... values) {
+        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserAnimeList().contains(values[0].getSeries())) {
+            seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(values[0].getSeries()));
+        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()) {
+            seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
+        }
+
+        if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
+            NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
+        }
+
+
+        super.onProgressUpdate(values);
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        if (!App.getInstance().isPostInitializing()) {
+            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel("image".hashCode());
+        }
+
+        if (!App.getInstance().isGettingInitialImages() && App.getInstance().isGettingPostInitialImages()) {
+            NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
+            NotificationHelper.getInstance().createOtherImagesNotification();
+        }
+
+        seriesFragment.hummingbirdSeasonImagesReceived();
+    }
+
 
     private File getCachedPosterFile(String MALID) {
         File cacheDirectory = App.getInstance().getCacheDir();
@@ -138,5 +134,4 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
 
         imageRequest.getBitmap().recycle();
     }
-
 }
