@@ -30,7 +30,8 @@
                 android:layout_marginTop="5dp"
                 android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
                 app:layoutManager="LinearLayoutManager"
-                tools:context=".fragments.SeriesFragment" />
+                tools:context=".fragments.SeriesFragment"
+                android:scrollbars="vertical"/>
 
             <RelativeLayout
                 android:id="@+id/empty_view"

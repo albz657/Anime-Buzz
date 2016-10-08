@@ -3,14 +3,17 @@
 
     <data>
 
-        <import type="android.view.View" />
+        <import type="android.view.View"/>
+
         <import type="java.util.List"/>
+
         <import type="android.databinding.ObservableArrayList"/>
+
         <import type="me.jakemoritz.animebuzz.models.BacklogItem"/>
 
         <variable
             name="dataset"
-            type="ObservableArrayList&lt;BacklogItem&gt;" />
+            type="ObservableArrayList&lt;BacklogItem&gt;"/>
     </data>
 
     <FrameLayout
@@ -18,18 +21,19 @@
         android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/backlog"
-            android:name="me.jakemoritz.animebuzz.fragments.BacklogFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="5dp"
-            android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
-            app:layoutManager="LinearLayoutManager"
-            tools:context=".fragments.BacklogFragment"
-            tools:listitem="@layout/backlog_list_item" />
+                                                xmlns:tools="http://schemas.android.com/tools"
+                                                android:id="@+id/backlog"
+                                                android:name="me.jakemoritz.animebuzz.fragments.BacklogFragment"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:layout_marginLeft="2dp"
+                                                android:layout_marginRight="2dp"
+                                                android:layout_marginTop="5dp"
+                                                android:scrollbars="vertical"
+                                                android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
+                                                app:layoutManager="LinearLayoutManager"
+                                                tools:context=".fragments.BacklogFragment"
+                                                tools:listitem="@layout/backlog_list_item"/>
 
         <RelativeLayout
             android:id="@+id/empty_view"
@@ -47,14 +51,14 @@
                 android:layout_marginBottom="10dp"
                 android:width="300dp"
                 android:gravity="center"
-                android:textColor="#59000000" />
+                android:textColor="#59000000"/>
 
             <ImageView
                 android:id="@+id/empty_image"
                 android:layout_width="128dp"
                 android:layout_height="160dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/empty" />
+                android:src="@drawable/empty"/>
         </RelativeLayout>
     </FrameLayout>
 </layout>
