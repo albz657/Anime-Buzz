@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -120,11 +119,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void malDataImported(boolean received) {
-        if (imageRequests == null) {
-            imageRequests = new ArrayList<>();
-            seriesList = new SeriesList();
-            Log.d(TAG, "crash happened here. why null?");
-        }
         super.malDataImported(received);
 
         AlarmHelper.getInstance().resetAlarms();
