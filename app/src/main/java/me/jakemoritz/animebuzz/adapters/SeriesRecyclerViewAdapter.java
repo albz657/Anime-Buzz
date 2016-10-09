@@ -18,8 +18,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
-
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -219,14 +217,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mShowType.setVisibility(View.GONE);
         }
 
-
-        File cacheDirectory = App.getInstance().getCacheDir();
-        File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
-        if (bitmapFile.exists()) {
-            Picasso.with(App.getInstance()).load(bitmapFile).fit().centerCrop().into(holder.mPoster);
-        } else {
-            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-        }
+        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID().toString(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override

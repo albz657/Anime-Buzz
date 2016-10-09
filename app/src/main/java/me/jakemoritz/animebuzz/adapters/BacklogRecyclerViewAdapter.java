@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.List;
 
@@ -58,13 +57,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
-        File cacheDirectory = App.getInstance().getCacheDir();
-        File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + ".jpg");
-        if (bitmapFile.exists()) {
-            Picasso.with(App.getInstance()).load(bitmapFile).fit().centerCrop().into(holder.mPoster);
-        } else {
-            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
-        }
+        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID().toString(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
