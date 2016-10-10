@@ -11,7 +11,6 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +19,6 @@ import io.realm.RealmList;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -56,18 +54,16 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
         Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
 
         if (season == null){
+
             realm.beginTransaction();
 
             season = realm.createObject(Season.class, seasonKey);
             season.setName(seasonName);
             season.setStartDate(startTimestamp);
-            realm.commitTransaction();
-
-            Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
-            realm.beginTransaction();
-            season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
 
             realm.commitTransaction();
+
+            Season.calculateRelativeTime(seasonName);
         }
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {

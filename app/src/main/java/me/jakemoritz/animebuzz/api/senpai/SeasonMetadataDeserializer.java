@@ -53,7 +53,7 @@ class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>
 
                     App.getInstance().getAllAnimeSeasons().add(season);
                     Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
-                    season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
+//                    season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
 
                     realm.commitTransaction();
                 }

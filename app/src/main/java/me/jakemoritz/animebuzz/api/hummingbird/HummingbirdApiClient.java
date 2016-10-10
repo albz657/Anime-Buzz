@@ -125,7 +125,7 @@ public class HummingbirdApiClient {
         }
 
         if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
-            if (currSeries.getSeason().getChronologicalIndex() >= realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst().getChronologicalIndex()) {
+            if (currSeries.getSeason().getRelativeTime().equals(Season.PRESENT) || currSeries.getSeason().getRelativeTime().equals(Season.FUTURE)) {
                 currSeries.setAiringStatus("Finished airing");
             } else {
                 currSeries.setAiringStatus("Not yet aired");

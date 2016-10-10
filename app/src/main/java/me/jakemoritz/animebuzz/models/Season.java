@@ -1,31 +1,58 @@
 package me.jakemoritz.animebuzz.models;
 
+import java.util.Collections;
+
+import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 
 public class Season extends RealmObject{
+
+    public static String PRESENT = "Current";
+    public static String PAST = "Past";
+    public static String FUTURE = "Future";
 
     @PrimaryKey
     private String key;
     private String name;
     private RealmList<Series> seasonSeries;
-    private int chronologicalIndex;
     private String startDate;
+    private String relativeTime;
 
-/*    public Season(String key, String name, String startDate) {
-        this.key = key;
-        this.name = name;
-        this.startDate = startDate;
+    public static void calculateRelativeTime(String seasonName){
+        Realm realm = Realm.getDefaultInstance();
+
+        Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
+
+
+        RealmList<Season> allSeasons = new RealmList<>();
+        allSeasons.addAll(realm.where(Season.class).findAll());
+        Collections.sort(allSeasons, new SeasonComparator());
+
+        if (latestSeason != null){
+            String relativeTime;
+
+            int thisIndex = allSeasons.indexOf(season);
+            int otherIndex = allSeasons.indexOf(latestSeason);
+
+            if (thisIndex == otherIndex){
+                relativeTime = PRESENT;
+            } else if (thisIndex > otherIndex){
+                relativeTime = FUTURE;
+            } else {
+                relativeTime = PAST;
+            }
+
+            realm.beginTransaction();
+            season.setRelativeTime(relativeTime);
+            realm.commitTransaction();
+        }
+
     }
-
-    public Season(String key, String name, RealmList<Series> seasonSeries, int chronologicalIndex, String startDate) {
-        this.key = key;
-        this.name = name;
-        this.seasonSeries = seasonSeries;
-        this.chronologicalIndex = chronologicalIndex;
-        this.startDate = startDate;
-    }*/
 
     @Override
     public boolean equals(Object o) {
@@ -43,12 +70,12 @@ public class Season extends RealmObject{
         return key.hashCode();
     }
 
-    public int getChronologicalIndex() {
-        return chronologicalIndex;
+    public String getRelativeTime() {
+        return relativeTime;
     }
 
-    public void setChronologicalIndex(int chronologicalIndex) {
-        this.chronologicalIndex = chronologicalIndex;
+    public void setRelativeTime(String relativeTime) {
+        this.relativeTime = relativeTime;
     }
 
     public String getKey() {

@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.realm.Realm;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -151,6 +152,13 @@ public class SenpaiExportHelper {
             public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
+
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+
+                    response.body().setRelativeTime(Season.PRESENT);
+
+                    realm.commitTransaction();
 
                     SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getName());
                     SharedPrefsHelper.getInstance().setLatestSeasonKey(response.body().getKey());
