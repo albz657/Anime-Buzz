@@ -14,22 +14,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.api.mal.GetMALImageTask;
-import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeTimeComparator;
 import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
-import me.jakemoritz.animebuzz.models.SeriesList;
+import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.tasks.GetImageTask;
 
 public class CurrentlyWatchingFragment extends SeriesFragment {
 
     private static final String TAG = CurrentlyWatchingFragment.class.getSimpleName();
 
-    private List<MALImageRequest> imageRequests;
-    private SeriesList seriesList;
+    private List<ImageRequest> imageRequests;
+    private RealmList<Series> seriesList;
 
     public CurrentlyWatchingFragment() {
 
@@ -37,7 +38,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     public static CurrentlyWatchingFragment newInstance() {
         CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
-        fragment.seriesList = new SeriesList();
+        fragment.seriesList = new RealmList<>();
         fragment.imageRequests = new ArrayList<>();
         return fragment;
     }
@@ -67,8 +68,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonReceived(List<MALImageRequest> malImageRequests, SeriesList seriesList) {
-        super.hummingbirdSeasonReceived(malImageRequests, seriesList);
+    public void hummingbirdSeasonReceived(List<ImageRequest> imageRequests, RealmList<Series> seriesList) {
+        super.hummingbirdSeasonReceived(imageRequests, seriesList);
 
         if (App.getInstance().isInitializing()) {
             getMalApiClient().getUserList();
@@ -79,7 +80,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        this.imageRequests = malImageRequests;
+        this.imageRequests = imageRequests;
         this.seriesList = seriesList;
 
         if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")) {
@@ -88,8 +89,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         }
 
         if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
-            GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
-            getMALImageTask.execute(malImageRequests);
+            GetImageTask getImageTask = new GetImageTask(this, this.seriesList);
+            getImageTask.execute(imageRequests);
         }
 
         if (isUpdating()) {
@@ -99,8 +100,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 AlarmHelper.getInstance().resetAlarms();
                 loadUserSortingPreference();
 
-                GetMALImageTask getMALImageTask = new GetMALImageTask(this, this.seriesList);
-                getMALImageTask.execute(imageRequests);
+                GetImageTask getImageTask = new GetImageTask(this, this.seriesList);
+                getImageTask.execute(this.imageRequests);
             }
         }
     }
@@ -131,13 +132,13 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         }
 
         if (getmAdapter() != null) {
-            if (getmAdapter().getAllSeries().isEmpty()) {
-                getmAdapter().getVisibleSeries().clear();
-            }
+//            if (getmAdapter().getAllSeries().isEmpty()) {
+//                getmAdapter().getVisibleSeries().clear();
+//            }
         }
 
-        GetMALImageTask getMALImageTask = new GetMALImageTask(this, seriesList);
-        getMALImageTask.execute(imageRequests);
+        GetImageTask getImageTask = new GetImageTask(this, seriesList);
+        getImageTask.execute(imageRequests);
 
         loadUserSortingPreference();
     }
@@ -157,18 +158,18 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     private void sortByDate() {
         SharedPrefsHelper.getInstance().setSortingPreference("date");
 
-        Collections.sort(getmAdapter().getAllSeries(), new NextEpisodeTimeComparator());
+        Collections.sort(getmAdapter().getData(), new NextEpisodeTimeComparator());
 
-        getmAdapter().getVisibleSeries().clear();
-        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+//        getmAdapter().getVisibleSeries().clear();
+//        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }
 
     private void sortByName() {
         SharedPrefsHelper.getInstance().setSortingPreference("name");
 
-        Collections.sort(getmAdapter().getAllSeries(), new SeriesNameComparator());
-        getmAdapter().getVisibleSeries().clear();
-        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+        Collections.sort(getmAdapter().getData(), new SeriesNameComparator());
+//        getmAdapter().getVisibleSeries().clear();
+//        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }
 
     @Override

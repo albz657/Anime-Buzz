@@ -13,7 +13,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
-public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
+class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
     private final static String TAG = GetUserAvatarTask.class.getSimpleName();
 
@@ -21,7 +21,7 @@ public class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
     private MainActivity mainActivity;
 
-    public GetUserAvatarTask(MainActivity mainActivity) {
+    GetUserAvatarTask(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
     }
 

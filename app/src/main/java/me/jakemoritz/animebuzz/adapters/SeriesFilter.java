@@ -7,7 +7,7 @@ import io.realm.RealmList;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesFilter extends Filter {
+class SeriesFilter extends Filter {
 
     private SeriesRecyclerViewAdapter adapter;
     private OrderedRealmCollection<Series> originalSeriesList;
@@ -50,7 +50,7 @@ public class SeriesFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
-        adapter.getData().addAll((RealmList<Series>) results.values);
+        adapter.getData().addAll((OrderedRealmCollection<Series>) results.values);
         adapter.notifyDataSetChanged();
     }
 }

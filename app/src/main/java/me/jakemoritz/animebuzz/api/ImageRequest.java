@@ -1,16 +1,16 @@
-package me.jakemoritz.animebuzz.api.mal.models;
+package me.jakemoritz.animebuzz.api;
 
 import android.graphics.Bitmap;
 
 import me.jakemoritz.animebuzz.models.Series;
 
-public class MALImageRequest {
+public class ImageRequest {
 
     private Series series;
     private String URL;
     private Bitmap bitmap;
 
-    public MALImageRequest(Series series) {
+    public ImageRequest(Series series) {
         this.series = series;
         this.URL = "";
         this.bitmap = null;

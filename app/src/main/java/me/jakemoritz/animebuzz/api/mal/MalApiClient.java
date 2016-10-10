@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
@@ -21,7 +23,6 @@ import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,6 +42,7 @@ public class MalApiClient {
     private VerifyCredentialsResponse verifyListener;
     private MalDataImportedListener malDataImportedListener;
     private IncrementEpisodeCountResponse incrementListener;
+    private Realm realm = Realm.getDefaultInstance();
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -51,7 +53,7 @@ public class MalApiClient {
     public MalApiClient() {
     }
 
-    public MalApiClient(IncrementEpisodeCountResponse incrementListener){
+    public MalApiClient(IncrementEpisodeCountResponse incrementListener) {
         this.incrementListener = incrementListener;
     }
 
@@ -88,7 +90,7 @@ public class MalApiClient {
     }
 
     public void updateAnimeEpisodeCount(String MALID) {
-        Series series = Series.findById(Series.class, Long.valueOf(MALID));
+        Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
         if (series != null) {
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
@@ -151,24 +153,26 @@ public class MalApiClient {
                         for (AnimeListHolder list : response.body().getAnimeList()) {
                             if (list.getMALID() != null && list.getMy_status() != null) {
                                 if (list.getMy_status().equals("1")) {
-                                    matchList.add(new MatchHolder(Integer.valueOf(list.getMALID()), Integer.valueOf(list.getMy_watched_episodes()), list.getSeries_image()));
+                                    matchList.add(new MatchHolder(list.getMALID(), Integer.valueOf(list.getMy_watched_episodes()), list.getSeries_image()));
                                 }
                             }
                         }
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
-                        SeriesList removedSeries = new SeriesList(App.getInstance().getUserAnimeList());
+                        RealmList<Series> removedSeries = new RealmList<>();
+                        removedSeries.addAll(App.getInstance().getUserList());
 
+                        realm.beginTransaction();
                         Series series;
-                        for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
+                        for (Iterator iterator = App.getInstance().getUserList().iterator(); iterator.hasNext(); ) {
                             series = (Series) iterator.next();
                             series.setInUserList(false);
                             AlarmHelper.getInstance().removeAlarm(series);
                             iterator.remove();
                         }
 
-                        Series.saveInTx(removedSeries);
+                        realm.commitTransaction();
 
                         seriesFragment.malDataImported(true);
                     }

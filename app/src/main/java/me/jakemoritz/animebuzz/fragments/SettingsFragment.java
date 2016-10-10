@@ -24,6 +24,8 @@ import net.xpece.android.support.preference.SwitchPreference;
 
 import java.io.File;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
@@ -52,6 +54,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private SwitchPreference incrementPreference;
     private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
+
+    private Realm realm = Realm.getDefaultInstance();
 
     public SettingsFragment() {
 
@@ -260,13 +264,16 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
 
         if (!add) {
-            for (Series series : App.getInstance().getUserAnimeList()) {
+            realm.beginTransaction();
+            for (Series series : App.getInstance().getUserList()) {
                 series.setInUserList(false);
             }
-            Series.saveInTx(App.getInstance().getUserAnimeList());
-            App.getInstance().getUserAnimeList().clear();
+//            Series.saveInTx(App.getInstance().getUserList());
+            App.getInstance().getUserList().clear();
+
+            realm.commitTransaction();
         } else {
-            for (Series series : App.getInstance().getUserAnimeList()) {
+            for (Series series : App.getInstance().getUserList()) {
                 malApiClient.addAnime(String.valueOf(series.getMALID()));
             }
         }
@@ -290,7 +297,15 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
-        Alarm.deleteAll(Alarm.class);
+
+        RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
+
+        realm.beginTransaction();
+
+        alarmRealmResults.deleteAllFromRealm();
+
+        realm.commitTransaction();
+//        Alarm.deleteAll(Alarm.class);
 
         String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
@@ -298,7 +313,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             signOutPreference.setSummary(summary);
         }
 
-        if (!App.getInstance().getUserAnimeList().isEmpty()) {
+        if (!App.getInstance().getUserList().isEmpty()) {
             importExistingSeries();
         } else {
             CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();

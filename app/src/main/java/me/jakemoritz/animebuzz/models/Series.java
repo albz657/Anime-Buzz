@@ -7,31 +7,31 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 public class Series extends RealmObject{
 
     @PrimaryKey
-    private String MALID;
-    private String name;
-    private boolean currentlyAiring;
-    private String simulcastProvider;
+    private String MALID = "";
+    private String name = "";
+    private boolean currentlyAiring = false;
+    private String simulcastProvider = "";
     private Season season;
-    private String ANNID;
-    private double simulcast_delay;
-    private long nextEpisodeAirtime;
-    private long nextEpisodeSimulcastTime;
-    private String nextEpisodeAirtimeFormatted;
-    private String nextEpisodeSimulcastTimeFormatted;
-    private String nextEpisodeAirtimeFormatted24;
-    private String nextEpisodeSimulcastTimeFormatted24;
-    private long lastNotificationTime;
-    private String englishTitle;
-    private String airingStatus;
-    private String showType;
-    private boolean single;
-    private String startedAiringDate;
-    private String finishedAiringDate;
-    private boolean shifted;
-    private boolean isInUserList;
-    private int episodesWatched;
+    private String ANNID  = "";
+    private double simulcast_delay = 0;
+    private long nextEpisodeAirtime = 0L;
+    private long nextEpisodeSimulcastTime = 0L;
+    private String nextEpisodeAirtimeFormatted = "";
+    private String nextEpisodeSimulcastTimeFormatted = "";
+    private String nextEpisodeAirtimeFormatted24 = "";
+    private String nextEpisodeSimulcastTimeFormatted24 = "";
+    private long lastNotificationTime = 0L;
+    private String englishTitle = "";
+    private String airingStatus = "";
+    private String showType  = "";
+    private boolean single = false;
+    private String startedAiringDate = "";
+    private String finishedAiringDate = "";
+    private boolean shifted = false;
+    private boolean isInUserList = false;
+    private int episodesWatched = 0;
 
-    public Series(int episodesWatched, String MALID, String name, boolean currentlyAiring, String simulcastProvider, Season season, String ANNID, double simulcast_delay, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate, boolean shifted, boolean isInUserList) {
+   /* public Series(int episodesWatched, String MALID, String name, boolean currentlyAiring, String simulcastProvider, Season season, String ANNID, double simulcast_delay, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate, boolean shifted, boolean isInUserList) {
         this.episodesWatched = episodesWatched;
         this.MALID = MALID;
         this.name = name;
@@ -56,7 +56,7 @@ public class Series extends RealmObject{
         this.shifted = shifted;
         this.isInUserList = isInUserList;
     }
-
+*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -160,11 +160,11 @@ public class Series extends RealmObject{
         this.currentlyAiring = currentlyAiring;
     }
 
-    void setSimulcastProvider(String simulcastProvider) {
+    public void setSimulcastProvider(String simulcastProvider) {
         this.simulcastProvider = simulcastProvider;
     }
 
-    void setANNID(String ANNID) {
+    public void setANNID(String ANNID) {
         this.ANNID = ANNID;
     }
 
@@ -184,11 +184,11 @@ public class Series extends RealmObject{
         this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
     }
 
-    double getSimulcast_delay() {
+    public double getSimulcast_delay() {
         return simulcast_delay;
     }
 
-    void setSimulcast_delay(double simulcast_delay) {
+    public void setSimulcast_delay(double simulcast_delay) {
         this.simulcast_delay = simulcast_delay;
     }
 

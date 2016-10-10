@@ -2,15 +2,17 @@ package me.jakemoritz.animebuzz.api.mal.models;
 
 public class MatchHolder {
 
-    int MALID;
-    int episodesWatched;
-    String imageURL;
+    private String MALID;
+    private int episodesWatched;
+    private String imageURL;
 
-    public String getImageURL() {
-        return imageURL;
+    public MatchHolder(String MALID, int episodesWatched, String imageURL) {
+        this.MALID = MALID;
+        this.episodesWatched = episodesWatched;
+        this.imageURL = imageURL;
     }
 
-    public int getMALID() {
+    public String getMALID() {
         return MALID;
     }
 
@@ -18,9 +20,7 @@ public class MatchHolder {
         return episodesWatched;
     }
 
-    public MatchHolder(int MALID, int episodesWatched, String imageURL) {
-        this.MALID = MALID;
-        this.imageURL = imageURL;
-        this.episodesWatched = episodesWatched;
+    public String getImageURL() {
+        return imageURL;
     }
 }

@@ -11,18 +11,20 @@ import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class SeasonDeserializer implements JsonDeserializer<Season> {
+class SeasonDeserializer implements JsonDeserializer<Season> {
 
     private static final String TAG = SeasonDeserializer.class.getSimpleName();
 
@@ -50,37 +52,49 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
         }
         String seasonKey = seasonMonth + seasonYear;
 
-        final SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
-        if (App.getInstance().getSeasonsList().add(seasonMetadata)){
-            seasonMetadata.save();
+        Realm realm = Realm.getDefaultInstance();
+        Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
+
+        if (season == null){
+            realm.beginTransaction();
+
+            season = realm.createObject(Season.class);
+            season.setName(seasonName);
+            season.setKey(seasonKey);
+            season.setStartDate(startTimestamp);
+
+            App.getInstance().getAllAnimeSeasons().add(season);
+            Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
+            season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
+
+            realm.commitTransaction();
         }
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
-            SharedPrefsHelper.getInstance().setLatestSeasonName(seasonMetadata.getName());
+            SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
         }
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
 
-        SeriesList seasonSeries = new SeriesList();
+        RealmList<Series> seasonSeries = new RealmList<>();
         for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
             String seriesName = seriesObject.get("name").getAsString();
-            Long MALID;
+            String MALID = null;
             try {
-                MALID = seriesObject.get("MALID").getAsLong();
+                MALID = seriesObject.get("MALID").getAsString();
             } catch (NumberFormatException e) {
-                MALID = -1L;
                 Log.d(TAG, "'" + seriesName + "' has no MALID, ignoring");
             }
 
-            if (MALID > 0) {
-                int ANNID;
+            if (MALID != null) {
+                String ANNID;
                 try {
-                    ANNID = seriesObject.get("ANNID").getAsInt();
+                    ANNID = seriesObject.get("ANNID").getAsString();
                 } catch (NumberFormatException e) {
-                    ANNID = -1;
+                    ANNID = "";
 //                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
                 }
 
@@ -112,21 +126,32 @@ public class SeasonDeserializer implements JsonDeserializer<Season> {
                     }
                 }
 
-                Series series = new Series(airdate, seriesName, MALID, simulcast, simulcast_airdate, seasonName, ANNID, simulcast_delay);
+                Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+
+                realm.beginTransaction();
+
+                if (series == null){
+                    series = realm.createObject(Series.class);
+                }
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, true);
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, false);
-
+                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
                     SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
                 }
+
+                series.setANNID(ANNID);
+                series.setSimulcastProvider(simulcast);
+                series.setSeason(season);
+                series.setSimulcast_delay(simulcast_delay);
+
+                realm.commitTransaction();
 
                 seasonSeries.add(series);
             }
 
         }
 
-        return new Season(seasonSeries, seasonMetadata);
+        season.setSeasonSeries(seasonSeries);
+        return season;
     }
 }

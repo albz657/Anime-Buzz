@@ -289,20 +289,35 @@ public class MainActivity extends AppCompatActivity
     public boolean updateFormattedTimes() {
         long lastUpdatedTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
 
-        Calendar currentCalendar = Calendar.getInstance();
+        final Calendar currentCalendar = Calendar.getInstance();
 
         Calendar lastUpdatedCalendar = Calendar.getInstance();
         lastUpdatedCalendar.setTimeInMillis(lastUpdatedTime);
 
         boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
 
-        if (!sameDay || true) {
-            for (Series series : App.getInstance().getCurrentlyBrowsingSeason().getSeasonSeries()) {
-                AlarmHelper.getInstance().generateNextEpisodeTimes(series, true);
-                AlarmHelper.getInstance().generateNextEpisodeTimes(series, false);
-            }
+        if (!sameDay) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    for (Series series : App.getInstance().getAiringList()) {
+                        if (series.getNextEpisodeAirtime() > 0) {
+                            Calendar airdateCalendar = Calendar.getInstance();
+                            airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, false);
+                        }
 
-            SharedPrefsHelper.getInstance().setLastUpdateTime(currentCalendar.getTimeInMillis());
+                        if (series.getNextEpisodeSimulcastTime() > 0) {
+                            Calendar airdateCalendar = Calendar.getInstance();
+                            airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, true);
+                        }
+                    }
+
+                    SharedPrefsHelper.getInstance().setLastUpdateTime(currentCalendar.getTimeInMillis());
+                }
+            });
+
         }
 
         return sameDay;
@@ -392,7 +407,7 @@ public class MainActivity extends AppCompatActivity
     public void saveData() {
         Realm realm = Realm.getDefaultInstance();
 
-        realm.executeTransactionAsync(new Realm.Transaction(){
+        realm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
 
@@ -455,7 +470,7 @@ public class MainActivity extends AppCompatActivity
         userList.addAll(realm.where(Series.class).equalTo("isInUserList", true).findAll());
 
         final RealmList<Series> removedShows = new RealmList<>();
-        realm.executeTransaction(new Realm.Transaction(){
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 for (Iterator iterator = userList.iterator(); iterator.hasNext(); ) {

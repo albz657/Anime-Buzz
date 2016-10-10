@@ -1,14 +1,6 @@
 package me.jakemoritz.animebuzz.data;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.Alarm;
 
 public class AlarmsDataHelper {
 
@@ -32,6 +24,7 @@ public class AlarmsDataHelper {
 
     // retrieval
 
+/*
     public List<Alarm> getAllAlarms(SQLiteDatabase database) {
         List<Alarm> alarms = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
@@ -55,13 +48,14 @@ public class AlarmsDataHelper {
 
         return new Alarm(name, time, id, -1);
     }
+*/
 
 
 
     // misc
 
     void upgradeAlarms(SQLiteDatabase database) {
-        List<Alarm> oldAlarms = getAllAlarms(database);
+      /*  List<Alarm> oldAlarms = getAllAlarms(database);
 
         for (Alarm alarm : oldAlarms) {
             alarm.setMALID(alarm.getId().intValue());
@@ -74,6 +68,6 @@ public class AlarmsDataHelper {
 
         App.getInstance().setAlarms(upgradedAlarms);
 
-        AlarmHelper.getInstance().setAlarmsOnBoot();
+        AlarmHelper.getInstance().setAlarmsOnBoot();*/
     }
 }

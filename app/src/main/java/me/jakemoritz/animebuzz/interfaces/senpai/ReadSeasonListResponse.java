@@ -1,10 +1,9 @@
 package me.jakemoritz.animebuzz.interfaces.senpai;
 
-import java.util.List;
-
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import io.realm.RealmList;
+import me.jakemoritz.animebuzz.models.Season;
 
 public interface ReadSeasonListResponse {
-    void senpaiSeasonListReceived(List<SeasonMetadata> seasonMetaList);
+    void senpaiSeasonListReceived(RealmList<Season> seasonMetaList);
 
 }

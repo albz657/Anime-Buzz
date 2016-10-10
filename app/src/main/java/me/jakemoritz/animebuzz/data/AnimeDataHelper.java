@@ -1,18 +1,11 @@
 package me.jakemoritz.animebuzz.data;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.models.BacklogItem;
-import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class AnimeDataHelper {
 
@@ -53,7 +46,7 @@ public class AnimeDataHelper {
 
     // retrieval
 
-    private Series getSeriesFromCursor(Cursor res) {
+/*    private Series getSeriesFromCursor(Cursor res) {
         int airdate = res.getInt(res.getColumnIndex(KEY_AIRDATE));
         String name = res.getString(res.getColumnIndex(KEY_NAME));
         int MALID = res.getInt(res.getColumnIndex(KEY_MALID));
@@ -82,7 +75,7 @@ public class AnimeDataHelper {
             oldBacklogItems.add(new BacklogItem(series, backlogTime));
         }
 
-        return series;
+        return null;
     }
 
     private SeriesList getAllSeries(SQLiteDatabase database) {
@@ -99,7 +92,7 @@ public class AnimeDataHelper {
         cursor.close();
 
         return allSeries;
-    }
+    }*/
 
     // misc
 
@@ -111,10 +104,10 @@ public class AnimeDataHelper {
     void upgradeDatabaseVersionToVersionThree(SQLiteDatabase database) {
         oldBacklogItems = new ArrayList<>();
 
-        SeriesList allSeries = getAllSeries(database);
+//        SeriesList allSeries = getAllSeries(database);
 
-        Series.saveInTx(allSeries);
+//        Series.saveInTx(allSeries);
 
-        BacklogItem.saveInTx(oldBacklogItems);
+//        BacklogItem.saveInTx(oldBacklogItems);
     }
 }

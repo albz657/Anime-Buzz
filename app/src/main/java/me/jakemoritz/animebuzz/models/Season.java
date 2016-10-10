@@ -11,19 +11,21 @@ public class Season extends RealmObject{
     private String name;
     private RealmList<Series> seasonSeries;
     private int chronologicalIndex;
+    private String startDate;
 
-    public Season(String name, String key, int chronologicalIndex) {
-        this.name = name;
+/*    public Season(String key, String name, String startDate) {
         this.key = key;
-        this.chronologicalIndex = chronologicalIndex;
+        this.name = name;
+        this.startDate = startDate;
     }
 
-    public Season(int chronologicalIndex, String key, String name, RealmList<Series> seasonSeries) {
-        this.chronologicalIndex = chronologicalIndex;
+    public Season(String key, String name, RealmList<Series> seasonSeries, int chronologicalIndex, String startDate) {
         this.key = key;
         this.name = name;
         this.seasonSeries = seasonSeries;
-    }
+        this.chronologicalIndex = chronologicalIndex;
+        this.startDate = startDate;
+    }*/
 
     @Override
     public boolean equals(Object o) {
@@ -71,6 +73,14 @@ public class Season extends RealmObject{
 
     public void setSeasonSeries(RealmList<Series> seasonSeries) {
         this.seasonSeries = seasonSeries;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
     }
 }
 

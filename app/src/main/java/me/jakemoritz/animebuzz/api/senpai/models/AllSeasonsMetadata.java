@@ -1,20 +1,19 @@
 package me.jakemoritz.animebuzz.api.senpai.models;
 
-import java.util.List;
-
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import io.realm.RealmList;
+import me.jakemoritz.animebuzz.models.Season;
 
 public class AllSeasonsMetadata {
 
-    private List<SeasonMetadata> metadataList;
+    private RealmList<Season> metadataList;
     private String latestSeasonKey;
 
-    public AllSeasonsMetadata(List<SeasonMetadata> metadataList, String latestSeasonKey) {
+    public AllSeasonsMetadata(RealmList<Season> metadataList, String latestSeasonKey) {
         this.metadataList = metadataList;
         this.latestSeasonKey = latestSeasonKey;
     }
 
-    public List<SeasonMetadata> getMetadataList() {
+    public RealmList<Season> getMetadataList() {
         return metadataList;
     }
 

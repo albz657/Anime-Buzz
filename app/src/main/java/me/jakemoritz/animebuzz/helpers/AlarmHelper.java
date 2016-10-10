@@ -1,3 +1,4 @@
+
 package me.jakemoritz.animebuzz.helpers;
 
 import android.app.AlarmManager;
@@ -12,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
@@ -19,6 +22,7 @@ import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 public class AlarmHelper {
     private static AlarmHelper alarmHelper;
     private AlarmManager alarmManager;
+    private Realm realm = Realm.getDefaultInstance();
 
     public synchronized static AlarmHelper getInstance() {
         if (alarmHelper == null) {
@@ -33,9 +37,15 @@ public class AlarmHelper {
 
         App.getInstance().getAlarms().clear();
 
-        Alarm.deleteAll(Alarm.class);
+        final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                alarmRealmResults.deleteAllFromRealm();
+            }
+        });
 
-        for (Series series : App.getInstance().getUserAnimeList()) {
+        for (Series series : App.getInstance().getUserList()) {
             makeAlarm(series);
         }
     }
@@ -47,27 +57,29 @@ public class AlarmHelper {
     }
 
     private void setAlarm(Alarm alarm) {
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(alarm.getId().intValue()));
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(Integer.valueOf(alarm.getMALID())));
     }
 
-    public Calendar generateNextEpisodeTimes(Series series, boolean prefersSimulcast) {
-        if ((prefersSimulcast && series.getSimulcast_airdate() < 0) || (series.getAirdate() < 0) || (!series.getShowType().equals("TV") && !series.getShowType().isEmpty())) {
-            return null;
-        }
-
+    public void generateNextEpisodeTimes(Series series, int airdate, int simulcastAirdate) {
         DateFormatHelper dateFormatHelper = new DateFormatHelper();
 
-        Calendar initialAirTime;
-        if (prefersSimulcast) {
-            initialAirTime = dateFormatHelper.getCalFromSeconds(series.getSimulcast_airdate());
-        } else {
-            initialAirTime = dateFormatHelper.getCalFromSeconds(series.getAirdate());
+        if (airdate > 0) {
+            Calendar airdateCalendar = dateFormatHelper.getCalFromSeconds(airdate);
+            calculateNextEpisodeTime(series, airdateCalendar, false);
         }
 
+        if (simulcastAirdate > 0) {
+            Calendar simulcastAidateCalendar = dateFormatHelper.getCalFromSeconds(simulcastAirdate);
+            calculateNextEpisodeTime(series, simulcastAidateCalendar, true);
+        }
+
+    }
+
+    public void calculateNextEpisodeTime(Series series, Calendar calendar, boolean simulcast) {
         Calendar nextEpisode = Calendar.getInstance();
-        nextEpisode.set(Calendar.HOUR_OF_DAY, initialAirTime.get(Calendar.HOUR_OF_DAY));
-        nextEpisode.set(Calendar.MINUTE, initialAirTime.get(Calendar.MINUTE));
-        nextEpisode.set(Calendar.DAY_OF_WEEK, initialAirTime.get(Calendar.DAY_OF_WEEK));
+        nextEpisode.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
         nextEpisode.set(Calendar.SECOND, 0);
         nextEpisode.set(Calendar.MILLISECOND, 0);
 
@@ -86,7 +98,7 @@ public class AlarmHelper {
         String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
         String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
-        if (prefersSimulcast) {
+        if (simulcast) {
             series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
             series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
@@ -95,8 +107,6 @@ public class AlarmHelper {
             series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
         }
-
-        return nextEpisode;
     }
 
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
@@ -130,12 +140,6 @@ public class AlarmHelper {
             }
         }
 
-
-        /*formattedTime = DateUtils.getRelativeTimeSpanString(calendar.getTimeInMillis(), System.currentTimeMillis(), 0, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
-        formattedTime = DateUtils.getRelativeTimeSpanString(System.currentTimeMillis(), System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
-        formattedTime = DateUtils.getRelativeTimeSpanString(1473259168106L, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();
-        formattedTime = DateUtils.getRelativeTimeSpanString(1473220250000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_SHOW_WEEKDAY).toString();*/
-
         if (prefers24hour) {
             hourFormat = new SimpleDateFormat(", kk:mm", Locale.getDefault());
             formattedTime += hourFormat.format(calendar.getTime());
@@ -150,29 +154,41 @@ public class AlarmHelper {
     }
 
 
-    public void makeAlarm(Series series) {
-        Calendar nextEpisode = generateNextEpisodeTimes(series, SharedPrefsHelper.getInstance().prefersSimulcast());
-
-        if (nextEpisode != null){
-            Alarm newAlarm = new Alarm(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
-            newAlarm.save();
-
-            setAlarm(newAlarm);
-
-            App.getInstance().getAlarms().add(newAlarm);
-
-            series.save();
+    public void makeAlarm(final Series series) {
+        final long nextEpisodeTime;
+        if (series.getNextEpisodeSimulcastTime() != 0L && SharedPrefsHelper.getInstance().prefersSimulcast()) {
+            nextEpisodeTime = series.getNextEpisodeSimulcastTime();
         } else {
-            removeAlarm(series);
+            nextEpisodeTime = series.getNextEpisodeAirtime();
         }
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Alarm newAlarm = realm.createObject(Alarm.class);
+                newAlarm.setAlarmTime(nextEpisodeTime);
+                newAlarm.setMALID(series.getMALID());
+                newAlarm.setSeries(series);
+
+                setAlarm(newAlarm);
+
+                App.getInstance().getAlarms().add(newAlarm);
+            }
+        });
     }
 
     public void switchAlarmTiming() {
         App.getInstance().getAlarms().clear();
 
-        Alarm.deleteAll(Alarm.class);
+        final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                alarmRealmResults.deleteAllFromRealm();
+            }
+        });
 
-        for (Series series : App.getInstance().getUserAnimeList()) {
+        for (Series series : App.getInstance().getUserList()) {
             makeAlarm(series);
         }
     }
@@ -185,22 +201,26 @@ public class AlarmHelper {
 
     public void cancelAllAlarms(List<Alarm> alarms) {
         for (Alarm alarm : alarms) {
-            alarmManager.cancel(createPendingIntent(alarm.getId().intValue()));
+            alarmManager.cancel(createPendingIntent(Integer.valueOf(alarm.getMALID())));
         }
     }
 
-    public void removeAlarm(Series series) {
-        int id;
-        Alarm alarm;
-        for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
-            alarm = (Alarm) iterator.next();
-            if (alarm.getMALID() == series.getMALID()) {
-                id = alarm.getId().intValue();
-                alarmManager.cancel(createPendingIntent(id));
-                alarm.delete();
-                iterator.remove();
+    public void removeAlarm(final Series series) {
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
+                    Alarm alarm = (Alarm) iterator.next();
+                    if (alarm.getMALID().equals(series.getMALID())) {
+                        int id = Integer.valueOf(series.getMALID());
+                        alarmManager.cancel(createPendingIntent(id));
+                        alarm.deleteFromRealm();
+                        iterator.remove();
+                    }
+                }
             }
-        }
+        });
+
     }
 
     private void dummyAlarm() {

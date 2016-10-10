@@ -23,6 +23,7 @@ public class App extends Application {
     private RealmList<Season> allAnimeSeasons;
     private RealmList<BacklogItem> backlog;
     private RealmList<Alarm> alarms;
+    private RealmList<Series> userList;
     private RealmList<Series> airingList;
     private boolean initializing = false;
     private boolean postInitializing = false;
@@ -166,5 +167,13 @@ public class App extends Application {
 
     public void setJustUpdated(boolean justUpdated) {
         this.justUpdated = justUpdated;
+    }
+
+    public RealmList<Series> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(RealmList<Series> userList) {
+        this.userList = userList;
     }
 }

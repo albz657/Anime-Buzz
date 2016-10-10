@@ -10,7 +10,7 @@ import com.google.gson.JsonPrimitive;
 import java.lang.reflect.Type;
 
 
-public class AnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolder> {
+class HummingbirdAnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolder> {
 
     @Override
     public HummingbirdAnimeHolder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

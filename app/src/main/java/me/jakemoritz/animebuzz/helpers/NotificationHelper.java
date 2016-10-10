@@ -121,7 +121,7 @@ public class NotificationHelper {
             notification.ledARGB = Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16);
         }
 
-        mNotificationManager.notify(series.getMALID().intValue(), notification);
+        mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
     }
 
     public int getTotalSyncingSeasons() {

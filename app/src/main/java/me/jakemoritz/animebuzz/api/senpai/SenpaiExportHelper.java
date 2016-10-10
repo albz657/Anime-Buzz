@@ -14,7 +14,6 @@ import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,9 +49,9 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
                 if (response.isSuccessful()) {
-                    App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
-                    fragment.getMainActivity().saveSeasonsList();
-                    fragment.getMainActivity().setSeasonsStatus();
+//                    App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
+//                    fragment.getMainActivity().saveSeasonsList();
+//                    fragment.getMainActivity().setSeasonsStatus();
 
                     fragment.senpaiSeasonListReceived(response.body().getMetadataList());
 
@@ -70,7 +69,7 @@ public class SenpaiExportHelper {
         });
     }
 
-    public void getSeasonData(final SeasonMetadata metadata) {
+    public void getSeasonData(final Season metadata) {
         Log.d(TAG, "Getting season data for: '" + metadata.getName() + "'");
 
         if (App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
@@ -153,9 +152,9 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
 
-                    SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonMetadata().getName());
+                    SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getName());
 
-                    response.body().getSeasonMetadata().setCurrentOrNewer(true);
+//                    response.body().getSeasonMetadata().setCurrentOrNewer(true);
 
                     if (App.getInstance().isInitializing()){
                         App.getInstance().setCurrentlyBrowsingSeason(response.body());

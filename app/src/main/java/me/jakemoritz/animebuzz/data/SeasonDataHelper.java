@@ -1,12 +1,6 @@
 package me.jakemoritz.animebuzz.data;
 
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
 
 public class SeasonDataHelper {
 
@@ -28,7 +22,7 @@ public class SeasonDataHelper {
 
     // retrieval
 
-    private SeasonMetadata getSeasonMetadataFromCursor(Cursor res) {
+/*    private SeasonMetadata getSeasonMetadataFromCursor(Cursor res) {
         String seasonName = res.getString(res.getColumnIndex(KEY_SEASON_NAME));
         String seasonDate = res.getString(res.getColumnIndex(KEY_SEASON_DATE));
         String seasonKey = res.getString(res.getColumnIndex(KEY_SEASON_KEY));
@@ -48,11 +42,11 @@ public class SeasonDataHelper {
 
         cursor.close();
         return seasonList;
-    }
+    }*/
 
     void upgradeToSugar(SQLiteDatabase database){
-        Set<SeasonMetadata> seasonMetadataList = getAllSeasonMetadata(database);
+//        Set<SeasonMetadata> seasonMetadataList = getAllSeasonMetadata(database);
 
-        SeasonMetadata.saveInTx(seasonMetadataList);
+//        SeasonMetadata.saveInTx(seasonMetadataList);
     }
 }

@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
+import io.realm.Realm;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -20,11 +21,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        int intentExtra = intent.getIntExtra("id", -999);
+        String intentExtra = intent.getStringExtra("id");
 
         Alarm thisAlarm = null;
         for (Alarm alarm : App.getInstance().getAlarms()){
-            if (alarm.getId() == intentExtra){
+            if (alarm.getMALID().equals(intentExtra)){
                 thisAlarm = alarm;
                 break;
             }
@@ -33,7 +34,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (thisAlarm != null) {
             Series series = null;
 
-            for (Series eachSeries : App.getInstance().getUserAnimeList()) {
+            for (Series eachSeries : App.getInstance().getUserList()) {
                 if (eachSeries.getMALID() == thisAlarm.getMALID()) {
                     series = eachSeries;
                     break;
@@ -46,16 +47,24 @@ public class AlarmReceiver extends BroadcastReceiver {
                 lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                 if (currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
+                    Realm realm = Realm.getDefaultInstance();
+                    realm.beginTransaction();
+
                     NotificationHelper helper = new NotificationHelper();
                     helper.createNewEpisodeNotification(series);
 
                     App.getInstance().setNotificationReceived(true);
 
                     App.getInstance().getAlarms().remove(thisAlarm);
-                    thisAlarm.delete();
+                    thisAlarm.deleteFromRealm();
+//                    thisAlarm.delete();
 
-                    BacklogItem backlogItem = new BacklogItem(series, thisAlarm.getAlarmTime());
-                    backlogItem.save();
+
+                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                    backlogItem.setSeries(series);
+                    backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
+                    backlogItem.setId(Integer.valueOf(series.getMALID()));
+//                    backlogItem.save();
                     App.getInstance().getBacklog().add(backlogItem);
 
                     series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
@@ -66,6 +75,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                     }
 
                     series.setLastNotificationTime(currentTime.getTimeInMillis());
+
+                    realm.commitTransaction();
                 }
             }
         }

@@ -10,11 +10,11 @@ public class BacklogItem extends RealmObject{
     private Series series;
     private Long alarmTime;
 
-    public BacklogItem(int id, Series series, Long alarmTime) {
+/*    public BacklogItem(int id, Series series, Long alarmTime) {
         this.id = id;
         this.series = series;
         this.alarmTime = alarmTime;
-    }
+    }*/
 
     public int getId() {
         return id;

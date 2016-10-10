@@ -9,7 +9,7 @@ public class HummingbirdAnimeHolder {
     private String showType;
     private int episodeCount;
 
-    public HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
+    HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
         this.englishTitle = englishTitle;
         this.imageURL = imageURL;
         this.finishedAiringDate = finishedAiringDate;
@@ -18,27 +18,27 @@ public class HummingbirdAnimeHolder {
         this.episodeCount = episodeCount;
     }
 
-    public int getEpisodeCount() {
+    int getEpisodeCount() {
         return episodeCount;
     }
 
-    public String getStartedAiringDate() {
+    String getStartedAiringDate() {
         return startedAiringDate;
     }
 
-    public String getEnglishTitle() {
+    String getEnglishTitle() {
         return englishTitle;
     }
 
-    public String getImageURL() {
+    String getImageURL() {
         return imageURL;
     }
 
-    public String getFinishedAiringDate() {
+    String getFinishedAiringDate() {
         return finishedAiringDate;
     }
 
-    public String getShowType() {
+    String getShowType() {
         return showType;
     }
 }

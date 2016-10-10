@@ -7,14 +7,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
+import io.realm.Realm;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
+import me.jakemoritz.animebuzz.models.Season;
 
-public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>{
+class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>{
 
     private static final String TAG = SeasonMetadataDeserializer.class.getSimpleName();
 
@@ -26,7 +29,8 @@ public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMe
 
         JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 
-        final List<SeasonMetadata> metadataList = new ArrayList<>();
+        final RealmList<Season> metadataList = new RealmList<>();
+        Realm realm = Realm.getDefaultInstance();
         for (Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
             String seasonKey = seasonEntry.getKey();
 
@@ -35,8 +39,27 @@ public class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMe
                 String seasonName = metadata.get("name").getAsString();
                 String startTimestamp = metadata.get("start_timestamp").getAsString();
 
-                SeasonMetadata seasonMetadata = new SeasonMetadata(seasonName, startTimestamp, seasonKey);
-                metadataList.add(seasonMetadata);
+                realm.beginTransaction();
+
+                Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
+
+                if (season == null){
+                    realm.beginTransaction();
+
+                    season = realm.createObject(Season.class);
+                    season.setName(seasonName);
+                    season.setKey(seasonKey);
+                    season.setStartDate(startTimestamp);
+
+                    App.getInstance().getAllAnimeSeasons().add(season);
+                    Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
+                    season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
+
+                    realm.commitTransaction();
+                }
+
+                realm.commitTransaction();
+                metadataList.add(season);
             }
         }
         return new AllSeasonsMetadata(metadataList, latestSeasonKey);

@@ -10,11 +10,11 @@ public class Alarm extends RealmObject {
     private Series series;
     private long alarmTime;
 
-    public Alarm(String MALID, Series series, long alarmTime) {
+/*    public Alarm(String MALID, Series series, long alarmTime) {
         this.MALID = MALID;
         this.series = series;
         this.alarmTime = alarmTime;
-    }
+    }*/
 
     public String getMALID() {
         return MALID;

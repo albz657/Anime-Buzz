@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import io.realm.Realm;
+import io.realm.RealmList;
+import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
@@ -19,8 +21,8 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -35,10 +37,11 @@ public class HummingbirdApiClient {
 
     private static final String BASE_URL = "https://hummingbird.me/";
     private SeriesFragment callback;
-    private SeriesList seriesList;
-    private List<MALImageRequest> imageRequests;
+    private RealmList<Series> seriesList;
+    private List<ImageRequest> imageRequests;
     private Retrofit retrofit;
     private int finishedCount = 0;
+    private Realm realm = Realm.getDefaultInstance();
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
@@ -56,7 +59,7 @@ public class HummingbirdApiClient {
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new AnimeDeserializer());
+        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new HummingbirdAnimeDeserializer());
         Gson gson = gsonBuilder.create();
 
         this.retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
@@ -65,11 +68,11 @@ public class HummingbirdApiClient {
                 .build();
     }
 
-    void setSeriesList(SeriesList seriesList) {
+    void setSeriesList(RealmList<Series> seriesList) {
         this.seriesList = seriesList;
     }
 
-    public void processSeriesList(SeriesList seriesList) {
+    public void processSeriesList(RealmList<Series> seriesList) {
         this.seriesList = seriesList;
         this.imageRequests = new ArrayList<>();
 
@@ -86,7 +89,7 @@ public class HummingbirdApiClient {
         final Series currSeries = series;
 
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID().toString());
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID());
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
@@ -107,6 +110,8 @@ public class HummingbirdApiClient {
     }
 
     private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
+        realm.beginTransaction();
+
         currSeries.setEnglishTitle(holder.getEnglishTitle());
 
         if (holder.getShowType().isEmpty()) {
@@ -120,7 +125,7 @@ public class HummingbirdApiClient {
         }
 
         if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
-            if (!App.getInstance().getAllAnimeSeasons().getSeason(currSeries.getSeason()).getSeasonMetadata().isCurrentOrNewer()) {
+            if (currSeries.getSeason().getChronologicalIndex() >= realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst().getChronologicalIndex()) {
                 currSeries.setAiringStatus("Finished airing");
             } else {
                 currSeries.setAiringStatus("Not yet aired");
@@ -160,31 +165,50 @@ public class HummingbirdApiClient {
             }
         }
 
+        realm.commitTransaction();
+
         if (!holder.getImageURL().isEmpty()) {
             File cacheDirectory = App.getInstance().getCacheDir();
             File bitmapFile = new File(cacheDirectory, currSeries.getMALID() + ".jpg");
             if (!bitmapFile.exists()) {
-                MALImageRequest malImageRequest = new MALImageRequest(currSeries);
-                malImageRequest.setURL(holder.getImageURL());
-                imageRequests.add(malImageRequest);
+                ImageRequest imageRequest = new ImageRequest(currSeries);
+                imageRequest.setURL(holder.getImageURL());
+                imageRequests.add(imageRequest);
             }
         }
     }
 
-    private void checkForSeasonSwitch(Series currSeries) {
+    private void checkForSeasonSwitch(final Series currSeries) {
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-        if (!currSeries.getSeason().equals(latestSeasonName) && !App.getInstance().getAllAnimeSeasons().getSeason(SharedPrefsHelper.getInstance().getLatestSeasonName()).getSeasonSeries().contains(currSeries)) {
-            AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, true);
-            AlarmHelper.getInstance().generateNextEpisodeTimes(currSeries, false);
-            currSeries.setShifted(true);
+        if (!currSeries.getSeason().getName().equals(latestSeasonName) && !currSeries.getSeason().equals(realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst())) {
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    for (Series series : App.getInstance().getAiringList()) {
+                        if (series.getNextEpisodeAirtime() > 0) {
+                            Calendar airdateCalendar = Calendar.getInstance();
+                            airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, false);
+                        }
+
+                        if (series.getNextEpisodeSimulcastTime() > 0) {
+                            Calendar airdateCalendar = Calendar.getInstance();
+                            airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, true);
+                        }
+                    }
+                    currSeries.setShifted(true);
+
+
+                }
+            });
 
             App.getInstance().getAiringList().add(currSeries);
 
             if (callback instanceof SeasonsFragment) {
-                callback.getmAdapter().getAllSeries().add(currSeries);
-                callback.getmAdapter().getVisibleSeries().add(currSeries);
-                callback.getRecyclerView().getRecycledViewPool().clear();
-                callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
+                callback.getmAdapter().getData().add(currSeries);
+//                callback.getRecyclerView().getRecycledViewPool().clear();
+//                callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
             }
         }
     }
@@ -192,7 +216,6 @@ public class HummingbirdApiClient {
     private void finishedCheck() {
         finishedCount++;
         if (finishedCount == seriesList.size()) {
-            Series.saveInTx(seriesList);
             finishedCount = 0;
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
         }

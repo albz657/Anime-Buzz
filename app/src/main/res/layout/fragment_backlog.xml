@@ -13,7 +13,7 @@
 
         <variable
             name="dataset"
-            type="ObservableArrayList&lt;BacklogItem&gt;"/>
+            type="io.realm.OrderedRealmCollection"/>
     </data>
 
     <FrameLayout

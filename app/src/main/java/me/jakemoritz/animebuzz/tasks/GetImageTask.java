@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.api.mal;
+package me.jakemoritz.animebuzz.tasks;
 
 import android.app.NotificationManager;
 import android.content.Context;
@@ -15,31 +15,32 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import me.jakemoritz.animebuzz.api.mal.models.MALImageRequest;
+import io.realm.RealmList;
+import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
-import me.jakemoritz.animebuzz.models.SeriesList;
+import me.jakemoritz.animebuzz.models.Series;
 
-public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRequest, Void> {
+public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Void> {
 
-    private static final String TAG = GetMALImageTask.class.getSimpleName();
+    private static final String TAG = GetImageTask.class.getSimpleName();
 
     private SeriesFragment seriesFragment;
-    private SeriesList seriesList;
-    private List<MALImageRequest> malImageRequests;
+    private RealmList<Series> seriesList;
+    private List<ImageRequest> imageRequests;
     private int max;
 
-    public GetMALImageTask(SeriesFragment seriesFragment, SeriesList seriesList) {
+    public GetImageTask(SeriesFragment seriesFragment, RealmList<Series> seriesList) {
         this.seriesFragment = seriesFragment;
         this.seriesList = seriesList;
     }
 
     @Override
-    protected Void doInBackground(List<MALImageRequest>... imageRequests) {
-        malImageRequests = imageRequests[0];
-        max = malImageRequests.size();
+    protected Void doInBackground(List<ImageRequest>... imageRequests) {
+        this.imageRequests = imageRequests[0];
+        max = this.imageRequests.size();
 
         if (max == 0) {
             return null;
@@ -54,7 +55,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
         }
 
         for (Object imageRequestObject : imageRequests[0].toArray()) {
-            MALImageRequest imageRequest = (MALImageRequest) imageRequestObject;
+            ImageRequest imageRequest = (ImageRequest) imageRequestObject;
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).get();
                 imageRequest.setBitmap(bitmap);
@@ -70,15 +71,15 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
     }
 
     @Override
-    protected void onProgressUpdate(MALImageRequest... values) {
-        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserAnimeList().contains(values[0].getSeries())) {
-            seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getVisibleSeries().indexOf(values[0].getSeries()));
-        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName()) || values[0].getSeries().isShifted()) {
+    protected void onProgressUpdate(ImageRequest... values) {
+        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserList().contains(values[0].getSeries())) {
+            seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getData().indexOf(values[0].getSeries()));
+        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getName()) || values[0].getSeries().isShifted()) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
         }
 
         if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
-            NotificationHelper.getInstance().createImagesNotification(max, malImageRequests.indexOf(values[0]));
+            NotificationHelper.getInstance().createImagesNotification(max, imageRequests.indexOf(values[0]));
         }
 
 
@@ -110,7 +111,7 @@ public class GetMALImageTask extends AsyncTask<List<MALImageRequest>, MALImageRe
         return null;
     }
 
-    private void cachePoster(MALImageRequest imageRequest) {
+    private void cachePoster(ImageRequest imageRequest) {
         FileOutputStream fos = null;
         try {
             File file = getCachedPosterFile(imageRequest.getSeries().getMALID().toString());
