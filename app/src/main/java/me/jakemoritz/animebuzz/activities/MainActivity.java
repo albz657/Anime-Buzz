@@ -106,6 +106,12 @@ public class MainActivity extends AppCompatActivity
                 App.getInstance().setJustUpdated(true);
             }
 
+            if (!SharedPrefsHelper.getInstance().upgradedToRealm()){
+
+
+                SharedPrefsHelper.getInstance().setUpgradedToRealm(true);
+            }
+
             // load data
             if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isInitializing()) {
                 loadData();
