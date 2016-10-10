@@ -2,21 +2,21 @@ package me.jakemoritz.animebuzz.adapters;
 
 import android.widget.Filter;
 
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
 public class SeriesFilter extends Filter {
 
     private SeriesRecyclerViewAdapter adapter;
-    private SeriesList originalSeriesList;
-    private SeriesList filteredSeriesList;
+    private OrderedRealmCollection<Series> originalSeriesList;
+    private OrderedRealmCollection<Series> filteredSeriesList;
 
-    public SeriesFilter(SeriesRecyclerViewAdapter adapter, SeriesList seriesList) {
-        super();
+    SeriesFilter(SeriesRecyclerViewAdapter adapter, OrderedRealmCollection<Series> originalSeriesList) {
         this.adapter = adapter;
-        this.originalSeriesList = seriesList;
-        this.filteredSeriesList = new SeriesList();
+        this.originalSeriesList = originalSeriesList;
+        this.filteredSeriesList = new RealmList<>();
     }
 
     @Override
@@ -50,8 +50,7 @@ public class SeriesFilter extends Filter {
 
     @Override
     protected void publishResults(CharSequence constraint, FilterResults results) {
-        adapter.getVisibleSeries().clear();
-        adapter.getVisibleSeries().addAll((SeriesList) results.values);
+        adapter.getData().addAll((RealmList<Series>) results.values);
         adapter.notifyDataSetChanged();
     }
 }

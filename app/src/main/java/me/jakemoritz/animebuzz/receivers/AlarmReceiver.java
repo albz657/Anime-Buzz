@@ -10,7 +10,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -22,10 +22,10 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         int intentExtra = intent.getIntExtra("id", -999);
 
-        AlarmHolder thisAlarm = null;
-        for (AlarmHolder alarmHolder : App.getInstance().getAlarms()){
-            if (alarmHolder.getId() == intentExtra){
-                thisAlarm = alarmHolder;
+        Alarm thisAlarm = null;
+        for (Alarm alarm : App.getInstance().getAlarms()){
+            if (alarm.getId() == intentExtra){
+                thisAlarm = alarm;
                 break;
             }
         }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 
 public class SeasonsSpinnerAdapter extends BaseAdapter {
 
@@ -21,10 +21,12 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
 
     private List<String> seasonNames = new ArrayList<>();
     private Context context;
+    private SeasonsFragment fragment;
 
-    public SeasonsSpinnerAdapter(Context context, List<String> seasonNames) {
+    public SeasonsSpinnerAdapter(Context context, List<String> seasonNames, SeasonsFragment fragment) {
         this.seasonNames = seasonNames;
         this.context = context;
+        this.fragment = fragment;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
         textView.setText(seasonNames.get(position));
 
-        if (seasonNames.get(position).equals(App.getInstance().getCurrentlyBrowsingSeason().getSeasonMetadata().getName())){
+        if (seasonNames.get(position).equals(fragment.getmAdapter().getData().get(position).getSeason())){
             textView.setBackgroundColor(0xFFECEFF1);
         } else {
             textView.setBackgroundResource(0);

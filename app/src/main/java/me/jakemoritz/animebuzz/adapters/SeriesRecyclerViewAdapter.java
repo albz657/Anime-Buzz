@@ -18,31 +18,33 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import io.realm.RealmList;
+import io.realm.RealmRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 
-public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
+public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
-    private SeriesList allSeries = null;
-    private SeriesList visibleSeries = null;
-    private SeriesFragment mParent = null;
+//    private RealmList<Series> allSeries = null;
+//    private RealmList<Series> visibleSeries = null;
+    private SeriesFragment seriesFragment = null;
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
     private ModifyItemStatusListener modifyListener;
 
-    public SeriesRecyclerViewAdapter(SeriesList items, SeriesFragment listener) {
-        allSeries = items;
-        visibleSeries = new SeriesList(items);
-        self = this;
-        mParent = listener;
-        modifyListener = listener;
+    public SeriesRecyclerViewAdapter(SeriesFragment seriesFragment, RealmList<Series> allSeries) {
+        super(seriesFragment.getContext(), allSeries, true);
+        this.seriesFragment = seriesFragment;
+//        this.allSeries = allSeries;
+//        this.visibleSeries = new RealmList<>();
+        this.modifyListener = seriesFragment;
+        this.self = this;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -82,7 +84,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.series = visibleSeries.get(position);
+        holder.series = getData().get(position);
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.series.getEnglishTitle());
@@ -166,14 +168,14 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
 
         }
 
-        if (SharedPrefsHelper.getInstance().prefersSimulcast() && !holder.series.getSimulcast().equals("false")) {
+        if (SharedPrefsHelper.getInstance().prefersSimulcast() && !holder.series.getSimulcastProvider().equals("false")) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
-            holder.mSimulcast.setText(holder.series.getSimulcast());
+            holder.mSimulcast.setText(holder.series.getSimulcastProvider());
 
             GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
 
             int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
-            switch (holder.series.getSimulcast()) {
+            switch (holder.series.getSimulcastProvider()) {
                 case "Crunchyroll":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
                     break;
@@ -194,7 +196,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
                     break;
                 case "The Anime Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                    holder.mSimulcast.setText(mParent.getString(R.string.simulcast_anime_network));
+                    holder.mSimulcast.setText(seriesFragment.getString(R.string.simulcast_anime_network));
                     break;
                 case "Viewster":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
@@ -217,7 +219,7 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             holder.mShowType.setVisibility(View.GONE);
         }
 
-        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID().toString(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,20 +231,15 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
             @Override
             public void onClick(View v) {
                 RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
-                dialogFragment.show(mParent.getMainActivity().getFragmentManager(), TAG);
+                dialogFragment.show(seriesFragment.getMainActivity().getFragmentManager(), TAG);
             }
         });
     }
 
     @Override
-    public int getItemCount() {
-        return visibleSeries.size();
-    }
-
-    @Override
     public Filter getFilter() {
         if (seriesFilter == null) {
-            seriesFilter = new SeriesFilter(this, allSeries);
+            seriesFilter = new SeriesFilter(this, getData());
         }
         return seriesFilter;
     }
@@ -255,24 +252,8 @@ public class SeriesRecyclerViewAdapter extends RecyclerView.Adapter<SeriesRecycl
     }
 
     private void addSeriesHelper(Series series) {
-        mParent.setAdding(true);
+        seriesFragment.setAdding(true);
         modifyListener.modifyItem(series);
-    }
-
-    public SeriesList getVisibleSeries() {
-        return visibleSeries;
-    }
-
-    public SeriesList getAllSeries() {
-        return allSeries;
-    }
-
-    public void setVisibleSeries(SeriesList visibleSeries) {
-        this.visibleSeries = visibleSeries;
-    }
-
-    public void setAllSeries(SeriesList allSeries) {
-        this.allSeries = allSeries;
     }
 
     public void setSeriesFilter(SeriesFilter seriesFilter) {

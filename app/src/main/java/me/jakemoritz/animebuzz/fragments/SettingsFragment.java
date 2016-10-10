@@ -34,7 +34,7 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
@@ -290,7 +290,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
 
         App.getInstance().getAlarms().clear();
-        AlarmHolder.deleteAll(AlarmHolder.class);
+        Alarm.deleteAll(Alarm.class);
 
         String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {

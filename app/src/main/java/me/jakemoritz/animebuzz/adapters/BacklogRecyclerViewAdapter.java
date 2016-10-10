@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.util.Calendar;
 import java.util.List;
 
+import io.realm.Realm;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
@@ -62,14 +63,14 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
-            if (!holder.backlogItem.getSeries().getSimulcast().equals("false")) {
-                holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcast());
+            if (!holder.backlogItem.getSeries().getSimulcastProvider().equals("false")) {
+                holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcastProvider());
             }
 
             GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
 
             int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
-            switch (holder.backlogItem.getSeries().getSimulcast()) {
+            switch (holder.backlogItem.getSeries().getSimulcastProvider()) {
                 case "Crunchyroll":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
                     break;
@@ -123,11 +124,15 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            BacklogItem removedItem = backlogItems.remove(position);
-            App.getInstance().getBacklog().remove(removedItem);
-            removedItem.delete();
-            series.save();
-            notifyDataSetChanged();
+            final BacklogItem removedItem = backlogItems.remove(position);
+//            App.getInstance().getBacklog().remove(removedItem);
+
+            Realm.getDefaultInstance().executeTransaction(new Realm.Transaction(){
+                @Override
+                public void execute(Realm realm) {
+                    removedItem.deleteFromRealm();
+                }
+            });
         }
     }
 
@@ -139,10 +144,15 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }
 
-        BacklogItem removedItem = backlogItems.remove(position);
-        App.getInstance().getBacklog().remove(removedItem);
-        removedItem.delete();
-        series.save();
+        final BacklogItem removedItem = backlogItems.remove(position);
+//        App.getInstance().getBacklog().remove(removedItem);
+
+        Realm.getDefaultInstance().executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                removedItem.deleteFromRealm();
+            }
+        });
 
         notifyDataSetChanged();
     }

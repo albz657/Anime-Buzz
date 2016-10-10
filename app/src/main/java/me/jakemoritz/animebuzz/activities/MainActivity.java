@@ -5,9 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
-import android.databinding.ObservableArrayList;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -34,14 +32,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
+import io.realm.Realm;
+import io.realm.RealmList;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
@@ -54,21 +51,12 @@ import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonMetadataComparator;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.SeasonList;
-import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.models.SeriesList;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
-import me.jakemoritz.animebuzz.tasks.SaveAllDataTask;
-import me.jakemoritz.animebuzz.tasks.SaveNewSeasonTask;
-import me.jakemoritz.animebuzz.tasks.SaveSeasonsListTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -82,12 +70,7 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private AlarmReceiver alarmReceiver;
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(alarmReceiver);
-    }
+    private Realm realm = Realm.getDefaultInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +82,12 @@ public class MainActivity extends AppCompatActivity
         IntentFilter callIntercepterIntentFilter = new IntentFilter("android.intent.action.ANY_ACTION");
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
+        App.getInstance().setAllAnimeSeasons(new RealmList<Season>());
+
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup()) {
-            App.getInstance().setUserAnimeList(new SeriesList());
-            App.getInstance().setAllAnimeSeasons(new SeasonList());
-            App.getInstance().setSeasonsList(new HashSet<SeasonMetadata>());
-            App.getInstance().setBacklog(new ObservableArrayList<BacklogItem>());
-            App.getInstance().setAlarms(new ArrayList<AlarmHolder>());
-            App.getInstance().setAiringList(new SeriesList());
+            App.getInstance().setBacklog(new RealmList<BacklogItem>());
+            App.getInstance().setAlarms(new RealmList<Alarm>());
+            App.getInstance().setAiringList(new RealmList<Series>());
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);
 
@@ -199,6 +181,12 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         saveData();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(alarmReceiver);
     }
 
     @Override
@@ -342,11 +330,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (App.getInstance().isInitializing()) {
-            return true;
-        } else {
-            return super.dispatchTouchEvent(ev);
-        }
+        return App.getInstance().isInitializing() || super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -379,145 +363,45 @@ public class MainActivity extends AppCompatActivity
     }
 
     /* Loading */
+
     public void loadData() {
-        Set<SeasonMetadata> seasonsList = new HashSet<>(SeasonMetadata.listAll(SeasonMetadata.class));
-        App.getInstance().setSeasonsList(seasonsList);
-        setSeasonsStatus();
-
-        SeriesList airingList = new SeriesList();
-
-        SeasonList allAnime = new SeasonList();
-
-        String previousSeasonName = SharedPrefsHelper.getInstance().getPreviousSeasonName();
-        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-
-        if (!previousSeasonName.isEmpty() && false) {
-            for (SeasonMetadata seasonMetadata : seasonsList) {
-                if (seasonMetadata.getName().equals(latestSeasonName) || seasonMetadata.getName().equals(previousSeasonName)){
-                    SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
-
-                    if (!seasonSeries.isEmpty()) {
-                        allAnime.add(new Season(seasonSeries, seasonMetadata));
-                    }
-                }
-            }
-        } else {
-            for (SeasonMetadata seasonMetadata : seasonsList) {
-                SeriesList seasonSeries = new SeriesList(Series.find(Series.class, "season = ?", seasonMetadata.getName()));
-
-                if (!seasonSeries.isEmpty()) {
-                    allAnime.add(new Season(seasonSeries, seasonMetadata));
-
-                    if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                        airingList.addAll(seasonSeries);
-                    } else {
-                        for (Series series : seasonSeries){
-                            if (series.getAiringStatus().equals("Airing")){
-                                airingList.add(series);
-                            }
-                        }
-                    }
-
-                }
-            }
-        }
+        RealmQuery<Series> airingQuery = realm.where(Series.class);
+        airingQuery.equalTo("airingStatus", "Airing");
+        RealmResults<Series> airingListResults = airingQuery.findAll();
+        RealmList<Series> airingList = new RealmList<>();
+        airingList.addAll(airingListResults);
 
         App.getInstance().setAiringList(airingList);
 
-        App.getInstance().setAllAnimeSeasons(allAnime);
-        Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
+        RealmQuery<BacklogItem> backlogQuery = realm.where(BacklogItem.class);
+        RealmResults<BacklogItem> backlogItemRealmResults = backlogQuery.findAll();
+        RealmList<BacklogItem> backlogItems = new RealmList<>();
+        backlogItems.addAll(backlogItemRealmResults);
 
-        if (previousSeasonName.isEmpty()) {
-            findPreviousSeason();
-        }
+        App.getInstance().setBacklog(backlogItems);
 
-        for (Season season : App.getInstance().getAllAnimeSeasons()) {
-            if (season.getSeasonMetadata().getName().equals(latestSeasonName)) {
-                App.getInstance().setCurrentlyBrowsingSeason(season);
-                break;
-            }
-        }
+        RealmQuery<Alarm> alarmQuery = realm.where(Alarm.class);
+        RealmResults<Alarm> alarmRealmResults = alarmQuery.findAll();
+        RealmList<Alarm> alarms = new RealmList<>();
+        alarms.addAll(alarmRealmResults);
 
-        SeriesList userAnimeList = loadUserList();
-        App.getInstance().setUserAnimeList(userAnimeList);
-
-        ObservableArrayList<BacklogItem> backlog = loadBacklog();
-        App.getInstance().setBacklog(backlog);
-
-        List<AlarmHolder> alarms = AlarmHolder.listAll(AlarmHolder.class);
         App.getInstance().setAlarms(alarms);
-    }
-
-    private SeriesList loadUserList() {
-        SeriesList userList = new SeriesList();
-        for (Series series : App.getInstance().getAiringList()) {
-            if (series.isInUserList()) {
-                userList.add(series);
-            }
-        }
-        return userList;
-    }
-
-    private ObservableArrayList<BacklogItem> loadBacklog() {
-        ObservableArrayList<BacklogItem> backlog = new ObservableArrayList<>();
-
-        backlog.addAll(BacklogItem.listAll(BacklogItem.class));
-
-        Collections.sort(backlog, new BacklogItemComparator());
-        return backlog;
     }
 
     /* Saving */
     public void saveData() {
-        SaveAllDataTask saveAllDataTask = new SaveAllDataTask();
-        saveAllDataTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
+        Realm realm = Realm.getDefaultInstance();
 
-    public void saveNewSeasonData(Season season) {
-        SaveNewSeasonTask saveNewSeasonTask = new SaveNewSeasonTask();
-        saveNewSeasonTask.execute(removeOlder(season));
-    }
+        realm.executeTransactionAsync(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
 
-    public void saveSeasonsList() {
-        SaveSeasonsListTask saveSeasonsListTask = new SaveSeasonsListTask();
-        saveSeasonsListTask.execute(App.getInstance().getSeasonsList());
-    }
-
-    public SeriesList removeOlder(Season season) {
-        SeasonList allSeasonList = new SeasonList(App.getInstance().getAllAnimeSeasons());
-        SeriesList allSeriesList = new SeriesList();
-        Collections.sort(allSeasonList, new SeasonComparator());
-
-        int indexOfThisSeason = -1;
-        for (Season eachSeason : allSeasonList) {
-            if (eachSeason.getSeasonMetadata().getName().equals(season.getSeasonMetadata().getName())) {
-                indexOfThisSeason = allSeasonList.indexOf(eachSeason);
             }
-        }
-
-        SeasonList newerSeasonList;
-        if (indexOfThisSeason < allSeasonList.size() - 1 && indexOfThisSeason > 0) {
-            newerSeasonList = new SeasonList(allSeasonList.subList(indexOfThisSeason + 1, allSeasonList.size()));
-            for (Season newerSeason : newerSeasonList) {
-                allSeriesList.addAll(newerSeason.getSeasonSeries());
-            }
-
-            allSeasonList.get(indexOfThisSeason).getSeasonSeries().addAll(season.getSeasonSeries());
-            SeriesList filteredList = new SeriesList(allSeasonList.get(indexOfThisSeason).getSeasonSeries());
-            for (Series series : season.getSeasonSeries()) {
-                if (allSeriesList.contains(series)) {
-                    filteredList.remove(series);
-                }
-            }
-
-
-            return filteredList;
-        } else {
-            return season.getSeasonSeries();
-        }
+        });
     }
 
     /* Helpers  */
+
     public void startFragment(Fragment fragment) {
         String id = "";
 
@@ -566,64 +450,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void setSeasonsStatus() {
-        List<SeasonMetadata> seasonMetadataList = new ArrayList<>();
-        seasonMetadataList.addAll(App.getInstance().getSeasonsList());
+    public RealmList<Series> removeOlderShows() {
+        final RealmList<Series> userList = new RealmList<>();
+        userList.addAll(realm.where(Series.class).equalTo("isInUserList", true).findAll());
 
-        Collections.sort(seasonMetadataList, new SeasonMetadataComparator());
-
-        boolean currentFound = false;
-        for (SeasonMetadata seasonMetadata : seasonMetadataList) {
-            if (currentFound){
-                seasonMetadata.setCurrentOrNewer(true);
-            } else {
-                if (seasonMetadata.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                    currentFound = true;
-                    seasonMetadata.setCurrentOrNewer(true);
-                } else {
-                    seasonMetadata.setCurrentOrNewer(false);
+        final RealmList<Series> removedShows = new RealmList<>();
+        realm.executeTransaction(new Realm.Transaction(){
+            @Override
+            public void execute(Realm realm) {
+                for (Iterator iterator = userList.iterator(); iterator.hasNext(); ) {
+                    Series series = (Series) iterator.next();
+                    if (!series.getShowType().equals("TV")) {
+                        AlarmHelper.getInstance().removeAlarm(series);
+                        series.setInUserList(false);
+                        removedShows.add(series);
+                        iterator.remove();
+                    }
                 }
             }
-            seasonMetadata.save();
-        }
-    }
+        });
 
-    public SeriesList removeOlderShows() {
-        SeriesList removedShows = new SeriesList();
-
-        for (Iterator iterator = App.getInstance().getUserAnimeList().iterator(); iterator.hasNext(); ) {
-            Series series = (Series) iterator.next();
-            if (!series.getShowType().equals("TV")) {
-                AlarmHelper.getInstance().removeAlarm(series);
-                series.setInUserList(false);
-                removedShows.add(series);
-                iterator.remove();
-            }
-        }
-
-        Series.saveInTx(removedShows);
 
         return removedShows;
-    }
-
-    private void findPreviousSeason() {
-        int indexOfCurrentSeason = indexOfCurrentSeason();
-        int indexOfPreviousSeason = indexOfCurrentSeason - 1;
-        if (indexOfPreviousSeason >= 0){
-            Season season = App.getInstance().getAllAnimeSeasons().get(indexOfPreviousSeason);
-            SharedPrefsHelper.getInstance().setPreviousSeasonName(season.getSeasonMetadata().getName());
-        }
-    }
-
-    public int indexOfCurrentSeason() {
-        Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
-
-        for (Season season : App.getInstance().getAllAnimeSeasons()) {
-            if (season.getSeasonMetadata().getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                return App.getInstance().getAllAnimeSeasons().indexOf(season);
-            }
-        }
-        return -1;
     }
 
     public void fixToolbar(String fragment) {

@@ -3,25 +3,25 @@ package me.jakemoritz.animebuzz.models;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-public class BacklogItem extends RealmObject{
+public class Alarm extends RealmObject {
 
     @PrimaryKey
-    private int id;
+    private String MALID;
     private Series series;
-    private Long alarmTime;
+    private long alarmTime;
 
-    public BacklogItem(int id, Series series, Long alarmTime) {
-        this.id = id;
+    public Alarm(String MALID, Series series, long alarmTime) {
+        this.MALID = MALID;
         this.series = series;
         this.alarmTime = alarmTime;
     }
 
-    public int getId() {
-        return id;
+    public String getMALID() {
+        return MALID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setMALID(String MALID) {
+        this.MALID = MALID;
     }
 
     public Series getSeries() {
@@ -32,11 +32,11 @@ public class BacklogItem extends RealmObject{
         this.series = series;
     }
 
-    public Long getAlarmTime() {
+    public long getAlarmTime() {
         return alarmTime;
     }
 
-    public void setAlarmTime(Long alarmTime) {
+    public void setAlarmTime(long alarmTime) {
         this.alarmTime = alarmTime;
     }
 }

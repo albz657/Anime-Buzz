@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.SeasonMetadata;
 import me.jakemoritz.animebuzz.models.Series;
@@ -26,7 +26,7 @@ public class SaveAllDataTask extends AsyncTask<Void, Void, Void> {
 
         SeasonMetadata.saveInTx(App.getInstance().getSeasonsList());
 
-        AlarmHolder.saveInTx(App.getInstance().getAlarms());
+        Alarm.saveInTx(App.getInstance().getAlarms());
 
         return null;
     }

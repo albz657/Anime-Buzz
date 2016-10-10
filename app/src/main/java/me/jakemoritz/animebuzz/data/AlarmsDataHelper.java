@@ -8,7 +8,7 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 
 public class AlarmsDataHelper {
 
@@ -32,13 +32,13 @@ public class AlarmsDataHelper {
 
     // retrieval
 
-    public List<AlarmHolder> getAllAlarms(SQLiteDatabase database) {
-        List<AlarmHolder> alarms = new ArrayList<>();
+    public List<Alarm> getAllAlarms(SQLiteDatabase database) {
+        List<Alarm> alarms = new ArrayList<>();
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            AlarmHolder tempAlarm = getAlarmWithCursor(cursor);
+            Alarm tempAlarm = getAlarmWithCursor(cursor);
             alarms.add(tempAlarm);
             cursor.moveToNext();
         }
@@ -48,12 +48,12 @@ public class AlarmsDataHelper {
         return alarms;
     }
 
-    private AlarmHolder getAlarmWithCursor(Cursor res) {
+    private Alarm getAlarmWithCursor(Cursor res) {
         Long id = res.getLong(res.getColumnIndex(KEY_ALARM_ID));
         long time = res.getLong(res.getColumnIndex(KEY_ALARM_TIME));
         String name = res.getString(res.getColumnIndex(KEY_ALARM_NAME));
 
-        return new AlarmHolder(name, time, id, -1);
+        return new Alarm(name, time, id, -1);
     }
 
 
@@ -61,16 +61,16 @@ public class AlarmsDataHelper {
     // misc
 
     void upgradeAlarms(SQLiteDatabase database) {
-        List<AlarmHolder> oldAlarms = getAllAlarms(database);
+        List<Alarm> oldAlarms = getAllAlarms(database);
 
-        for (AlarmHolder alarmHolder : oldAlarms) {
-            alarmHolder.setMALID(alarmHolder.getId().intValue());
-            alarmHolder.save();
+        for (Alarm alarm : oldAlarms) {
+            alarm.setMALID(alarm.getId().intValue());
+            alarm.save();
         }
 
         AlarmHelper.getInstance().cancelAllAlarms(oldAlarms);
 
-        List<AlarmHolder> upgradedAlarms = AlarmHolder.listAll(AlarmHolder.class);
+        List<Alarm> upgradedAlarms = Alarm.listAll(Alarm.class);
 
         App.getInstance().setAlarms(upgradedAlarms);
 

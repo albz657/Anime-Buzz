@@ -1,6 +1,30 @@
 package me.jakemoritz.animebuzz.models;
 
-public class Season {
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Season extends RealmObject{
+
+    @PrimaryKey
+    private String key;
+    private String name;
+    private RealmList<Series> seasonSeries;
+    private int chronologicalIndex;
+
+    public Season(String name, String key, int chronologicalIndex) {
+        this.name = name;
+        this.key = key;
+        this.chronologicalIndex = chronologicalIndex;
+    }
+
+    public Season(int chronologicalIndex, String key, String name, RealmList<Series> seasonSeries) {
+        this.chronologicalIndex = chronologicalIndex;
+        this.key = key;
+        this.name = name;
+        this.seasonSeries = seasonSeries;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -8,35 +32,45 @@ public class Season {
 
         Season season = (Season) o;
 
-        return seasonMetadata.equals(season.seasonMetadata);
+        return key.equals(season.key);
 
     }
 
     @Override
     public int hashCode() {
-        int result = seasonSeries.hashCode();
-        result = 31 * result + seasonMetadata.hashCode();
-        return result;
+        return key.hashCode();
     }
 
-    private SeriesList seasonSeries;
-    private SeasonMetadata seasonMetadata;
-
-    public Season(SeriesList seasonSeries, SeasonMetadata seasonMetadata) {
-        this.seasonSeries = seasonSeries;
-        this.seasonMetadata = seasonMetadata;
+    public int getChronologicalIndex() {
+        return chronologicalIndex;
     }
 
-    public SeriesList getSeasonSeries() {
+    public void setChronologicalIndex(int chronologicalIndex) {
+        this.chronologicalIndex = chronologicalIndex;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public RealmList<Series> getSeasonSeries() {
         return seasonSeries;
     }
 
-    public SeasonMetadata getSeasonMetadata() {
-        return seasonMetadata;
-    }
-
-    @Override
-    public String toString() {
-        return getSeasonMetadata().getKey();
+    public void setSeasonSeries(RealmList<Series> seasonSeries) {
+        this.seasonSeries = seasonSeries;
     }
 }
+

@@ -89,9 +89,9 @@
     <string name="pref_category_notifications_key">categorynotificationskey</string>
 
     <string name="pref_simulcast_key">airingorsimulcast</string>
-    <string name="pref_simulcast_title">Prefer simulcast times</string>
+    <string name="pref_simulcast_title">Prefer simulcastProvider times</string>
     <string name="pref_simulcast_off_summary">You will be notified when an episode airs.</string>
-    <string name="pref_simulcast_summary">You will be notified when an episode is simulcast.</string>
+    <string name="pref_simulcast_summary">You will be notified when an episode is simulcastProvider.</string>
 
     <string name="pref_vibrate_key">vibratekey</string>
     <string name="pref_vibrate_title">Vibrate</string>
@@ -135,7 +135,7 @@
     <string name="pref_account_signout">Sign Out</string>
 
     <!-- About -->
-    <string name="about_senpai"><b>Senpai</b> provides data about anime airing/simulcast times and other crucial information.</string>
+    <string name="about_senpai"><b>Senpai</b> provides data about anime airing/simulcastProvider times and other crucial information.</string>
     <string name="about_senpai_url">http://www.senpai.moe</string>
 
     <string name="about_mal"><b>MyAnimeList</b> allows users to sign in with their MAL accounts to access and update the anime they\'re currently watching.</string>

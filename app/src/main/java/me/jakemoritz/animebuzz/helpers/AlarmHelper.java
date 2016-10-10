@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import me.jakemoritz.animebuzz.models.AlarmHolder;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -33,7 +33,7 @@ public class AlarmHelper {
 
         App.getInstance().getAlarms().clear();
 
-        AlarmHolder.deleteAll(AlarmHolder.class);
+        Alarm.deleteAll(Alarm.class);
 
         for (Series series : App.getInstance().getUserAnimeList()) {
             makeAlarm(series);
@@ -41,12 +41,12 @@ public class AlarmHelper {
     }
 
     public void setAlarmsOnBoot() {
-        for (AlarmHolder alarm : App.getInstance().getAlarms()) {
+        for (Alarm alarm : App.getInstance().getAlarms()) {
             setAlarm(alarm);
         }
     }
 
-    private void setAlarm(AlarmHolder alarm) {
+    private void setAlarm(Alarm alarm) {
         alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(alarm.getId().intValue()));
     }
 
@@ -154,7 +154,7 @@ public class AlarmHelper {
         Calendar nextEpisode = generateNextEpisodeTimes(series, SharedPrefsHelper.getInstance().prefersSimulcast());
 
         if (nextEpisode != null){
-            AlarmHolder newAlarm = new AlarmHolder(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
+            Alarm newAlarm = new Alarm(series.getName(), nextEpisode.getTimeInMillis(), series.getMALID().intValue());
             newAlarm.save();
 
             setAlarm(newAlarm);
@@ -170,7 +170,7 @@ public class AlarmHelper {
     public void switchAlarmTiming() {
         App.getInstance().getAlarms().clear();
 
-        AlarmHolder.deleteAll(AlarmHolder.class);
+        Alarm.deleteAll(Alarm.class);
 
         for (Series series : App.getInstance().getUserAnimeList()) {
             makeAlarm(series);
@@ -183,21 +183,21 @@ public class AlarmHelper {
         return PendingIntent.getBroadcast(App.getInstance(), id, notificationIntent, 0);
     }
 
-    public void cancelAllAlarms(List<AlarmHolder> alarms) {
-        for (AlarmHolder alarmHolder : alarms) {
-            alarmManager.cancel(createPendingIntent(alarmHolder.getId().intValue()));
+    public void cancelAllAlarms(List<Alarm> alarms) {
+        for (Alarm alarm : alarms) {
+            alarmManager.cancel(createPendingIntent(alarm.getId().intValue()));
         }
     }
 
     public void removeAlarm(Series series) {
         int id;
-        AlarmHolder alarmHolder;
+        Alarm alarm;
         for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
-            alarmHolder = (AlarmHolder) iterator.next();
-            if (alarmHolder.getMALID() == series.getMALID()) {
-                id = alarmHolder.getId().intValue();
+            alarm = (Alarm) iterator.next();
+            if (alarm.getMALID() == series.getMALID()) {
+                id = alarm.getId().intValue();
                 alarmManager.cancel(createPendingIntent(id));
-                alarmHolder.delete();
+                alarm.delete();
                 iterator.remove();
             }
         }
