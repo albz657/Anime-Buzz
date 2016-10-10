@@ -36,8 +36,6 @@ import java.util.Calendar;
 import java.util.Iterator;
 
 import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
@@ -70,24 +68,39 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private AlarmReceiver alarmReceiver;
-    private Realm realm = Realm.getDefaultInstance();
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Register AlarmReceiver
         alarmReceiver = new AlarmReceiver();
         alarmReceiver.setMainActivity(this);
         IntentFilter callIntercepterIntentFilter = new IntentFilter("android.intent.action.ANY_ACTION");
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
-        App.getInstance().setAllAnimeSeasons(new RealmList<Season>());
+        realm = Realm.getDefaultInstance();
+        // Initialize global RealmResults
+        RealmResults<Season> allSeasons = realm.where(Season.class).findAll();
+        App.getInstance().setAllAnimeSeasons(allSeasons);
 
+        RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
+        App.getInstance().setUserList(userList);
+
+        RealmResults<Alarm> alarms = realm.where(Alarm.class).findAll();
+        App.getInstance().setAlarms(alarms);
+
+        RealmResults<BacklogItem> backlogItems = realm.where(BacklogItem.class).findAll();
+        App.getInstance().setBacklog(backlogItems);
+
+        RealmResults<Series> airingList = realm.where(Series.class).equalTo("airingStatus", "Airing").findAll();
+        App.getInstance().setAiringList(airingList);
+
+        // Check if user has completed setup
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup()) {
-            App.getInstance().setBacklog(new RealmList<BacklogItem>());
-            App.getInstance().setAlarms(new RealmList<Alarm>());
-            App.getInstance().setAiringList(new RealmList<Series>());
+            // Just finished setup
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);
 
@@ -98,6 +111,9 @@ public class MainActivity extends AppCompatActivity
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
+            // Default startup procedure
+            App.getInstance().setJustLaunched(true);
+
             // fix old databases
             if (doesOldDatabaseExist()) {
                 SQLiteDatabase database = DatabaseHelper.getInstance(this).getWritableDatabase();
@@ -106,29 +122,26 @@ public class MainActivity extends AppCompatActivity
                 App.getInstance().setJustUpdated(true);
             }
 
-            if (!SharedPrefsHelper.getInstance().upgradedToRealm()){
-
+            // Upgrade old/sugar database to Realm
+            if (!SharedPrefsHelper.getInstance().upgradedToRealm()) {
+                // FILL IN
 
                 SharedPrefsHelper.getInstance().setUpgradedToRealm(true);
             }
 
-            // load data
-            if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isInitializing()) {
-                loadData();
-                updateFormattedTimes();
-//            backlogDummyData();
-//            dummyAlarm();
-                AlarmHelper.getInstance().setAlarmsOnBoot();
-            }
+            updateFormattedTimes();
 
-            App.getInstance().setJustLaunched(true);
+            AlarmHelper.getInstance().setAlarmsOnBoot();
         }
 
+        // Initialize UI elements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         setSupportActionBar(toolbar);
 
         // Set up drawer and nav view
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             @Override
@@ -142,10 +155,12 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
 
         loadDrawerUserInfo();
 
+        // Start relevant fragment
         if (App.getInstance().isInitializing()) {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
@@ -186,7 +201,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        saveData();
+//        saveData();
     }
 
     @Override
@@ -215,7 +230,6 @@ public class MainActivity extends AppCompatActivity
         for (int i = 0; i < navMenu.size(); i++) {
             if (navMenu.getItem(i).isChecked()) {
                 previousItemId = navMenu.getItem(i).getItemId();
-//                navMenu.getItem(i).setChecked(false);
             }
         }
 
@@ -246,11 +260,8 @@ public class MainActivity extends AppCompatActivity
     public void loadDrawerUserInfo() {
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-        if (avatarFile.exists()) {
-            Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        } else {
-            Picasso.with(App.getInstance()).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        }
+
+        Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
         drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());
@@ -348,7 +359,6 @@ public class MainActivity extends AppCompatActivity
         return dbFile.exists();
     }
 
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         return App.getInstance().isInitializing() || super.dispatchTouchEvent(ev);
@@ -381,32 +391,6 @@ public class MainActivity extends AppCompatActivity
                 startFragment(BacklogFragment.newInstance());
             }
         }
-    }
-
-    /* Loading */
-
-    public void loadData() {
-        RealmQuery<Series> airingQuery = realm.where(Series.class);
-        airingQuery.equalTo("airingStatus", "Airing");
-        RealmResults<Series> airingListResults = airingQuery.findAll();
-        RealmList<Series> airingList = new RealmList<>();
-        airingList.addAll(airingListResults);
-
-        App.getInstance().setAiringList(airingList);
-
-        RealmQuery<BacklogItem> backlogQuery = realm.where(BacklogItem.class);
-        RealmResults<BacklogItem> backlogItemRealmResults = backlogQuery.findAll();
-        RealmList<BacklogItem> backlogItems = new RealmList<>();
-        backlogItems.addAll(backlogItemRealmResults);
-
-        App.getInstance().setBacklog(backlogItems);
-
-        RealmQuery<Alarm> alarmQuery = realm.where(Alarm.class);
-        RealmResults<Alarm> alarmRealmResults = alarmQuery.findAll();
-        RealmList<Alarm> alarms = new RealmList<>();
-        alarms.addAll(alarmRealmResults);
-
-        App.getInstance().setAlarms(alarms);
     }
 
     /* Saving */
@@ -469,30 +453,6 @@ public class MainActivity extends AppCompatActivity
         if (navigationView != null && menuIndex != -1) {
             navigationView.getMenu().getItem(menuIndex).setChecked(true);
         }
-    }
-
-    public RealmList<Series> removeOlderShows() {
-        final RealmList<Series> userList = new RealmList<>();
-        userList.addAll(realm.where(Series.class).equalTo("isInUserList", true).findAll());
-
-        final RealmList<Series> removedShows = new RealmList<>();
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                for (Iterator iterator = userList.iterator(); iterator.hasNext(); ) {
-                    Series series = (Series) iterator.next();
-                    if (!series.getShowType().equals("TV")) {
-                        AlarmHelper.getInstance().removeAlarm(series);
-                        series.setInUserList(false);
-                        removedShows.add(series);
-                        iterator.remove();
-                    }
-                }
-            }
-        });
-
-
-        return removedShows;
     }
 
     public void fixToolbar(String fragment) {

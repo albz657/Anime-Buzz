@@ -83,7 +83,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         this.imageRequests = imageRequests;
         this.seriesList = seriesList;
 
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().equals("Summer 2013")) {
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().getName().equals("Summer 2013")) {
             App.getInstance().setPostInitializing(false);
             App.getInstance().setGettingPostInitialImages(true);
         }

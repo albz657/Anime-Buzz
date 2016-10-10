@@ -1,7 +1,6 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -18,7 +17,6 @@ import java.util.Collections;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.databinding.FragmentBacklogBinding;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.comparators.BacklogItemComparator;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
@@ -62,9 +60,9 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         container.removeAllViews();
         container.clearDisappearingChildren();
 
-        FragmentBacklogBinding backlogBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_backlog, container, false);
+//        FragmentBacklogBinding backlogBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_backlog, container, false);
 
-        backlogLayout = backlogBinding.getRoot();
+        backlogLayout = inflater.inflate(R.layout.fragment_backlog, container, false);
 
         TextView emptyText = (TextView) backlogLayout.findViewById(R.id.empty_text);
         emptyText.setText(getString(R.string.empty_text_backlog));
@@ -78,7 +76,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
         recyclerView.setAdapter(mAdapter);
 
-        backlogBinding.setDataset(App.getInstance().getBacklog());
+//        backlogBinding.setData(dataset);
 
         return backlogLayout;
     }

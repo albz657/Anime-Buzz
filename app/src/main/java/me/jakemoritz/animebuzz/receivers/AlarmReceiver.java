@@ -23,23 +23,12 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String intentExtra = intent.getStringExtra("id");
 
-        Alarm thisAlarm = null;
-        for (Alarm alarm : App.getInstance().getAlarms()){
-            if (alarm.getMALID().equals(intentExtra)){
-                thisAlarm = alarm;
-                break;
-            }
-        }
+        Realm realm = Realm.getDefaultInstance();
+
+        Alarm thisAlarm = realm.where(Alarm.class).equalTo("MALID", intentExtra).findFirst();
 
         if (thisAlarm != null) {
-            Series series = null;
-
-            for (Series eachSeries : App.getInstance().getUserList()) {
-                if (eachSeries.getMALID() == thisAlarm.getMALID()) {
-                    series = eachSeries;
-                    break;
-                }
-            }
+            Series series = realm.where(Series.class).equalTo("MALID", intentExtra).findFirst();
 
             if (series != null){
                 Calendar currentTime = Calendar.getInstance();
@@ -47,25 +36,19 @@ public class AlarmReceiver extends BroadcastReceiver {
                 lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                 if (currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
 
                     NotificationHelper helper = new NotificationHelper();
                     helper.createNewEpisodeNotification(series);
 
                     App.getInstance().setNotificationReceived(true);
 
-                    App.getInstance().getAlarms().remove(thisAlarm);
+                    realm.beginTransaction();
                     thisAlarm.deleteFromRealm();
-//                    thisAlarm.delete();
-
 
                     BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                     backlogItem.setSeries(series);
                     backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
                     backlogItem.setId(Integer.valueOf(series.getMALID()));
-//                    backlogItem.save();
-                    App.getInstance().getBacklog().add(backlogItem);
 
                     series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
                     AlarmHelper.getInstance().makeAlarm(series);

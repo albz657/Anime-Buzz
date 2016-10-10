@@ -18,6 +18,7 @@ import java.util.List;
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
+import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -74,7 +75,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
     protected void onProgressUpdate(ImageRequest... values) {
         if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserList().contains(values[0].getSeries())) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getData().indexOf(values[0].getSeries()));
-        } else if (values[0].getSeries().getSeason().equals(App.getInstance().getCurrentlyBrowsingSeason().getName()) || values[0].getSeries().isShifted()) {
+        } else if (values[0].getSeries().getSeason().equals(((SeasonsFragment) seriesFragment).getCurrentlyBrowsingSeason()) || values[0].getSeries().isShifted()) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
         }
 
@@ -114,7 +115,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
     private void cachePoster(ImageRequest imageRequest) {
         FileOutputStream fos = null;
         try {
-            File file = getCachedPosterFile(imageRequest.getSeries().getMALID().toString());
+            File file = getCachedPosterFile(imageRequest.getSeries().getMALID());
             if (file != null) {
                 fos = new FileOutputStream(file);
                 imageRequest.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);

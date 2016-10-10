@@ -3,11 +3,12 @@
 
     <data>
 
-        <import type="android.view.View" />
-
+        <import type="android.view.View"/>
+        <import type="io.realm.OrderedRealmCollection"/>
+        <import type="me.jakemoritz.animebuzz.models.Series"/>
         <variable
             name="dataset"
-            type="io.realm.OrderedRealmCollection" />
+            type="OrderedRealmCollection" />
     </data>
 
     <android.support.v4.widget.SwipeRefreshLayout xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -28,7 +29,7 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginTop="5dp"
-                android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
+                android:visibility="visible"
                 app:layoutManager="LinearLayoutManager"
                 tools:context=".fragments.SeriesFragment"
                 android:scrollbars="vertical"/>
@@ -37,7 +38,7 @@
                 android:id="@+id/empty_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="@{dataset.size() > 0 ? View.GONE : View.VISIBLE}">
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/empty_text"

@@ -5,17 +5,14 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
@@ -160,18 +157,8 @@ public class MalApiClient {
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
-                        RealmList<Series> removedSeries = new RealmList<>();
-                        removedSeries.addAll(App.getInstance().getUserList());
-
                         realm.beginTransaction();
-                        Series series;
-                        for (Iterator iterator = App.getInstance().getUserList().iterator(); iterator.hasNext(); ) {
-                            series = (Series) iterator.next();
-                            series.setInUserList(false);
-                            AlarmHelper.getInstance().removeAlarm(series);
-                            iterator.remove();
-                        }
-
+                        App.getInstance().getUserList().deleteAllFromRealm();
                         realm.commitTransaction();
 
                         seriesFragment.malDataImported(true);

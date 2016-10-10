@@ -148,6 +148,16 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
+    public String getLatestSeasonKey(){
+        return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_latest_season), "");
+    }
+
+    public void setLatestSeasonKey(String latestSeasonKey){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(App.getInstance().getString(R.string.shared_prefs_latest_season), latestSeasonKey);
+        editor.apply();
+    }
+
     public String getPreviousSeasonName(){
         return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_previous_season), "");
     }

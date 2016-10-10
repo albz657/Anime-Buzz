@@ -20,6 +20,7 @@ import com.squareup.picasso.Picasso;
 
 import io.realm.RealmList;
 import io.realm.RealmRecyclerViewAdapter;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -31,18 +32,21 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
-//    private RealmList<Series> allSeries = null;
-//    private RealmList<Series> visibleSeries = null;
     private SeriesFragment seriesFragment = null;
     private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
     private ModifyItemStatusListener modifyListener;
 
+    public SeriesRecyclerViewAdapter(SeriesFragment seriesFragment, RealmResults<Series> allSeries) {
+        super(seriesFragment.getContext(), allSeries, true);
+        this.seriesFragment = seriesFragment;
+        this.modifyListener = seriesFragment;
+        this.self = this;
+    }
+
     public SeriesRecyclerViewAdapter(SeriesFragment seriesFragment, RealmList<Series> allSeries) {
         super(seriesFragment.getContext(), allSeries, true);
         this.seriesFragment = seriesFragment;
-//        this.allSeries = allSeries;
-//        this.visibleSeries = new RealmList<>();
         this.modifyListener = seriesFragment;
         this.self = this;
     }

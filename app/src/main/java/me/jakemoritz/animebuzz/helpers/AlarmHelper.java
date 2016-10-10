@@ -35,7 +35,7 @@ public class AlarmHelper {
     public void resetAlarms() {
         cancelAllAlarms(App.getInstance().getAlarms());
 
-        App.getInstance().getAlarms().clear();
+//        App.getInstance().getAlarms().clear();
 
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
@@ -178,7 +178,6 @@ public class AlarmHelper {
     }
 
     public void switchAlarmTiming() {
-        App.getInstance().getAlarms().clear();
 
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {

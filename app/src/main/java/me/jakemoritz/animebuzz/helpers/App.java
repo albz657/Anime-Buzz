@@ -9,6 +9,7 @@ import com.squareup.picasso.Picasso;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
@@ -20,19 +21,19 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private RealmList<Season> allAnimeSeasons;
-    private RealmList<BacklogItem> backlog;
-    private RealmList<Alarm> alarms;
-    private RealmList<Series> userList;
-    private RealmList<Series> airingList;
+    private RealmResults<Season> allAnimeSeasons;
+    private RealmResults<BacklogItem> backlog;
+    private RealmResults<Alarm> alarms;
+    private RealmResults<Series> userList;
+    private RealmResults<Series> airingList;
+    private RealmList<Season> syncingSeasons;
+
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean gettingInitialImages = false;
     private boolean gettingPostInitialImages = false;
     private boolean tryingToVerify = false;
-    private Season currentlyBrowsingSeason;
     private boolean justLaunched = false;
-    private RealmList<Season> syncingSeasons;
     private boolean notificationReceived = false;
     private boolean justUpdated = false;
 
@@ -57,35 +58,35 @@ public class App extends Application {
 
     /* Getters/Setters */
 
-    public RealmList<Season> getAllAnimeSeasons() {
+    public RealmResults<Season> getAllAnimeSeasons() {
         return allAnimeSeasons;
     }
 
-    public void setAllAnimeSeasons(RealmList<Season> allAnimeSeasons) {
+    public void setAllAnimeSeasons(RealmResults<Season> allAnimeSeasons) {
         this.allAnimeSeasons = allAnimeSeasons;
     }
 
-    public RealmList<BacklogItem> getBacklog() {
+    public RealmResults<BacklogItem> getBacklog() {
         return backlog;
     }
 
-    public void setBacklog(RealmList<BacklogItem> backlog) {
+    public void setBacklog(RealmResults<BacklogItem> backlog) {
         this.backlog = backlog;
     }
 
-    public RealmList<Alarm> getAlarms() {
+    public RealmResults<Alarm> getAlarms() {
         return alarms;
     }
 
-    public void setAlarms(RealmList<Alarm> alarms) {
+    public void setAlarms(RealmResults<Alarm> alarms) {
         this.alarms = alarms;
     }
 
-    public RealmList<Series> getAiringList() {
+    public RealmResults<Series> getAiringList() {
         return airingList;
     }
 
-    public void setAiringList(RealmList<Series> airingList) {
+    public void setAiringList(RealmResults<Series> airingList) {
         this.airingList = airingList;
     }
 
@@ -129,14 +130,6 @@ public class App extends Application {
         this.tryingToVerify = tryingToVerify;
     }
 
-    public Season getCurrentlyBrowsingSeason() {
-        return currentlyBrowsingSeason;
-    }
-
-    public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
-        this.currentlyBrowsingSeason = currentlyBrowsingSeason;
-    }
-
     public boolean isJustLaunched() {
         return justLaunched;
     }
@@ -169,11 +162,11 @@ public class App extends Application {
         this.justUpdated = justUpdated;
     }
 
-    public RealmList<Series> getUserList() {
+    public RealmResults<Series> getUserList() {
         return userList;
     }
 
-    public void setUserList(RealmList<Series> userList) {
+    public void setUserList(RealmResults<Series> userList) {
         this.userList = userList;
     }
 }

@@ -5,7 +5,6 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -41,11 +40,12 @@ public class HummingbirdApiClient {
     private List<ImageRequest> imageRequests;
     private Retrofit retrofit;
     private int finishedCount = 0;
-    private Realm realm = Realm.getDefaultInstance();
+    private Realm realm;
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
         this.imageRequests = new ArrayList<>();
+        this.realm = Realm.getDefaultInstance();
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -142,7 +142,7 @@ public class HummingbirdApiClient {
                     } else {
                         currSeries.setAiringStatus("Airing");
 
-                        checkForSeasonSwitch(currSeries);
+//                        checkForSeasonSwitch(currSeries);
                     }
                 } else {
                     currSeries.setAiringStatus("Not yet aired");
@@ -156,7 +156,7 @@ public class HummingbirdApiClient {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         currSeries.setAiringStatus("Airing");
 
-                        checkForSeasonSwitch(currSeries);
+//                        checkForSeasonSwitch(currSeries);
                     } else {
                         currSeries.setAiringStatus("Not yet aired");
                     }
@@ -167,14 +167,10 @@ public class HummingbirdApiClient {
 
         realm.commitTransaction();
 
-        if (!holder.getImageURL().isEmpty()) {
-            File cacheDirectory = App.getInstance().getCacheDir();
-            File bitmapFile = new File(cacheDirectory, currSeries.getMALID() + ".jpg");
-            if (!bitmapFile.exists()) {
-                ImageRequest imageRequest = new ImageRequest(currSeries);
-                imageRequest.setURL(holder.getImageURL());
-                imageRequests.add(imageRequest);
-            }
+        if (!holder.getImageURL().isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + currSeries.getMALID(), "drawable", "me.jakemoritz.animebuzz") == 0) {
+            ImageRequest imageRequest = new ImageRequest(currSeries);
+            imageRequest.setURL(holder.getImageURL());
+            imageRequests.add(imageRequest);
         }
     }
 
@@ -203,7 +199,7 @@ public class HummingbirdApiClient {
                 }
             });
 
-            App.getInstance().getAiringList().add(currSeries);
+//            App.getInstance().getAiringList().add(currSeries);
 
             if (callback instanceof SeasonsFragment) {
                 callback.getmAdapter().getData().add(currSeries);

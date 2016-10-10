@@ -22,35 +22,22 @@ class MalImportHelper {
     }
 
     void matchSeries(List<MatchHolder> matchList) {
-        RealmList<Series> matchedSeries = new RealmList<>();
-
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
+
+        RealmList<Series> matchedSeries = new RealmList<>();
         for (MatchHolder matchHolder : matchList) {
-            for (Series savedSeries : App.getInstance().getAiringList()) {
-                if (matchHolder.getMALID() == savedSeries.getMALID() && savedSeries.getShowType().equals("TV")) {
-                    savedSeries.setInUserList(true);
-                    savedSeries.setEpisodesWatched(matchHolder.getEpisodesWatched());
-                    matchedSeries.add(savedSeries);
-                    break;
-                }
-            }
+            Series series = realm.where(Series.class).equalTo("MALID", matchHolder.getMALID()).findFirst();
+            series.setInUserList(true);
+            series.setEpisodesWatched(matchHolder.getEpisodesWatched());
+            matchedSeries.add(series);
         }
 
-        RealmList<Series> removedSeries = new RealmList<>();
-        if (App.getInstance().getUserList().isEmpty()) {
-            App.getInstance().getUserList().addAll(matchedSeries);
-        } else {
-            for (Series series : App.getInstance().getUserList()) {
-                if (!matchedSeries.contains(series) || !series.getShowType().equals("TV")) {
-                    series.setInUserList(false);
-                    AlarmHelper.getInstance().removeAlarm(series);
-                    removedSeries.add(series);
-                }
+        for (Series series : App.getInstance().getUserList()) {
+            if (!matchedSeries.contains(series) || !series.getShowType().equals("TV")) {
+                series.setInUserList(false);
+                AlarmHelper.getInstance().removeAlarm(series);
             }
-
-            App.getInstance().getUserList().removeAll(removedSeries);
-            App.getInstance().getUserList().addAll(matchedSeries);
         }
 
         realm.commitTransaction();
@@ -59,11 +46,6 @@ class MalImportHelper {
             if (series.getNextEpisodeAirtime() > 0 || series.getNextEpisodeSimulcastTime() > 0) {
                 AlarmHelper.getInstance().makeAlarm(series);
             }
-        }
-
-        if (fragment.getmAdapter() != null) {
-            fragment.getmAdapter().getData().clear();
-            fragment.getmAdapter().getData().addAll(App.getInstance().getUserList());
         }
 
         if (malDataImportedListener != null) {

@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.fragments;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -27,11 +26,10 @@ import io.realm.RealmList;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.databinding.FragmentSeriesListBinding;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
@@ -64,7 +62,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private Series itemToBeChanged;
     private MainActivity mainActivity;
     private RecyclerView recyclerView;
-    private Realm realm = Realm.getDefaultInstance();
+    private Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +70,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
+        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -80,9 +79,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         container.clearDisappearingChildren();
         container.removeAllViews();
 
-        FragmentSeriesListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_list, container, false);
+//        FragmentSeriesListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_list, container, false);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) binding.getRoot();
+        swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
         RelativeLayout emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view);
@@ -92,14 +91,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         if (this instanceof SeasonsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(this, new RealmList<Series>());
+            mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAll());
             emptyText.setText(getString(R.string.empty_text_season));
         } else if (this instanceof CurrentlyWatchingFragment) {
             mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList());
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
-        binding.setDataset(getmAdapter().getData());
+//        binding.setDataset(getmAdapter().getData());
 
         recyclerView.setAdapter(mAdapter);
 
@@ -147,8 +146,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void senpaiSeasonRetrieved(Season season) {
         if (season != null) {
             if (App.getInstance().isNetworkAvailable()) {
-                int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
-                new HummingbirdApiClient(this).processSeriesList(App.getInstance().getAllAnimeSeasons().get(index).getSeasonSeries());
+//                int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
+                new HummingbirdApiClient(this).processSeriesList(season.getSeasonSeries());
             } else {
                 stopRefreshing();
                 if (swipeRefreshLayout != null) {
@@ -172,8 +171,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void hummingbirdSeasonReceived(List<ImageRequest> imageRequests, RealmList<Series> seriesList) {
         if (App.getInstance().isJustUpdated()) {
-            RealmList<Series> removedSeries = mainActivity.removeOlderShows();
-            mAdapter.getData().removeAll(removedSeries);
 
             App.getInstance().setPostInitializing(true);
             App.getInstance().setJustUpdated(false);
@@ -311,7 +308,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private void addSeries(final Series item) {
         adding = false;
 
-        App.getInstance().getUserList().add(item);
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -339,8 +335,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private void removeSeries(final Series item) {
 //        App.getInstance().setJustRemoved(true);
 
-        item.setInUserList(false);
-        App.getInstance().getUserList().remove(item);
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -467,4 +461,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public RecyclerView getRecyclerView() {
         return recyclerView;
     }
+
+
 }

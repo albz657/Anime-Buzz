@@ -58,13 +58,13 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
         if (season == null){
             realm.beginTransaction();
 
-            season = realm.createObject(Season.class);
+            season = realm.createObject(Season.class, seasonKey);
             season.setName(seasonName);
-            season.setKey(seasonKey);
             season.setStartDate(startTimestamp);
+            realm.commitTransaction();
 
-            App.getInstance().getAllAnimeSeasons().add(season);
             Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
+            realm.beginTransaction();
             season.setChronologicalIndex(App.getInstance().getAllAnimeSeasons().indexOf(season));
 
             realm.commitTransaction();
@@ -72,6 +72,7 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
+            SharedPrefsHelper.getInstance().setLatestSeasonKey(seasonKey);
         }
 
         // Parse Series
@@ -151,7 +152,9 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
 
         }
 
+        realm.beginTransaction();
         season.setSeasonSeries(seasonSeries);
+        realm.commitTransaction();
         return season;
     }
 }

@@ -4,16 +4,11 @@
     <data>
 
         <import type="android.view.View"/>
-
-        <import type="java.util.List"/>
-
-        <import type="android.databinding.ObservableArrayList"/>
-
+        <import type="io.realm.RealmResults"/>
         <import type="me.jakemoritz.animebuzz.models.BacklogItem"/>
-
         <variable
             name="dataset"
-            type="io.realm.OrderedRealmCollection"/>
+            type="RealmResults&lt;BacklogItem&gt;"/>
     </data>
 
     <FrameLayout
@@ -30,7 +25,7 @@
                                                 android:layout_marginRight="2dp"
                                                 android:layout_marginTop="5dp"
                                                 android:scrollbars="vertical"
-                                                android:visibility="@{dataset.size() > 0 ? View.VISIBLE : View.GONE}"
+                                                android:visibility="visible"
                                                 app:layoutManager="LinearLayoutManager"
                                                 tools:context=".fragments.BacklogFragment"
                                                 tools:listitem="@layout/backlog_list_item"/>
@@ -39,7 +34,7 @@
             android:id="@+id/empty_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="@{dataset.size() > 0 ? View.GONE : View.VISIBLE}">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/empty_text"

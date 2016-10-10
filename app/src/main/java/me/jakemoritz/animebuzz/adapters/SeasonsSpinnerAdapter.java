@@ -64,7 +64,7 @@ public class SeasonsSpinnerAdapter extends BaseAdapter {
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
         textView.setText(seasonNames.get(position));
 
-        if (seasonNames.get(position).equals(fragment.getmAdapter().getData().get(position).getSeason())){
+        if (seasonNames.get(position).equals(fragment.getmAdapter().getData().get(position).getSeason().getName())){
             textView.setBackgroundColor(0xFFECEFF1);
         } else {
             textView.setBackgroundResource(0);

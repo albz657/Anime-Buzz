@@ -13,9 +13,10 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.Calendar;
-import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmRecyclerViewAdapter;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
@@ -26,19 +27,18 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
+public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
-    private final List<BacklogItem> backlogItems;
     public ItemTouchHelper touchHelper;
     private MalApiClient malApiClient;
     private BacklogFragment fragment;
 
-    public BacklogRecyclerViewAdapter(BacklogFragment parent, List<BacklogItem> backlogItems) {
-        this.backlogItems = backlogItems;
+    public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
+        super(parent.getContext(), backlogItems, true);
         this.malApiClient = new MalApiClient(parent);
         this.fragment =  parent;
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
-        touchHelper = new ItemTouchHelper(callback);
+        this.touchHelper = new ItemTouchHelper(callback);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.backlogItem = backlogItems.get(position);
+        holder.backlogItem = getData().get(position);
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()){
             holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
@@ -58,7 +58,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
-        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID().toString(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
@@ -91,7 +91,7 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
                     break;
                 case "The Anime Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                    holder.mSimulcast.setText("Anime Network");
+                    holder.mSimulcast.setText(fragment.getMainActivity().getString(R.string.simulcast_anime_network));
                     break;
                 case "Viewster":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
@@ -112,25 +112,20 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
     }
 
     @Override
-    public int getItemCount() {
-        return backlogItems.size();
-    }
-
-    @Override
     public void onItemDismiss(int position) {
-        Series series = backlogItems.get(position).getSeries();
+        Series series = getData().get(position).getSeries();
 
         if (SharedPrefsHelper.getInstance().prefersIncrementDialog() && SharedPrefsHelper.getInstance().isLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            final BacklogItem removedItem = backlogItems.remove(position);
+            final BacklogItem removedItem = getData().remove(position);
 //            App.getInstance().getBacklog().remove(removedItem);
 
             Realm.getDefaultInstance().executeTransaction(new Realm.Transaction(){
                 @Override
                 public void execute(Realm realm) {
-                    removedItem.deleteFromRealm();
+//                    removedItem.deleteFromRealm();
                 }
             });
         }
@@ -144,17 +139,15 @@ public class BacklogRecyclerViewAdapter extends RecyclerView.Adapter<BacklogRecy
             SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }
 
-        final BacklogItem removedItem = backlogItems.remove(position);
+        final BacklogItem removedItem = getData().remove(position);
 //        App.getInstance().getBacklog().remove(removedItem);
 
         Realm.getDefaultInstance().executeTransaction(new Realm.Transaction(){
             @Override
             public void execute(Realm realm) {
-                removedItem.deleteFromRealm();
+//                removedItem.deleteFromRealm();
             }
         });
-
-        notifyDataSetChanged();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
