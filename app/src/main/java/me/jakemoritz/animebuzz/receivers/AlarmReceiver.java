@@ -43,23 +43,22 @@ public class AlarmReceiver extends BroadcastReceiver {
                     App.getInstance().setNotificationReceived(true);
 
                     realm.beginTransaction();
+
                     thisAlarm.deleteFromRealm();
 
                     BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                     backlogItem.setSeries(series);
                     backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
-                    backlogItem.setId(Integer.valueOf(series.getMALID()));
 
                     series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
+
+                    realm.commitTransaction();
+
                     AlarmHelper.getInstance().makeAlarm(series);
 
                     if (mainActivity != null){
                         mainActivity.episodeNotificationReceived();
                     }
-
-                    series.setLastNotificationTime(currentTime.getTimeInMillis());
-
-                    realm.commitTransaction();
                 }
             }
         }

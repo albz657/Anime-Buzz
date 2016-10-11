@@ -11,7 +11,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -20,8 +19,6 @@ import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.NextEpisodeTimeComparator;
-import me.jakemoritz.animebuzz.helpers.comparators.SeriesNameComparator;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.tasks.GetImageTask;
 
@@ -158,7 +155,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     private void sortByDate() {
         SharedPrefsHelper.getInstance().setSortingPreference("date");
 
-        Collections.sort(getmAdapter().getData(), new NextEpisodeTimeComparator());
+//        Collections.sort(getmAdapter().getData(), new NextEpisodeTimeComparator());
 
 //        getmAdapter().getVisibleSeries().clear();
 //        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
@@ -167,7 +164,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     private void sortByName() {
         SharedPrefsHelper.getInstance().setSortingPreference("name");
 
-        Collections.sort(getmAdapter().getData(), new SeriesNameComparator());
+//        Collections.sort(getmAdapter().getData(), new SeriesNameComparator());
 //        getmAdapter().getVisibleSeries().clear();
 //        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
     }

@@ -37,6 +37,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.Alarm;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
@@ -268,8 +269,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             for (Series series : App.getInstance().getUserList()) {
                 series.setInUserList(false);
             }
-//            Series.saveInTx(App.getInstance().getUserList());
-            App.getInstance().getUserList().clear();
 
             realm.commitTransaction();
         } else {
@@ -292,20 +291,15 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         App.getInstance().setJustLaunched(true);
 
-        App.getInstance().getBacklog().clear();
-
         AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
-
-        App.getInstance().getAlarms().clear();
-
-        RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
 
         realm.beginTransaction();
 
-        alarmRealmResults.deleteAllFromRealm();
+        realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
+
+        realm.where(Alarm.class).findAll().deleteAllFromRealm();
 
         realm.commitTransaction();
-//        Alarm.deleteAll(Alarm.class);
 
         String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {

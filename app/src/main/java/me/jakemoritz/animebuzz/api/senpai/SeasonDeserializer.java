@@ -53,18 +53,14 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
         Realm realm = Realm.getDefaultInstance();
         Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
 
-        if (season == null){
-
-            realm.beginTransaction();
-
-            season = realm.createObject(Season.class, seasonKey);
-            season.setName(seasonName);
-            season.setStartDate(startTimestamp);
-
-            realm.commitTransaction();
-
-            Season.calculateRelativeTime(seasonName);
+        if (season == null) {
+            season = new Season();
         }
+
+        season.setKey(seasonKey);
+        season.setName(seasonName);
+        season.setStartDate(startTimestamp);
+        Season.calculateRelativeTime(seasonName);
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
@@ -125,15 +121,10 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
 
                 Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
-                realm.beginTransaction();
-
-                if (series == null){
-                    series = realm.createObject(Series.class);
-                }
-
-                if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
-                    SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
+                if (series == null) {
+                    series = new Series();
+                    series.setName(seriesName);
+                    series.setMALID(MALID);
                 }
 
                 series.setANNID(ANNID);
@@ -141,16 +132,18 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
                 series.setSeason(season);
                 series.setSimulcast_delay(simulcast_delay);
 
-                realm.commitTransaction();
+                if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
+                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
+                    SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
+                }
 
                 seasonSeries.add(series);
             }
 
         }
 
-        realm.beginTransaction();
         season.setSeasonSeries(seasonSeries);
-        realm.commitTransaction();
+
         return season;
     }
 }

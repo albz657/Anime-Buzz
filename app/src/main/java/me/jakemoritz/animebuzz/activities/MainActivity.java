@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
         realm = Realm.getDefaultInstance();
+
         // Initialize global RealmResults
         RealmResults<Season> allSeasons = realm.where(Season.class).findAll();
         App.getInstance().setAllAnimeSeasons(allSeasons);
@@ -151,6 +152,7 @@ public class MainActivity extends AppCompatActivity
                 drawer.requestLayout();
             }
         };
+
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
@@ -196,12 +198,6 @@ public class MainActivity extends AppCompatActivity
         }
 
         setNavPositions(fragment);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        saveData();
     }
 
     @Override
@@ -313,7 +309,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
 
-        if (!sameDay) {
+        if (!sameDay && false) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -391,18 +387,6 @@ public class MainActivity extends AppCompatActivity
                 startFragment(BacklogFragment.newInstance());
             }
         }
-    }
-
-    /* Saving */
-    public void saveData() {
-        Realm realm = Realm.getDefaultInstance();
-
-        realm.executeTransactionAsync(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-
-            }
-        });
     }
 
     /* Helpers  */

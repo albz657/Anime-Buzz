@@ -67,6 +67,8 @@ public class Series extends RealmObject{
         return MALID == series.getMALID();
     }
 
+
+
     @Override
     public int hashCode() {
         return Integer.parseInt(MALID);
@@ -74,6 +76,14 @@ public class Series extends RealmObject{
 
     public String getMALID() {
         return MALID;
+    }
+
+    public void setMALID(String MALID) {
+        this.MALID = MALID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public long getLastNotificationTime() {

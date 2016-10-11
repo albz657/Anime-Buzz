@@ -9,7 +9,7 @@ import io.realm.annotations.PrimaryKey;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 
-public class Season extends RealmObject{
+public class Season extends RealmObject {
 
     public static String PRESENT = "Current";
     public static String PAST = "Past";
@@ -22,7 +22,7 @@ public class Season extends RealmObject{
     private String startDate;
     private String relativeTime;
 
-    public static void calculateRelativeTime(String seasonName){
+    public static String calculateRelativeTime(String seasonName) {
         Realm realm = Realm.getDefaultInstance();
 
         Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
@@ -33,25 +33,25 @@ public class Season extends RealmObject{
         allSeasons.addAll(realm.where(Season.class).findAll());
         Collections.sort(allSeasons, new SeasonComparator());
 
-        if (latestSeason != null){
+        if (latestSeason != null) {
             String relativeTime;
 
             int thisIndex = allSeasons.indexOf(season);
             int otherIndex = allSeasons.indexOf(latestSeason);
 
-            if (thisIndex == otherIndex){
+            if (thisIndex == otherIndex) {
                 relativeTime = PRESENT;
-            } else if (thisIndex > otherIndex){
+            } else if (thisIndex > otherIndex) {
                 relativeTime = FUTURE;
             } else {
                 relativeTime = PAST;
             }
 
-            realm.beginTransaction();
-            season.setRelativeTime(relativeTime);
-            realm.commitTransaction();
+//            realm.beginTransaction();
+            return relativeTime;
+//            realm.commitTransaction();
         }
-
+        return "";
     }
 
     @Override

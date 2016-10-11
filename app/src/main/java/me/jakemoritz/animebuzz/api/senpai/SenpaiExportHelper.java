@@ -50,9 +50,13 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
                 if (response.isSuccessful()) {
-//                    App.getInstance().getSeasonsList().addAll(response.body().getMetadataList());
-//                    fragment.getMainActivity().saveSeasonsList();
-//                    fragment.getMainActivity().setSeasonsStatus();
+                    Realm realm = Realm.getDefaultInstance();
+
+                    for (Season season : response.body().getMetadataList()){
+                        realm.beginTransaction();
+                        realm.copyToRealm(season);
+                        realm.commitTransaction();
+                    }
 
                     fragment.senpaiSeasonListReceived(response.body().getMetadataList());
 
@@ -153,15 +157,18 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
 
+                    Season season = response.body();
+                    season.setRelativeTime(Season.PRESENT);
+
                     Realm realm = Realm.getDefaultInstance();
                     realm.beginTransaction();
 
-                    response.body().setRelativeTime(Season.PRESENT);
+                    realm.copyToRealm(season);
 
                     realm.commitTransaction();
 
-                    SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getName());
-                    SharedPrefsHelper.getInstance().setLatestSeasonKey(response.body().getKey());
+                    SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
+                    SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());
 
                     fragment.senpaiSeasonRetrieved(response.body());
                 } else {

@@ -116,10 +116,10 @@ public class SeasonsFragment extends SeriesFragment {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
         } else {
-            getmAdapter().getData().clear();
-            getmAdapter().getData().addAll(browsingSeries);
+//            getmAdapter().getData().clear();
+//            getmAdapter().getData().addAll(browsingSeries);
 
-            getmAdapter().setSeriesFilter(null);
+//            getmAdapter().setSeriesFilter(null);
         }
     }
 
@@ -182,13 +182,15 @@ public class SeasonsFragment extends SeriesFragment {
     private void refreshSpinnerItems() {
         seasonsSpinnerAdapter.getSeasonNames().clear();
 
-        Collections.sort(App.getInstance().getAllAnimeSeasons(), new SeasonComparator());
+        RealmList<Season> allSeasons = new RealmList<>();
+        allSeasons.addAll(realm.where(Season.class).findAll());
+        Collections.sort(allSeasons, new SeasonComparator());
 
-        for (Season season : App.getInstance().getAllAnimeSeasons()){
+        for (Season season : allSeasons){
             seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
 
             if (season.getName().equals(currentlyBrowsingSeason.getName())) {
-                previousSpinnerIndex = App.getInstance().getAllAnimeSeasons().indexOf(season);
+                previousSpinnerIndex = allSeasons.indexOf(season);
             }
         }
 
@@ -247,6 +249,8 @@ public class SeasonsFragment extends SeriesFragment {
                                               }
                                           }
         );
+
+        searchView.setEnabled(false);
     }
 
     public Season getCurrentlyBrowsingSeason() {

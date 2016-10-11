@@ -99,13 +99,17 @@ public class AlarmHelper {
         String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
         if (simulcast) {
+            realm.beginTransaction();
             series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
             series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
+            realm.commitTransaction();
         } else {
+            realm.beginTransaction();
             series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
             series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
+            realm.commitTransaction();
         }
     }
 
@@ -118,9 +122,6 @@ public class AlarmHelper {
         DateFormatHelper helper = new DateFormatHelper();
 
         Calendar currentTime = Calendar.getInstance();
-
-        //DEBUG
-//        calendar.setTimeInMillis(1473047450000L);
 
         if (currentTime.get(Calendar.YEAR) == calendar.get(Calendar.YEAR)) {
             int dayDiff = calendar.get(Calendar.DAY_OF_YEAR) - currentTime.get(Calendar.DAY_OF_YEAR);
@@ -162,23 +163,22 @@ public class AlarmHelper {
             nextEpisodeTime = series.getNextEpisodeAirtime();
         }
 
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Alarm newAlarm = realm.createObject(Alarm.class);
-                newAlarm.setAlarmTime(nextEpisodeTime);
-                newAlarm.setMALID(series.getMALID());
-                newAlarm.setSeries(series);
+        Alarm newAlarm = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
 
-                setAlarm(newAlarm);
+        if (newAlarm == null) {
+            realm.beginTransaction();
 
-                App.getInstance().getAlarms().add(newAlarm);
-            }
-        });
+            newAlarm = realm.createObject(Alarm.class, series.getMALID());
+            newAlarm.setAlarmTime(nextEpisodeTime);
+            newAlarm.setSeries(series);
+
+            realm.commitTransaction();
+        }
+
+        setAlarm(newAlarm);
     }
 
     public void switchAlarmTiming() {
-
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -205,21 +205,19 @@ public class AlarmHelper {
     }
 
     public void removeAlarm(final Series series) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
-                    Alarm alarm = (Alarm) iterator.next();
-                    if (alarm.getMALID().equals(series.getMALID())) {
-                        int id = Integer.valueOf(series.getMALID());
-                        alarmManager.cancel(createPendingIntent(id));
-                        alarm.deleteFromRealm();
-                        iterator.remove();
-                    }
-                }
-            }
-        });
+        for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
+            Alarm alarm = (Alarm) iterator.next();
+            if (alarm.getMALID().equals(series.getMALID())) {
+                int id = Integer.valueOf(series.getMALID());
+                alarmManager.cancel(createPendingIntent(id));
 
+                realm.beginTransaction();
+                alarm.deleteFromRealm();
+                realm.commitTransaction();
+
+                iterator.remove();
+            }
+        }
     }
 
     private void dummyAlarm() {

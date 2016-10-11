@@ -68,10 +68,6 @@ public class HummingbirdApiClient {
                 .build();
     }
 
-    void setSeriesList(RealmList<Series> seriesList) {
-        this.seriesList = seriesList;
-    }
-
     public void processSeriesList(RealmList<Series> seriesList) {
         this.seriesList = seriesList;
         this.imageRequests = new ArrayList<>();
@@ -110,60 +106,72 @@ public class HummingbirdApiClient {
     }
 
     private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
-        realm.beginTransaction();
-
-        currSeries.setEnglishTitle(holder.getEnglishTitle());
+        String showType;
+        boolean single = currSeries.isSingle();
+        String airingStatus = "";
+        String startAiringDate = "";
+        String finishAiringDate = "";
 
         if (holder.getShowType().isEmpty()) {
-            currSeries.setShowType("TV");
+            showType = "TV";
         } else {
-            currSeries.setShowType(holder.getShowType());
+            showType = holder.getShowType();
         }
 
         if (holder.getEpisodeCount() == 1) {
-            currSeries.setSingle(true);
+            single = true;
         }
 
         if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
             if (currSeries.getSeason().getRelativeTime().equals(Season.PRESENT) || currSeries.getSeason().getRelativeTime().equals(Season.FUTURE)) {
-                currSeries.setAiringStatus("Finished airing");
+                airingStatus = "Finished airing";
             } else {
-                currSeries.setAiringStatus("Not yet aired");
+                airingStatus = "Not yet aired";
             }
         } else {
             Calendar currentCalendar = Calendar.getInstance();
             Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
 
-            currSeries.setStartedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
+            startAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
             if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                 if (currentCalendar.compareTo(startedCalendar) > 0) {
                     if (currSeries.isSingle()) {
-                        currSeries.setAiringStatus("Finished airing");
+                        airingStatus = "Finished airing";
                     } else {
-                        currSeries.setAiringStatus("Airing");
+                        airingStatus = "Airing";
 
 //                        checkForSeasonSwitch(currSeries);
                     }
                 } else {
-                    currSeries.setAiringStatus("Not yet aired");
+                    airingStatus = "Not yet aired";
                 }
             } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
                 Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
-                currSeries.setFinishedAiringDate(DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR)));
+                finishAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                 if (currentCalendar.compareTo(finishedCalendar) > 0) {
-                    currSeries.setAiringStatus("Finished airing");
+                    airingStatus = "Finished airing";
                 } else {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
-                        currSeries.setAiringStatus("Airing");
+                        airingStatus = "Airing";
 
 //                        checkForSeasonSwitch(currSeries);
                     } else {
-                        currSeries.setAiringStatus("Not yet aired");
+                        airingStatus = "Not yet aired";
                     }
 
                 }
             }
         }
+
+
+        realm.beginTransaction();
+
+        currSeries.setShowType(showType);
+        currSeries.setSingle(single);
+        currSeries.setEnglishTitle(holder.getEnglishTitle());
+        currSeries.setAiringStatus(airingStatus);
+        currSeries.setStartedAiringDate(startAiringDate);
+        currSeries.setFinishedAiringDate(finishAiringDate);
 
         realm.commitTransaction();
 

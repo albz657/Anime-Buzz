@@ -23,24 +23,30 @@ class MalImportHelper {
 
     void matchSeries(List<MatchHolder> matchList) {
         Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
 
         RealmList<Series> matchedSeries = new RealmList<>();
         for (MatchHolder matchHolder : matchList) {
             Series series = realm.where(Series.class).equalTo("MALID", matchHolder.getMALID()).findFirst();
+            realm.beginTransaction();
+
             series.setInUserList(true);
             series.setEpisodesWatched(matchHolder.getEpisodesWatched());
+
+            realm.commitTransaction();
+
             matchedSeries.add(series);
         }
 
         for (Series series : App.getInstance().getUserList()) {
             if (!matchedSeries.contains(series) || !series.getShowType().equals("TV")) {
+                realm.beginTransaction();
                 series.setInUserList(false);
+                realm.commitTransaction();
+
                 AlarmHelper.getInstance().removeAlarm(series);
             }
         }
 
-        realm.commitTransaction();
 
         for (Series series : App.getInstance().getUserList()) {
             if (series.getNextEpisodeAirtime() > 0 || series.getNextEpisodeSimulcastTime() > 0) {

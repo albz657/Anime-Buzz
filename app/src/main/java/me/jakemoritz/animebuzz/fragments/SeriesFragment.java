@@ -182,7 +182,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
 
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
-            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -222,7 +222,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public void malDataImported(boolean received) {
         if (received) {
-            mAdapter.notifyDataSetChanged();
+//            mAdapter.notifyDataSetChanged();
         }
 
         if (updating) {
@@ -260,12 +260,16 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void failedInitializationResponse(boolean retryNow) {
+        clearAppData();
+
         if (retryNow) {
-            clearAppData();
+            getMainActivity().finish();
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+
         } else {
             Intent homeIntent = new Intent(Intent.ACTION_MAIN);
             homeIntent.addCategory(Intent.CATEGORY_HOME);
