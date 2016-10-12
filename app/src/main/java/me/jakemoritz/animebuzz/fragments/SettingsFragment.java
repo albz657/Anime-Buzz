@@ -25,7 +25,6 @@ import net.xpece.android.support.preference.SwitchPreference;
 import java.io.File;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
@@ -81,6 +80,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         container.clearDisappearingChildren();
         return super.onCreateView(inflater, container, savedInstanceState);
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
     }
 
     @Override

@@ -60,7 +60,13 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
-        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", "me.jakemoritz.animebuzz");
+        if (imageId != 0){
+            Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
+        } else {
+            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        }
+
 
         if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);

@@ -130,6 +130,12 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        realm.close();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) context;
@@ -201,7 +207,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (seasonMetaList != null) {
             NotificationHelper.getInstance().createSeasonDataNotification("Getting list of seasons...");
 
-            Realm realm = Realm.getDefaultInstance();
             RealmList<Season> seasonList = new RealmList<>();
             seasonList.addAll(realm.where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll());
 

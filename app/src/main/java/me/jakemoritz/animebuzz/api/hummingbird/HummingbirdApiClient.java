@@ -13,7 +13,6 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.ImageRequest;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -140,7 +139,7 @@ public class HummingbirdApiClient {
                     } else {
                         airingStatus = "Airing";
 
-//                        checkForSeasonSwitch(currSeries);
+                        checkForSeasonSwitch(currSeries);
                     }
                 } else {
                     airingStatus = "Not yet aired";
@@ -154,7 +153,7 @@ public class HummingbirdApiClient {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         airingStatus = "Airing";
 
-//                        checkForSeasonSwitch(currSeries);
+                        checkForSeasonSwitch(currSeries);
                     } else {
                         airingStatus = "Not yet aired";
                     }
@@ -184,36 +183,26 @@ public class HummingbirdApiClient {
 
     private void checkForSeasonSwitch(final Series currSeries) {
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-        if (!currSeries.getSeason().getName().equals(latestSeasonName) && !currSeries.getSeason().equals(realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst())) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    for (Series series : App.getInstance().getAiringList()) {
-                        if (series.getNextEpisodeAirtime() > 0) {
-                            Calendar airdateCalendar = Calendar.getInstance();
-                            airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, false);
-                        }
-
-                        if (series.getNextEpisodeSimulcastTime() > 0) {
-                            Calendar airdateCalendar = Calendar.getInstance();
-                            airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, true);
-                        }
-                    }
-                    currSeries.setShifted(true);
-
-
+        Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        if (!currSeries.getSeason().getName().equals(latestSeasonName) && !currSeries.getSeason().equals(latestSeason)) {
+//            for (Series series : App.getInstance().getAiringList()) {
+                if (currSeries.getNextEpisodeAirtime() > 0) {
+                    Calendar airdateCalendar = Calendar.getInstance();
+                    airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
+                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries, airdateCalendar, false);
                 }
-            });
 
-//            App.getInstance().getAiringList().add(currSeries);
+                if (currSeries.getNextEpisodeSimulcastTime() > 0) {
+                    Calendar airdateCalendar = Calendar.getInstance();
+                    airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
+                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries, airdateCalendar, true);
+                }
+//            }
 
-            if (callback instanceof SeasonsFragment) {
-                callback.getmAdapter().getData().add(currSeries);
-//                callback.getRecyclerView().getRecycledViewPool().clear();
-//                callback.getmAdapter().notifyItemInserted(callback.getmAdapter().getVisibleSeries().size() - 1);
-            }
+            realm.beginTransaction();
+            currSeries.setShifted(true);
+            latestSeason.getSeasonSeries().add(currSeries);
+            realm.commitTransaction();
         }
     }
 
@@ -222,6 +211,7 @@ public class HummingbirdApiClient {
         if (finishedCount == seriesList.size()) {
             finishedCount = 0;
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
+            realm.close();
         }
     }
 }

@@ -63,6 +63,8 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
         }
 
+        realm.close();
+
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }

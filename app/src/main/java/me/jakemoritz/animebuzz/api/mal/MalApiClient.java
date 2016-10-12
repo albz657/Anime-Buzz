@@ -167,6 +167,7 @@ public class MalApiClient {
                     seriesFragment.malDataImported(false);
                 }
 
+
             }
 
             @Override

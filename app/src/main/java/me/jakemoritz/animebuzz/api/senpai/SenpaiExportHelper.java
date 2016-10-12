@@ -58,6 +58,8 @@ public class SenpaiExportHelper {
                         realm.commitTransaction();
                     }
 
+                    realm.close();
+
                     fragment.senpaiSeasonListReceived(response.body().getMetadataList());
 
                     Log.d(TAG, "Got season list");
@@ -166,6 +168,8 @@ public class SenpaiExportHelper {
                     realm.copyToRealm(season);
 
                     realm.commitTransaction();
+
+                    realm.close();
 
                     SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
                     SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());

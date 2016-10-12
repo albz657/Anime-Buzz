@@ -215,7 +215,12 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
             holder.mShowType.setVisibility(View.GONE);
         }
 
-        Picasso.with(App.getInstance()).load(App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz")).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz");
+        if (imageId != 0){
+            Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
+        } else {
+            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+        }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override

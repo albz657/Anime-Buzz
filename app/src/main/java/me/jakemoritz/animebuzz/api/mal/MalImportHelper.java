@@ -57,5 +57,6 @@ class MalImportHelper {
         if (malDataImportedListener != null) {
             malDataImportedListener.malDataImported(true);
         }
+        realm.close();
     }
 }

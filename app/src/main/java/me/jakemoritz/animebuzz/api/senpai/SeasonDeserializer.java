@@ -144,6 +144,7 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
 
         season.setSeasonSeries(seasonSeries);
 
+        realm.close();
         return season;
     }
 }

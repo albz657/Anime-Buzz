@@ -13,6 +13,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.Series;
 
 class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>{
 
@@ -46,10 +47,12 @@ class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>
                 season.setName(seasonName);
                 season.setStartDate(startTimestamp);
                 season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+                season.setSeasonSeries(new RealmList<Series>());
 
                 metadataList.add(season);
             }
         }
+        realm.close();
         return new AllSeasonsMetadata(metadataList, latestSeasonKey);
     }
 }

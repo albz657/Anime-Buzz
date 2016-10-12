@@ -18,7 +18,6 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.api.ImageRequest;
@@ -48,6 +47,12 @@ public class SeasonsFragment extends SeriesFragment {
         SeasonsFragment fragment = new SeasonsFragment();
         fragment.seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(App.getInstance(), new ArrayList<String>(), fragment);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        currentlyBrowsingSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
     }
 
     @Override
@@ -103,19 +108,19 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void loadSeason(String seasonName) {
-        RealmResults<Series> browsingSeries;
 
-        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
-            browsingSeries = App.getInstance().getAiringList();
-        } else {
-            browsingSeries = realm.where(Series.class).equalTo("name", seasonName).findAll();
-        }
+//        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+//            browsingSeries = App.getInstance().getAiringList();
+//        } else {
+            currentlyBrowsingSeason = realm.where(Season.class).equalTo("name", seasonName).findFirst();
+//        }
 
-        if (browsingSeries.isEmpty()) {
+        if (currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
             if (getSwipeRefreshLayout() != null){
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
         } else {
+            getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries());
 //            getmAdapter().getData().clear();
 //            getmAdapter().getData().addAll(browsingSeries);
 
