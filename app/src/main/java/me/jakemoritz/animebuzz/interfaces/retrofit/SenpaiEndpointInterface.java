@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.interfaces.retrofit;
 
-import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.models.Season;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -11,5 +11,5 @@ public interface SenpaiEndpointInterface {
     Call<Season> getSeasonData(@Query("type") String type, @Query("src") String source);
 
     @GET("/export.php")
-    Call<AllSeasonsMetadata> getSeasonList(@Query("type") String type, @Query("src") String source);
+    Call<RealmList<Season>> getSeasonList(@Query("type") String type, @Query("src") String source);
 }

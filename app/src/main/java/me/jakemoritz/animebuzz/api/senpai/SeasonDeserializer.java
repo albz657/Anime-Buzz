@@ -55,12 +55,17 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
 
         if (season == null) {
             season = new Season();
+            season.setKey(seasonKey);
+            season.setName(seasonName);
+            season.setStartDate(startTimestamp);
+            season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+        } else {
+            realm.beginTransaction();
+            season.setName(seasonName);
+            season.setStartDate(startTimestamp);
+            season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+            realm.commitTransaction();
         }
-
-        season.setKey(seasonKey);
-        season.setName(seasonName);
-        season.setStartDate(startTimestamp);
-        Season.calculateRelativeTime(seasonName);
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
@@ -125,12 +130,17 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
                     series = new Series();
                     series.setName(seriesName);
                     series.setMALID(MALID);
+                    series.setANNID(ANNID);
+                    series.setSimulcastProvider(simulcast);
+                    series.setSeason(season);
+                    series.setSimulcast_delay(simulcast_delay);
+                } else {
+                    series.setANNID(ANNID);
+                    series.setSimulcastProvider(simulcast);
+                    series.setSeason(season);
+                    series.setSimulcast_delay(simulcast_delay);
                 }
 
-                series.setANNID(ANNID);
-                series.setSimulcastProvider(simulcast);
-                series.setSeason(season);
-                series.setSimulcast_delay(simulcast_delay);
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                     AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);

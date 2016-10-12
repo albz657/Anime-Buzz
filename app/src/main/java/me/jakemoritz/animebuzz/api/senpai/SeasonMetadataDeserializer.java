@@ -11,23 +11,19 @@ import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
 
-class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>{
+class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
 
     private static final String TAG = SeasonMetadataDeserializer.class.getSimpleName();
 
     @Override
-    public AllSeasonsMetadata deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public RealmList<Season> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject jsonObject = json.getAsJsonObject();
-
-        String latestSeasonKey = jsonObject.get("latest").getAsString();
 
         JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 
-        final RealmList<Season> metadataList = new RealmList<>();
+        RealmList<Season> metadataList = new RealmList<>();
         Realm realm = Realm.getDefaultInstance();
         for (Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
             String seasonKey = seasonEntry.getKey();
@@ -41,18 +37,22 @@ class SeasonMetadataDeserializer implements JsonDeserializer<AllSeasonsMetadata>
 
                 if (season == null) {
                     season = new Season();
+                    season.setKey(seasonKey);
+                    season.setName(seasonName);
+                    season.setStartDate(startTimestamp);
+                    season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+                } else {
+                    realm.beginTransaction();
+                    season.setName(seasonName);
+                    season.setStartDate(startTimestamp);
+                    season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+                    realm.commitTransaction();
                 }
-
-                season.setKey(seasonKey);
-                season.setName(seasonName);
-                season.setStartDate(startTimestamp);
-                season.setRelativeTime(Season.calculateRelativeTime(seasonName));
-                season.setSeasonSeries(new RealmList<Series>());
 
                 metadataList.add(season);
             }
         }
         realm.close();
-        return new AllSeasonsMetadata(metadataList, latestSeasonKey);
+        return metadataList;
     }
 }

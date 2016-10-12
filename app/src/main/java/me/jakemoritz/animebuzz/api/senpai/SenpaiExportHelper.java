@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.api.senpai.models.AllSeasonsMetadata;
+import io.realm.RealmList;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -35,8 +35,10 @@ public class SenpaiExportHelper {
     public void getSeasonList() {
         Log.d(TAG, "Getting season list");
 
+        RealmList<Season> typeList = new RealmList<>();
+
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(AllSeasonsMetadata.class, new SeasonMetadataDeserializer());
+        gsonBuilder.registerTypeAdapter(typeList.getClass(), new SeasonMetadataDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -45,22 +47,24 @@ public class SenpaiExportHelper {
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<AllSeasonsMetadata> call = senpaiEndpointInterface.getSeasonList("json", "seasonlist");
-        call.enqueue(new Callback<AllSeasonsMetadata>() {
+        Call<RealmList<Season>> call = senpaiEndpointInterface.getSeasonList("json", "seasonlist");
+        call.enqueue(new Callback<RealmList<Season>>() {
             @Override
-            public void onResponse(Call<AllSeasonsMetadata> call, retrofit2.Response<AllSeasonsMetadata> response) {
+            public void onResponse(Call<RealmList<Season>> call, retrofit2.Response<RealmList<Season>> response) {
                 if (response.isSuccessful()) {
                     Realm realm = Realm.getDefaultInstance();
 
-                    for (Season season : response.body().getMetadataList()){
-                        realm.beginTransaction();
-                        realm.copyToRealm(season);
-                        realm.commitTransaction();
+                    for (Season season : response.body()){
+                        if (!season.isManaged()){
+                            realm.beginTransaction();
+                            realm.copyToRealm(season);
+                            realm.commitTransaction();
+                        }
                     }
 
                     realm.close();
 
-                    fragment.senpaiSeasonListReceived(response.body().getMetadataList());
+                    fragment.senpaiSeasonListReceived(response.body());
 
                     Log.d(TAG, "Got season list");
                 } else {
@@ -69,7 +73,7 @@ public class SenpaiExportHelper {
             }
 
             @Override
-            public void onFailure(Call<AllSeasonsMetadata> call, Throwable t) {
+            public void onFailure(Call<RealmList<Season>> call, Throwable t) {
                 Log.d(TAG, "Failed getting season list");
                 fragment.senpaiSeasonListReceived(null);
             }
@@ -162,14 +166,17 @@ public class SenpaiExportHelper {
                     Season season = response.body();
                     season.setRelativeTime(Season.PRESENT);
 
-                    Realm realm = Realm.getDefaultInstance();
-                    realm.beginTransaction();
+                    if (!season.isManaged()){
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
 
-                    realm.copyToRealm(season);
+                        realm.copyToRealm(season);
 
-                    realm.commitTransaction();
+                        realm.commitTransaction();
 
-                    realm.close();
+                        realm.close();
+                    }
+
 
                     SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
                     SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());
