@@ -32,7 +32,6 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
     public ItemTouchHelper touchHelper;
     private MalApiClient malApiClient;
     private BacklogFragment fragment;
-    private Realm realm;
 
     public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(parent.getContext(), backlogItems, true);
@@ -40,7 +39,6 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         this.fragment =  parent;
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
         this.touchHelper = new ItemTouchHelper(callback);
-        this.realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -127,11 +125,13 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            BacklogItem removedItem = getData().remove(position);
+            BacklogItem removedItem = getData().get(position);
 
+            Realm realm = Realm.getDefaultInstance();
             realm.beginTransaction();
             removedItem.deleteFromRealm();
             realm.commitTransaction();
+            realm.close();
         }
     }
 
@@ -143,11 +143,13 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }
 
-        BacklogItem removedItem = getData().remove(position);
+        BacklogItem removedItem = getData().get(position);
 
+        Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         removedItem.deleteFromRealm();
         realm.commitTransaction();
+        realm.close();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

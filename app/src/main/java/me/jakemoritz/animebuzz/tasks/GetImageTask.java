@@ -48,11 +48,11 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
         }
 
         if (!App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
-            NotificationHelper.getInstance().createImagesNotification(max, 0);
+//            NotificationHelper.getInstance().createImagesNotification(max, 0);
         }
 
         if (App.getInstance().isGettingPostInitialImages()) {
-            NotificationHelper.getInstance().createOtherImagesNotification();
+//            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         for (Object imageRequestObject : imageRequests[0].toArray()) {
@@ -80,7 +80,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
         }
 
         if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
-            NotificationHelper.getInstance().createImagesNotification(max, imageRequests.indexOf(values[0]));
+//            NotificationHelper.getInstance().createImagesNotification(max, imageRequests.indexOf(values[0]));
         }
 
 
@@ -96,7 +96,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
 
         if (!App.getInstance().isGettingInitialImages() && App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
-            NotificationHelper.getInstance().createOtherImagesNotification();
+//            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         seriesFragment.hummingbirdSeasonImagesReceived();

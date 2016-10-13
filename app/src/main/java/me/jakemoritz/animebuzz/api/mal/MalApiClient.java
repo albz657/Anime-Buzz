@@ -39,7 +39,6 @@ public class MalApiClient {
     private VerifyCredentialsResponse verifyListener;
     private MalDataImportedListener malDataImportedListener;
     private IncrementEpisodeCountResponse incrementListener;
-    private Realm realm = Realm.getDefaultInstance();
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -87,8 +86,9 @@ public class MalApiClient {
     }
 
     public void updateAnimeEpisodeCount(String MALID) {
+        Realm realm = Realm.getDefaultInstance();
         Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-
+        realm.close();
         if (series != null) {
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
             Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + (series.getEpisodesWatched() + 1) + "</episode></entry>", MALID);
@@ -157,9 +157,11 @@ public class MalApiClient {
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
+                        Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
                         App.getInstance().getUserList().deleteAllFromRealm();
                         realm.commitTransaction();
+                        realm.close();
 
                         seriesFragment.malDataImported(true);
                     }

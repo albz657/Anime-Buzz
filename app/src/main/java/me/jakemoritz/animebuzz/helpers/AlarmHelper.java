@@ -22,7 +22,6 @@ import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 public class AlarmHelper {
     private static AlarmHelper alarmHelper;
     private AlarmManager alarmManager;
-    private Realm realm = Realm.getDefaultInstance();
 
     public synchronized static AlarmHelper getInstance() {
         if (alarmHelper == null) {
@@ -37,6 +36,7 @@ public class AlarmHelper {
 
 //        App.getInstance().getAlarms().clear();
 
+        Realm realm = Realm.getDefaultInstance();
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -44,7 +44,7 @@ public class AlarmHelper {
                 alarmRealmResults.deleteAllFromRealm();
             }
         });
-
+        realm.close();
         for (Series series : App.getInstance().getUserList()) {
             makeAlarm(series);
         }
@@ -114,6 +114,8 @@ public class AlarmHelper {
             series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
             realm.commitTransaction();
         }
+
+        realm.close();
     }
 
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
@@ -166,6 +168,8 @@ public class AlarmHelper {
             nextEpisodeTime = series.getNextEpisodeAirtime();
         }
 
+        Realm realm = Realm.getDefaultInstance();
+
         Alarm newAlarm = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
 
         if (newAlarm == null) {
@@ -177,11 +181,14 @@ public class AlarmHelper {
 
             realm.commitTransaction();
         }
+        realm.close();
 
         setAlarm(newAlarm);
     }
 
     public void switchAlarmTiming() {
+        Realm realm = Realm.getDefaultInstance();
+
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -189,6 +196,8 @@ public class AlarmHelper {
                 alarmRealmResults.deleteAllFromRealm();
             }
         });
+
+        realm.close();
 
         for (Series series : App.getInstance().getUserList()) {
             makeAlarm(series);
@@ -208,6 +217,8 @@ public class AlarmHelper {
     }
 
     public void removeAlarm(final Series series) {
+        Realm realm = Realm.getDefaultInstance();
+
         for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
             Alarm alarm = (Alarm) iterator.next();
             if (alarm.getMALID().equals(series.getMALID())) {
@@ -221,6 +232,8 @@ public class AlarmHelper {
                 iterator.remove();
             }
         }
+
+        realm.close();
     }
 
     private void dummyAlarm() {

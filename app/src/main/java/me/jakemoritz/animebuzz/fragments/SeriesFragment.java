@@ -474,5 +474,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         return recyclerView;
     }
 
-
+    public Realm getRealm() {
+        return realm;
+    }
 }
