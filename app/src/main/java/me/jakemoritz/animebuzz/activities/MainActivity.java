@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         App.getInstance().setAiringList(airingList);
 
         // Check if user has completed setup
-        if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || getIntent().getBooleanExtra(getString(R.string.shared_prefs_completed_setup), true)) {
+        if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || getIntent().getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
             // Just finished setup
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);

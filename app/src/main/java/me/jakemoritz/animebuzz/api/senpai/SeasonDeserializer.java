@@ -92,7 +92,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 Log.d(TAG, "'" + seriesName + "' has no MALID, ignoring");
             }
 
-            if (MALID != null) {
+            if (MALID != null && !MALID.equals("false")) {
                 String ANNID;
                 try {
                     ANNID = seriesObject.get("ANNID").getAsString();
