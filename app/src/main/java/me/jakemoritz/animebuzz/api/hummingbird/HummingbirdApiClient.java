@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.api.hummingbird;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -44,7 +45,6 @@ public class HummingbirdApiClient {
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
         this.imageRequests = new ArrayList<>();
-        this.realm = Realm.getDefaultInstance();
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -80,17 +80,26 @@ public class HummingbirdApiClient {
         }
     }
 
-    void getSeriesData(final String MALID) {
+    private void getSeriesData(final String MALID) {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
         Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID);
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
-                Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                final HummingbirdAnimeHolder holder = response.body();
+
                 if (response.isSuccessful()) {
-                    processSeries(currSeries, response.body());
+                    AsyncTask.execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            realm = Realm.getDefaultInstance();
+                            Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                            processSeries(currSeries, holder);
+                            realm.close();
+                        }
+                    });
                 } else {
-                    Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
+                    Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
                 }
                 finishedCheck();
             }
@@ -98,13 +107,12 @@ public class HummingbirdApiClient {
             @Override
             public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
                 finishedCheck();
-                Log.d(TAG, "Failed getting Hummingbird data for '" +  "'");
+                Log.d(TAG, "Failed getting Hummingbird data for '" + "'");
             }
         });
     }
 
     private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
-
         String showType;
         boolean single = currSeries.isSingle();
         String airingStatus = "";
@@ -186,17 +194,17 @@ public class HummingbirdApiClient {
         Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
         if (!currSeries.getSeason().getName().equals(latestSeasonName) && !currSeries.getSeason().equals(latestSeason)) {
 //            for (Series series : App.getInstance().getAiringList()) {
-                if (currSeries.getNextEpisodeAirtime() > 0) {
-                    Calendar airdateCalendar = Calendar.getInstance();
-                    airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
-                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
-                }
+            if (currSeries.getNextEpisodeAirtime() > 0) {
+                Calendar airdateCalendar = Calendar.getInstance();
+                airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
+                AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
+            }
 
-                if (currSeries.getNextEpisodeSimulcastTime() > 0) {
-                    Calendar airdateCalendar = Calendar.getInstance();
-                    airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
-                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
-                }
+            if (currSeries.getNextEpisodeSimulcastTime() > 0) {
+                Calendar airdateCalendar = Calendar.getInstance();
+                airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
+                AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
+            }
 //            }
 
             realm.beginTransaction();
@@ -211,7 +219,6 @@ public class HummingbirdApiClient {
         if (finishedCount == seriesList.size()) {
             finishedCount = 0;
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
-            realm.close();
         }
     }
 }

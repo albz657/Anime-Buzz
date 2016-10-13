@@ -90,7 +90,7 @@ public class SeasonsFragment extends SeriesFragment {
             setUpdating(true);
         } else {
             stopRefreshing();
-            if (getSwipeRefreshLayout() != null){
+            if (getSwipeRefreshLayout() != null) {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         }
@@ -98,51 +98,43 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             currentlyBrowsingSeason = getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
-            ;
+            loadSeason(currentlyBrowsingSeason.getName());
         }
 
         super.senpaiSeasonRetrieved(seasonKey);
     }
 
     private void loadSeason(String seasonName) {
-
-//        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
-//            browsingSeries = App.getInstance().getAiringList();
-//        } else {
-            currentlyBrowsingSeason = getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
-//        }
+        currentlyBrowsingSeason = getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
 
         if (currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
-            if (getSwipeRefreshLayout() != null){
+            if (getSwipeRefreshLayout() != null) {
                 Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
-        } else {
-            getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries());
-//            getmAdapter().getData().clear();
-//            getmAdapter().getData().addAll(browsingSeries);
-
-//            getmAdapter().setSeriesFilter(null);
         }
+
+        getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries());
+//            getmAdapter().setSeriesFilter(null);
     }
 
     @Override
     public void hummingbirdSeasonReceived(List<ImageRequest> imageRequests, RealmList<Series> seriesList) {
         super.hummingbirdSeasonReceived(imageRequests, seriesList);
 
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().getName().equals("Summer 2013")){
+        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().getName().equals("Summer 2013")) {
             App.getInstance().setPostInitializing(false);
             App.getInstance().setGettingPostInitialImages(true);
         }
 
-        if (App.getInstance().isPostInitializing()){
+        if (App.getInstance().isPostInitializing()) {
             if (isVisible()) {
                 refreshToolbar();
             }
         }
 
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
 //            getmAdapter().getData().addAll(App.getInstance().getAiringList());
 
             if (isVisible()) {
@@ -190,7 +182,7 @@ public class SeasonsFragment extends SeriesFragment {
         allSeasons.addAll(getRealm().where(Season.class).findAll());
         Collections.sort(allSeasons, new SeasonComparator());
 
-        for (Season season : allSeasons){
+        for (Season season : allSeasons) {
             seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
 
             if (season.getName().equals(currentlyBrowsingSeason.getName())) {
