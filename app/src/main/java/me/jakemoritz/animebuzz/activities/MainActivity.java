@@ -318,13 +318,13 @@ public class MainActivity extends AppCompatActivity
                         if (series.getNextEpisodeAirtime() > 0) {
                             Calendar airdateCalendar = Calendar.getInstance();
                             airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, false);
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series.getMALID(), airdateCalendar, false);
                         }
 
                         if (series.getNextEpisodeSimulcastTime() > 0) {
                             Calendar airdateCalendar = Calendar.getInstance();
                             airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series, airdateCalendar, true);
+                            AlarmHelper.getInstance().calculateNextEpisodeTime(series.getMALID(), airdateCalendar, true);
                         }
                     }
 

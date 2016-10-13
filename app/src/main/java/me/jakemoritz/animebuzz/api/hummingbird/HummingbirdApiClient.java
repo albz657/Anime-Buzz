@@ -75,19 +75,18 @@ public class HummingbirdApiClient {
             callback.hummingbirdSeasonReceived(imageRequests, seriesList);
         } else {
             for (Series series : seriesList) {
-                getSeriesData(series);
+                getSeriesData(series.getMALID());
             }
         }
     }
 
-    void getSeriesData(Series series) {
-        final Series currSeries = series;
-
+    void getSeriesData(final String MALID) {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getMALID());
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID);
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
+                Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
                 if (response.isSuccessful()) {
                     processSeries(currSeries, response.body());
                 } else {
@@ -99,12 +98,13 @@ public class HummingbirdApiClient {
             @Override
             public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
                 finishedCheck();
-                Log.d(TAG, "Failed getting Hummingbird data for '" + currSeries.getName() + "'");
+                Log.d(TAG, "Failed getting Hummingbird data for '" +  "'");
             }
         });
     }
 
     private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
+
         String showType;
         boolean single = currSeries.isSingle();
         String airingStatus = "";
@@ -189,13 +189,13 @@ public class HummingbirdApiClient {
                 if (currSeries.getNextEpisodeAirtime() > 0) {
                     Calendar airdateCalendar = Calendar.getInstance();
                     airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
-                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries, airdateCalendar, false);
+                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
                 }
 
                 if (currSeries.getNextEpisodeSimulcastTime() > 0) {
                     Calendar airdateCalendar = Calendar.getInstance();
                     airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
-                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries, airdateCalendar, true);
+                    AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
                 }
 //            }
 

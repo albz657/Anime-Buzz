@@ -149,7 +149,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void senpaiSeasonRetrieved(Season season) {
+    public void senpaiSeasonRetrieved(String seasonKey) {
+        Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
         if (season != null) {
             if (App.getInstance().isNetworkAvailable()) {
 //                int index = App.getInstance().getAllAnimeSeasons().indexOf(season);

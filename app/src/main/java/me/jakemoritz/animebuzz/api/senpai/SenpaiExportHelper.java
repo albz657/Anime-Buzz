@@ -12,7 +12,6 @@ import io.realm.RealmList;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
 import okhttp3.OkHttpClient;
@@ -88,7 +87,7 @@ public class SenpaiExportHelper {
         }
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
+        gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
 /*        OkHttpClient client = new OkHttpClient.Builder()
@@ -103,10 +102,10 @@ public class SenpaiExportHelper {
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<Season> call = senpaiEndpointInterface.getSeasonData("json", season.getKey());
-        call.enqueue(new Callback<Season>() {
+        Call<String> call = senpaiEndpointInterface.getSeasonData("json", season.getKey());
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
+            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
                 if (response.isSuccessful()) {
                     if (App.getInstance().isPostInitializing()) {
                         if (App.getInstance().getSyncingSeasons().isEmpty()) {
@@ -130,7 +129,7 @@ public class SenpaiExportHelper {
             }
 
             @Override
-            public void onFailure(Call<Season> call, Throwable t) {
+            public void onFailure(Call<String> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(100);
                 Log.d(TAG, "Failed getting season data for: '" + season.getName() + "'");
@@ -146,7 +145,7 @@ public class SenpaiExportHelper {
         Log.d(TAG, "Getting latest season data");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(Season.class, new SeasonDeserializer());
+        gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -156,30 +155,27 @@ public class SenpaiExportHelper {
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<Season> call = senpaiEndpointInterface.getSeasonData("json", "raw");
-        call.enqueue(new Callback<Season>() {
+        Call<String> call = senpaiEndpointInterface.getSeasonData("json", "raw");
+        call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<Season> call, retrofit2.Response<Season> response) {
+            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
 
-                    Season season = response.body();
-                    season.setRelativeTime(Season.PRESENT);
+                    String cok = response.body();
+//                    Season season = response.body();
+//                    season.setRelativeTime(Season.PRESENT);
 
-                    if (!season.isManaged()){
+/*                    if (!season.isManaged()){
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
-
                         realm.copyToRealm(season);
-
                         realm.commitTransaction();
-
                         realm.close();
-                    }
+                    }*/
 
-
-                    SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
-                    SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());
+//                    SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
+//                    SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());
 
                     fragment.senpaiSeasonRetrieved(response.body());
                 } else {
@@ -190,7 +186,7 @@ public class SenpaiExportHelper {
             }
 
             @Override
-            public void onFailure(Call<Season> call, Throwable t) {
+            public void onFailure(Call<String> call, Throwable t) {
                 Log.d(TAG, "Failed getting latest season data");
 
                 fragment.senpaiSeasonRetrieved(null);

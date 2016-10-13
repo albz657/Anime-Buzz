@@ -65,17 +65,20 @@ public class AlarmHelper {
 
         if (airdate > 0) {
             Calendar airdateCalendar = dateFormatHelper.getCalFromSeconds(airdate);
-            calculateNextEpisodeTime(series, airdateCalendar, false);
+            calculateNextEpisodeTime(series.getMALID(), airdateCalendar, false);
         }
 
         if (simulcastAirdate > 0) {
             Calendar simulcastAidateCalendar = dateFormatHelper.getCalFromSeconds(simulcastAirdate);
-            calculateNextEpisodeTime(series, simulcastAidateCalendar, true);
+            calculateNextEpisodeTime(series.getMALID(), simulcastAidateCalendar, true);
         }
 
     }
 
-    public void calculateNextEpisodeTime(Series series, Calendar calendar, boolean simulcast) {
+    public void calculateNextEpisodeTime(String MALID, Calendar calendar, boolean simulcast) {
+        Realm realm = Realm.getDefaultInstance();
+        Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+
         Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));

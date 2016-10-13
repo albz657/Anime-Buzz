@@ -8,7 +8,7 @@ import retrofit2.http.Query;
 
 public interface SenpaiEndpointInterface {
     @GET("/export.php")
-    Call<Season> getSeasonData(@Query("type") String type, @Query("src") String source);
+    Call<String> getSeasonData(@Query("type") String type, @Query("src") String source);
 
     @GET("/export.php")
     Call<RealmList<Season>> getSeasonList(@Query("type") String type, @Query("src") String source);

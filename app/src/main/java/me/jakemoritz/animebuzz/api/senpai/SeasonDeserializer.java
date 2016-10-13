@@ -22,12 +22,12 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-class SeasonDeserializer implements JsonDeserializer<Season> {
+class SeasonDeserializer implements JsonDeserializer<String> {
 
     private static final String TAG = SeasonDeserializer.class.getSimpleName();
 
     @Override
-    public Season deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject jsonObject = json.getAsJsonObject();
 
         // Create SeasonMetadata object
@@ -54,18 +54,23 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
         Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
 
         if (season == null) {
-            season = new Season();
-            season.setKey(seasonKey);
-            season.setName(seasonName);
-            season.setStartDate(startTimestamp);
-            season.setRelativeTime(Season.calculateRelativeTime(seasonName));
-        } else {
             realm.beginTransaction();
-            season.setName(seasonName);
-            season.setStartDate(startTimestamp);
-            season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+
+            season = realm.createObject(Season.class, seasonKey);
             realm.commitTransaction();
+
+//            season.setKey(seasonKey);
+
+//            realm.beginTransaction();
+//            realm.copyToRealm(season);
+//            realm.commitTransaction();
         }
+
+        realm.beginTransaction();
+        season.setName(seasonName);
+        season.setStartDate(startTimestamp);
+        season.setRelativeTime(Season.calculateRelativeTime(seasonName));
+        realm.commitTransaction();
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
@@ -127,19 +132,22 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
                 Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
                 if (series == null) {
-                    series = new Series();
+                    realm.beginTransaction();
+                    series = realm.createObject(Series.class, MALID);
                     series.setName(seriesName);
-                    series.setMALID(MALID);
-                    series.setANNID(ANNID);
-                    series.setSimulcastProvider(simulcast);
-                    series.setSeason(season);
-                    series.setSimulcast_delay(simulcast_delay);
-                } else {
-                    series.setANNID(ANNID);
-                    series.setSimulcastProvider(simulcast);
-                    series.setSeason(season);
-                    series.setSimulcast_delay(simulcast_delay);
+//                    series.setMALID(MALID);
+                    realm.commitTransaction();
+//                    realm.beginTransaction();
+//                    realm.copyToRealm(series);
+//                    realm.commitTransaction();
                 }
+
+                realm.beginTransaction();
+                series.setANNID(ANNID);
+                series.setSimulcastProvider(simulcast);
+                series.setSeason(season);
+                series.setSimulcast_delay(simulcast_delay);
+                realm.commitTransaction();
 
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
@@ -148,13 +156,18 @@ class SeasonDeserializer implements JsonDeserializer<Season> {
                 }
 
                 seasonSeries.add(series);
+
             }
 
         }
 
+        realm.beginTransaction();
+        realm.copyToRealm(seasonSeries);
+
         season.setSeasonSeries(seasonSeries);
+        realm.commitTransaction();
 
         realm.close();
-        return season;
+        return seasonKey;
     }
 }

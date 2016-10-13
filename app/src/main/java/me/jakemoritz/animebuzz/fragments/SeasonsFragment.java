@@ -99,12 +99,13 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void senpaiSeasonRetrieved(Season season) {
+    public void senpaiSeasonRetrieved(String seasonKey) {
         if (App.getInstance().isInitializing()){
-            currentlyBrowsingSeason = season;
+            currentlyBrowsingSeason = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
+            ;
         }
 
-        super.senpaiSeasonRetrieved(season);
+        super.senpaiSeasonRetrieved(seasonKey);
     }
 
     private void loadSeason(String seasonName) {

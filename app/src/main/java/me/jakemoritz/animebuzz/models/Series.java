@@ -9,7 +9,6 @@ public class Series extends RealmObject{
     @PrimaryKey
     private String MALID = "";
     private String name = "";
-    private boolean currentlyAiring = false;
     private String simulcastProvider = "";
     private Season season;
     private String ANNID  = "";
@@ -31,32 +30,6 @@ public class Series extends RealmObject{
     private boolean isInUserList = false;
     private int episodesWatched = 0;
 
-   /* public Series(int episodesWatched, String MALID, String name, boolean currentlyAiring, String simulcastProvider, Season season, String ANNID, double simulcast_delay, long nextEpisodeAirtime, long nextEpisodeSimulcastTime, String nextEpisodeAirtimeFormatted, String nextEpisodeSimulcastTimeFormatted, String nextEpisodeAirtimeFormatted24, String nextEpisodeSimulcastTimeFormatted24, long lastNotificationTime, String englishTitle, String airingStatus, String showType, boolean single, String startedAiringDate, String finishedAiringDate, boolean shifted, boolean isInUserList) {
-        this.episodesWatched = episodesWatched;
-        this.MALID = MALID;
-        this.name = name;
-        this.currentlyAiring = currentlyAiring;
-        this.simulcastProvider = simulcastProvider;
-        this.season = season;
-        this.ANNID = ANNID;
-        this.simulcast_delay = simulcast_delay;
-        this.nextEpisodeAirtime = nextEpisodeAirtime;
-        this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
-        this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
-        this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
-        this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
-        this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
-        this.lastNotificationTime = lastNotificationTime;
-        this.englishTitle = englishTitle;
-        this.airingStatus = airingStatus;
-        this.showType = showType;
-        this.single = single;
-        this.startedAiringDate = startedAiringDate;
-        this.finishedAiringDate = finishedAiringDate;
-        this.shifted = shifted;
-        this.isInUserList = isInUserList;
-    }
-*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,8 +39,6 @@ public class Series extends RealmObject{
 
         return MALID == series.getMALID();
     }
-
-
 
     @Override
     public int hashCode() {
@@ -166,10 +137,6 @@ public class Series extends RealmObject{
         this.nextEpisodeAirtimeFormatted = nextEpisodeAirtimeFormatted;
     }
 
-    public void setCurrentlyAiring(boolean currentlyAiring) {
-        this.currentlyAiring = currentlyAiring;
-    }
-
     public void setSimulcastProvider(String simulcastProvider) {
         this.simulcastProvider = simulcastProvider;
     }
@@ -204,10 +171,6 @@ public class Series extends RealmObject{
 
     public String getANNID() {
         return ANNID;
-    }
-
-    public boolean isCurrentlyAiring() {
-        return currentlyAiring;
     }
 
     public Season getSeason() {

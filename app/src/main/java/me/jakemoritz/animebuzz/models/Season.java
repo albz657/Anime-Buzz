@@ -6,7 +6,6 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 
@@ -18,13 +17,8 @@ public class Season extends RealmObject {
 
     @PrimaryKey
     private String key;
-
-    @Required
     private String name;
-
     private RealmList<Series> seasonSeries;
-
-    @Required
     private String startDate;
     private String relativeTime;
 
