@@ -17,6 +17,13 @@
                 tools:context=".fragments.SeriesFragment"
                 android:scrollbars="vertical"/>
 
+        <com.futuremind.recyclerviewfastscroll.FastScroller
+            android:id="@+id/fastscroll"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"/>
+
             <include layout="@layout/empty_view"
                      android:visibility="gone"/>
 

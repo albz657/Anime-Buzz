@@ -10,12 +10,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 
 import io.realm.RealmRecyclerViewAdapter;
@@ -27,12 +26,11 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, SeriesRecyclerViewAdapter.ViewHolder> implements Filterable, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
+public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, SeriesRecyclerViewAdapter.ViewHolder> implements SectionTitleProvider, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
     private SeriesFragment seriesFragment = null;
-    private SeriesFilter seriesFilter;
     private SeriesRecyclerViewAdapter self;
     private ModifyItemStatusListener modifyListener;
 
@@ -238,11 +236,8 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
     }
 
     @Override
-    public Filter getFilter() {
-        if (seriesFilter == null) {
-            seriesFilter = new SeriesFilter(this, getData());
-        }
-        return seriesFilter;
+    public String getSectionTitle(int position) {
+        return null;
     }
 
     @Override
@@ -255,10 +250,6 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
     private void addSeriesHelper(Series series) {
         seriesFragment.setAdding(true);
         modifyListener.modifyItem(series);
-    }
-
-    public void setSeriesFilter(SeriesFilter seriesFilter) {
-        this.seriesFilter = seriesFilter;
     }
 
     public interface ModifyItemStatusListener {

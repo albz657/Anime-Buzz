@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.futuremind.recyclerviewfastscroll.FastScroller;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -96,6 +98,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
 
         recyclerView.setAdapter(mAdapter);
+
+        FastScroller fastScroller = (FastScroller) swipeRefreshLayout.findViewById(R.id.fastscroll);
+        fastScroller.setRecyclerView(recyclerView);
 
         return swipeRefreshLayout;
     }

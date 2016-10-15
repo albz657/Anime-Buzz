@@ -3,11 +3,9 @@ package me.jakemoritz.animebuzz.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -209,7 +207,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         getMainActivity().getMenuInflater().inflate(R.menu.seasons_menu, menu);
-
+/*
         final MenuItem item = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(item);
         searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
@@ -244,7 +242,7 @@ public class SeasonsFragment extends SeriesFragment {
                                           }
         );
 
-        searchView.setEnabled(false);
+        searchView.setEnabled(false);*/
     }
 
     public Season getCurrentlyBrowsingSeason() {
