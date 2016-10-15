@@ -17,8 +17,6 @@ import java.util.List;
 
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.ImageRequest;
-import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
-import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -30,8 +28,6 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
 
     private SeriesFragment seriesFragment;
     private RealmList<Series> seriesList;
-    private List<ImageRequest> imageRequests;
-    private int max;
 
     public GetImageTask(SeriesFragment seriesFragment, RealmList<Series> seriesList) {
         this.seriesFragment = seriesFragment;
@@ -40,29 +36,18 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
 
     @Override
     protected Void doInBackground(List<ImageRequest>... imageRequests) {
-        this.imageRequests = imageRequests[0];
-        max = this.imageRequests.size();
+        List<ImageRequest> requests = imageRequests[0];
+        int max = requests.size();
 
         if (max == 0) {
             return null;
         }
 
-        if (!App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
-//            NotificationHelper.getInstance().createImagesNotification(max, 0);
-        }
-
-        if (App.getInstance().isGettingPostInitialImages()) {
-//            NotificationHelper.getInstance().createOtherImagesNotification();
-        }
-
-        for (Object imageRequestObject : imageRequests[0].toArray()) {
-            ImageRequest imageRequest = (ImageRequest) imageRequestObject;
+        for (ImageRequest imageRequest : requests) {
             try {
                 Bitmap bitmap = Picasso.with(App.getInstance()).load(imageRequest.getURL()).memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE).get();
                 imageRequest.setBitmap(bitmap);
                 cachePoster(imageRequest);
-
-                publishProgress(imageRequest);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -73,16 +58,11 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
 
     @Override
     protected void onProgressUpdate(ImageRequest... values) {
-        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserList().contains(values[0].getSeries())) {
+/*        if (seriesFragment instanceof CurrentlyWatchingFragment && App.getInstance().getUserList().contains(values[0].getSeries())) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesFragment.getmAdapter().getData().indexOf(values[0].getSeries()));
         } else if (values[0].getSeries().getSeason().equals(((SeasonsFragment) seriesFragment).getCurrentlyBrowsingSeason()) || values[0].getSeries().isShifted()) {
             seriesFragment.getmAdapter().notifyItemChanged(seriesList.indexOf(values[0].getSeries()));
-        }
-
-        if (!App.getInstance().isGettingPostInitialImages() && !App.getInstance().isPostInitializing()) {
-//            NotificationHelper.getInstance().createImagesNotification(max, imageRequests.indexOf(values[0]));
-        }
-
+        }*/
 
         super.onProgressUpdate(values);
     }
@@ -96,7 +76,6 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
 
         if (!App.getInstance().isGettingInitialImages() && App.getInstance().isGettingPostInitialImages()) {
             NotificationHelper.getInstance().setCurrentSyncingSeasons(NotificationHelper.getInstance().getCurrentSyncingSeasons() + 1);
-//            NotificationHelper.getInstance().createOtherImagesNotification();
         }
 
         seriesFragment.hummingbirdSeasonImagesReceived();
@@ -115,7 +94,7 @@ public class GetImageTask extends AsyncTask<List<ImageRequest>, ImageRequest, Vo
     private void cachePoster(ImageRequest imageRequest) {
         FileOutputStream fos = null;
         try {
-            File file = getCachedPosterFile(imageRequest.getSeries().getMALID());
+            File file = getCachedPosterFile(imageRequest.getMALID());
             if (file != null) {
                 fos = new FileOutputStream(file);
                 imageRequest.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, fos);

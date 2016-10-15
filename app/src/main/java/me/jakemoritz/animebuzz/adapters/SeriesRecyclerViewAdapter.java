@@ -80,7 +80,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.series = getData().get(position);
+        holder.series = getItem(position);
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.series.getEnglishTitle());

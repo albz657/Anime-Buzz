@@ -6,22 +6,14 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class ImageRequest {
 
-    private Series series;
+    private String MALID;
     private String URL;
     private Bitmap bitmap;
 
     public ImageRequest(Series series) {
-        this.series = series;
+        this.MALID = series.getMALID();
         this.URL = "";
         this.bitmap = null;
-    }
-
-    public Series getSeries() {
-        return series;
-    }
-
-    public void setSeries(Series series) {
-        this.series = series;
     }
 
     public String getURL() {
@@ -38,5 +30,9 @@ public class ImageRequest {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public String getMALID() {
+        return MALID;
     }
 }

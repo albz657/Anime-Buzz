@@ -83,15 +83,13 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        super.onRefresh();
-
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getSeasonData(currentlyBrowsingSeason);
             setUpdating(true);
         } else {
             stopRefreshing();
-            if (getSwipeRefreshLayout() != null) {
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            if (getView() != null) {
+                Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         }
     }
@@ -110,8 +108,8 @@ public class SeasonsFragment extends SeriesFragment {
         currentlyBrowsingSeason = getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
 
         if (currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
-            if (getSwipeRefreshLayout() != null) {
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
+            if (getView() != null) {
+                Snackbar.make(getView(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
             }
         }
 

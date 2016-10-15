@@ -55,15 +55,8 @@ class SeasonDeserializer implements JsonDeserializer<String> {
 
         if (season == null) {
             realm.beginTransaction();
-
             season = realm.createObject(Season.class, seasonKey);
             realm.commitTransaction();
-
-//            season.setKey(seasonKey);
-
-//            realm.beginTransaction();
-//            realm.copyToRealm(season);
-//            realm.commitTransaction();
         }
 
         realm.beginTransaction();
@@ -135,11 +128,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                     realm.beginTransaction();
                     series = realm.createObject(Series.class, MALID);
                     series.setName(seriesName);
-//                    series.setMALID(MALID);
                     realm.commitTransaction();
-//                    realm.beginTransaction();
-//                    realm.copyToRealm(series);
-//                    realm.commitTransaction();
                 }
 
                 realm.beginTransaction();
@@ -148,7 +137,6 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 series.setSeason(season);
                 series.setSimulcast_delay(simulcast_delay);
                 realm.commitTransaction();
-
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                     AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
@@ -163,7 +151,6 @@ class SeasonDeserializer implements JsonDeserializer<String> {
 
         realm.beginTransaction();
         realm.copyToRealm(seasonSeries);
-
         season.setSeasonSeries(seasonSeries);
         realm.commitTransaction();
 

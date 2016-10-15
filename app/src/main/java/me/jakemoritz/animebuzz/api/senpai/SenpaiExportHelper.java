@@ -162,21 +162,6 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "Got latest season data");
 
-                    String cok = response.body();
-//                    Season season = response.body();
-//                    season.setRelativeTime(Season.PRESENT);
-
-/*                    if (!season.isManaged()){
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        realm.copyToRealm(season);
-                        realm.commitTransaction();
-                        realm.close();
-                    }*/
-
-//                    SharedPrefsHelper.getInstance().setLatestSeasonName(season.getName());
-//                    SharedPrefsHelper.getInstance().setLatestSeasonKey(season.getKey());
-
                     fragment.senpaiSeasonRetrieved(response.body());
                 } else {
                     Log.d(TAG, "Failed getting latest season data");

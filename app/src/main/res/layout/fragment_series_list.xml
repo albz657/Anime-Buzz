@@ -1,25 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <data>
-
-        <import type="android.view.View"/>
-        <import type="io.realm.OrderedRealmCollection"/>
-        <import type="me.jakemoritz.animebuzz.models.Series"/>
-        <variable
-            name="dataset"
-            type="OrderedRealmCollection" />
-    </data>
-
     <android.support.v4.widget.SwipeRefreshLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <FrameLayout
-            android:id="@+id/swipe_view_holder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/list"
@@ -29,38 +13,12 @@
                 android:layout_marginLeft="2dp"
                 android:layout_marginRight="2dp"
                 android:layout_marginTop="5dp"
-                android:visibility="visible"
                 app:layoutManager="LinearLayoutManager"
                 tools:context=".fragments.SeriesFragment"
                 android:scrollbars="vertical"/>
 
-            <RelativeLayout
-                android:id="@+id/empty_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone">
-
-                <TextView
-                    android:id="@+id/empty_text"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/empty_image"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginBottom="10dp"
-                    android:width="300dp"
-                    android:gravity="center"
-                    android:textColor="#59000000" />
-
-                <ImageView
-                    android:id="@+id/empty_image"
-                    android:layout_width="128dp"
-                    android:layout_height="160dp"
-                    android:layout_centerInParent="true"
-                    android:src="@drawable/empty" />
-            </RelativeLayout>
-        </FrameLayout>
-
+            <include layout="@layout/empty_view"
+                     android:visibility="gone"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 </layout>

@@ -54,14 +54,13 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
     private SeriesRecyclerViewAdapter mAdapter;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private MalApiClient malApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
     private MainActivity mainActivity;
-    private RecyclerView recyclerView;
     private Realm realm;
 
     @Override
@@ -76,13 +75,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        container.clearDisappearingChildren();
-        container.removeAllViews();
-
-//        FragmentSeriesListBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_series_list, container, false);
+//        container.clearDisappearingChildren();
+//        container.removeAllViews();
 
         swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
-        recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
+        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
         RelativeLayout emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
@@ -98,8 +95,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
-//        binding.setDataset(getmAdapter().getData());
-
         recyclerView.setAdapter(mAdapter);
 
         return swipeRefreshLayout;
@@ -113,10 +108,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
         if (App.getInstance().isJustLaunched()) {
             onRefresh();
-            getSwipeRefreshLayout().post(new Runnable() {
+            swipeRefreshLayout.post(new Runnable() {
                 @Override
                 public void run() {
-                    getSwipeRefreshLayout().setRefreshing(true);
+                    swipeRefreshLayout.setRefreshing(true);
                 }
             });
             App.getInstance().setJustLaunched(false);
@@ -142,29 +137,21 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void onRefresh() {
-        if (mainActivity.updateFormattedTimes()) {
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
         Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
         if (season != null) {
             if (App.getInstance().isNetworkAvailable()) {
-//                int index = App.getInstance().getAllAnimeSeasons().indexOf(season);
                 new HummingbirdApiClient(this).processSeriesList(season.getSeasonSeries());
             } else {
                 stopRefreshing();
-                if (swipeRefreshLayout != null) {
-                    Snackbar.make(swipeRefreshLayout, getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         } else {
             if (!App.getInstance().isInitializing()) {
-                if (swipeRefreshLayout != null) {
-                    Snackbar.make(swipeRefreshLayout, getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
                 }
 
                 stopRefreshing();
@@ -186,10 +173,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             NotificationHelper.getInstance().setCurrentSyncingSeasons(0);
 
             senpaiExportHelper.getSeasonList();
-        }
-
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
-//            mAdapter.notifyDataSetChanged();
         }
     }
 
@@ -227,10 +210,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void malDataImported(boolean received) {
-        if (received) {
-//            mAdapter.notifyDataSetChanged();
-        }
-
         if (updating) {
             stopRefreshing();
         }
@@ -287,7 +266,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     public void stopRefreshing() {
-        if (swipeRefreshLayout != null) {
+        if (getView() != null) {
             swipeRefreshLayout.setRefreshing(false);
             updating = false;
             swipeRefreshLayout.destroyDrawingCache();
@@ -312,14 +291,13 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             addSeries(itemToBeChanged);
         } else {
             adding = false;
-            if (swipeRefreshLayout != null)
-                Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_LONG).show();
+            if (getView() != null)
+                Snackbar.make(getView(), App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
     private void addSeries(final Series item) {
         adding = false;
-
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -327,27 +305,14 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 item.setInUserList(true);
             }
         });
-
-        if (this instanceof CurrentlyWatchingFragment) {
-
-        }
-
-//        App.getInstance().getCircleBitmap(item);
-
-//        getmAdapter().notifyDataSetChanged();
-
         AlarmHelper.getInstance().makeAlarm(item);
 
-
-        if (swipeRefreshLayout != null)
-            Snackbar.make(swipeRefreshLayout, "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
+        if (getView() != null)
+            Snackbar.make(getView(), "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
 
     }
 
     private void removeSeries(final Series item) {
-//        App.getInstance().setJustRemoved(true);
-
-
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
@@ -355,17 +320,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             }
         });
 
-        if (this instanceof CurrentlyWatchingFragment) {
-//            getmAdapter().getVisibleSeries().remove(item);
-//            getmAdapter().getAllSeries().remove(item);
-        }
-
-//        getmAdapter().notifyDataSetChanged();
-
         AlarmHelper.getInstance().removeAlarm(item);
 
-        if (swipeRefreshLayout != null)
-            Snackbar.make(swipeRefreshLayout, "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+        if (getView() != null)
+            Snackbar.make(getView(), "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
     @Override
@@ -373,8 +331,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         if (deleted) {
             removeSeries(itemToBeChanged);
         } else {
-            if (swipeRefreshLayout != null)
-                Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_LONG).show();
+            if (getView() != null)
+                Snackbar.make(getView(), App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -394,8 +352,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
                 malApiClient.verify(username, password);
             } else {
                 adding = false;
-                if (swipeRefreshLayout != null)
-                    Snackbar.make(swipeRefreshLayout, App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                if (getView() != null)
+                    Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (adding) {
@@ -431,8 +389,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void verified(boolean verified) {
-        if (verified && swipeRefreshLayout != null) {
-            Snackbar.make(swipeRefreshLayout, "Your MAL credentials have been verified.", Snackbar.LENGTH_LONG).show();
+        if (verified && getView() != null) {
+            Snackbar.make(getView(), "Your MAL credentials have been verified.", Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -440,10 +398,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     public SeriesRecyclerViewAdapter getmAdapter() {
         return mAdapter;
-    }
-
-    public SwipeRefreshLayout getSwipeRefreshLayout() {
-        return swipeRefreshLayout;
     }
 
     public boolean isUpdating() {
@@ -468,10 +422,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     public MainActivity getMainActivity() {
         return mainActivity;
-    }
-
-    public RecyclerView getRecyclerView() {
-        return recyclerView;
     }
 
     public Realm getRealm() {

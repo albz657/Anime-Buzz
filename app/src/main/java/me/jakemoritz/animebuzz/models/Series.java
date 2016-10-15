@@ -11,6 +11,7 @@ public class Series extends RealmObject{
     private String name = "";
     private String simulcastProvider = "";
     private Season season;
+    private String seasonKey;
     private String ANNID  = "";
     private double simulcast_delay = 0;
     private long nextEpisodeAirtime = 0L;
@@ -179,6 +180,7 @@ public class Series extends RealmObject{
 
     public void setSeason(Season season) {
         this.season = season;
+        this.seasonKey = season.getKey();
     }
 
     public String getName() {

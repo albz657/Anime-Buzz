@@ -51,15 +51,13 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        super.onRefresh();
-
         if (App.getInstance().isNetworkAvailable()) {
             getSenpaiExportHelper().getLatestSeasonData();
             setUpdating(true);
         } else {
             stopRefreshing();
-            if (getSwipeRefreshLayout() != null) {
-                Snackbar.make(getSwipeRefreshLayout(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            if (getView() != null) {
+                Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
         }
     }
