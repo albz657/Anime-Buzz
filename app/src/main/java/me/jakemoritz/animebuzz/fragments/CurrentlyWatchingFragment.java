@@ -149,7 +149,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         } else {
             if (SharedPrefsHelper.getInstance().prefersSimulcast()){
                 sort = "nextEpisodeSimulcastTime";
-            } else if (sort.equals("date")){
+            } else if (sort.equals("date") || sort.isEmpty()){
                 // supports upgrading users
                 sort = "nextEpisodeAirtime";
             }

@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity
 
             // fix old databases
             if (doesOldDatabaseExist()) {
-                deleteOldImages();
                 DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
 //                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
                 deleteOldImages();
@@ -125,14 +124,10 @@ public class MainActivity extends AppCompatActivity
             }
 
             if (doesSugarDatabaseExist()) {
-                deleteOldImages();
-
                 SugarMigrator.migrateToRealm();
 //                deleteDatabase("buzz_sugar.db");
                 deleteOldImages();
-                // delete images
             }
-
 
             updateFormattedTimes();
 
@@ -191,20 +186,24 @@ public class MainActivity extends AppCompatActivity
         File appDir = new File(cache.getParent());
 
         // deletes images from cache
-        for (String file : cache.list()){
-            if (file.contains(".jpg")){
-                File imageFile = new File(cache.getPath() + "/" + file);
-                imageFile.delete();
+        if (cache.exists()){
+            for (String file : cache.list()){
+                if (file.contains(".jpg")){
+                    File imageFile = new File(cache.getPath() + "/" + file);
+                    imageFile.delete();
+                }
             }
         }
 
         File files = new File(appDir.getPath() + "/app_cache/images");
 
         // deletes images from old incorrect cache
-        for (String file : files.list()){
-            if (file.contains(".jpg")){
-                File imageFile = new File(files.getPath() + "/" + file);
-                imageFile.delete();
+        if (files.exists()){
+            for (String file : files.list()){
+                if (file.contains(".jpg")){
+                    File imageFile = new File(files.getPath() + "/" + file);
+                    imageFile.delete();
+                }
             }
         }
     }
