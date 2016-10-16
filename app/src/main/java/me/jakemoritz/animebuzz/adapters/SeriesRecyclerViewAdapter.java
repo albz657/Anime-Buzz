@@ -14,7 +14,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.futuremind.recyclerviewfastscroll.SectionTitleProvider;
 import com.squareup.picasso.Picasso;
 
 import io.realm.RealmRecyclerViewAdapter;
@@ -26,7 +25,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, SeriesRecyclerViewAdapter.ViewHolder> implements SectionTitleProvider, RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
+public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, SeriesRecyclerViewAdapter.ViewHolder> implements RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
     private static final String TAG = SeriesRecyclerViewAdapter.class.getSimpleName();
 
@@ -233,18 +232,6 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
                 dialogFragment.show(seriesFragment.getMainActivity().getFragmentManager(), TAG);
             }
         });
-    }
-
-    @Override
-    public String getSectionTitle(int position) {
-        Series series = getItem(position);
-        String title;
-        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()){
-            title = series.getEnglishTitle();
-        } else {
-            title = series.getName();
-        }
-        return title.substring(0, 1);
     }
 
     @Override

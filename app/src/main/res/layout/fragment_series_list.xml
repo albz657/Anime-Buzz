@@ -12,18 +12,9 @@
                                                 android:name="me.jakemoritz.animebuzz.fragments.SeriesFragment"
                                                 android:layout_width="match_parent"
                                                 android:layout_height="match_parent"
-                                                android:layout_marginLeft="2dp"
-                                                android:layout_marginRight="2dp"
-                                                android:layout_marginTop="5dp"
+                                                android:scrollbars="vertical"
                                                 app:layoutManager="LinearLayoutManager"
                                                 tools:context=".fragments.SeriesFragment"/>
-
-        <com.futuremind.recyclerviewfastscroll.FastScroller
-            android:id="@+id/fastscroll"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:orientation="vertical"/>
 
         <include
             layout="@layout/empty_view"
