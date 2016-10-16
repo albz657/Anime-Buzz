@@ -135,7 +135,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 series.setANNID(ANNID);
                 series.setSimulcastProvider(simulcast);
                 series.setSeason(season);
-                series.setSimulcast_delay(simulcast_delay);
+                series.setSimulcastDelay(simulcast_delay);
                 realm.commitTransaction();
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {

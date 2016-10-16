@@ -28,16 +28,6 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
-    public boolean upgradedToRealm(){
-        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.upgraded_to_realm), false);
-    }
-
-    public void setUpgradedToRealm(boolean upgraded){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(App.getInstance().getString(R.string.upgraded_to_realm), upgraded);
-        editor.apply();
-    }
-
     public boolean hasCompletedSetup(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.shared_prefs_completed_setup), false);
     }

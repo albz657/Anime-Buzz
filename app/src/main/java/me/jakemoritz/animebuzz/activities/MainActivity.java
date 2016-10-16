@@ -41,6 +41,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
+import me.jakemoritz.animebuzz.data.SugarMigrator;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
@@ -123,12 +124,11 @@ public class MainActivity extends AppCompatActivity
                 App.getInstance().setJustUpdated(true);
             }
 
-            // Upgrade old/sugar database to Realm
-            if (!SharedPrefsHelper.getInstance().upgradedToRealm()) {
-                // FILL IN
-
-                SharedPrefsHelper.getInstance().setUpgradedToRealm(true);
+            if (doesSugarDatabaseExist()){
+                SugarMigrator.migrateToRealm();
+//                deleteDatabase("buzz_sugar.db");
             }
+
 
             updateFormattedTimes();
 
@@ -353,6 +353,11 @@ public class MainActivity extends AppCompatActivity
 
     private boolean doesOldDatabaseExist() {
         File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
+        return dbFile.exists();
+    }
+
+    private boolean doesSugarDatabaseExist() {
+        File dbFile = App.getInstance().getDatabasePath("buzz_sugar.db");
         return dbFile.exists();
     }
 

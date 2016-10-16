@@ -12,7 +12,7 @@ public class Series extends RealmObject{
     private String simulcastProvider = "";
     private Season season;
     private String ANNID  = "";
-    private double simulcast_delay = 0;
+    private double simulcastDelay = 0;
     private long nextEpisodeAirtime = 0L;
     private long nextEpisodeSimulcastTime = 0L;
     private String nextEpisodeAirtimeFormatted = "";
@@ -136,12 +136,12 @@ public class Series extends RealmObject{
         this.nextEpisodeSimulcastTime = nextEpisodeSimulcastTime;
     }
 
-    public double getSimulcast_delay() {
-        return simulcast_delay;
+    public double getSimulcastDelay() {
+        return simulcastDelay;
     }
 
-    public void setSimulcast_delay(double simulcast_delay) {
-        this.simulcast_delay = simulcast_delay;
+    public void setSimulcastDelay(double simulcastDelay) {
+        this.simulcastDelay = simulcastDelay;
     }
 
     public String getANNID() {

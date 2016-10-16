@@ -1,6 +1,11 @@
 package me.jakemoritz.animebuzz.data;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import io.realm.Realm;
+import me.jakemoritz.animebuzz.models.Alarm;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class AlarmsDataHelper {
 
@@ -22,52 +27,31 @@ public class AlarmsDataHelper {
         return mInstance;
     }
 
-    // retrieval
-
-/*
-    public List<Alarm> getAllAlarms(SQLiteDatabase database) {
-        List<Alarm> alarms = new ArrayList<>();
+    void upgradeAlarms(SQLiteDatabase database) {
         Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
+
+        Realm realm = Realm.getDefaultInstance();
 
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            Alarm tempAlarm = getAlarmWithCursor(cursor);
-            alarms.add(tempAlarm);
+            final Long id = cursor.getLong(cursor.getColumnIndex(KEY_ALARM_ID));
+            final long time = cursor.getLong(cursor.getColumnIndex(KEY_ALARM_TIME));
+            final String name = cursor.getString(cursor.getColumnIndex(KEY_ALARM_NAME));
             cursor.moveToNext();
+
+            final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(id)).findFirst();
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Alarm alarm = realm.createObject(Alarm.class, String.valueOf(id));
+                    alarm.setSeries(series);
+                    alarm.setAlarmTime(time);
+                }
+            });
         }
 
+        realm.close();
         cursor.close();
-
-        return alarms;
-    }
-
-    private Alarm getAlarmWithCursor(Cursor res) {
-        Long id = res.getLong(res.getColumnIndex(KEY_ALARM_ID));
-        long time = res.getLong(res.getColumnIndex(KEY_ALARM_TIME));
-        String name = res.getString(res.getColumnIndex(KEY_ALARM_NAME));
-
-        return new Alarm(name, time, id, -1);
-    }
-*/
-
-
-
-    // misc
-
-    void upgradeAlarms(SQLiteDatabase database) {
-      /*  List<Alarm> oldAlarms = getAllAlarms(database);
-
-        for (Alarm alarm : oldAlarms) {
-            alarm.setMALID(alarm.getId().intValue());
-            alarm.save();
-        }
-
-        AlarmHelper.getInstance().cancelAllAlarms(oldAlarms);
-
-        List<Alarm> upgradedAlarms = Alarm.listAll(Alarm.class);
-
-        App.getInstance().setAlarms(upgradedAlarms);
-
-        AlarmHelper.getInstance().setAlarmsOnBoot();*/
     }
 }
