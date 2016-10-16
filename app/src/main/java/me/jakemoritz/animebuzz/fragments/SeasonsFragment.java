@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.realm.OrderedRealmCollection;
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
@@ -105,6 +106,7 @@ public class SeasonsFragment extends SeriesFragment {
     private void loadSeason(String seasonName) {
         currentlyBrowsingSeason = getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
 
+
         if (currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
             if (getView() != null) {
                 Snackbar.make(getView(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
@@ -112,12 +114,19 @@ public class SeasonsFragment extends SeriesFragment {
         }
 
         String sort;
-        if (SharedPrefsHelper.getInstance().prefersEnglish()){
-           sort = "englishTitle";
+        if (SharedPrefsHelper.getInstance().prefersEnglish()) {
+            sort = "englishTitle";
         } else {
             sort = "name";
         }
-        getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries().sort(sort));
+
+        OrderedRealmCollection<Series> seasonSeries;
+        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+            seasonSeries = getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAll();
+        } else {
+            seasonSeries = currentlyBrowsingSeason.getSeasonSeries();
+        }
+        getmAdapter().updateData(seasonSeries.sort(sort));
 //            getmAdapter().setSeriesFilter(null);
     }
 
