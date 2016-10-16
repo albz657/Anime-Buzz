@@ -47,7 +47,6 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
         callback.hummingbirdSeasonReceived(imageRequests, seriesList);
-
     }
 
     private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
@@ -129,8 +128,8 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
 
     private void checkForSeasonSwitch(final Series currSeries) {
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-//        Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
         if (!currSeries.getSeason().getName().equals(latestSeasonName)) {
+            // generate times for series airing but not in current season
             if (currSeries.getNextEpisodeAirtime() > 0) {
                 Calendar airdateCalendar = Calendar.getInstance();
                 airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
@@ -142,11 +141,6 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
                 airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
                 AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
             }
-
-/*            realm.beginTransaction();
-            currSeries.setShifted(true);
-            latestSeason.getSeasonSeries().add(currSeries);
-            realm.commitTransaction();*/
         }
     }
 }

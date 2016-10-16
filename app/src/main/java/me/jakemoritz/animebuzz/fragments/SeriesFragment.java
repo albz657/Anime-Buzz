@@ -79,9 +79,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-//        container.clearDisappearingChildren();
-//        container.removeAllViews();
-
         swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
@@ -169,12 +166,17 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void senpaiSeasonRetrieved(String seasonKey) {
         Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
         if (season != null) {
-            if (App.getInstance().isNetworkAvailable()) {
-                new HummingbirdApiClient(this).processSeriesList(season.getSeasonSeries());
+            if (App.getInstance().isInitializing() && season.getSeasonSeries().isEmpty()) {
+                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+                failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
             } else {
-                stopRefreshing();
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                if (App.getInstance().isNetworkAvailable()) {
+                    new HummingbirdApiClient(this).processSeriesList(season.getSeasonSeries());
+                } else {
+                    stopRefreshing();
+                    if (getView() != null) {
+                        Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                    }
                 }
             }
         } else {

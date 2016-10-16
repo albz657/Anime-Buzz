@@ -11,7 +11,6 @@ public class Series extends RealmObject{
     private String name = "";
     private String simulcastProvider = "";
     private Season season;
-    private String seasonKey;
     private String ANNID  = "";
     private double simulcast_delay = 0;
     private long nextEpisodeAirtime = 0L;
@@ -27,7 +26,6 @@ public class Series extends RealmObject{
     private boolean single = false;
     private String startedAiringDate = "";
     private String finishedAiringDate = "";
-    private boolean shifted = false;
     private boolean isInUserList = false;
     private int episodesWatched = 0;
 
@@ -38,7 +36,7 @@ public class Series extends RealmObject{
 
         Series series = (Series) o;
 
-        return MALID == series.getMALID();
+        return MALID.equals(series.getMALID());
     }
 
     @Override
@@ -82,10 +80,6 @@ public class Series extends RealmObject{
         this.episodesWatched = episodesWatched;
     }
 
-    String getNextEpisodeSimulcastTimeFormatted24() {
-        return nextEpisodeSimulcastTimeFormatted24;
-    }
-
     public void setNextEpisodeSimulcastTimeFormatted24(String nextEpisodeSimulcastTimeFormatted24) {
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
     }
@@ -98,14 +92,6 @@ public class Series extends RealmObject{
         this.finishedAiringDate = finishedAiringDate;
     }
 
-    public boolean isShifted() {
-        return shifted;
-    }
-
-    public void setShifted(boolean shifted) {
-        this.shifted = shifted;
-    }
-
     public String getStartedAiringDate() {
         return startedAiringDate;
     }
@@ -114,24 +100,12 @@ public class Series extends RealmObject{
         this.startedAiringDate = startedAiringDate;
     }
 
-    String getNextEpisodeAirtimeFormatted24() {
-        return nextEpisodeAirtimeFormatted24;
-    }
-
     public void setNextEpisodeAirtimeFormatted24(String nextEpisodeAirtimeFormatted24) {
         this.nextEpisodeAirtimeFormatted24 = nextEpisodeAirtimeFormatted24;
     }
 
-    String getNextEpisodeSimulcastTimeFormatted() {
-        return nextEpisodeSimulcastTimeFormatted;
-    }
-
     public void setNextEpisodeSimulcastTimeFormatted(String nextEpisodeSimulcastTimeFormatted) {
         this.nextEpisodeSimulcastTimeFormatted = nextEpisodeSimulcastTimeFormatted;
-    }
-
-    String getNextEpisodeAirtimeFormatted() {
-        return nextEpisodeAirtimeFormatted;
     }
 
     public void setNextEpisodeAirtimeFormatted(String nextEpisodeAirtimeFormatted) {
@@ -180,7 +154,6 @@ public class Series extends RealmObject{
 
     public void setSeason(Season season) {
         this.season = season;
-        this.seasonKey = season.getKey();
     }
 
     public String getName() {

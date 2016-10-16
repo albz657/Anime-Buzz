@@ -43,9 +43,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
-
         loadUserSortingPreference();
-
         super.onViewCreated(view, savedInstanceState);
     }
 
@@ -143,28 +141,18 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             return;
         }
 
-        if (SharedPrefsHelper.getInstance().getSortingPreference().equals("name")) {
-            sortByName();
+        String sort = SharedPrefsHelper.getInstance().getSortingPreference();
+        if (sort.equals("name")){
+            if (SharedPrefsHelper.getInstance().prefersEnglish()) {
+                sort = "englishTitle";
+            }
         } else {
-            sortByDate();
+            if (SharedPrefsHelper.getInstance().prefersSimulcast()){
+                sort = "nextEpisodeSimulcastTime";
+            }
         }
-    }
 
-    private void sortByDate() {
-        SharedPrefsHelper.getInstance().setSortingPreference("date");
-
-//        Collections.sort(getmAdapter().getData(), new NextEpisodeTimeComparator());
-
-//        getmAdapter().getVisibleSeries().clear();
-//        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
-    }
-
-    private void sortByName() {
-        SharedPrefsHelper.getInstance().setSortingPreference("name");
-
-//        Collections.sort(getmAdapter().getData(), new SeriesNameComparator());
-//        getmAdapter().getVisibleSeries().clear();
-//        getmAdapter().getVisibleSeries().addAll(getmAdapter().getAllSeries());
+        getmAdapter().updateData(getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort));
     }
 
     @Override
@@ -186,13 +174,15 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 public boolean onMenuItemClick(MenuItem item) {
                     int id = item.getItemId();
 
+                    String sort = "";
                     if (id == R.id.action_sort_date) {
-                        sortByDate();
+                        sort = "nextEpisodeAirtime";
                     } else if (id == R.id.action_sort_name) {
-                        sortByName();
+                        sort = "name";
                     }
+                    SharedPrefsHelper.getInstance().setSortingPreference(sort);
+                    loadUserSortingPreference();
 
-                    getmAdapter().notifyDataSetChanged();
                     return false;
                 }
             });
