@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.Alarm;
@@ -70,7 +71,7 @@ public class SugarMigrator {
         migrateAlarms(sugarDb);
     }
 
-    private static void migrateSeason(SQLiteDatabase sugarDb){
+    private static void migrateSeason(SQLiteDatabase sugarDb) {
         Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SEASON, null);
         cursor.moveToFirst();
@@ -92,7 +93,7 @@ public class SugarMigrator {
         }
 
         RealmResults<Season> seasonRealmResults = realm.where(Season.class).findAll();
-        for (Season season : seasonRealmResults){
+        for (Season season : seasonRealmResults) {
             String relativeTime = Season.calculateRelativeTime(season.getName());
             realm.beginTransaction();
             season.setRelativeTime(relativeTime);
@@ -102,7 +103,7 @@ public class SugarMigrator {
         realm.close();
     }
 
-    private static void migrateSeries(SQLiteDatabase sugarDb){
+    private static void migrateSeries(SQLiteDatabase sugarDb) {
         Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SERIES, null);
         cursor.moveToFirst();
@@ -171,7 +172,7 @@ public class SugarMigrator {
             series.setEnglishTitle(englishTitle);
             realm.commitTransaction();
 
-            if (airingStatus.equals("Airing")){
+            if (airingStatus.equals("Airing")) {
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
             }
 
@@ -181,12 +182,11 @@ public class SugarMigrator {
         realm.close();
     }
 
-    private static void migrateBacklog(SQLiteDatabase sugarDb){
+    private static void migrateBacklog(SQLiteDatabase sugarDb) {
         Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_BACKLOG, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            final int id = cursor.getInt(cursor.getColumnIndex(BACKLOG_ID));
             final long alarmTime = cursor.getLong(cursor.getColumnIndex(BACKLOG_TIME));
             int seriesMALID = cursor.getInt(cursor.getColumnIndex(SERIES));
             final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
@@ -194,7 +194,7 @@ public class SugarMigrator {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    BacklogItem backlogItem = realm.createObject(BacklogItem.class, id);
+                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                     backlogItem.setAlarmTime(alarmTime);
                     backlogItem.setSeries(series);
                 }
@@ -207,24 +207,25 @@ public class SugarMigrator {
         realm.close();
     }
 
-    private static void migrateAlarms(SQLiteDatabase sugarDb){
+    private static void migrateAlarms(SQLiteDatabase sugarDb) {
         Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ALARM, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            final int id = cursor.getInt(cursor.getColumnIndex(ALARM_ID));
-            final long alarmTime = (long) cursor.getLong(cursor.getColumnIndex(ALARM_TIME));
-            int seriesMALID = cursor.getInt(cursor.getColumnIndex(ALARM_MALID));
-            final String seriesName = cursor.getString(cursor.getColumnIndex(SERIES_NAME));
+            final long alarmTime = cursor.getLong(cursor.getColumnIndex(ALARM_TIME));
+            final int seriesMALID = cursor.getInt(cursor.getColumnIndex(ALARM_MALID));
             final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
 
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Alarm alarm = realm.createObject(Alarm.class, id);
-                    alarm.setAlarmTime(alarmTime);
-                    alarm.setSeries(series);
-                    alarm.setMALID(seriesName);
+                    try {
+                        Alarm alarm = realm.createObject(Alarm.class, String.valueOf(seriesMALID));
+                        alarm.setAlarmTime(alarmTime);
+                        alarm.setSeries(series);
+                    } catch (RealmPrimaryKeyConstraintException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
 
