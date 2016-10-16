@@ -244,7 +244,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         } else {
             title = series.getName();
         }
-        return title;
+        return title.substring(0, 1);
     }
 
     @Override

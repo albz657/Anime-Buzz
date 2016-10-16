@@ -109,7 +109,11 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
 
         currSeries.setShowType(showType);
         currSeries.setSingle(single);
-        currSeries.setEnglishTitle(holder.getEnglishTitle());
+        if (!holder.getEnglishTitle().isEmpty()){
+            currSeries.setEnglishTitle(holder.getEnglishTitle());
+        } else {
+            currSeries.setEnglishTitle(currSeries.getName());
+        }
         currSeries.setAiringStatus(airingStatus);
         currSeries.setStartedAiringDate(startAiringDate);
         currSeries.setFinishedAiringDate(finishAiringDate);
