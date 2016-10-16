@@ -237,7 +237,14 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
     @Override
     public String getSectionTitle(int position) {
-        return null;
+        Series series = getItem(position);
+        String title;
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()){
+            title = series.getEnglishTitle();
+        } else {
+            title = series.getName();
+        }
+        return title;
     }
 
     @Override

@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
-    <android.support.v4.widget.SwipeRefreshLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-            <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
-                android:id="@+id/list"
-                android:name="me.jakemoritz.animebuzz.fragments.SeriesFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginLeft="2dp"
-                android:layout_marginRight="2dp"
-                android:layout_marginTop="5dp"
-                app:layoutManager="LinearLayoutManager"
-                tools:context=".fragments.SeriesFragment"
-                android:scrollbars="vertical"/>
+        <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+                                                android:id="@+id/list"
+                                                android:name="me.jakemoritz.animebuzz.fragments.SeriesFragment"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:layout_marginLeft="2dp"
+                                                android:layout_marginRight="2dp"
+                                                android:layout_marginTop="5dp"
+                                                android:scrollbars="vertical"
+                                                app:layoutManager="LinearLayoutManager"
+                                                tools:context=".fragments.SeriesFragment"/>
 
         <com.futuremind.recyclerviewfastscroll.FastScroller
             android:id="@+id/fastscroll"
-            android:orientation="vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:orientation="vertical"/>
 
-            <include layout="@layout/empty_view"
-                     android:visibility="gone"/>
+        <include
+            layout="@layout/empty_view"
+            android:visibility="gone"/>
 
     </android.support.v4.widget.SwipeRefreshLayout>
 </layout>

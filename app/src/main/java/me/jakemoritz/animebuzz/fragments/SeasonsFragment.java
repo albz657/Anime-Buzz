@@ -111,7 +111,13 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries());
+        String sort;
+        if (SharedPrefsHelper.getInstance().prefersEnglish()){
+           sort = "englishTitle";
+        } else {
+            sort = "name";
+        }
+        getmAdapter().updateData(currentlyBrowsingSeason.getSeasonSeries().sort(sort));
 //            getmAdapter().setSeriesFilter(null);
     }
 

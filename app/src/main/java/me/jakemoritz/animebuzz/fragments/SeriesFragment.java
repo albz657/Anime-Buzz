@@ -90,10 +90,18 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
 
         if (this instanceof SeasonsFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAll());
+            if (SharedPrefsHelper.getInstance().prefersEnglish()){
+                mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted("englishTitle"));
+            } else {
+                mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted("name"));
+            }
             emptyText.setText(getString(R.string.empty_text_season));
         } else if (this instanceof CurrentlyWatchingFragment) {
-            mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList());
+            if (SharedPrefsHelper.getInstance().prefersEnglish()){
+                mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList().sort("englishTitle"));
+            } else {
+                mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList().sort("name"));
+            }
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
@@ -101,6 +109,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
         FastScroller fastScroller = (FastScroller) swipeRefreshLayout.findViewById(R.id.fastscroll);
         fastScroller.setRecyclerView(recyclerView);
+        fastScroller.setHandleColor(getResources().getColor(R.color.colorPrimary));
 
         return swipeRefreshLayout;
     }
