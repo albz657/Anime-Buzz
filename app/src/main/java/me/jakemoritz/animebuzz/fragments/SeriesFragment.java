@@ -22,7 +22,9 @@ import java.util.Collections;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
@@ -57,6 +59,8 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private RecyclerView recyclerView;
+    private RelativeLayout emptyView;
     private MalApiClient malApiClient;
     private boolean adding = false;
     private Series itemToBeChanged;
@@ -79,33 +83,50 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 //        container.removeAllViews();
 
         swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
-        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
+        recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 
-        RelativeLayout emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view);
+        emptyView = (RelativeLayout) swipeRefreshLayout.findViewById(R.id.empty_view_included);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
 
-        Context context = recyclerView.getContext();
-        recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        RealmResults<Series> realmResults;
+        String sort;
+        if (SharedPrefsHelper.getInstance().prefersEnglish()) {
+            sort = "englishTitle";
+        } else {
+            sort = "name";
+        }
 
         if (this instanceof SeasonsFragment) {
-            if (SharedPrefsHelper.getInstance().prefersEnglish()){
-                mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted("englishTitle"));
-            } else {
-                mAdapter = new SeriesRecyclerViewAdapter(this, realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted("name"));
-            }
+            realmResults = realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
-        } else if (this instanceof CurrentlyWatchingFragment) {
-            if (SharedPrefsHelper.getInstance().prefersEnglish()){
-                mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList().sort("englishTitle"));
-            } else {
-                mAdapter = new SeriesRecyclerViewAdapter(this, App.getInstance().getUserList().sort("name"));
-            }
+        } else {
+            realmResults = App.getInstance().getUserList().sort(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
+        mAdapter = new SeriesRecyclerViewAdapter(this, realmResults);
         recyclerView.setAdapter(mAdapter);
+        setVisibility(realmResults);
+        realmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
+            @Override
+            public void onChange(RealmResults<Series> element) {
+                setVisibility(element);
+            }
+        });
 
         return swipeRefreshLayout;
+    }
+
+    private void setVisibility(RealmResults<Series> element) {
+        if (element.isEmpty() && recyclerView.getVisibility() == View.VISIBLE) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        } else if (!element.isEmpty() && emptyView.getVisibility() == View.VISIBLE) {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
