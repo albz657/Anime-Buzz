@@ -117,14 +117,19 @@ public class MainActivity extends AppCompatActivity
 
             // fix old databases
             if (doesOldDatabaseExist()) {
+                deleteOldImages();
                 DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
 //                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
+                deleteOldImages();
                 App.getInstance().setJustUpdated(true);
             }
 
-            if (doesSugarDatabaseExist()){
+            if (doesSugarDatabaseExist()) {
+                deleteOldImages();
+
                 SugarMigrator.migrateToRealm();
 //                deleteDatabase("buzz_sugar.db");
+                deleteOldImages();
                 // delete images
             }
 
@@ -181,8 +186,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void deleteOldImages(){
+    private void deleteOldImages() {
+        File cache = getCacheDir();
+        File appDir = new File(cache.getParent());
 
+        // deletes images from cache
+        for (String file : cache.list()){
+            if (file.contains(".jpg")){
+                File imageFile = new File(cache.getPath() + "/" + file);
+                imageFile.delete();
+            }
+        }
+
+        File files = new File(appDir.getPath() + "/app_cache/images");
+
+        // deletes images from old incorrect cache
+        for (String file : files.list()){
+            if (file.contains(".jpg")){
+                File imageFile = new File(files.getPath() + "/" + file);
+                imageFile.delete();
+            }
+        }
     }
 
     @Override
