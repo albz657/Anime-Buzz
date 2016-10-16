@@ -4,14 +4,22 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class SugarMigrator {
 
     // Table names
     private static final String TABLE_SERIES = "SERIES";
+    private static final String TABLE_SEASON = "SEASON_METADATA";
+
+    // Season columns
+    private static final String KEY = "KEY";
+    private static final String SEASON_NAME = "NAME";
+    private static final String START_TIMESTAMP = "STARTTIMESTAMP";
 
     // Anime columns
     private static final String ID = "ID";
@@ -40,7 +48,43 @@ public class SugarMigrator {
 
     public static void migrateToRealm() {
         SQLiteDatabase sugarDb = SQLiteDatabase.openDatabase(App.getInstance().getDatabasePath("buzz_sugar.db").getPath(), null, 0);
+        migrateSeason(sugarDb);
+        migrateSeries(sugarDb);
+    }
 
+    private static void migrateSeason(SQLiteDatabase sugarDb){
+        Realm realm = Realm.getDefaultInstance();
+        Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SEASON, null);
+        cursor.moveToFirst();
+        for (int i = 0; i < cursor.getCount(); i++) {
+            final String seasonKey = cursor.getString(cursor.getColumnIndex(KEY));
+            final String seasonName = cursor.getString(cursor.getColumnIndex(SEASON_NAME));
+            final String startTimeStamp = cursor.getString(cursor.getColumnIndex(START_TIMESTAMP));
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Season season = realm.createObject(Season.class, seasonKey);
+                    season.setName(seasonName);
+                    season.setStartDate(startTimeStamp);
+                }
+            });
+
+            cursor.moveToNext();
+        }
+
+        RealmResults<Season> seasonRealmResults = realm.where(Season.class).findAll();
+        for (Season season : seasonRealmResults){
+            String relativeTime = Season.calculateRelativeTime(season.getName());
+            realm.beginTransaction();
+            season.setRelativeTime(relativeTime);
+            realm.commitTransaction();
+        }
+        cursor.close();
+        realm.close();
+    }
+
+    private static void migrateSeries(SQLiteDatabase sugarDb){
         Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SERIES, null);
         cursor.moveToFirst();
@@ -113,5 +157,6 @@ public class SugarMigrator {
         cursor.close();
         realm.close();
     }
+
 
 }
