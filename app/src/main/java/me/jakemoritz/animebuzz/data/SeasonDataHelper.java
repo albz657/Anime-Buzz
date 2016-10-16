@@ -1,6 +1,11 @@
 package me.jakemoritz.animebuzz.data;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import me.jakemoritz.animebuzz.models.Season;
 
 public class SeasonDataHelper {
 
@@ -20,33 +25,36 @@ public class SeasonDataHelper {
         return mInstance;
     }
 
-    // retrieval
-
-/*    private SeasonMetadata getSeasonMetadataFromCursor(Cursor res) {
-        String seasonName = res.getString(res.getColumnIndex(KEY_SEASON_NAME));
-        String seasonDate = res.getString(res.getColumnIndex(KEY_SEASON_DATE));
-        String seasonKey = res.getString(res.getColumnIndex(KEY_SEASON_KEY));
-
-        return new SeasonMetadata(seasonName, seasonDate, seasonKey);
-    }
-
-    public Set<SeasonMetadata> getAllSeasonMetadata(SQLiteDatabase database) {
-        Set<SeasonMetadata> seasonList = new HashSet<>();
-        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
-
+    public void migrateSeason(SQLiteDatabase sugarDb) {
+        Realm realm = Realm.getDefaultInstance();
+        Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            seasonList.add(getSeasonMetadataFromCursor(cursor));
+            final String seasonKey = cursor.getString(cursor.getColumnIndex(KEY_SEASON_KEY));
+            final String seasonName = cursor.getString(cursor.getColumnIndex(KEY_SEASON_NAME));
+            final String startTimeStamp = cursor.getString(cursor.getColumnIndex(KEY_SEASON_DATE));
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Season season = realm.createObject(Season.class, seasonKey);
+                    season.setName(seasonName);
+                    season.setStartDate(startTimeStamp);
+                }
+            });
+
             cursor.moveToNext();
         }
 
+        RealmResults<Season> seasonRealmResults = realm.where(Season.class).findAll();
+        for (Season season : seasonRealmResults) {
+            String relativeTime = Season.calculateRelativeTime(season.getName());
+            realm.beginTransaction();
+            season.setRelativeTime(relativeTime);
+            realm.commitTransaction();
+        }
         cursor.close();
-        return seasonList;
-    }*/
-
-    void upgradeToSugar(SQLiteDatabase database){
-//        Set<SeasonMetadata> seasonMetadataList = getAllSeasonMetadata(database);
-
-//        SeasonMetadata.saveInTx(seasonMetadataList);
+        realm.close();
     }
+
 }

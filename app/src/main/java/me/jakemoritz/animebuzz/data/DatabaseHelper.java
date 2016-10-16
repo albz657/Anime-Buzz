@@ -24,6 +24,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (mInstance == null) {
             mInstance = new DatabaseHelper(context);
@@ -31,21 +36,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return mInstance;
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        switch (oldVersion) {
-            case 1:
-                AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionTwo(db);
-            case 2:
-                AlarmsDataHelper.getInstance().upgradeAlarms(db);
-                AnimeDataHelper.getInstance().upgradeDatabaseVersionToVersionThree(db);
-                SeasonDataHelper.getInstance().upgradeToSugar(db);
-        }
-    }
-
     public void migrateToRealm(){
         SQLiteDatabase db = SQLiteDatabase.openDatabase(App.getInstance().getDatabasePath(DATABASE_NAME).getPath(), null, 0);
 
-        AlarmsDataHelper.getInstance().upgradeAlarms(db);
+        SeasonDataHelper.getInstance().migrateSeason(db);
+        AnimeDataHelper.getInstance().migrateSeries(db);
+        AlarmsDataHelper.getInstance().migrateAlarms(db);
     }
 }

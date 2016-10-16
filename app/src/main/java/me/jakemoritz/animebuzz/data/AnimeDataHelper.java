@@ -1,11 +1,20 @@
 package me.jakemoritz.animebuzz.data;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.models.BacklogItem;
+import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.Series;
 
 public class AnimeDataHelper {
 
@@ -44,70 +53,102 @@ public class AnimeDataHelper {
         return mInstance;
     }
 
-    // retrieval
-
-/*    private Series getSeriesFromCursor(Cursor res) {
-        int airdate = res.getInt(res.getColumnIndex(KEY_AIRDATE));
-        String name = res.getString(res.getColumnIndex(KEY_NAME));
-        int MALID = res.getInt(res.getColumnIndex(KEY_MALID));
-        int simulcast_airdate = res.getInt(res.getColumnIndex(KEY_SIMULCAST_AIRDATE));
-        boolean isInUserList = (res.getInt(res.getColumnIndex(KEY_IS_IN_USER_LIST)) == 1);
-        String season = res.getString(res.getColumnIndex(KEY_ANIME_SEASON));
-        boolean isCurrentlyAiring = (res.getInt(res.getColumnIndex(KEY_CURRENTLY_AIRING)) == 1);
-        int ANNID = res.getInt(res.getColumnIndex(KEY_ANNID));
-        double simulcast_delay = res.getDouble(res.getColumnIndex(KEY_SIMULCAST_DELAY));
-        String simulcast = res.getString(res.getColumnIndex(KEY_SIMULCAST));
-        long nextEpisodeAirtime = res.getLong(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME));
-        long nextEpisodeSimulcastAirtime = res.getLong(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME));
-        int episodesWatched = res.getInt(res.getColumnIndex(KEY_EPISODES_WATCHED));
-        String nextEpisodeAirtimeFormatted = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED));
-        String nextEpisodeSimulcastAirtimeFormatted = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED));
-        String nextEpisodeAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
-        String nextEpisodeSimulcastAirtimeFormatted24 = res.getString(res.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
-
-        Series series = new Series(airdate, name, (long) MALID, simulcast, simulcast_airdate, season, ANNID, simulcast_delay, isInUserList, isCurrentlyAiring, nextEpisodeAirtime, nextEpisodeSimulcastAirtime, episodesWatched, nextEpisodeAirtimeFormatted, nextEpisodeSimulcastAirtimeFormatted, nextEpisodeAirtimeFormatted24, nextEpisodeSimulcastAirtimeFormatted24, 0, "", "", "", false, "", "", false);
-
-        Type type = new TypeToken<ArrayList<Long>>() {
-        }.getType();
-        List<Long> backlog = new Gson().fromJson(res.getString(res.getColumnIndex(KEY_BACKLOG)), type);
-
-        for (long backlogTime : backlog){
-            oldBacklogItems.add(new BacklogItem(series, backlogTime));
-        }
-
-        return null;
-    }
-
-    private SeriesList getAllSeries(SQLiteDatabase database) {
-        SeriesList allSeries = new SeriesList();
-        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
-
+    public void migrateSeries(SQLiteDatabase sugarDb) {
+        Realm realm = Realm.getDefaultInstance();
+        Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            Series series = getSeriesFromCursor(cursor);
-            allSeries.add(series);
+            int id = cursor.getInt(cursor.getColumnIndex(KEY_MALID));
+            final String MALID = String.valueOf(id);
+            int annid = cursor.getInt(cursor.getColumnIndex(KEY_ANNID));
+            final String ANNID = String.valueOf(annid);
+            int airdate = cursor.getInt(cursor.getColumnIndex(KEY_AIRDATE));
+            final int episodesWatched = cursor.getInt(cursor.getColumnIndex(KEY_EPISODES_WATCHED));
+            final int isInUserList = cursor.getInt(cursor.getColumnIndex(KEY_IS_IN_USER_LIST));
+            final int lastNotificationTime = 0;
+            final int nextEpisodeAirtime = cursor.getInt(cursor.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME));
+            final int nextEpisodeSimulcastTime = cursor.getInt(cursor.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME));
+            int simulcastAirdate = cursor.getInt(cursor.getColumnIndex(KEY_SIMULCAST_AIRDATE));
+            final int single = 0;
+
+            final String name = cursor.getString(cursor.getColumnIndex(KEY_NAME));
+            int isCurrentlyAiring = cursor.getInt(cursor.getColumnIndex("iscurrentlyairing"));
+
+            String airingStatus = "";
+            if (isCurrentlyAiring == 1) {
+                airingStatus = "Airing";
+            }
+
+            final String finishedAiringDate = "";
+            final String nextEpisodeAirtimeFormatted = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED));
+            final String nextEpisodeAirtimeFormatted24 = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
+            final String nextEpisodeSimulcastTimeFormatted = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED));
+            final String nextEpisodeSimulcastTimeFormatted24 = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24));
+            String seasonName = cursor.getString(cursor.getColumnIndex(KEY_ANIME_SEASON));
+            final String showType = "";
+            final String startedAiringDate = "";
+            final String simulcast = cursor.getString(cursor.getColumnIndex(KEY_SIMULCAST));
+
+            final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(KEY_SIMULCAST_DELAY));
+
+            final Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
+
+            Type type = new TypeToken<ArrayList<Long>>() {
+            }.getType();
+            List<Long> backlog = new Gson().fromJson(cursor.getString(cursor.getColumnIndex(KEY_BACKLOG)), type);
+
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Series series = realm.createObject(Series.class, MALID);
+                    series.setANNID(ANNID);
+                    series.setName(name);
+                    series.setFinishedAiringDate(finishedAiringDate);
+                    series.setNextEpisodeAirtime(nextEpisodeAirtime);
+                    series.setNextEpisodeAirtimeFormatted(nextEpisodeAirtimeFormatted);
+                    series.setNextEpisodeAirtimeFormatted24(nextEpisodeAirtimeFormatted24);
+                    series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeSimulcastTimeFormatted);
+                    series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeSimulcastTimeFormatted24);
+                    series.setNextEpisodeSimulcastTime(nextEpisodeSimulcastTime);
+                    series.setSimulcastProvider(simulcast);
+                    series.setSimulcastDelay(simulcastDelay);
+                    series.setStartedAiringDate(startedAiringDate);
+                    series.setShowType(showType);
+                    series.setInUserList(isInUserList == 1);
+                    series.setLastNotificationTime(lastNotificationTime);
+                    series.setSingle(single == 1);
+                    series.setEpisodesWatched(episodesWatched);
+                    series.setSeason(season);
+                    series.setEnglishTitle(name);
+                    season.getSeasonSeries().add(series);
+                }
+            });
+
+            final Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+
+            for (final Long alarmTime : backlog){
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                        backlogItem.setAlarmTime(alarmTime);
+                        backlogItem.setSeries(series);
+                    }
+                });
+            }
+
+            realm.beginTransaction();
+            series.setAiringStatus(airingStatus);
+            realm.commitTransaction();
+
+            if (airingStatus.equals("Airing")) {
+                AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
+            }
+
             cursor.moveToNext();
         }
-
         cursor.close();
-
-        return allSeries;
-    }*/
-
-    // misc
-
-    void upgradeDatabaseVersionToVersionTwo(SQLiteDatabase database) {
-        database.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24 + " TEXT");
-        database.execSQL("ALTER TABLE " + TABLE_ANIME + " ADD COLUMN " + KEY_NEXT_EPISODE_SIMULCAST_AIRTIME_FORMATTED_24 + " TEXT");
+        realm.close();
     }
 
-    void upgradeDatabaseVersionToVersionThree(SQLiteDatabase database) {
-        oldBacklogItems = new ArrayList<>();
-
-//        SeriesList allSeries = getAllSeries(database);
-
-//        Series.saveInTx(allSeries);
-
-//        BacklogItem.saveInTx(oldBacklogItems);
-    }
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -118,9 +117,8 @@ public class MainActivity extends AppCompatActivity
 
             // fix old databases
             if (doesOldDatabaseExist()) {
-                SQLiteDatabase database = DatabaseHelper.getInstance(this).getWritableDatabase();
-                database.close();
-                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
+                DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
+//                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
                 App.getInstance().setJustUpdated(true);
             }
 
@@ -181,6 +179,10 @@ public class MainActivity extends AppCompatActivity
         } else {
             startFragment(CurrentlyWatchingFragment.newInstance());
         }
+    }
+
+    private void deleteOldImages(){
+
     }
 
     @Override

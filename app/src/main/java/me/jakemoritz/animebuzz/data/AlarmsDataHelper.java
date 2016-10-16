@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import io.realm.Realm;
+import io.realm.exceptions.RealmPrimaryKeyConstraintException;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -27,31 +28,32 @@ public class AlarmsDataHelper {
         return mInstance;
     }
 
-    void upgradeAlarms(SQLiteDatabase database) {
-        Cursor cursor = database.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
-
+    public void migrateAlarms(SQLiteDatabase sugarDb) {
         Realm realm = Realm.getDefaultInstance();
-
+        Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
-            final Long id = cursor.getLong(cursor.getColumnIndex(KEY_ALARM_ID));
-            final long time = cursor.getLong(cursor.getColumnIndex(KEY_ALARM_TIME));
-            final String name = cursor.getString(cursor.getColumnIndex(KEY_ALARM_NAME));
-            cursor.moveToNext();
-
-            final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(id)).findFirst();
+            final long alarmTime = cursor.getLong(cursor.getColumnIndex(KEY_ALARM_TIME));
+            final int seriesMALID = cursor.getInt(cursor.getColumnIndex(KEY_ALARM_ID));
+            final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
 
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Alarm alarm = realm.createObject(Alarm.class, String.valueOf(id));
-                    alarm.setSeries(series);
-                    alarm.setAlarmTime(time);
+                    try {
+                        Alarm alarm = realm.createObject(Alarm.class, String.valueOf(seriesMALID));
+                        alarm.setAlarmTime(alarmTime);
+                        alarm.setSeries(series);
+                    } catch (RealmPrimaryKeyConstraintException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
+
+            cursor.moveToNext();
         }
 
-        realm.close();
         cursor.close();
+        realm.close();
     }
 }
