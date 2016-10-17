@@ -72,7 +72,7 @@
     <string name="fragment_about">About</string>
 
     <!--File names-->
-    <string name="file_avatar">malavatar</string>
+    <string name="file_avatar">malavatar.jpg</string>
 
     <!--Notifications-->
     <string name="notification_list_update">Downloading other seasons&#8230;</string>

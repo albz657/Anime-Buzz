@@ -265,7 +265,11 @@ public class MainActivity extends AppCompatActivity
         File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
 
-        Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        if (avatarFile.exists()){
+            Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        } else {
+            Picasso.with(App.getInstance()).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
+        }
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
         drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());
