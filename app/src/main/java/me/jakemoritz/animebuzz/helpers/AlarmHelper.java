@@ -9,7 +9,6 @@ import android.text.format.DateUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -219,8 +218,7 @@ public class AlarmHelper {
     public void removeAlarm(final Series series) {
         Realm realm = Realm.getDefaultInstance();
 
-        for (Iterator iterator = App.getInstance().getAlarms().iterator(); iterator.hasNext(); ) {
-            Alarm alarm = (Alarm) iterator.next();
+        for (Alarm alarm : App.getInstance().getAlarms()) {
             if (alarm.getMALID().equals(series.getMALID())) {
                 int id = Integer.valueOf(series.getMALID());
                 alarmManager.cancel(createPendingIntent(id));
@@ -228,8 +226,6 @@ public class AlarmHelper {
                 realm.beginTransaction();
                 alarm.deleteFromRealm();
                 realm.commitTransaction();
-
-                iterator.remove();
             }
         }
 

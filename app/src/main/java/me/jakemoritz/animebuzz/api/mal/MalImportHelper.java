@@ -7,7 +7,6 @@ import io.realm.RealmList;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -37,7 +36,7 @@ class MalImportHelper {
             matchedSeries.add(series);
         }
 
-        for (Series series : App.getInstance().getUserList()) {
+        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
             if (!matchedSeries.contains(series) || !series.getShowType().equals("TV")) {
                 realm.beginTransaction();
                 series.setInUserList(false);
@@ -48,7 +47,7 @@ class MalImportHelper {
         }
 
 
-        for (Series series : App.getInstance().getUserList()) {
+        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
             if (series.getNextEpisodeAirtime() > 0 || series.getNextEpisodeSimulcastTime() > 0) {
                 AlarmHelper.getInstance().makeAlarm(series);
             }

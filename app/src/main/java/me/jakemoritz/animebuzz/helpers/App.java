@@ -23,7 +23,6 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private RealmResults<Season> allAnimeSeasons;
     private RealmResults<BacklogItem> backlog;
     private RealmResults<Alarm> alarms;
     private RealmResults<Series> userList;
@@ -63,14 +62,6 @@ public class App extends Application {
     }
 
     /* Getters/Setters */
-
-    public RealmResults<Season> getAllAnimeSeasons() {
-        return allAnimeSeasons;
-    }
-
-    public void setAllAnimeSeasons(RealmResults<Season> allAnimeSeasons) {
-        this.allAnimeSeasons = allAnimeSeasons;
-    }
 
     public RealmResults<BacklogItem> getBacklog() {
         return backlog;

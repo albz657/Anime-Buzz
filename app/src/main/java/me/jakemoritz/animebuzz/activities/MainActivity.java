@@ -52,7 +52,6 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
-import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -84,9 +83,6 @@ public class MainActivity extends AppCompatActivity
         realm = Realm.getDefaultInstance();
 
         // Initialize global RealmResults
-        RealmResults<Season> allSeasons = realm.where(Season.class).findAll();
-        App.getInstance().setAllAnimeSeasons(allSeasons);
-
         RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
         App.getInstance().setUserList(userList);
 
@@ -115,7 +111,7 @@ public class MainActivity extends AppCompatActivity
             // Default startup procedure
             App.getInstance().setJustLaunched(true);
 
-            // fix old databases
+            // fix old database
             if (doesOldDatabaseExist()) {
                 DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
                 deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
@@ -123,6 +119,7 @@ public class MainActivity extends AppCompatActivity
                 App.getInstance().setJustUpdated(true);
             }
 
+            // fix sugar database
             if (doesSugarDatabaseExist()) {
                 SugarMigrator.migrateToRealm();
                 deleteDatabase("buzz_sugar.db");

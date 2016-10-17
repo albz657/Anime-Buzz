@@ -158,9 +158,13 @@ public class MalApiClient {
                         helper.matchSeries(matchList);
                     } else {
                         Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        App.getInstance().getUserList().deleteAllFromRealm();
-                        realm.commitTransaction();
+
+                        for (Series series : App.getInstance().getUserList()){
+                            realm.beginTransaction();
+                            series.setInUserList(false);
+                            realm.commitTransaction();
+                        }
+
                         realm.close();
 
                         seriesFragment.malDataImported(true);

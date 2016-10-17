@@ -124,12 +124,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             App.getInstance().setInitializing(false);
         }
 
-        if (getmAdapter() != null) {
-//            if (getmAdapter().getAllSeries().isEmpty()) {
-//                getmAdapter().getVisibleSeries().clear();
-//            }
-        }
-
         GetImageTask getImageTask = new GetImageTask(this, seriesList);
         getImageTask.execute(imageRequests);
 
