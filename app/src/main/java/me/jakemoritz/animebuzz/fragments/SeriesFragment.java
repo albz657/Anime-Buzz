@@ -79,6 +79,9 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
+        container.clearDisappearingChildren();
+        container.removeAllViews();
+
         swipeRefreshLayout = (SwipeRefreshLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
         recyclerView = (RecyclerView) swipeRefreshLayout.findViewById(R.id.list);
 

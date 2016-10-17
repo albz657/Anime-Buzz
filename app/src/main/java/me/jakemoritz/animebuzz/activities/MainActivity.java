@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity
 
             if (doesSugarDatabaseExist()) {
                 SugarMigrator.migrateToRealm();
-//                deleteDatabase("buzz_sugar.db");
+                deleteDatabase("buzz_sugar.db");
                 deleteOldImages();
             }
 
