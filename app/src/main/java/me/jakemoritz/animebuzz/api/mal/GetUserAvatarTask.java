@@ -17,7 +17,7 @@ class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
     private final static String TAG = GetUserAvatarTask.class.getSimpleName();
 
-    private final static String BASE_URL = "http://cdn.myanimelist.net/images/userimages/";
+    private final static String BASE_URL = "https://myanimelist.cdn-dena.com/images/userimages/";
 
     private MainActivity mainActivity;
 
