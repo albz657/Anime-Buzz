@@ -35,7 +35,6 @@ import java.util.Calendar;
 import java.util.Iterator;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
@@ -50,8 +49,6 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.models.Alarm;
-import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -81,19 +78,6 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
         realm = Realm.getDefaultInstance();
-
-        // Initialize global RealmResults
-        RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
-        App.getInstance().setUserList(userList);
-
-        RealmResults<Alarm> alarms = realm.where(Alarm.class).findAll();
-        App.getInstance().setAlarms(alarms);
-
-        RealmResults<BacklogItem> backlogItems = realm.where(BacklogItem.class).findAll();
-        App.getInstance().setBacklog(backlogItems);
-
-        RealmResults<Series> airingList = realm.where(Series.class).equalTo("airingStatus", "Airing").findAll();
-        App.getInstance().setAiringList(airingList);
 
         // Check if user has completed setup
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || getIntent().getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
@@ -337,7 +321,7 @@ public class MainActivity extends AppCompatActivity
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    for (Series series : App.getInstance().getAiringList()) {
+                    for (Series series : realm.where(Series.class).equalTo("airingStatus", "Airing").findAll()) {
                         if (series.getNextEpisodeAirtime() > 0) {
                             Calendar airdateCalendar = Calendar.getInstance();
                             airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
@@ -60,8 +61,8 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-//        container.removeAllViews();
-//        container.clearDisappearingChildren();
+        container.removeAllViews();
+        container.clearDisappearingChildren();
 
         backlogLayout = inflater.inflate(R.layout.fragment_backlog, container, false);
         recyclerView = (RecyclerView) backlogLayout.findViewById(R.id.list);
@@ -72,7 +73,11 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
         Context context = backlogLayout.getContext();
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        RealmResults<BacklogItem> backlogItems = App.getInstance().getBacklog().sort("alarmTime");
+
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<BacklogItem> backlogItems = realm.where(BacklogItem.class).findAllSorted("alarmTime");
+        realm.close();
+
         setVisibility(backlogItems);
         backlogItems.addChangeListener(new RealmChangeListener<RealmResults<BacklogItem>>() {
             @Override

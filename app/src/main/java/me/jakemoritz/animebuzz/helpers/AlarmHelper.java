@@ -31,11 +31,9 @@ public class AlarmHelper {
     }
 
     public void resetAlarms() {
-        cancelAllAlarms(App.getInstance().getAlarms());
-
-//        App.getInstance().getAlarms().clear();
-
         Realm realm = Realm.getDefaultInstance();
+        cancelAllAlarms(realm.where(Alarm.class).findAll());
+
         final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
         realm.executeTransaction(new Realm.Transaction() {
             @Override
@@ -44,15 +42,17 @@ public class AlarmHelper {
             }
         });
         realm.close();
-        for (Series series : App.getInstance().getUserList()) {
+        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
             makeAlarm(series);
         }
     }
 
     public void setAlarmsOnBoot() {
-        for (Alarm alarm : App.getInstance().getAlarms()) {
+        Realm realm = Realm.getDefaultInstance();
+        for (Alarm alarm : realm.where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }
+        realm.close();
     }
 
     private void setAlarm(Alarm alarm) {
@@ -198,7 +198,7 @@ public class AlarmHelper {
 
         realm.close();
 
-        for (Series series : App.getInstance().getUserList()) {
+        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
             makeAlarm(series);
         }
     }
@@ -218,7 +218,7 @@ public class AlarmHelper {
     public void removeAlarm(final Series series) {
         Realm realm = Realm.getDefaultInstance();
 
-        for (Alarm alarm : App.getInstance().getAlarms()) {
+        for (Alarm alarm : realm.where(Alarm.class).findAll()) {
             if (alarm.getMALID().equals(series.getMALID())) {
                 int id = Integer.valueOf(series.getMALID());
                 alarmManager.cancel(createPendingIntent(id));
@@ -233,11 +233,15 @@ public class AlarmHelper {
     }
 
     private void dummyAlarm() {
-        if (!App.getInstance().getAlarms().isEmpty()) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Alarm> alarms = realm.where(Alarm.class).findAll();
+        if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
             time += 5000L;
-            App.getInstance().getAlarms().get(0).setAlarmTime(time);
+            // needs transaction
+            alarms.get(0).setAlarmTime(time);
         }
+        realm.close();
     }
 
 }

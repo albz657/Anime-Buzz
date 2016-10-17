@@ -102,7 +102,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
             realmResults = realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
-            realmResults = App.getInstance().getUserList().sort(sort);
+            realmResults = realm.where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 

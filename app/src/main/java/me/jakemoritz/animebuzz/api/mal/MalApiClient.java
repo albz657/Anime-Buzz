@@ -159,7 +159,7 @@ public class MalApiClient {
                     } else {
                         Realm realm = Realm.getDefaultInstance();
 
-                        for (Series series : App.getInstance().getUserList()){
+                        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()){
                             realm.beginTransaction();
                             series.setInUserList(false);
                             realm.commitTransaction();

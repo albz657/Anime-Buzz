@@ -149,7 +149,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        getmAdapter().updateData(App.getInstance().getUserList().sort(sort));
+        getmAdapter().updateData(getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort));
     }
 
     @Override

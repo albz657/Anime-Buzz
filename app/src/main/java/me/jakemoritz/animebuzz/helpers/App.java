@@ -11,11 +11,7 @@ import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
-import me.jakemoritz.animebuzz.models.Alarm;
-import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class App extends Application {
 
@@ -23,10 +19,6 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private RealmResults<BacklogItem> backlog;
-    private RealmResults<Alarm> alarms;
-    private RealmResults<Series> userList;
-    private RealmResults<Series> airingList;
     private RealmList<Season> syncingSeasons;
 
     private boolean initializing = false;
@@ -62,30 +54,6 @@ public class App extends Application {
     }
 
     /* Getters/Setters */
-
-    public RealmResults<BacklogItem> getBacklog() {
-        return backlog;
-    }
-
-    public void setBacklog(RealmResults<BacklogItem> backlog) {
-        this.backlog = backlog;
-    }
-
-    public RealmResults<Alarm> getAlarms() {
-        return alarms;
-    }
-
-    public void setAlarms(RealmResults<Alarm> alarms) {
-        this.alarms = alarms;
-    }
-
-    public RealmResults<Series> getAiringList() {
-        return airingList;
-    }
-
-    public void setAiringList(RealmResults<Series> airingList) {
-        this.airingList = airingList;
-    }
 
     public boolean isInitializing() {
         return initializing;
@@ -157,13 +125,5 @@ public class App extends Application {
 
     public void setJustUpdated(boolean justUpdated) {
         this.justUpdated = justUpdated;
-    }
-
-    public RealmResults<Series> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(RealmResults<Series> userList) {
-        this.userList = userList;
     }
 }

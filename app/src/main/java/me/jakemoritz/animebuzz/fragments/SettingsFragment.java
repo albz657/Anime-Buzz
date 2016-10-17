@@ -25,6 +25,7 @@ import net.xpece.android.support.preference.SwitchPreference;
 import java.io.File;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
@@ -267,16 +268,17 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         MalApiClient malApiClient = new MalApiClient(currentlyWatchingFragment);
 
+        RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
         if (!add) {
             realm.beginTransaction();
-            for (Series series : App.getInstance().getUserList()) {
+            for (Series series : userList) {
                 series.setInUserList(false);
             }
-            AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getAlarms());
+            AlarmHelper.getInstance().cancelAllAlarms(realm.where(Alarm.class).findAll());
             realm.where(Alarm.class).findAll().deleteAllFromRealm();
             realm.commitTransaction();
         } else {
-            for (Series series : App.getInstance().getUserList()) {
+            for (Series series : userList) {
                 malApiClient.addAnime(String.valueOf(series.getMALID()));
             }
         }
@@ -301,7 +303,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             signOutPreference.setSummary(summary);
         }
 
-        if (!App.getInstance().getUserList().isEmpty()) {
+        if (!realm.where(Series.class).equalTo("isInUserList", true).findAll().isEmpty()) {
             importExistingSeries();
         } else {
             CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
@@ -312,8 +314,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             if (mainActivity.findViewById(R.id.nav_view) != null)
                 Snackbar.make(mainActivity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         }
-
-        mainActivity.loadDrawerUserInfo();
 
         incrementPreference.setEnabled(true);
         incrementPreference.setChecked(true);
