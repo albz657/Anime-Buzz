@@ -155,7 +155,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        App.getInstance().getUserList().sort(sort);
+        getmAdapter().updateData(App.getInstance().getUserList().sort(sort));
     }
 
     @Override

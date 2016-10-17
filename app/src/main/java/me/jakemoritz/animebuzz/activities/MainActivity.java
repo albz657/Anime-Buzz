@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity
             // fix old databases
             if (doesOldDatabaseExist()) {
                 DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
-//                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
+                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
                 deleteOldImages();
                 App.getInstance().setJustUpdated(true);
             }
