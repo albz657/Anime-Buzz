@@ -8,7 +8,6 @@ public class HummingbirdAnimeHolder {
     private String startedAiringDate;
     private String showType;
     private int episodeCount;
-    private String MALID;
 
     HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
         this.englishTitle = englishTitle;
@@ -41,13 +40,5 @@ public class HummingbirdAnimeHolder {
 
     public String getShowType() {
         return showType;
-    }
-
-    public String getMALID() {
-        return MALID;
-    }
-
-    public void setMALID(String MALID) {
-        this.MALID = MALID;
     }
 }

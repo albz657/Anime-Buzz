@@ -43,6 +43,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name=".helpers.PosterDownloadHelper"/>
+        <service android:name=".services.PosterDownloader"/>
+        <service android:name=".services.HummingbirdDataProcessor"/>
     </application>
 </manifest>

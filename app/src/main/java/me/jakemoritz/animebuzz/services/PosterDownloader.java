@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.helpers;
+package me.jakemoritz.animebuzz.services;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -13,12 +13,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
+import me.jakemoritz.animebuzz.helpers.App;
+
+
 import static android.content.ContentValues.TAG;
 
-public class PosterDownloadHelper extends IntentService{
+public class PosterDownloader extends IntentService{
 
-    public PosterDownloadHelper() {
-        super(PosterDownloadHelper.class.getSimpleName());
+    public PosterDownloader() {
+        super(PosterDownloader.class.getSimpleName());
     }
 
     @Override

@@ -1,65 +1,55 @@
-package me.jakemoritz.animebuzz.tasks;
+package me.jakemoritz.animebuzz.services;
 
+import android.app.IntentService;
 import android.content.Intent;
-import android.os.AsyncTask;
 
 import java.util.Calendar;
-import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmList;
-import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdAnimeHolder;
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.helpers.PosterDownloadHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder>, Void, Void> {
 
-    private SeriesFragment callback;
+public class HummingbirdDataProcessor extends IntentService {
+
     private Realm realm;
-    private RealmList<Series> seriesList;
 
-    public ProcessHBResponseTask(SeriesFragment callback, RealmList<Series> seriesList) {
-        this.callback = callback;
-        this.seriesList = seriesList;
+    public HummingbirdDataProcessor() {
+        super(HummingbirdDataProcessor.class.getSimpleName());
     }
 
     @Override
-    protected Void doInBackground(List<HummingbirdAnimeHolder>... params) {
+    protected void onHandleIntent(Intent intent) {
         realm = Realm.getDefaultInstance();
-        for (HummingbirdAnimeHolder holder : params[0]){
-            Series currSeries = realm.where(Series.class).equalTo("MALID", holder.getMALID()).findFirst();
-            processSeries(currSeries, holder);
-        }
+
+        String MALID = intent.getStringExtra("MALID");
+        String englishTitle = intent.getStringExtra("englishTitle");
+        int episodeCount = intent.getIntExtra("episodeCount", 1);
+        String finishedAiringDate = intent.getStringExtra("finishedAiringDate");
+        String startedAiringDate = intent.getStringExtra("startedAiringDate");
+        String showType = intent.getStringExtra("showType");
+
+        processSeries(MALID, englishTitle, episodeCount, finishedAiringDate, startedAiringDate, showType);
+
         realm.close();
-        return null;
     }
 
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        callback.hummingbirdSeasonReceived();
-    }
+    private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType) {
+        final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
-    private void processSeries(final Series currSeries, final HummingbirdAnimeHolder holder) {
-        String showType;
-        final boolean single = holder.getEpisodeCount() == 1;
+        final boolean single = episodeCount == 1;
         String airingStatus = "";
-        String startAiringDate = "";
-        String finishAiringDate = "";
+        String formattedStartAiringDate = "";
+        String formattedFinishedAiringDate = "";
 
-        if (holder.getShowType().isEmpty()) {
+        if (showType.isEmpty()) {
             showType = "TV";
-        } else {
-            showType = holder.getShowType();
         }
 
-        if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
+        if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
             if (currSeries.getSeason().getRelativeTime().equals(Season.PRESENT) || currSeries.getSeason().getRelativeTime().equals(Season.FUTURE)) {
                 airingStatus = "Finished airing";
             } else {
@@ -67,10 +57,10 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
             }
         } else {
             Calendar currentCalendar = Calendar.getInstance();
-            Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getStartedAiringDate());
+            Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(startedAiringDate);
 
-            startAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
-            if (holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
+            formattedStartAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+            if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                 if (currentCalendar.compareTo(startedCalendar) > 0) {
                     if (currSeries.isSingle()) {
                         airingStatus = "Finished airing";
@@ -81,9 +71,9 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
                 } else {
                     airingStatus = "Not yet aired";
                 }
-            } else if (!holder.getFinishedAiringDate().isEmpty() && !holder.getStartedAiringDate().isEmpty()) {
-                Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(holder.getFinishedAiringDate());
-                finishAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+            } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
+                Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(finishedAiringDate);
+                formattedFinishedAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                 if (currentCalendar.compareTo(finishedCalendar) > 0) {
                     airingStatus = "Finished airing";
                 } else {
@@ -99,31 +89,26 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
 
         final String finalAiringStatus = airingStatus;
         final String finalShowType = showType;
-        final String finalStartAiringDate = startAiringDate;
-        final String finalFinishAiringDate = finishAiringDate;
+        final String finalStartAiringDate = formattedStartAiringDate;
+        final String finalfinishedAiringDate = formattedFinishedAiringDate;
 
         realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 currSeries.setShowType(finalShowType);
                 currSeries.setSingle(single);
-                if (!holder.getEnglishTitle().isEmpty()){
-                    currSeries.setEnglishTitle(holder.getEnglishTitle());
+                if (!englishTitle.isEmpty()){
+                    currSeries.setEnglishTitle(englishTitle);
                 } else {
                     currSeries.setEnglishTitle(currSeries.getName());
                 }
                 currSeries.setAiringStatus(finalAiringStatus);
                 currSeries.setStartedAiringDate(finalStartAiringDate);
-                currSeries.setFinishedAiringDate(finalFinishAiringDate);
+                currSeries.setFinishedAiringDate(finalfinishedAiringDate);
             }
         });
 
-        if (!holder.getImageURL().isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + currSeries.getMALID(), "drawable", "me.jakemoritz.animebuzz") == 0) {
-            Intent imageIntent = new Intent(App.getInstance(), PosterDownloadHelper.class);
-            imageIntent.putExtra("url", holder.getImageURL());
-            imageIntent.putExtra("MALID", currSeries.getMALID());
-            App.getInstance().startService(imageIntent);
-        }
+
     }
 
     private void checkForSeasonSwitch(final Series currSeries) {

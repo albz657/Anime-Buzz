@@ -64,12 +64,6 @@ class HummingbirdAnimeDeserializer implements JsonDeserializer<HummingbirdAnimeH
             englishPrimitive = titlesObject.getAsJsonPrimitive("english");
 
             englishTitle = englishPrimitive.getAsString();
-
-/*            Pattern englishPattern = Pattern.compile("([\"'])(?:(?=(\\\\?))\\2.)*?\\1");
-            Matcher englishMatcher = englishPattern.matcher(englishPrimitive.getAsString());
-            if (englishMatcher.find()){
-                englishTitle = englishMatcher.group();
-            }*/
         } catch (ClassCastException e){
 
         }
