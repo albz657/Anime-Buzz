@@ -40,6 +40,8 @@ public class HummingbirdDataProcessor extends IntentService {
     private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType) {
         final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
+        String currentAiringStatus = currSeries.getAiringStatus();
+
         final boolean single = episodeCount == 1;
         String airingStatus = "";
         String formattedStartAiringDate = "";
@@ -86,6 +88,10 @@ public class HummingbirdDataProcessor extends IntentService {
                     }
                 }
             }
+        }
+
+        if (currentAiringStatus.equals("Airing") && airingStatus.equals("Finished airing")){
+            AlarmHelper.getInstance().removeAlarm(currSeries);
         }
 
         final String finalAiringStatus = airingStatus;

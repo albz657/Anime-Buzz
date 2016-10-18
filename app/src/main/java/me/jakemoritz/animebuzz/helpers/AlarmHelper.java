@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
+import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -165,28 +166,33 @@ public class AlarmHelper {
 
 
     public void makeAlarm(final Series series) {
-        final long nextEpisodeTime;
-        if (series.getNextEpisodeSimulcastTime() != 0L && SharedPrefsHelper.getInstance().prefersSimulcast()) {
-            nextEpisodeTime = series.getNextEpisodeSimulcastTime();
+        if (series.getAiringStatus().equals("Airing")){
+            final long nextEpisodeTime;
+            if (series.getNextEpisodeSimulcastTime() != 0L && SharedPrefsHelper.getInstance().prefersSimulcast()) {
+                nextEpisodeTime = series.getNextEpisodeSimulcastTime();
+            } else {
+                nextEpisodeTime = series.getNextEpisodeAirtime();
+            }
+
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Alarm alarm = new Alarm();
+                    alarm.setMALID(series.getMALID());
+                    alarm.setAlarmTime(nextEpisodeTime);
+                    alarm.setSeries(series);
+
+                    App.getInstance().getRealm().insertOrUpdate(alarm);
+                }
+            });
+
+            Alarm newAlarm = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
+
+            setAlarm(newAlarm);
         } else {
-            nextEpisodeTime = series.getNextEpisodeAirtime();
+            Log.d("s", "not airing ahh");
         }
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Alarm alarm = new Alarm();
-                alarm.setMALID(series.getMALID());
-                alarm.setAlarmTime(nextEpisodeTime);
-                alarm.setSeries(series);
-
-                App.getInstance().getRealm().insertOrUpdate(alarm);
-            }
-        });
-
-        Alarm newAlarm = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
-
-        setAlarm(newAlarm);
     }
 
     public void switchAlarmTiming() {
@@ -228,7 +234,5 @@ public class AlarmHelper {
             }
         });
     }
-
-
 
 }
