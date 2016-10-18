@@ -23,8 +23,6 @@ public class App extends Application {
 
     private boolean initializing = false;
     private boolean postInitializing = false;
-    private boolean gettingInitialImages = false;
-    private boolean gettingPostInitialImages = false;
     private boolean tryingToVerify = false;
     private boolean justLaunched = false;
     private boolean notificationReceived = false;
@@ -70,22 +68,6 @@ public class App extends Application {
 
     public void setPostInitializing(boolean postInitializing) {
         this.postInitializing = postInitializing;
-    }
-
-    public boolean isGettingInitialImages() {
-        return gettingInitialImages;
-    }
-
-    public void setGettingInitialImages(boolean gettingInitialImages) {
-        this.gettingInitialImages = gettingInitialImages;
-    }
-
-    public boolean isGettingPostInitialImages() {
-        return gettingPostInitialImages;
-    }
-
-    public void setGettingPostInitialImages(boolean gettingPostInitialImages) {
-        this.gettingPostInitialImages = gettingPostInitialImages;
     }
 
     public boolean isTryingToVerify() {

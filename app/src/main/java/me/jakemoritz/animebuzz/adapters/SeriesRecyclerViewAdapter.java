@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
@@ -213,10 +215,13 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         }
 
         int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz");
-        if (imageId != 0){
+        if (imageId != 0) {
             Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
         } else {
-            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+            File cacheDirectory = App.getInstance().getCacheDir();
+            File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
+
+            Picasso.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {

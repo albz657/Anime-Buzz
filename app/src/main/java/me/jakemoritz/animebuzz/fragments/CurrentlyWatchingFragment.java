@@ -10,24 +10,15 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.realm.RealmList;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.tasks.GetImageTask;
 
 public class CurrentlyWatchingFragment extends SeriesFragment {
 
     private static final String TAG = CurrentlyWatchingFragment.class.getSimpleName();
-
-    private List<ImageRequest> imageRequests;
-    private RealmList<Series> seriesList;
 
     public CurrentlyWatchingFragment() {
 
@@ -35,8 +26,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     public static CurrentlyWatchingFragment newInstance() {
         CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
-        fragment.seriesList = new RealmList<>();
-        fragment.imageRequests = new ArrayList<>();
         return fragment;
     }
 
@@ -49,20 +38,28 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        if (App.getInstance().isNetworkAvailable()) {
-            getSenpaiExportHelper().getLatestSeasonData();
-            setUpdating(true);
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+            if (App.getInstance().isNetworkAvailable()) {
+                getSenpaiExportHelper().getLatestSeasonData();
+                setUpdating(true);
+            } else {
+                if (getSwipeRefreshLayout().isRefreshing()) {
+                    stopRefreshing();
+                }
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                }
+            }
         } else {
-            stopRefreshing();
-            if (getView() != null) {
-                Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+            if (getSwipeRefreshLayout().isRefreshing()) {
+                stopRefreshing();
             }
         }
     }
 
     @Override
-    public void hummingbirdSeasonReceived(List<ImageRequest> imageRequests, RealmList<Series> seriesList) {
-        super.hummingbirdSeasonReceived(imageRequests, seriesList);
+    public void hummingbirdSeasonReceived() {
+        super.hummingbirdSeasonReceived();
 
         if (App.getInstance().isInitializing()) {
             getMalApiClient().getUserList();
@@ -73,41 +70,16 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             }
         }
 
-        this.imageRequests = imageRequests;
-        this.seriesList = seriesList;
-
-        if (!seriesList.isEmpty() && seriesList.get(0).getSeason().getName().equals("Summer 2013")) {
-            App.getInstance().setPostInitializing(false);
-            App.getInstance().setGettingPostInitialImages(true);
-        }
-
-        if (App.getInstance().isPostInitializing() || App.getInstance().isGettingPostInitialImages()) {
-            GetImageTask getImageTask = new GetImageTask(this, this.seriesList);
-            getImageTask.execute(imageRequests);
-        }
-
         if (isUpdating()) {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
+                if (getSwipeRefreshLayout().isRefreshing()) {
+                    stopRefreshing();
+                }
                 AlarmHelper.getInstance().resetAlarms();
                 loadUserSortingPreference();
-
-                GetImageTask getImageTask = new GetImageTask(this, this.seriesList);
-                getImageTask.execute(this.imageRequests);
             }
-        }
-    }
-
-    @Override
-    public void hummingbirdSeasonImagesReceived() {
-        super.hummingbirdSeasonImagesReceived();
-
-        if (App.getInstance().isGettingInitialImages()) {
-            App.getInstance().setGettingInitialImages(false);
-            App.getInstance().setPostInitializing(true);
-
-            getSenpaiExportHelper().getSeasonList();
         }
     }
 
@@ -120,12 +92,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
 
-            App.getInstance().setGettingInitialImages(true);
             App.getInstance().setInitializing(false);
         }
-
-        GetImageTask getImageTask = new GetImageTask(this, seriesList);
-        getImageTask.execute(imageRequests);
 
         loadUserSortingPreference();
     }

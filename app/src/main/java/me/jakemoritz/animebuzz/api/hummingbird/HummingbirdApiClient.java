@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.RealmList;
-import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
@@ -61,7 +60,7 @@ public class HummingbirdApiClient {
 
     public void processSeriesList(RealmList<Series> seriesList) {
         if (seriesList.isEmpty()) {
-            callback.hummingbirdSeasonReceived(new ArrayList<ImageRequest>(), seriesList);
+            callback.hummingbirdSeasonReceived();
         } else {
             this.seriesList = seriesList;
             this.responses = new ArrayList<>();

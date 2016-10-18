@@ -1,26 +1,25 @@
 package me.jakemoritz.animebuzz.tasks;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import me.jakemoritz.animebuzz.api.ImageRequest;
 import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdAnimeHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.PosterDownloadHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder>, Void, Void> {
 
-    private List<ImageRequest> imageRequests;
     private SeriesFragment callback;
     private Realm realm;
     private RealmList<Series> seriesList;
@@ -32,7 +31,6 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
 
     @Override
     protected Void doInBackground(List<HummingbirdAnimeHolder>... params) {
-        this.imageRequests = new ArrayList<>();
         realm = Realm.getDefaultInstance();
         for (HummingbirdAnimeHolder holder : params[0]){
             Series currSeries = realm.where(Series.class).equalTo("MALID", holder.getMALID()).findFirst();
@@ -45,7 +43,7 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        callback.hummingbirdSeasonReceived(imageRequests, seriesList);
+        callback.hummingbirdSeasonReceived();
     }
 
     private void processSeries(final Series currSeries, final HummingbirdAnimeHolder holder) {
@@ -121,9 +119,10 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
         });
 
         if (!holder.getImageURL().isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + currSeries.getMALID(), "drawable", "me.jakemoritz.animebuzz") == 0) {
-            ImageRequest imageRequest = new ImageRequest(currSeries);
-            imageRequest.setURL(holder.getImageURL());
-            imageRequests.add(imageRequest);
+            Intent imageIntent = new Intent(App.getInstance(), PosterDownloadHelper.class);
+            imageIntent.putExtra("url", holder.getImageURL());
+            imageIntent.putExtra("MALID", currSeries.getMALID());
+            App.getInstance().startService(imageIntent);
         }
     }
 

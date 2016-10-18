@@ -76,7 +76,7 @@ public class SenpaiExportHelper {
     public void getSeasonData(final Season season) {
         Log.d(TAG, "Getting season data for: '" + season.getName() + "'");
 
-        if (App.getInstance().isPostInitializing() && !App.getInstance().isGettingPostInitialImages()) {
+        if (App.getInstance().isPostInitializing()) {
             NotificationHelper.getInstance().createSeasonDataNotification(season.getName());
         }
 
@@ -106,7 +106,7 @@ public class SenpaiExportHelper {
                             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotificationManager.cancel(100);
 
-//                            App.getInstance().setPostInitializing(false);
+                            App.getInstance().setPostInitializing(false);
                         } else {
                             getSeasonData(App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1));
                         }

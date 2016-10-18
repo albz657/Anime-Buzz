@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.Calendar;
 
 import io.realm.Realm;
@@ -62,7 +63,10 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         if (imageId != 0) {
             Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
         } else {
-            Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+            File cacheDirectory = App.getInstance().getCacheDir();
+            File bitmapFile = new File(cacheDirectory, holder.backlogItem.getSeries().getMALID() + ".jpg");
+
+            Picasso.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
         }
 
 
