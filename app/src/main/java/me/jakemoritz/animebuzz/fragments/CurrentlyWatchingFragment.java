@@ -10,9 +10,14 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class CurrentlyWatchingFragment extends SeriesFragment {
@@ -37,9 +42,16 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onRefresh() {
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
             if (App.getInstance().isNetworkAvailable()) {
-                getSenpaiExportHelper().getLatestSeasonData();
+                Set<Season> nonCurrentAiringSeasons = new HashSet<>();
+                RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAll();
+                for (Series series : seriesRealmResults) {
+                    nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
+                }
+                for (Season season : nonCurrentAiringSeasons) {
+                    getSenpaiExportHelper().getSeasonData(season);
+                }
                 setUpdating(true);
             } else {
                 if (getSwipeRefreshLayout().isRefreshing()) {
@@ -103,14 +115,14 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         }
 
         String sort = SharedPrefsHelper.getInstance().getSortingPreference();
-        if (sort.equals("name")){
+        if (sort.equals("name")) {
             if (SharedPrefsHelper.getInstance().prefersEnglish()) {
                 sort = "englishTitle";
             }
         } else {
-            if (SharedPrefsHelper.getInstance().prefersSimulcast()){
+            if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
                 sort = "nextEpisodeSimulcastTime";
-            } else if (sort.equals("date") || sort.isEmpty()){
+            } else if (sort.equals("date") || sort.isEmpty()) {
                 // supports upgrading users
                 sort = "nextEpisodeAirtime";
             }

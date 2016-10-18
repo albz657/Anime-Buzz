@@ -9,9 +9,12 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -77,7 +80,18 @@ public class SeasonsFragment extends SeriesFragment {
     public void onRefresh() {
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
             if (App.getInstance().isNetworkAvailable()) {
-                getSenpaiExportHelper().getSeasonData(currentlyBrowsingSeason);
+                if (currentlyBrowsingSeason.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+                    Set<Season> nonCurrentAiringSeasons = new HashSet<>();
+                    RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").notEqualTo("seasonKey", currentlyBrowsingSeason.getKey()).findAll();
+                    for (Series series : seriesRealmResults){
+                        nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
+                    }
+                    for (Season season : nonCurrentAiringSeasons){
+                        getSenpaiExportHelper().getSeasonData(season);
+                    }
+                } else {
+                    getSenpaiExportHelper().getSeasonData(currentlyBrowsingSeason);
+                }
                 setUpdating(true);
             } else {
                 if (getSwipeRefreshLayout().isRefreshing()) {
@@ -92,14 +106,12 @@ public class SeasonsFragment extends SeriesFragment {
                 stopRefreshing();
             }
         }
-
     }
 
     @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
         if (App.getInstance().isInitializing()) {
             currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
-//            loadSeason(currentlyBrowsingSeason.getName());
         }
 
         super.senpaiSeasonRetrieved(seasonKey);

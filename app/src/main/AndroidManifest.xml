@@ -46,5 +46,6 @@
         <receiver android:name=".receivers.AlarmReceiver"/>
         <service android:name=".services.PosterDownloader"/>
         <service android:name=".services.HummingbirdDataProcessor"/>
+        <service android:name=".services.EpisodeTimeGenerator"/>
     </application>
 </manifest>

@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
+import android.content.Intent;
 import android.util.Log;
 
 import com.google.gson.JsonArray;
@@ -10,16 +11,15 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
 import java.lang.reflect.Type;
-import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.services.EpisodeTimeGenerator;
 
 class SeasonDeserializer implements JsonDeserializer<String> {
 
@@ -157,10 +157,11 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                     }
                 });
 
-                if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(realm.where(Series.class).equalTo("MALID", finalMALID).findFirst(), airdate, simulcast_airdate);
-                    SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
-                }
+                Intent episodeTimeIntent = new Intent(App.getInstance(), EpisodeTimeGenerator.class);
+                episodeTimeIntent.putExtra("MALID", MALID);
+                episodeTimeIntent.putExtra("airdate", airdate);
+                episodeTimeIntent.putExtra("simulcast_airdate", simulcast_airdate);
+                App.getInstance().startService(episodeTimeIntent);
             }
         }
 

@@ -48,7 +48,7 @@ public class AlarmHelper {
     }
 
     public void setAlarmsOnBoot() {
-        dummyAlarm();
+//        dummyAlarm();
         for (Alarm alarm : App.getInstance().getRealm().where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }

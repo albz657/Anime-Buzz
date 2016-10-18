@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -111,6 +112,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
             holder.mMinusButton.setVisibility(View.GONE);
         } else if (!holder.series.getAiringStatus().equals("Finished airing")) {
             if (holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
+                Log.d(TAG, "empty");
             } else if (holder.series.getAiringStatus().equals("Airing")) {
                 holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
             } else {
