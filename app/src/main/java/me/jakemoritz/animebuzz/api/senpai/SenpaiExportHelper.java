@@ -74,6 +74,7 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonData(final Season season) {
+//        Season currSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", season)
         Log.d(TAG, "Getting season data for: '" + season.getName() + "'");
 
         if (App.getInstance().isPostInitializing()) {

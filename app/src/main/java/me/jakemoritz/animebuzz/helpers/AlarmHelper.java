@@ -222,17 +222,20 @@ public class AlarmHelper {
     }
 
     public void removeAlarm(final Series series) {
-        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
+        Realm realm = Realm.getDefaultInstance();
+        final RealmResults<Alarm> alarms = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
 
         int id = Integer.valueOf(series.getMALID());
         alarmManager.cancel(createPendingIntent(id));
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 alarms.deleteAllFromRealm();
             }
         });
+
+        realm.close();
     }
 
 }
