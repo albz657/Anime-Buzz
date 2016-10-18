@@ -31,21 +31,24 @@ public class AlarmHelper {
         return alarmHelper;
     }
 
-    public void resetAlarms() {
-        cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
+    private void dummyAlarm() {
+        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
+        if (!alarms.isEmpty()) {
+            final long time = System.currentTimeMillis() + 5000L;
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-               App.getInstance().getRealm().where(Alarm.class).findAll().deleteAllFromRealm();
-            }
-        });
-        for (Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
-            makeAlarm(series);
+
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    alarms.get(0).setAlarmTime(time);
+
+                }
+            });
         }
     }
 
     public void setAlarmsOnBoot() {
+        dummyAlarm();
         for (Alarm alarm : App.getInstance().getRealm().where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }
@@ -202,7 +205,7 @@ public class AlarmHelper {
 
     private PendingIntent createPendingIntent(int id) {
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
-        notificationIntent.putExtra("id", id);
+        notificationIntent.putExtra("id", String.valueOf(id));
         return PendingIntent.getBroadcast(App.getInstance(), id, notificationIntent, 0);
     }
 
@@ -226,14 +229,6 @@ public class AlarmHelper {
         });
     }
 
-    private void dummyAlarm() {
-        RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
-        if (!alarms.isEmpty()) {
-            long time = System.currentTimeMillis();
-            time += 5000L;
-            // needs transaction
-            alarms.get(0).setAlarmTime(time);
-        }
-    }
+
 
 }

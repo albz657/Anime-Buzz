@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.activities;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -49,7 +48,6 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,18 +60,11 @@ public class MainActivity extends AppCompatActivity
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
     private boolean openRingtones = false;
-    private AlarmReceiver alarmReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Register AlarmReceiver
-        alarmReceiver = new AlarmReceiver();
-        alarmReceiver.setMainActivity(this);
-        IntentFilter callIntercepterIntentFilter = new IntentFilter("android.intent.action.ANY_ACTION");
-        registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
         if (App.getInstance().getRealm() != null){
             App.getInstance().getRealm().close();
@@ -219,7 +210,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(alarmReceiver);
         App.getInstance().getRealm().close();
     }
 
@@ -306,20 +296,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void episodeNotificationReceived() {
-        if (getSupportFragmentManager().getFragments() != null) {
-            if (!getSupportFragmentManager().getFragments().isEmpty()) {
-                if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof CurrentlyWatchingFragment) {
-                    CurrentlyWatchingFragment currentlyWatchingFragment = ((CurrentlyWatchingFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1));
-                    currentlyWatchingFragment.getmAdapter().notifyDataSetChanged();
-                    currentlyWatchingFragment.loadUserSortingPreference();
-                } else if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
-                    ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
-                }
-            }
-        }
-    }
-
     public boolean updateFormattedTimes() {
         long lastUpdatedTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
 
@@ -400,17 +376,11 @@ public class MainActivity extends AppCompatActivity
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
-        boolean backlogVisible = false;
         if (intent.hasExtra("notificationClicked")) {
             if (!getSupportFragmentManager().getFragments().isEmpty()) {
                 if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
-                    ((BacklogFragment) getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1)).getmAdapter().notifyDataSetChanged();
-                    backlogVisible = true;
+                    startFragment(BacklogFragment.newInstance());
                 }
-            }
-
-            if (!backlogVisible) {
-                startFragment(BacklogFragment.newInstance());
             }
         }
     }

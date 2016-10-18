@@ -11,7 +11,6 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Series;
@@ -77,7 +76,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 if (getSwipeRefreshLayout().isRefreshing()) {
                     stopRefreshing();
                 }
-                AlarmHelper.getInstance().resetAlarms();
+
                 loadUserSortingPreference();
             }
         }
@@ -86,8 +85,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
     @Override
     public void malDataImported(boolean received) {
         super.malDataImported(received);
-
-        AlarmHelper.getInstance().resetAlarms();
 
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();

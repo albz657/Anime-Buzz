@@ -7,7 +7,6 @@ import android.content.Intent;
 import java.util.Calendar;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -16,8 +15,6 @@ import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class AlarmReceiver extends BroadcastReceiver {
-
-    private MainActivity mainActivity;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -31,12 +28,11 @@ public class AlarmReceiver extends BroadcastReceiver {
             final Series series = realm.where(Series.class).equalTo("MALID", intentExtra).findFirst();
 
             if (series != null){
-                Calendar currentTime = Calendar.getInstance();
+                final Calendar currentTime = Calendar.getInstance();
                 final Calendar lastNotificationTime = Calendar.getInstance();
                 lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
-                if (currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
-
+                if (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
                     NotificationHelper helper = new NotificationHelper();
                     helper.createNewEpisodeNotification(series);
 
@@ -45,21 +41,18 @@ public class AlarmReceiver extends BroadcastReceiver {
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
+                            long alarmTime = thisAlarm.getAlarmTime();
                             thisAlarm.deleteFromRealm();
 
                             BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                             backlogItem.setSeries(series);
-                            backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
+                            backlogItem.setAlarmTime(alarmTime);
 
-                            series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
+                            series.setLastNotificationTime(currentTime.getTimeInMillis());
                         }
                     });
 
                     AlarmHelper.getInstance().makeAlarm(series);
-
-                    if (mainActivity != null){
-                        mainActivity.episodeNotificationReceived();
-                    }
                 }
             }
         }
@@ -69,10 +62,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
-    }
-
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
     }
 }
 
