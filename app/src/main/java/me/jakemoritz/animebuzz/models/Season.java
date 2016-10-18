@@ -29,6 +29,7 @@ public class Season extends RealmObject {
         Realm realm = Realm.getDefaultInstance();
         Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
         Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
+        realm.close();
 
         RealmList<Season> allSeasons = new RealmList<>();
         allSeasons.addAll(realm.where(Season.class).findAll());
@@ -49,9 +50,9 @@ public class Season extends RealmObject {
             }
 
             return relativeTime;
+        } else {
+            return PRESENT;
         }
-        realm.close();
-        return "";
     }
 
     @Override
