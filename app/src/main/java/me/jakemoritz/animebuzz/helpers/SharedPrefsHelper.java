@@ -88,24 +88,8 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
-    public boolean getActivityRunning(){
-        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.activity_running), false);
-    }
-
-    public void setActivityRunning(boolean running){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(App.getInstance().getString(R.string.activity_running), running);
-        editor.apply();
-    }
-
     boolean prefersVibrate(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), false);
-    }
-
-    public void setPrefersVibrate(boolean prefersVibrate){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(App.getInstance().getString(R.string.pref_vibrate_key), prefersVibrate);
-        editor.apply();
     }
 
     public String getUsername(){
@@ -120,12 +104,6 @@ public class SharedPrefsHelper {
 
     public String getLed(){
         return sharedPrefs.getString(App.getInstance().getString(R.string.pref_led_key), "-1");
-    }
-
-    public void setLed(String led){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(App.getInstance().getString(R.string.pref_led_key), led);
-        editor.apply();
     }
 
     public String getMalId(){
@@ -158,24 +136,8 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
-    public String getPreviousSeasonName(){
-        return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_previous_season), "");
-    }
-
-    public void setPreviousSeasonName(String previousSeasonName){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(App.getInstance().getString(R.string.shared_prefs_previous_season), previousSeasonName);
-        editor.apply();
-    }
-
     public String getRingtone(){
         return sharedPrefs.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
-    }
-
-    public void setRingtone(String ringtone){
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putString(App.getInstance().getString(R.string.pref_ringtone_key), ringtone);
-        editor.apply();
     }
 
     public String getSortingPreference(){

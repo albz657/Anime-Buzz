@@ -94,7 +94,8 @@ public class AnimeDataHelper {
 
             final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(KEY_SIMULCAST_DELAY));
 
-            final Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            final String seasonKey = season.getKey();
 
             Type type = new TypeToken<ArrayList<Long>>() {
             }.getType();
@@ -121,10 +122,9 @@ public class AnimeDataHelper {
                     series.setLastNotificationTime(lastNotificationTime);
                     series.setSingle(single == 1);
                     series.setEpisodesWatched(episodesWatched);
-                    series.setSeason(season);
+                    series.setSeasonKey(seasonKey);
                     series.setEnglishTitle(name);
                     series.setAiringStatus(finalAiringStatus);
-                    season.getSeasonSeries().add(series);
                 }
             });
 

@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder;
 import java.io.File;
 import java.io.IOException;
 
-import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
@@ -56,11 +56,13 @@ public class HummingbirdApiClient {
                 .build();
     }
 
-    public void processSeriesList(RealmList<Series> seriesList) {
-        if (seriesList.isEmpty()) {
+    public void processSeriesList(String seasonKey) {
+        RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
+
+        if (seriesRealmResults.isEmpty()) {
             callback.hummingbirdSeasonReceived();
         } else {
-            for (Series series : seriesList) {
+            for (Series series : seriesRealmResults) {
                 getSeriesData(series.getMALID());
             }
             callback.hummingbirdSeasonReceived();

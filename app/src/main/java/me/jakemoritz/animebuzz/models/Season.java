@@ -21,7 +21,6 @@ public class Season extends RealmObject {
 
     @Index
     private String name;
-    private RealmList<Series> seasonSeries;
     private String start_timestamp;
     private String relativeTime;
 
@@ -93,14 +92,6 @@ public class Season extends RealmObject {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public RealmList<Series> getSeasonSeries() {
-        return seasonSeries;
-    }
-
-    public void setSeasonSeries(RealmList<Series> seasonSeries) {
-        this.seasonSeries = seasonSeries;
     }
 
     public String getStart_timestamp() {

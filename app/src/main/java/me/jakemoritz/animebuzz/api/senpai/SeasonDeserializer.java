@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
@@ -87,7 +86,6 @@ class SeasonDeserializer implements JsonDeserializer<String> {
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
 
-        final RealmList<Series> seasonSeries = new RealmList<>();
         for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
@@ -154,10 +152,8 @@ class SeasonDeserializer implements JsonDeserializer<String> {
 
                         series.setANNID(finalANNID);
                         series.setSimulcastProvider(finalSimulcast);
-                        series.setSeason(season);
+                        series.setSeasonKey(seasonKey);
                         series.setSimulcastDelay(finalSimulcastDelay);
-
-                        seasonSeries.add(series);
                     }
                 });
 
@@ -167,14 +163,6 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 }
             }
         }
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
-                season.setSeasonSeries(seasonSeries);
-            }
-        });
 
         realm.close();
         return seasonKey;

@@ -136,13 +136,15 @@ public class SugarMigrator {
             final String nextEpisodeSimulcastTimeFormatted = cursor.getString(cursor.getColumnIndex(NEXT_EPISODE_SIMULCAST_TIME_FORMATTED));
             final String nextEpisodeSimulcastTimeFormatted24 = cursor.getString(cursor.getColumnIndex(NEXT_EPISODE_SIMULCAST_TIME_FORMATTED24));
             String seasonName = cursor.getString(cursor.getColumnIndex(SEASON));
+
             final String showType = cursor.getString(cursor.getColumnIndex(SHOW_TYPE));
             final String startedAiringDate = cursor.getString(cursor.getColumnIndex(STARTED_AIRING_DATE));
             final String simulcast = cursor.getString(cursor.getColumnIndex(SIMULCAST));
 
             final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(SIMULCASTDELAY));
 
-            final Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            final String seasonKey = season.getKey();
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -165,9 +167,8 @@ public class SugarMigrator {
                     series.setLastNotificationTime(lastNotificationTime);
                     series.setSingle(single == 1);
                     series.setEpisodesWatched(episodesWatched);
-                    series.setSeason(season);
+                    series.setSeasonKey(seasonKey);
                     series.setEnglishTitle(finalEnglishTitle);
-                    season.getSeasonSeries().add(series);
                 }
             });
 

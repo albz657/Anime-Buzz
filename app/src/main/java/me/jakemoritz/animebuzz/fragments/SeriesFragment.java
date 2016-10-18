@@ -157,14 +157,15 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
-        Season season = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
-        if (season != null) {
-            if (App.getInstance().isInitializing() && season.getSeasonSeries().isEmpty()) {
+        if (seasonKey != null) {
+            RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
+
+            if (App.getInstance().isInitializing() && seriesRealmResults.isEmpty()) {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
                 failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
             } else {
                 if (App.getInstance().isNetworkAvailable()) {
-                    new HummingbirdApiClient(this).processSeriesList(season.getSeasonSeries());
+                    new HummingbirdApiClient(this).processSeriesList(seasonKey);
                 } else {
                     if (swipeRefreshLayout.isRefreshing()) {
                         stopRefreshing();

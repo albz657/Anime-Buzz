@@ -50,7 +50,8 @@ public class HummingbirdDataProcessor extends IntentService {
         }
 
         if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
-            if (currSeries.getSeason().getRelativeTime().equals(Season.PRESENT) || currSeries.getSeason().getRelativeTime().equals(Season.FUTURE)) {
+            Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
+            if (season.getRelativeTime().equals(Season.PRESENT) || season.getRelativeTime().equals(Season.FUTURE)) {
                 airingStatus = "Finished airing";
             } else {
                 airingStatus = "Not yet aired";
@@ -113,7 +114,8 @@ public class HummingbirdDataProcessor extends IntentService {
 
     private void checkForSeasonSwitch(final Series currSeries) {
         String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
-        if (!currSeries.getSeason().getName().equals(latestSeasonName)) {
+        Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
+        if (!season.getName().equals(latestSeasonName)) {
             // generate times for series airing but not in current season
             if (currSeries.getNextEpisodeAirtime() > 0) {
                 Calendar airdateCalendar = Calendar.getInstance();

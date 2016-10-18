@@ -108,12 +108,6 @@ public class SeasonsFragment extends SeriesFragment {
     private void loadSeason(String seasonName) {
         currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
 
-        if (currentlyBrowsingSeason.getSeasonSeries().isEmpty()) {
-            if (getView() != null) {
-                Snackbar.make(getView(), getString(R.string.season_not_found), Snackbar.LENGTH_LONG).show();
-            }
-        }
-
         String sort;
         if (SharedPrefsHelper.getInstance().prefersEnglish()) {
             sort = "englishTitle";
@@ -123,12 +117,18 @@ public class SeasonsFragment extends SeriesFragment {
 
         OrderedRealmCollection<Series> seasonSeries;
         if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAll();
+            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
         } else {
-            seasonSeries = currentlyBrowsingSeason.getSeasonSeries();
+            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
         }
 
-        getmAdapter().updateData(seasonSeries.sort(sort));
+        if (seasonSeries.isEmpty()) {
+            if (getView() != null) {
+                Snackbar.make(getView(), "No series were found for that season.", Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+        getmAdapter().updateData(seasonSeries);
     }
 
     @Override
@@ -188,5 +188,9 @@ public class SeasonsFragment extends SeriesFragment {
 
         toolbarSpinner.setSelection(previousSpinnerIndex);
         seasonsSpinnerAdapter.notifyDataSetChanged();
+    }
+
+    public Season getCurrentlyBrowsingSeason() {
+        return currentlyBrowsingSeason;
     }
 }

@@ -11,7 +11,8 @@ public class Series extends RealmObject{
     private String MALID = "";
     private String name = "";
     private String simulcastProvider = "";
-    private Season season;
+    @Index
+    private String seasonKey;
     private String ANNID  = "";
     private double simulcastDelay = 0;
     private long nextEpisodeAirtime = 0L;
@@ -151,12 +152,12 @@ public class Series extends RealmObject{
         return ANNID;
     }
 
-    public Season getSeason() {
-        return season;
+    public String getSeasonKey() {
+        return seasonKey;
     }
 
-    public void setSeason(Season season) {
-        this.season = season;
+    public void setSeasonKey(String seasonKey) {
+        this.seasonKey = seasonKey;
     }
 
     public String getName() {
