@@ -83,6 +83,7 @@
     <string name="shared_prefs_latest_season">latestseason</string>
     <string name="shared_prefs_previous_season">previousseason</string>
     <string name="shared_prefs_latest_season_key">latestseasonkey</string>
+    <string name="shared_prefs_failed">failedinit</string>
 
     <string name="credentials_username">credentialsusername</string>
     <string name="credentials_password">credentialspassword</string>

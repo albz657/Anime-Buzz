@@ -262,14 +262,13 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         MalApiClient malApiClient = new MalApiClient(currentlyWatchingFragment);
 
-        final RealmResults<Series> userList = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll();
         if (!add) {
             AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
 
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    for (Series series : userList) {
+                    for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
                         series.setInUserList(false);
                     }
                     App.getInstance().getRealm().where(Alarm.class).findAll().deleteAllFromRealm();
@@ -277,6 +276,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             });
 
         } else {
+            RealmResults<Series> userList = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll();
             for (Series series : userList) {
                 malApiClient.addAnime(String.valueOf(series.getMALID()));
             }

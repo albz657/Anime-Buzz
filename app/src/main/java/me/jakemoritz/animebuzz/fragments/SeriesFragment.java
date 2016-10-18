@@ -270,11 +270,11 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     public void failedInitializationResponse(boolean retryNow) {
         clearAppData();
 
+        SharedPrefsHelper.getInstance().setJustFailed(true);
         if (retryNow) {
             getMainActivity().finish();
 
             Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.putExtra(getString(R.string.shared_prefs_completed_setup), true);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
 

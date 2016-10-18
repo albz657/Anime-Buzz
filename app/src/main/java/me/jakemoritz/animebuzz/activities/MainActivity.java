@@ -79,10 +79,17 @@ public class MainActivity extends AppCompatActivity
             App.getInstance().getRealm().close();
         }
 
+        boolean justFailed = SharedPrefsHelper.getInstance().isJustFailed();
+        if (justFailed){
+            Realm.init(App.getInstance());
+            SharedPrefsHelper.getInstance().setJustFailed(false);
+        }
+
+
         App.getInstance().setRealm(Realm.getDefaultInstance());
 
         // Check if user has completed setup
-        if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || getIntent().getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
+        if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || justFailed) {
             // Just finished setup
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);

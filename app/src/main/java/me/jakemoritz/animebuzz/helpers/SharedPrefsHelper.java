@@ -28,6 +28,16 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
+    public boolean isJustFailed(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.shared_prefs_failed), false);
+    }
+
+    public void setJustFailed(boolean failed){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.shared_prefs_failed), failed);
+        editor.apply();
+    }
+
     public boolean hasCompletedSetup(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.shared_prefs_completed_setup), false);
     }

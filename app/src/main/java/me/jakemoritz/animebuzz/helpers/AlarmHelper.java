@@ -34,11 +34,10 @@ public class AlarmHelper {
     public void resetAlarms() {
         cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
 
-        final RealmResults<Alarm> alarmRealmResults = App.getInstance().getRealm().where(Alarm.class).findAll();
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                alarmRealmResults.deleteAllFromRealm();
+               App.getInstance().getRealm().where(Alarm.class).findAll().deleteAllFromRealm();
             }
         });
         for (Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
@@ -186,12 +185,10 @@ public class AlarmHelper {
     }
 
     public void switchAlarmTiming() {
-
-        final RealmResults<Alarm> alarmRealmResults = App.getInstance().getRealm().where(Alarm.class).findAll();
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                alarmRealmResults.deleteAllFromRealm();
+                realm.where(Alarm.class).findAll().deleteAllFromRealm();
             }
         });
 
@@ -214,13 +211,10 @@ public class AlarmHelper {
     }
 
     public void removeAlarm(final Series series) {
-        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
-        for (Alarm alarm : alarms) {
-            if (alarm.getMALID().equals(series.getMALID())) {
-                int id = Integer.valueOf(series.getMALID());
-                alarmManager.cancel(createPendingIntent(id));
-            }
-        }
+        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
+
+        int id = Integer.valueOf(series.getMALID());
+        alarmManager.cancel(createPendingIntent(id));
 
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
