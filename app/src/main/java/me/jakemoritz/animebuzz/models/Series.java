@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.models;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
@@ -21,11 +22,13 @@ public class Series extends RealmObject{
     private String nextEpisodeSimulcastTimeFormatted24 = "";
     private long lastNotificationTime = 0L;
     private String englishTitle = "";
+    @Index
     private String airingStatus = "";
     private String showType  = "";
     private boolean single = false;
     private String startedAiringDate = "";
     private String finishedAiringDate = "";
+    @Index
     private boolean isInUserList = false;
     private int episodesWatched = 0;
 
