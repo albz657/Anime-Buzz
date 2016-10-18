@@ -65,7 +65,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 }
 
                 season.setName(finalSeasonName);
-                season.setStartDate(finalStartTimestamp);
+                season.setStart_timestamp(finalStartTimestamp);
             }
         });
 

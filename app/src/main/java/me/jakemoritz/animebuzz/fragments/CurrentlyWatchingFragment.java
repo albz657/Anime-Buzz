@@ -93,6 +93,8 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             stopInitialSpinner();
 
             App.getInstance().setInitializing(false);
+            App.getInstance().setPostInitializing(true);
+            getSenpaiExportHelper().getSeasonList();
         }
 
         loadUserSortingPreference();

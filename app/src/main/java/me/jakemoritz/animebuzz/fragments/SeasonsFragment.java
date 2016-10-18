@@ -99,7 +99,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void senpaiSeasonRetrieved(String seasonKey) {
         if (App.getInstance().isInitializing()) {
             currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
-            loadSeason(currentlyBrowsingSeason.getName());
+//            loadSeason(currentlyBrowsingSeason.getName());
         }
 
         super.senpaiSeasonRetrieved(seasonKey);
@@ -146,13 +146,14 @@ public class SeasonsFragment extends SeriesFragment {
         }
 
         if (App.getInstance().isInitializing()) {
-
             if (isVisible()) {
                 refreshToolbar();
             }
 
             stopInitialSpinner();
             App.getInstance().setInitializing(false);
+            App.getInstance().setPostInitializing(true);
+            getSenpaiExportHelper().getSeasonList();
         }
     }
 

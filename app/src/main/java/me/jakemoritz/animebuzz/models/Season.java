@@ -22,7 +22,7 @@ public class Season extends RealmObject {
     @Index
     private String name;
     private RealmList<Series> seasonSeries;
-    private String startDate;
+    private String start_timestamp;
     private String relativeTime;
 
     public static String calculateRelativeTime(String seasonName) {
@@ -103,12 +103,12 @@ public class Season extends RealmObject {
         this.seasonSeries = seasonSeries;
     }
 
-    public String getStartDate() {
-        return startDate;
+    public String getStart_timestamp() {
+        return start_timestamp;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setStart_timestamp(String start_timestamp) {
+        this.start_timestamp = start_timestamp;
     }
 }
 

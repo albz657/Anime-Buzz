@@ -19,14 +19,23 @@ class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
     private static final String TAG = SeasonMetadataDeserializer.class.getSimpleName();
 
     @Override
-    public RealmList<Season> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public RealmList<Season> deserialize(final JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject jsonObject = json.getAsJsonObject();
 
-        JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
+        final JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
+
 
         RealmList<Season> metadataList = new RealmList<>();
         Realm realm = Realm.getDefaultInstance();
-        for (Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
+
+
+        for (final Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    realm.createObjectFromJson(Season.class, seasonEntry.getValue().getAsString());
+                }
+            });
             String seasonKey = seasonEntry.getKey();
 
             if (!seasonKey.equals("nodate")){
@@ -38,7 +47,7 @@ class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
                     final Season season = new Season();
                     season.setKey(seasonKey);
                     season.setName(seasonName);
-                    season.setStartDate(startTimestamp);
+                    season.setStart_timestamp(startTimestamp);
                     season.setRelativeTime(Season.calculateRelativeTime(seasonName));
 
                     realm.executeTransaction(new Realm.Transaction() {
