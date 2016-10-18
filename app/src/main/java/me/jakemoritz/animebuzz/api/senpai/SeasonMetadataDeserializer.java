@@ -24,18 +24,10 @@ class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
 
         final JsonObject seasonsListObject = jsonObject.getAsJsonObject("seasons");
 
-
         RealmList<Season> metadataList = new RealmList<>();
         Realm realm = Realm.getDefaultInstance();
 
-
         for (final Map.Entry<String, JsonElement> seasonEntry : seasonsListObject.entrySet()){
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    realm.createObjectFromJson(Season.class, seasonEntry.getValue().getAsString());
-                }
-            });
             String seasonKey = seasonEntry.getKey();
 
             if (!seasonKey.equals("nodate")){
