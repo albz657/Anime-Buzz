@@ -51,7 +51,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        holder.backlogItem = getData().get(position);
+        holder.backlogItem = getItem(position);
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
