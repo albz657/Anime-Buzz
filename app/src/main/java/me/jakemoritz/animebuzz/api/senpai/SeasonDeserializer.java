@@ -48,22 +48,23 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 seasonYear = yearMatcher.group();
             }
         }
-        String seasonKey = seasonMonth + seasonYear;
+
+        final String seasonKey = seasonMonth + seasonYear;
 
         Realm realm = Realm.getDefaultInstance();
-        Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
 
-        if (season == null) {
-            realm.beginTransaction();
-            season = realm.createObject(Season.class, seasonKey);
-            realm.commitTransaction();
-        }
-
-        realm.beginTransaction();
+        final Season season = new Season();
+        season.setKey(seasonKey);
         season.setName(seasonName);
         season.setStartDate(startTimestamp);
         season.setRelativeTime(Season.calculateRelativeTime(seasonName));
-        realm.commitTransaction();
+
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.insertOrUpdate(season);
+            }
+        });
 
         if (App.getInstance().isInitializing() && SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             SharedPrefsHelper.getInstance().setLatestSeasonName(seasonName);
@@ -73,7 +74,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
 
-        RealmList<Series> seasonSeries = new RealmList<>();
+        final RealmList<Series> seasonSeries = new RealmList<>();
         for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
@@ -122,37 +123,36 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                     }
                 }
 
-                Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-
-                if (series == null) {
-                    realm.beginTransaction();
-                    series = realm.createObject(Series.class, MALID);
-                    series.setName(seriesName);
-                    realm.commitTransaction();
-                }
-
-                realm.beginTransaction();
+                final Series series = new Series();
+                series.setMALID(MALID);
+                series.setName(seriesName);
                 series.setANNID(ANNID);
                 series.setSimulcastProvider(simulcast);
                 series.setSeason(season);
                 series.setSimulcastDelay(simulcast_delay);
-                realm.commitTransaction();
+
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        Series managedSeries = realm.copyToRealmOrUpdate(series);
+                        seasonSeries.add(managedSeries);
+                    }
+                });
 
                 if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                     AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
                     SharedPrefsHelper.getInstance().setLastUpdateTime(Calendar.getInstance().getTimeInMillis());
                 }
-
-                seasonSeries.add(series);
-
             }
-
         }
 
-        realm.beginTransaction();
-        realm.copyToRealm(seasonSeries);
-        season.setSeasonSeries(seasonSeries);
-        realm.commitTransaction();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
+                season.setSeasonSeries(seasonSeries);
+            }
+        });
 
         realm.close();
         return seasonKey;

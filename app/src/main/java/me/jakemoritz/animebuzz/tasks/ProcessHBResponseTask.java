@@ -27,7 +27,6 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
 
     public ProcessHBResponseTask(SeriesFragment callback, RealmList<Series> seriesList) {
         this.callback = callback;
-        this.realm = Realm.getDefaultInstance();
         this.seriesList = seriesList;
     }
 
@@ -49,9 +48,9 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
         callback.hummingbirdSeasonReceived(imageRequests, seriesList);
     }
 
-    private void processSeries(Series currSeries, HummingbirdAnimeHolder holder) {
+    private void processSeries(final Series currSeries, final HummingbirdAnimeHolder holder) {
         String showType;
-        boolean single = currSeries.isSingle();
+        final boolean single = holder.getEpisodeCount() == 1;
         String airingStatus = "";
         String startAiringDate = "";
         String finishAiringDate = "";
@@ -60,10 +59,6 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
             showType = "TV";
         } else {
             showType = holder.getShowType();
-        }
-
-        if (holder.getEpisodeCount() == 1) {
-            single = true;
         }
 
         if (holder.getFinishedAiringDate().isEmpty() && holder.getStartedAiringDate().isEmpty()) {
@@ -104,20 +99,26 @@ public class ProcessHBResponseTask extends AsyncTask<List<HummingbirdAnimeHolder
             }
         }
 
-        realm.beginTransaction();
+        final String finalAiringStatus = airingStatus;
+        final String finalShowType = showType;
+        final String finalStartAiringDate = startAiringDate;
+        final String finalFinishAiringDate = finishAiringDate;
 
-        currSeries.setShowType(showType);
-        currSeries.setSingle(single);
-        if (!holder.getEnglishTitle().isEmpty()){
-            currSeries.setEnglishTitle(holder.getEnglishTitle());
-        } else {
-            currSeries.setEnglishTitle(currSeries.getName());
-        }
-        currSeries.setAiringStatus(airingStatus);
-        currSeries.setStartedAiringDate(startAiringDate);
-        currSeries.setFinishedAiringDate(finishAiringDate);
-
-        realm.commitTransaction();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                currSeries.setShowType(finalShowType);
+                currSeries.setSingle(single);
+                if (!holder.getEnglishTitle().isEmpty()){
+                    currSeries.setEnglishTitle(holder.getEnglishTitle());
+                } else {
+                    currSeries.setEnglishTitle(currSeries.getName());
+                }
+                currSeries.setAiringStatus(finalAiringStatus);
+                currSeries.setStartedAiringDate(finalStartAiringDate);
+                currSeries.setFinishedAiringDate(finalFinishAiringDate);
+            }
+        });
 
         if (!holder.getImageURL().isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + currSeries.getMALID(), "drawable", "me.jakemoritz.animebuzz") == 0) {
             ImageRequest imageRequest = new ImageRequest(currSeries);

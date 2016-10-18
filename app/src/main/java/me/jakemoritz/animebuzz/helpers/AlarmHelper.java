@@ -18,6 +18,7 @@ import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
+
 public class AlarmHelper {
     private static AlarmHelper alarmHelper;
     private AlarmManager alarmManager;
@@ -31,28 +32,24 @@ public class AlarmHelper {
     }
 
     public void resetAlarms() {
-        Realm realm = Realm.getDefaultInstance();
-        cancelAllAlarms(realm.where(Alarm.class).findAll());
+        cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
 
-        final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
-        realm.executeTransaction(new Realm.Transaction() {
+        final RealmResults<Alarm> alarmRealmResults = App.getInstance().getRealm().where(Alarm.class).findAll();
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 alarmRealmResults.deleteAllFromRealm();
             }
         });
-        realm.close();
-        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
+        for (Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
             makeAlarm(series);
         }
     }
 
     public void setAlarmsOnBoot() {
-        Realm realm = Realm.getDefaultInstance();
-        for (Alarm alarm : realm.where(Alarm.class).findAll()) {
+        for (Alarm alarm : App.getInstance().getRealm().where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }
-        realm.close();
     }
 
     private void setAlarm(Alarm alarm) {
@@ -76,9 +73,9 @@ public class AlarmHelper {
 
     public void calculateNextEpisodeTime(String MALID, Calendar calendar, boolean simulcast) {
         Realm realm = Realm.getDefaultInstance();
-        Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+        final Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
-        Calendar nextEpisode = Calendar.getInstance();
+        final Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
         nextEpisode.set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
@@ -97,21 +94,27 @@ public class AlarmHelper {
             App.getInstance().setNotificationReceived(false);
         }
 
-        String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
-        String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
+        final String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
+        final String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
         if (simulcast) {
-            realm.beginTransaction();
-            series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
-            series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
-            series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
-            realm.commitTransaction();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
+                    series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
+                    series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
+                }
+            });
         } else {
-            realm.beginTransaction();
-            series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
-            series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
-            series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
-            realm.commitTransaction();
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
+                    series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
+                    series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
+                }
+            });
         }
 
         realm.close();
@@ -167,38 +170,33 @@ public class AlarmHelper {
             nextEpisodeTime = series.getNextEpisodeAirtime();
         }
 
-        Realm realm = Realm.getDefaultInstance();
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Alarm newAlarm = App.getInstance().getRealm().createObject(Alarm.class, series.getMALID());
+                newAlarm.setAlarmTime(nextEpisodeTime);
+                newAlarm.setSeries(series);
 
-        Alarm newAlarm = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
+            }
+        });
 
-        if (newAlarm == null) {
-            realm.beginTransaction();
-
-            newAlarm = realm.createObject(Alarm.class, series.getMALID());
-            newAlarm.setAlarmTime(nextEpisodeTime);
-            newAlarm.setSeries(series);
-
-            realm.commitTransaction();
-        }
-        realm.close();
+        Alarm newAlarm = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findFirst();
 
         setAlarm(newAlarm);
     }
 
     public void switchAlarmTiming() {
-        Realm realm = Realm.getDefaultInstance();
 
-        final RealmResults<Alarm> alarmRealmResults = realm.where(Alarm.class).findAll();
-        realm.executeTransaction(new Realm.Transaction() {
+        final RealmResults<Alarm> alarmRealmResults = App.getInstance().getRealm().where(Alarm.class).findAll();
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 alarmRealmResults.deleteAllFromRealm();
             }
         });
 
-        realm.close();
 
-        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
+        for (Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
             makeAlarm(series);
         }
     }
@@ -216,32 +214,30 @@ public class AlarmHelper {
     }
 
     public void removeAlarm(final Series series) {
-        Realm realm = Realm.getDefaultInstance();
-
-        for (Alarm alarm : realm.where(Alarm.class).findAll()) {
+        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
+        for (Alarm alarm : alarms) {
             if (alarm.getMALID().equals(series.getMALID())) {
                 int id = Integer.valueOf(series.getMALID());
                 alarmManager.cancel(createPendingIntent(id));
-
-                realm.beginTransaction();
-                alarm.deleteFromRealm();
-                realm.commitTransaction();
             }
         }
 
-        realm.close();
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                alarms.deleteAllFromRealm();
+            }
+        });
     }
 
     private void dummyAlarm() {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Alarm> alarms = realm.where(Alarm.class).findAll();
+        RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
         if (!alarms.isEmpty()) {
             long time = System.currentTimeMillis();
             time += 5000L;
             // needs transaction
             alarms.get(0).setAlarmTime(time);
         }
-        realm.close();
     }
 
 }

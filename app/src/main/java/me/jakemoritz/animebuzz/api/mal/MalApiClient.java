@@ -86,9 +86,7 @@ public class MalApiClient {
     }
 
     public void updateAnimeEpisodeCount(String MALID) {
-        Realm realm = Realm.getDefaultInstance();
-        Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-        realm.close();
+        Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
         if (series != null) {
             MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
             Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + (series.getEpisodesWatched() + 1) + "</episode></entry>", MALID);
@@ -157,15 +155,14 @@ public class MalApiClient {
                         MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
-                        Realm realm = Realm.getDefaultInstance();
-
-                        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()){
-                            realm.beginTransaction();
-                            series.setInUserList(false);
-                            realm.commitTransaction();
-                        }
-
-                        realm.close();
+                        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
+                                    series.setInUserList(false);
+                                }
+                            }
+                        });
 
                         seriesFragment.malDataImported(true);
                     }

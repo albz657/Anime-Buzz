@@ -36,7 +36,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
     public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(parent.getContext(), backlogItems, true);
         this.malApiClient = new MalApiClient(parent);
-        this.fragment =  parent;
+        this.fragment = parent;
         ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
         this.touchHelper = new ItemTouchHelper(callback);
     }
@@ -52,14 +52,14 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.backlogItem = getData().get(position);
 
-        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()){
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
         } else {
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
         int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", "me.jakemoritz.animebuzz");
-        if (imageId != 0){
+        if (imageId != 0) {
             Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
         } else {
             Picasso.with(App.getInstance()).load(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
@@ -119,19 +119,22 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
     @Override
     public void onItemDismiss(int position) {
-        Series series = getData().get(position).getSeries();
+        Series series = getItem(position).getSeries();
 
         if (SharedPrefsHelper.getInstance().prefersIncrementDialog() && SharedPrefsHelper.getInstance().isLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            BacklogItem removedItem = getData().get(position);
+            final BacklogItem removedItem = getItem(position);
 
-            Realm realm = Realm.getDefaultInstance();
-            realm.beginTransaction();
-            removedItem.deleteFromRealm();
-            realm.commitTransaction();
-            realm.close();
+            if (removedItem != null) {
+                App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        removedItem.deleteFromRealm();
+                    }
+                });
+            }
         }
     }
 
@@ -143,13 +146,16 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }
 
-        BacklogItem removedItem = getData().get(position);
+        final BacklogItem removedItem = getItem(position);
 
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        removedItem.deleteFromRealm();
-        realm.commitTransaction();
-        realm.close();
+        if (removedItem != null) {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    removedItem.deleteFromRealm();
+                }
+            });
+        }
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

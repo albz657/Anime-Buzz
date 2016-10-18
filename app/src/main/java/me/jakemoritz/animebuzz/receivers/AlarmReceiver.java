@@ -25,14 +25,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Realm realm = Realm.getDefaultInstance();
 
-        Alarm thisAlarm = realm.where(Alarm.class).equalTo("MALID", intentExtra).findFirst();
+        final Alarm thisAlarm = realm.where(Alarm.class).equalTo("MALID", intentExtra).findFirst();
 
         if (thisAlarm != null) {
-            Series series = realm.where(Series.class).equalTo("MALID", intentExtra).findFirst();
+            final Series series = realm.where(Series.class).equalTo("MALID", intentExtra).findFirst();
 
             if (series != null){
                 Calendar currentTime = Calendar.getInstance();
-                Calendar lastNotificationTime = Calendar.getInstance();
+                final Calendar lastNotificationTime = Calendar.getInstance();
                 lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                 if (currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
@@ -42,17 +42,18 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                     App.getInstance().setNotificationReceived(true);
 
-                    realm.beginTransaction();
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            thisAlarm.deleteFromRealm();
 
-                    thisAlarm.deleteFromRealm();
+                            BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                            backlogItem.setSeries(series);
+                            backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
 
-                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
-                    backlogItem.setSeries(series);
-                    backlogItem.setAlarmTime(thisAlarm.getAlarmTime());
-
-                    series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
-
-                    realm.commitTransaction();
+                            series.setLastNotificationTime(lastNotificationTime.getTimeInMillis());
+                        }
+                    });
 
                     AlarmHelper.getInstance().makeAlarm(series);
 

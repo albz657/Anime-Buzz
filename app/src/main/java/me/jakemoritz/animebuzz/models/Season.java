@@ -24,10 +24,8 @@ public class Season extends RealmObject {
 
     public static String calculateRelativeTime(String seasonName) {
         Realm realm = Realm.getDefaultInstance();
-
         Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
         Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
-
 
         RealmList<Season> allSeasons = new RealmList<>();
         allSeasons.addAll(realm.where(Season.class).findAll());
@@ -47,9 +45,7 @@ public class Season extends RealmObject {
                 relativeTime = PAST;
             }
 
-//            realm.beginTransaction();
             return relativeTime;
-//            realm.commitTransaction();
         }
         realm.close();
         return "";

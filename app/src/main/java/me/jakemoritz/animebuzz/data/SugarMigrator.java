@@ -13,6 +13,7 @@ import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
+
 public class SugarMigrator {
 
     // Table names
@@ -72,7 +73,6 @@ public class SugarMigrator {
     }
 
     private static void migrateSeason(SQLiteDatabase sugarDb) {
-        Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SEASON, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -80,10 +80,10 @@ public class SugarMigrator {
             final String seasonName = cursor.getString(cursor.getColumnIndex(SEASON_NAME));
             final String startTimeStamp = cursor.getString(cursor.getColumnIndex(START_TIMESTAMP));
 
-            realm.executeTransaction(new Realm.Transaction() {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Season season = realm.createObject(Season.class, seasonKey);
+                    Season season = App.getInstance().getRealm().createObject(Season.class, seasonKey);
                     season.setName(seasonName);
                     season.setStartDate(startTimeStamp);
                 }
@@ -92,19 +92,21 @@ public class SugarMigrator {
             cursor.moveToNext();
         }
 
-        RealmResults<Season> seasonRealmResults = realm.where(Season.class).findAll();
-        for (Season season : seasonRealmResults) {
-            String relativeTime = Season.calculateRelativeTime(season.getName());
-            realm.beginTransaction();
-            season.setRelativeTime(relativeTime);
-            realm.commitTransaction();
+        RealmResults<Season> seasonRealmResults = App.getInstance().getRealm().where(Season.class).findAll();
+
+        for (final Season season : seasonRealmResults) {
+            final String relativeTime = Season.calculateRelativeTime(season.getName());
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    season.setRelativeTime(relativeTime);
+                }
+            });
         }
         cursor.close();
-        realm.close();
     }
 
     private static void migrateSeries(SQLiteDatabase sugarDb) {
-        Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SERIES, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -127,6 +129,7 @@ public class SugarMigrator {
             if (englishTitle.isEmpty()) {
                 englishTitle = name;
             }
+            final String finalEnglishTitle = englishTitle;
             final String finishedAiringDate = cursor.getString(cursor.getColumnIndex(FINISHED_AIRING_DATE));
             final String nextEpisodeAirtimeFormatted = cursor.getString(cursor.getColumnIndex(NEXT_EPISODE_AIRTIME_FORMATTED));
             final String nextEpisodeAirtimeFormatted24 = cursor.getString(cursor.getColumnIndex(NEXT_EPISODE_AIRTIME_FORMATTED24));
@@ -139,11 +142,11 @@ public class SugarMigrator {
 
             final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(SIMULCASTDELAY));
 
-            final Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
-            realm.executeTransaction(new Realm.Transaction() {
+            final Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Series series = realm.createObject(Series.class, MALID);
+                    Series series = App.getInstance().getRealm().createObject(Series.class, MALID);
                     series.setANNID(ANNID);
                     series.setName(name);
                     series.setAiringStatus(airingStatus);
@@ -163,14 +166,12 @@ public class SugarMigrator {
                     series.setSingle(single == 1);
                     series.setEpisodesWatched(episodesWatched);
                     series.setSeason(season);
+                    series.setEnglishTitle(finalEnglishTitle);
                     season.getSeasonSeries().add(series);
                 }
             });
 
-            Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-            realm.beginTransaction();
-            series.setEnglishTitle(englishTitle);
-            realm.commitTransaction();
+            Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
 
             if (airingStatus.equals("Airing")) {
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
@@ -179,22 +180,20 @@ public class SugarMigrator {
             cursor.moveToNext();
         }
         cursor.close();
-        realm.close();
     }
 
     private static void migrateBacklog(SQLiteDatabase sugarDb) {
-        Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_BACKLOG, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             final long alarmTime = cursor.getLong(cursor.getColumnIndex(BACKLOG_TIME));
             int seriesMALID = cursor.getInt(cursor.getColumnIndex(SERIES));
-            final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
+            final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
 
-            realm.executeTransaction(new Realm.Transaction() {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                    BacklogItem backlogItem = App.getInstance().getRealm().createObject(BacklogItem.class);
                     backlogItem.setAlarmTime(alarmTime);
                     backlogItem.setSeries(series);
                 }
@@ -204,23 +203,21 @@ public class SugarMigrator {
         }
 
         cursor.close();
-        realm.close();
     }
 
     private static void migrateAlarms(SQLiteDatabase sugarDb) {
-        Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ALARM, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
             final long alarmTime = cursor.getLong(cursor.getColumnIndex(ALARM_TIME));
             final int seriesMALID = cursor.getInt(cursor.getColumnIndex(ALARM_MALID));
-            final Series series = realm.where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
+            final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", String.valueOf(seriesMALID)).findFirst();
 
-            realm.executeTransaction(new Realm.Transaction() {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     try {
-                        Alarm alarm = realm.createObject(Alarm.class, String.valueOf(seriesMALID));
+                        Alarm alarm = App.getInstance().getRealm().createObject(Alarm.class, String.valueOf(seriesMALID));
                         alarm.setAlarmTime(alarmTime);
                         alarm.setSeries(series);
                     } catch (RealmPrimaryKeyConstraintException e) {
@@ -233,6 +230,5 @@ public class SugarMigrator {
         }
 
         cursor.close();
-        realm.close();
     }
 }

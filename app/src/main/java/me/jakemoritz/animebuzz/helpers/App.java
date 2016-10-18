@@ -29,6 +29,7 @@ public class App extends Application {
     private boolean justLaunched = false;
     private boolean notificationReceived = false;
     private boolean justUpdated = false;
+    private Realm realm;
 
     public static synchronized App getInstance() {
         return mInstance;
@@ -125,5 +126,13 @@ public class App extends Application {
 
     public void setJustUpdated(boolean justUpdated) {
         this.justUpdated = justUpdated;
+    }
+
+    public Realm getRealm() {
+        return realm;
+    }
+
+    public void setRealm(Realm realm) {
+        this.realm = realm;
     }
 }

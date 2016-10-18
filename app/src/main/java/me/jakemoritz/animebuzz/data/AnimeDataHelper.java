@@ -12,9 +12,11 @@ import java.util.List;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+
 
 public class AnimeDataHelper {
 
@@ -54,7 +56,6 @@ public class AnimeDataHelper {
     }
 
     public void migrateSeries(SQLiteDatabase sugarDb) {
-        Realm realm = Realm.getDefaultInstance();
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
@@ -79,6 +80,8 @@ public class AnimeDataHelper {
                 airingStatus = "Airing";
             }
 
+            final String finalAiringStatus = airingStatus;
+
             final String finishedAiringDate = "";
             final String nextEpisodeAirtimeFormatted = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED));
             final String nextEpisodeAirtimeFormatted24 = cursor.getString(cursor.getColumnIndex(KEY_NEXT_EPISODE_AIRTIME_FORMATTED_24));
@@ -91,16 +94,16 @@ public class AnimeDataHelper {
 
             final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(KEY_SIMULCAST_DELAY));
 
-            final Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
+            final Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
 
             Type type = new TypeToken<ArrayList<Long>>() {
             }.getType();
-            List<Long> backlog = new Gson().fromJson(cursor.getString(cursor.getColumnIndex(KEY_BACKLOG)), type);
+            final List<Long> backlog = new Gson().fromJson(cursor.getString(cursor.getColumnIndex(KEY_BACKLOG)), type);
 
-            realm.executeTransaction(new Realm.Transaction() {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Series series = realm.createObject(Series.class, MALID);
+                    final Series series = App.getInstance().getRealm().createObject(Series.class, MALID);
                     series.setANNID(ANNID);
                     series.setName(name);
                     series.setFinishedAiringDate(finishedAiringDate);
@@ -120,26 +123,23 @@ public class AnimeDataHelper {
                     series.setEpisodesWatched(episodesWatched);
                     series.setSeason(season);
                     series.setEnglishTitle(name);
+                    series.setAiringStatus(finalAiringStatus);
                     season.getSeasonSeries().add(series);
                 }
             });
 
-            final Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+            final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
 
-            for (final Long alarmTime : backlog){
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    for (final Long alarmTime : backlog) {
+                        BacklogItem backlogItem = App.getInstance().getRealm().createObject(BacklogItem.class);
                         backlogItem.setAlarmTime(alarmTime);
                         backlogItem.setSeries(series);
                     }
-                });
-            }
-
-            realm.beginTransaction();
-            series.setAiringStatus(airingStatus);
-            realm.commitTransaction();
+                }
+            });
 
             if (airingStatus.equals("Airing")) {
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
@@ -148,7 +148,6 @@ public class AnimeDataHelper {
             cursor.moveToNext();
         }
         cursor.close();
-        realm.close();
     }
 
 }

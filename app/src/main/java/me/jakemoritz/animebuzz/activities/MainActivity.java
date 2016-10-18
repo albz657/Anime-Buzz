@@ -49,7 +49,6 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
 public class MainActivity extends AppCompatActivity
@@ -64,7 +63,6 @@ public class MainActivity extends AppCompatActivity
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private AlarmReceiver alarmReceiver;
-    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +75,11 @@ public class MainActivity extends AppCompatActivity
         IntentFilter callIntercepterIntentFilter = new IntentFilter("android.intent.action.ANY_ACTION");
         registerReceiver(alarmReceiver, callIntercepterIntentFilter);
 
-        realm = Realm.getDefaultInstance();
+        if (App.getInstance().getRealm() != null){
+            App.getInstance().getRealm().close();
+        }
+
+        App.getInstance().setRealm(Realm.getDefaultInstance());
 
         // Check if user has completed setup
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || getIntent().getBooleanExtra(getString(R.string.shared_prefs_completed_setup), false)) {
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(alarmReceiver);
-        realm.close();
+        App.getInstance().getRealm().close();
     }
 
     @Override
@@ -321,7 +323,7 @@ public class MainActivity extends AppCompatActivity
 
         boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
 
-        if (!sameDay && false) {
+/*        if (!sameDay && false) {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -343,7 +345,7 @@ public class MainActivity extends AppCompatActivity
                 }
             });
 
-        }
+        }*/
 
         return sameDay;
     }

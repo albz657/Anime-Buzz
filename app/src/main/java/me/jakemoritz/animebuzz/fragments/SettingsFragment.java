@@ -39,6 +39,7 @@ import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
+
 public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
@@ -54,8 +55,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private SwitchPreference incrementPreference;
     private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
-
-    private Realm realm = Realm.getDefaultInstance();
 
     public SettingsFragment() {
 
@@ -82,11 +81,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        realm.close();
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -268,15 +262,20 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         MalApiClient malApiClient = new MalApiClient(currentlyWatchingFragment);
 
-        RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
+        final RealmResults<Series> userList = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll();
         if (!add) {
-            realm.beginTransaction();
-            for (Series series : userList) {
-                series.setInUserList(false);
-            }
-            AlarmHelper.getInstance().cancelAllAlarms(realm.where(Alarm.class).findAll());
-            realm.where(Alarm.class).findAll().deleteAllFromRealm();
-            realm.commitTransaction();
+            AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
+
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    for (Series series : userList) {
+                        series.setInUserList(false);
+                    }
+                    App.getInstance().getRealm().where(Alarm.class).findAll().deleteAllFromRealm();
+                }
+            });
+
         } else {
             for (Series series : userList) {
                 malApiClient.addAnime(String.valueOf(series.getMALID()));
@@ -303,7 +302,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             signOutPreference.setSummary(summary);
         }
 
-        if (!realm.where(Series.class).equalTo("isInUserList", true).findAll().isEmpty()) {
+        if (!App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll().isEmpty()) {
             importExistingSeries();
         } else {
             CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 
 class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
@@ -33,23 +34,23 @@ class SeasonMetadataDeserializer implements JsonDeserializer<RealmList<Season>>{
                 String seasonName = metadata.get("name").getAsString();
                 String startTimestamp = metadata.get("start_timestamp").getAsString();
 
-                Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
-
-                if (season == null) {
-                    season = new Season();
+                if (!seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+                    final Season season = new Season();
                     season.setKey(seasonKey);
                     season.setName(seasonName);
                     season.setStartDate(startTimestamp);
                     season.setRelativeTime(Season.calculateRelativeTime(seasonName));
-                } else {
-                    realm.beginTransaction();
-                    season.setName(seasonName);
-                    season.setStartDate(startTimestamp);
-                    season.setRelativeTime(Season.calculateRelativeTime(seasonName));
-                    realm.commitTransaction();
+
+                    realm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            realm.insertOrUpdate(season);
+                        }
+                    });
+
+                    metadataList.add(season);
                 }
 
-                metadataList.add(season);
             }
         }
         realm.close();

@@ -65,7 +65,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private boolean adding = false;
     private Series itemToBeChanged;
     private MainActivity mainActivity;
-    private Realm realm;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,7 +72,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
-        realm = Realm.getDefaultInstance();
     }
 
     @Override
@@ -99,10 +97,10 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
         }
 
         if (this instanceof SeasonsFragment) {
-            realmResults = realm.where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
-            realmResults = realm.where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
@@ -154,12 +152,6 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        realm.close();
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) context;
@@ -167,7 +159,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
-        Season season = realm.where(Season.class).equalTo("key", seasonKey).findFirst();
+        Season season = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
         if (season != null) {
             if (App.getInstance().isInitializing() && season.getSeasonSeries().isEmpty()) {
                 FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
@@ -221,25 +213,22 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     @Override
-    public void senpaiSeasonListReceived(RealmList<Season> seasonMetaList) {
-        if (seasonMetaList != null) {
-            NotificationHelper.getInstance().createSeasonDataNotification("Getting list of seasons...");
+    public void senpaiSeasonListReceived() {
+        NotificationHelper.getInstance().createSeasonDataNotification("Getting list of seasons...");
 
-            RealmList<Season> seasonList = new RealmList<>();
-            seasonList.addAll(realm.where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll());
+        RealmList<Season> seasonList = new RealmList<>();
+        RealmResults<Season> seasonsResults = App.getInstance().getRealm().where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll();
 
-            App.getInstance().setSyncingSeasons(seasonList);
+        seasonList.addAll(seasonsResults);
 
-            NotificationHelper.getInstance().setTotalSyncingSeasons(App.getInstance().getSyncingSeasons().size());
+        App.getInstance().setSyncingSeasons(seasonList);
 
-            Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonComparator());
-            Season seasonMetadata = App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1);
-            NotificationHelper.getInstance().createSeasonDataNotification(seasonMetadata.getName());
-            senpaiExportHelper.getSeasonData(seasonMetadata);
-        } else {
-            FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-            failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
-        }
+        NotificationHelper.getInstance().setTotalSyncingSeasons(App.getInstance().getSyncingSeasons().size());
+
+        Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonComparator());
+        Season seasonMetadata = App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1);
+        NotificationHelper.getInstance().createSeasonDataNotification(seasonMetadata.getName());
+        senpaiExportHelper.getSeasonData(seasonMetadata);
     }
 
     @Override
@@ -333,7 +322,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     private void addSeries(final Series item) {
         adding = false;
 
-        realm.executeTransaction(new Realm.Transaction() {
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 item.setInUserList(true);
@@ -347,7 +336,7 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
     }
 
     private void removeSeries(final Series item) {
-        realm.executeTransaction(new Realm.Transaction() {
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 item.setInUserList(false);
@@ -456,9 +445,5 @@ public abstract class SeriesFragment extends Fragment implements SeasonPostersIm
 
     public MainActivity getMainActivity() {
         return mainActivity;
-    }
-
-    public Realm getRealm() {
-        return realm;
     }
 }

@@ -7,8 +7,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.realm.Realm;
 import io.realm.RealmList;
+import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -51,30 +51,24 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<RealmList<Season>> call, retrofit2.Response<RealmList<Season>> response) {
                 if (response.isSuccessful()) {
-                    Realm realm = Realm.getDefaultInstance();
-
-                    for (Season season : response.body()){
-                        if (!season.isManaged()){
-                            realm.beginTransaction();
-                            realm.copyToRealm(season);
-                            realm.commitTransaction();
-                        }
-                    }
-
-                    realm.close();
-
-                    fragment.senpaiSeasonListReceived(response.body());
+                    fragment.senpaiSeasonListReceived();
 
                     Log.d(TAG, "Got season list");
                 } else {
-                    fragment.senpaiSeasonListReceived(null);
+                    if (App.getInstance().isInitializing()){
+                        FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(fragment);
+                        failedInitializationFragment.show(fragment.getMainActivity().getFragmentManager(), TAG);
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<RealmList<Season>> call, Throwable t) {
                 Log.d(TAG, "Failed getting season list");
-                fragment.senpaiSeasonListReceived(null);
+                if (App.getInstance().isInitializing()){
+                    FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(fragment);
+                    failedInitializationFragment.show(fragment.getMainActivity().getFragmentManager(), TAG);
+                }
             }
         });
     }
