@@ -4,11 +4,13 @@ import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
+import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
 class MalImportHelper {
@@ -41,9 +43,10 @@ class MalImportHelper {
             @Override
             public void execute(Realm realm) {
                 for (final Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
-                    if (!matchedSeries.contains(series) || !series.getShowType().equals("TV")) {
+                    if (!matchedSeries.contains(series) || (!series.getShowType().equals("TV") && !series.getShowType().isEmpty())) {
                         series.setInUserList(false);
-                        AlarmHelper.getInstance().removeAlarm(series);
+                        RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
+                        alarms.deleteAllFromRealm();
                     }
                 }
             }

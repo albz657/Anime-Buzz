@@ -194,6 +194,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public void hummingbirdSeasonReceived() {
         if (App.getInstance().isJustUpdated()){
+            App.getInstance().setJustUpdated(false);
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
             senpaiExportHelper.getSeasonList();

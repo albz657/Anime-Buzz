@@ -172,10 +172,12 @@ public class AlarmHelper {
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                Alarm newAlarm = App.getInstance().getRealm().createObject(Alarm.class, series.getMALID());
-                newAlarm.setAlarmTime(nextEpisodeTime);
-                newAlarm.setSeries(series);
+                Alarm alarm = new Alarm();
+                alarm.setMALID(series.getMALID());
+                alarm.setAlarmTime(nextEpisodeTime);
+                alarm.setSeries(series);
 
+                App.getInstance().getRealm().insertOrUpdate(alarm);
             }
         });
 
