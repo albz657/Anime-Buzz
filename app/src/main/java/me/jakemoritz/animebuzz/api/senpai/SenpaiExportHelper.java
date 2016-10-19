@@ -74,7 +74,6 @@ public class SenpaiExportHelper {
     }
 
     public void getSeasonData(final Season season) {
-//        Season currSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", season)
         Log.d(TAG, "Getting season data for: '" + season.getName() + "'");
 
         if (App.getInstance().isPostInitializing()) {
@@ -84,11 +83,6 @@ public class SenpaiExportHelper {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
-
-/*        OkHttpClient client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(10, TimeUnit.SECONDS)
-                .build();*/
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)

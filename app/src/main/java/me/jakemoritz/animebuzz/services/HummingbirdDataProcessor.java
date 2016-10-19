@@ -65,7 +65,7 @@ public class HummingbirdDataProcessor extends IntentService {
             formattedStartAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
             if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                 if (currentCalendar.compareTo(startedCalendar) > 0) {
-                    if (currSeries.isSingle()) {
+                    if (single) {
                         airingStatus = "Finished airing";
                     } else {
                         airingStatus = "Airing";
