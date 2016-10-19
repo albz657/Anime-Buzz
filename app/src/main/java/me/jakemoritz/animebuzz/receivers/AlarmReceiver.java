@@ -16,6 +16,8 @@ import me.jakemoritz.animebuzz.models.Series;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
+    private final static String TAG = AlarmReceiver.class.getSimpleName();
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String intentExtra = intent.getStringExtra("id");

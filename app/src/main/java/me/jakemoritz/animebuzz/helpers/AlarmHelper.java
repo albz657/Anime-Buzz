@@ -51,11 +51,11 @@ public class AlarmHelper {
     public void setAlarmsOnBoot() {
 //        dummyAlarm();
         DailyTimeGenerator.getInstance().setNextAlarm(true);
-        for (Alarm alarm : App.getInstance().getRealm().where(Alarm.class).findAll()) {
+        Realm realm = Realm.getDefaultInstance();
+        for (Alarm alarm : realm.where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }
-
-
+        realm.close();
     }
 
     private void setAlarm(Alarm alarm) {
