@@ -37,9 +37,12 @@ public class SeasonDataHelper {
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Season season = App.getInstance().getRealm().createObject(Season.class, seasonKey);
+                    Season season = new Season();
+                    season.setKey(seasonKey);
                     season.setName(seasonName);
                     season.setStart_timestamp(startTimeStamp);
+
+                    App.getInstance().getRealm().insertOrUpdate(season);
                 }
             });
 
