@@ -101,6 +101,8 @@ public class NotificationHelper {
             notification.ledARGB = Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16);
         }
 
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
         mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
     }
 }

@@ -12,6 +12,7 @@ import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
 import okhttp3.OkHttpClient;
@@ -96,6 +97,10 @@ public class SenpaiExportHelper {
             @Override
             public void onResponse(Call<String> call, retrofit2.Response<String> response) {
                 if (response.isSuccessful()) {
+                    if (response.body().equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
+                        SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
+                    }
+
                     if (App.getInstance().isPostInitializing()) {
                         if (App.getInstance().getSyncingSeasons().isEmpty()) {
                             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
