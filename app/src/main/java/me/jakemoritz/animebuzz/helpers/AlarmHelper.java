@@ -50,9 +50,12 @@ public class AlarmHelper {
 
     public void setAlarmsOnBoot() {
 //        dummyAlarm();
+        DailyTimeGenerator.getInstance().setNextAlarm(true);
         for (Alarm alarm : App.getInstance().getRealm().where(Alarm.class).findAll()) {
             setAlarm(alarm);
         }
+
+
     }
 
     private void setAlarm(Alarm alarm) {

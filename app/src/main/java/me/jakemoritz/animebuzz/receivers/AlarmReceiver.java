@@ -58,7 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             AlarmHelper.getInstance().setAlarmsOnBoot();
-            DailyTimeGenerator.getInstance().setNextAlarm();
+            DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
     }
 }

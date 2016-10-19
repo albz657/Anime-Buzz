@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
             progressView.startAnimation();
         } else {
             if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L){
-                DailyTimeGenerator.getInstance().setNextAlarm();
+                DailyTimeGenerator.getInstance().setNextAlarm(false);
             }
 
             // Default startup procedure

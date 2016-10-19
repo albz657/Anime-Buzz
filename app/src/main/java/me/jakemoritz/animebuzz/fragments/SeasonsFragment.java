@@ -164,7 +164,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
 
             stopInitialSpinner();
-            DailyTimeGenerator.getInstance().setNextAlarm();
+            DailyTimeGenerator.getInstance().setNextAlarm(false);
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
             getSenpaiExportHelper().getSeasonList();

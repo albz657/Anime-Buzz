@@ -102,7 +102,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
 
-            DailyTimeGenerator.getInstance().setNextAlarm();
+            DailyTimeGenerator.getInstance().setNextAlarm(false);
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
             getSenpaiExportHelper().getSeasonList();

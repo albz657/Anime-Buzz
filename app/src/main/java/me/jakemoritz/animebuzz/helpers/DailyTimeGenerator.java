@@ -24,14 +24,14 @@ public class DailyTimeGenerator {
         return dailyTimeGenerator;
     }
 
-    public void setNextAlarm(){
+    public void setNextAlarm(boolean booted){
         long lastUpdateTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
 
         Calendar currentCalendar = Calendar.getInstance();
         Calendar lastUpdateCalendar = Calendar.getInstance();
         lastUpdateCalendar.setTimeInMillis(lastUpdateTime);
 
-        if ((lastUpdateTime == 0L) || (currentCalendar.get(Calendar.DAY_OF_YEAR) != lastUpdateCalendar.get(Calendar.DAY_OF_YEAR))){
+        if ((lastUpdateTime == 0L) || (currentCalendar.get(Calendar.DAY_OF_YEAR) != lastUpdateCalendar.get(Calendar.DAY_OF_YEAR)) || booted){
             // Sets calendar to the next day at 12:01:00:00 AM
             Calendar nextAlarmCalendar = Calendar.getInstance();
             nextAlarmCalendar.set(Calendar.HOUR_OF_DAY, 24);
@@ -41,7 +41,7 @@ public class DailyTimeGenerator {
 
             Intent timeGeneratorIntent = new Intent(App.getInstance(), DailyReceiver.class);
             timeGeneratorIntent.setAction("GENERATE_TIME");
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), 0, timeGeneratorIntent, 0);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), 0, timeGeneratorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, nextAlarmCalendar.getTimeInMillis(), pendingIntent);
         }
