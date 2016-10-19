@@ -85,16 +85,11 @@ public class AlarmHelper {
         nextEpisode.set(Calendar.SECOND, 0);
         nextEpisode.set(Calendar.MILLISECOND, 0);
 
-        if (!App.getInstance().isNotificationReceived()) {
-            Calendar currentTime = Calendar.getInstance();
-            currentTime.set(Calendar.SECOND, 0);
-            currentTime.set(Calendar.MILLISECOND, 0);
-            if (currentTime.compareTo(nextEpisode) >= 0) {
-                nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-            }
-        } else {
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+        if (currentTime.compareTo(nextEpisode) >= 0) {
             nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
-            App.getInstance().setNotificationReceived(false);
         }
 
         final String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
@@ -166,7 +161,7 @@ public class AlarmHelper {
 
 
     public void makeAlarm(final Series series) {
-        if (series.getAiringStatus().equals("Airing")){
+        if (series.getAiringStatus().equals("Airing")) {
             final long nextEpisodeTime;
             if (series.getNextEpisodeSimulcastTime() != 0L && SharedPrefsHelper.getInstance().prefersSimulcast()) {
                 nextEpisodeTime = series.getNextEpisodeSimulcastTime();
@@ -182,7 +177,7 @@ public class AlarmHelper {
                     alarm.setAlarmTime(nextEpisodeTime);
                     alarm.setSeries(series);
 
-                    App.getInstance().getRealm().insertOrUpdate(alarm);
+                    realm.insertOrUpdate(alarm);
                 }
             });
 
@@ -212,7 +207,7 @@ public class AlarmHelper {
     private PendingIntent createPendingIntent(int id) {
         Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
         notificationIntent.putExtra("id", String.valueOf(id));
-        return PendingIntent.getBroadcast(App.getInstance(), id, notificationIntent, 0);
+        return PendingIntent.getBroadcast(App.getInstance(), id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     public void cancelAllAlarms(List<Alarm> alarms) {

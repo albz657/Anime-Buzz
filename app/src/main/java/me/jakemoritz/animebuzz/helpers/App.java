@@ -94,14 +94,6 @@ public class App extends Application {
         this.syncingSeasons = syncingSeasons;
     }
 
-    public boolean isNotificationReceived() {
-        return notificationReceived;
-    }
-
-    public void setNotificationReceived(boolean notificationReceived) {
-        this.notificationReceived = notificationReceived;
-    }
-
     public boolean isJustUpdated() {
         return justUpdated;
     }

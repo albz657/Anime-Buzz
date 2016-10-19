@@ -8,7 +8,6 @@ import java.util.Calendar;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -36,13 +35,10 @@ public class AlarmReceiver extends BroadcastReceiver {
                     NotificationHelper helper = new NotificationHelper();
                     helper.createNewEpisodeNotification(series);
 
-                    App.getInstance().setNotificationReceived(true);
-
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
                             long alarmTime = thisAlarm.getAlarmTime();
-                            thisAlarm.deleteFromRealm();
 
                             BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                             backlogItem.setSeries(series);
