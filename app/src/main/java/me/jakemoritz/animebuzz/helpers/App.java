@@ -25,7 +25,6 @@ public class App extends Application {
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
     private boolean justLaunched = false;
-    private boolean notificationReceived = false;
     private boolean justUpdated = false;
     private Realm realm;
 
