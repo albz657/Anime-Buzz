@@ -116,6 +116,15 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
         }
 
+        holder.mShowType.setText(holder.backlogItem.getSeries().getShowType());
+        if (!holder.backlogItem.getSeries().getShowType().isEmpty()) {
+            holder.mShowType.setVisibility(View.VISIBLE);
+            GradientDrawable background = (GradientDrawable) holder.mShowType.getBackground();
+            background.setColor(ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal));
+        } else {
+            holder.mShowType.setVisibility(View.GONE);
+        }
+
         Calendar backlogCalendar = Calendar.getInstance();
         backlogCalendar.setTimeInMillis(holder.backlogItem.getAlarmTime());
         holder.mDate.setText(AlarmHelper.getInstance().formatAiringTime(backlogCalendar, SharedPrefsHelper.getInstance().prefers24hour()));
@@ -170,6 +179,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         final TextView mDate;
         final ImageView mWatch;
         final TextView mSimulcast;
+        final TextView mShowType;
 
         BacklogItem backlogItem;
 
@@ -181,6 +191,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             mDate = (TextView) view.findViewById(R.id.series_date);
             mWatch = (ImageView) view.findViewById(R.id.watch_imageview);
             mSimulcast = (TextView) view.findViewById(R.id.series_simulcast);
+            mShowType = (TextView) view.findViewById(R.id.series_type);
         }
     }
 }
