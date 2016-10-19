@@ -30,7 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Iterator;
 
 import io.realm.Realm;
@@ -46,6 +45,7 @@ import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 
@@ -92,6 +92,10 @@ public class MainActivity extends AppCompatActivity
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
+            if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L){
+                DailyTimeGenerator.getInstance().setNextAlarm();
+            }
+
             // Default startup procedure
             App.getInstance().setJustLaunched(true);
 
@@ -109,8 +113,6 @@ public class MainActivity extends AppCompatActivity
                 deleteDatabase("buzz_sugar.db");
                 deleteOldImages();
             }
-
-            updateFormattedTimes();
 
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
@@ -294,43 +296,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             return null;
         }
-    }
-
-    public boolean updateFormattedTimes() {
-        long lastUpdatedTime = SharedPrefsHelper.getInstance().getLastUpdateTime();
-
-        final Calendar currentCalendar = Calendar.getInstance();
-
-        Calendar lastUpdatedCalendar = Calendar.getInstance();
-        lastUpdatedCalendar.setTimeInMillis(lastUpdatedTime);
-
-        boolean sameDay = (currentCalendar.get(Calendar.YEAR) == lastUpdatedCalendar.get(Calendar.YEAR)) && (currentCalendar.get(Calendar.DAY_OF_YEAR) == lastUpdatedCalendar.get(Calendar.DAY_OF_YEAR));
-
-/*        if (!sameDay && false) {
-            realm.executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    for (Series series : realm.where(Series.class).equalTo("airingStatus", "Airing").findAll()) {
-                        if (series.getNextEpisodeAirtime() > 0) {
-                            Calendar airdateCalendar = Calendar.getInstance();
-                            airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series.getMALID(), airdateCalendar, false);
-                        }
-
-                        if (series.getNextEpisodeSimulcastTime() > 0) {
-                            Calendar airdateCalendar = Calendar.getInstance();
-                            airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
-                            AlarmHelper.getInstance().calculateNextEpisodeTime(series.getMALID(), airdateCalendar, true);
-                        }
-                    }
-
-                    SharedPrefsHelper.getInstance().setLastUpdateTime(currentCalendar.getTimeInMillis());
-                }
-            });
-
-        }*/
-
-        return sameDay;
     }
 
     public void cacheUserAvatar(Bitmap bitmap) {

@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
+import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -57,6 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
             AlarmHelper.getInstance().setAlarmsOnBoot();
+            DailyTimeGenerator.getInstance().setNextAlarm();
         }
     }
 }

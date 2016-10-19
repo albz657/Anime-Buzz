@@ -18,6 +18,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.models.Season;
@@ -163,6 +164,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
 
             stopInitialSpinner();
+            DailyTimeGenerator.getInstance().setNextAlarm();
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
             getSenpaiExportHelper().getSeasonList();

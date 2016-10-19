@@ -159,9 +159,20 @@ public class AlarmHelper {
         return formattedTime;
     }
 
-
     public void makeAlarm(final Series series) {
         if (series.getAiringStatus().equals("Airing")) {
+            if (series.getNextEpisodeAirtime() > 0) {
+                Calendar airdateCalendar = Calendar.getInstance();
+                airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());
+                calculateNextEpisodeTime(series.getMALID(), airdateCalendar, false);
+            }
+
+            if (series.getNextEpisodeSimulcastTime() > 0) {
+                Calendar airdateCalendar = Calendar.getInstance();
+                airdateCalendar.setTimeInMillis(series.getNextEpisodeSimulcastTime());
+                calculateNextEpisodeTime(series.getMALID(), airdateCalendar, true);
+            }
+
             final long nextEpisodeTime;
             if (series.getNextEpisodeSimulcastTime() != 0L && SharedPrefsHelper.getInstance().prefersSimulcast()) {
                 nextEpisodeTime = series.getNextEpisodeSimulcastTime();

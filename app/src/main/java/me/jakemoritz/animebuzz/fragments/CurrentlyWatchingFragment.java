@@ -16,6 +16,7 @@ import java.util.Set;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
@@ -101,6 +102,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
 
+            DailyTimeGenerator.getInstance().setNextAlarm();
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
             getSenpaiExportHelper().getSeasonList();
