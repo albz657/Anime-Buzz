@@ -48,7 +48,7 @@ public class DailyTimeGenerator {
     }
 
 
-    public class DailyReceiver extends BroadcastReceiver{
+    public static class DailyReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("GENERATE_TIME")){
