@@ -76,7 +76,6 @@ public class MainActivity extends AppCompatActivity
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
 
-
         App.getInstance().setRealm(Realm.getDefaultInstance());
 
         // Check if user has completed setup
@@ -194,6 +193,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (App.getInstance().getRealm() == null || App.getInstance().getRealm().isClosed()){
+//            Realm.init(App.getInstance());
+            App.getInstance().setRealm(Realm.getDefaultInstance());
+        }
 
         final Fragment fragment = getCurrentFragment();
         if (openRingtones) {
