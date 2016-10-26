@@ -102,10 +102,9 @@ public class App extends Application {
     }
 
     public Realm getRealm() {
+        if (realm == null || realm.isClosed()){
+            realm = Realm.getDefaultInstance();
+        }
         return realm;
-    }
-
-    public void setRealm(Realm realm) {
-        this.realm = realm;
     }
 }

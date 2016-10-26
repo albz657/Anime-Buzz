@@ -146,12 +146,13 @@ public class SugarMigrator {
 
             final double simulcastDelay = cursor.getDouble(cursor.getColumnIndex(SIMULCASTDELAY));
 
-            Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+            final Season season = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
             final String seasonKey = season.getKey();
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    Series series = App.getInstance().getRealm().createObject(Series.class, MALID);
+                    Series series = new Series();
+                    series.setMALID(MALID);
                     series.setANNID(ANNID);
                     series.setName(name);
                     series.setAiringStatus(airingStatus);
@@ -172,6 +173,8 @@ public class SugarMigrator {
                     series.setEpisodesWatched(episodesWatched);
                     series.setSeasonKey(seasonKey);
                     series.setEnglishTitle(finalEnglishTitle);
+
+                    realm.insertOrUpdate(series);
                 }
             });
 

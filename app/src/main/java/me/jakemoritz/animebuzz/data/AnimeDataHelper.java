@@ -104,7 +104,9 @@ public class AnimeDataHelper {
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    final Series series = App.getInstance().getRealm().createObject(Series.class, MALID);
+                    Series series = new Series();
+
+                    series.setMALID(MALID);
                     series.setANNID(ANNID);
                     series.setName(name);
                     series.setFinishedAiringDate(finishedAiringDate);
@@ -125,6 +127,8 @@ public class AnimeDataHelper {
                     series.setSeasonKey(seasonKey);
                     series.setEnglishTitle(name);
                     series.setAiringStatus(finalAiringStatus);
+
+                    realm.insertOrUpdate(series);
                 }
             });
 

@@ -32,7 +32,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import io.realm.Realm;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
@@ -66,17 +65,11 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (App.getInstance().getRealm() != null){
-            App.getInstance().getRealm().close();
-        }
-
         boolean justFailed = SharedPrefsHelper.getInstance().isJustFailed();
         if (justFailed){
-            Realm.init(App.getInstance());
+//            Realm.init(App.getInstance());
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
-
-        App.getInstance().setRealm(Realm.getDefaultInstance());
 
         // Check if user has completed setup
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || justFailed) {
@@ -194,11 +187,6 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
 
-        if (App.getInstance().getRealm() == null || App.getInstance().getRealm().isClosed()){
-//            Realm.init(App.getInstance());
-            App.getInstance().setRealm(Realm.getDefaultInstance());
-        }
-
         final Fragment fragment = getCurrentFragment();
         if (openRingtones) {
             if (fragment instanceof SettingsFragment) {
@@ -216,7 +204,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        App.getInstance().getRealm().close();
+
+        if (App.getInstance().getRealm() != null && !App.getInstance().getRealm().isClosed()){
+            App.getInstance().getRealm().close();
+        }
     }
 
     @Override
