@@ -105,7 +105,6 @@ public class AnimeDataHelper {
                 @Override
                 public void execute(Realm realm) {
                     Series series = new Series();
-
                     series.setMALID(MALID);
                     series.setANNID(ANNID);
                     series.setName(name);

@@ -58,16 +58,16 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE) {
-                    if (App.getInstance().isNetworkAvailable()){
+                    if (App.getInstance().isNetworkAvailable()) {
                         attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                     } else {
-                        Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
-                        View view = failSnackbar.getView();
-                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-                        params.gravity = Gravity.TOP;
-                        view.setLayoutParams(params);
+                        if (dialogView != null) {
+                            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
+                            View view = failSnackbar.getView();
+                            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                            params.gravity = Gravity.TOP;
+                            view.setLayoutParams(params);
 
-                        if (dialogView != null){
                             failSnackbar.show();
                         }
                     }
@@ -80,17 +80,18 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (App.getInstance().isNetworkAvailable()){
+                if (App.getInstance().isNetworkAvailable()) {
                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                 } else {
-                    Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
-                    View view1 = failSnackbar.getView();
-                    FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
-                    params.gravity = Gravity.TOP;
-                    view.setLayoutParams(params);
-                    failSnackbar.show();
+                    if (view != null){
+                        Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
+                        View view1 = failSnackbar.getView();
+                        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
+                        params.gravity = Gravity.TOP;
+                        view.setLayoutParams(params);
+                        failSnackbar.show();
+                    }
                 }
-
             }
         });
 
@@ -102,7 +103,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            if (mainActivity.getNavigationView() != null){
+            if (mainActivity.getNavigationView() != null) {
                 Snackbar.make(mainActivity.getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
             }
         }
@@ -120,14 +121,16 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
             getDialog().cancel();
         } else {
-            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.verification_failed), Snackbar.LENGTH_LONG);
-            View view = failSnackbar.getView();
-            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
-            params.gravity = Gravity.TOP;
-            view.setLayoutParams(params);
+            if (dialogView != null) {
+                Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.verification_failed), Snackbar.LENGTH_LONG);
+                View view = failSnackbar.getView();
+                FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+                params.gravity = Gravity.TOP;
+                view.setLayoutParams(params);
 
-            if (dialogView != null)
-            failSnackbar.show();
+                failSnackbar.show();
+            }
+
         }
     }
 
