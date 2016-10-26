@@ -116,7 +116,7 @@ public class SenpaiExportHelper {
                 } else {
                     NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                     manager.cancel(100);
-                    Log.d(TAG, "Failed getting season data for: '" + season.getName() + "'");
+                    Log.d(TAG, "Failed getting season data for: '" + "" + "'");
 
                     fragment.senpaiSeasonRetrieved(null);
                 }
@@ -126,7 +126,7 @@ public class SenpaiExportHelper {
             public void onFailure(Call<String> call, Throwable t) {
                 NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(100);
-                Log.d(TAG, "Failed getting season data for: '" + season.getName() + "'");
+                Log.d(TAG, "Failed getting season data for: '" + "" + "'");
 
                 fragment.senpaiSeasonRetrieved(null);
             }
