@@ -347,12 +347,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void modifyItem(Series item) {
-        itemStatusChangeHelper(item);
+    public void modifyItem(String MALID) {
+        itemStatusChangeHelper(MALID);
     }
 
-    private void itemStatusChangeHelper(Series item) {
-        itemToBeChanged = item;
+    private void itemStatusChangeHelper(String MALID) {
+        itemToBeChanged = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
 
         if (SharedPrefsHelper.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {

@@ -244,16 +244,16 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
     @Override
     public void removeSeriesDialogClosed(boolean accepted, Series series, int position) {
         if (accepted) {
-            modifyListener.modifyItem(series);
+            modifyListener.modifyItem(series.getMALID());
         }
     }
 
     private void addSeriesHelper(Series series) {
         seriesFragment.setAdding(true);
-        modifyListener.modifyItem(series);
+        modifyListener.modifyItem(series.getMALID());
     }
 
     public interface ModifyItemStatusListener {
-        void modifyItem(Series item);
+        void modifyItem(String MALID);
     }
 }
