@@ -8,7 +8,6 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
@@ -26,37 +25,43 @@ class MalImportHelper {
     void matchSeries(final List<MatchHolder> matchList) {
         final RealmList<Series> matchedSeries = new RealmList<>();
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+        Realm realm = Realm.getDefaultInstance();
+
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
                 for (final MatchHolder matchHolder : matchList) {
-                    final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", matchHolder.getMALID()).findFirst();
-                    series.setInUserList(true);
-                    series.setEpisodesWatched(matchHolder.getEpisodesWatched());
-                    matchedSeries.add(series);
+                    final Series series = realm.where(Series.class).equalTo("MALID", matchHolder.getMALID()).findFirst();
+                    if (series != null){
+                        series.setInUserList(true);
+                        series.setEpisodesWatched(matchHolder.getEpisodesWatched());
+                        matchedSeries.add(series);
+                    }
                 }
             }
         });
 
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+        realm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                for (final Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
+                for (final Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
                     if (!matchedSeries.contains(series) || (!series.getShowType().equals("TV") && !series.getShowType().isEmpty())) {
                         series.setInUserList(false);
-                        RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
+                        RealmResults<Alarm> alarms = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
                         alarms.deleteAllFromRealm();
                     }
                 }
             }
         });
 
-        for (Series series : App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll()) {
+        for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
             if (series.getNextEpisodeAirtime() > 0 || series.getNextEpisodeSimulcastTime() > 0) {
                 AlarmHelper.getInstance().makeAlarm(series);
             }
         }
+
+        realm.close();
 
         if (malDataImportedListener != null) {
             malDataImportedListener.malDataImported(true);
