@@ -72,11 +72,19 @@ public class NotificationHelper {
             }
         }
 
+        String seriesName;
+
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()){
+            seriesName = series.getEnglishTitle();
+        } else {
+            seriesName = series.getName();
+        }
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
                         .setAutoCancel(true)
-                        .setContentText(series.getName())
+                        .setContentText(seriesName)
                         .setContentTitle("New episode released");
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
