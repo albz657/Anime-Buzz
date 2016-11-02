@@ -72,12 +72,10 @@ public class NotificationHelper {
             }
         }
 
-        String seriesName;
+        String seriesName = series.getName();
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()){
             seriesName = series.getEnglishTitle();
-        } else {
-            seriesName = series.getName();
         }
 
         NotificationCompat.Builder mBuilder =
