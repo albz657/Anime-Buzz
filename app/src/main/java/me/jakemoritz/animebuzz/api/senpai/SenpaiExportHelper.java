@@ -102,7 +102,7 @@ public class SenpaiExportHelper {
                     }
 
                     if (App.getInstance().isPostInitializing()) {
-                        if (App.getInstance().getSyncingSeasons().isEmpty()) {
+                        if (App.getInstance().getSyncingSeasons() == null || App.getInstance().getSyncingSeasons().isEmpty()) {
                             NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
                             mNotificationManager.cancel(100);
 
@@ -132,8 +132,6 @@ public class SenpaiExportHelper {
             }
         });
     }
-
-
 
     public void getLatestSeasonData() {
         Log.d(TAG, "Getting latest season data");
