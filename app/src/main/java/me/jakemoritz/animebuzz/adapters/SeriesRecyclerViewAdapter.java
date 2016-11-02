@@ -229,7 +229,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addSeriesHelper(holder.series);
+                addSeriesHelper(holder.series.getMALID());
             }
         });
         holder.mMinusButton.setOnClickListener(new View.OnClickListener() {
@@ -248,9 +248,9 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         }
     }
 
-    private void addSeriesHelper(Series series) {
+    private void addSeriesHelper(String MALID) {
         seriesFragment.setAdding(true);
-        modifyListener.modifyItem(series.getMALID());
+        modifyListener.modifyItem(MALID);
     }
 
     public interface ModifyItemStatusListener {

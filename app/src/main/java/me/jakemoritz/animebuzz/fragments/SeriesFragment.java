@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.File;
 import java.util.Collections;
 
@@ -354,24 +356,34 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private void itemStatusChangeHelper(String MALID) {
         itemToBeChanged = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
 
-        if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-            if (App.getInstance().isNetworkAvailable()) {
-                String username = SharedPrefsHelper.getInstance().getUsername();
-                String password = SharedPrefsHelper.getInstance().getPassword();
+        try {
+            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                if (App.getInstance().isNetworkAvailable()) {
+                    String username = SharedPrefsHelper.getInstance().getUsername();
+                    String password = SharedPrefsHelper.getInstance().getPassword();
 
-                malApiClient.verify(username, password);
+                    malApiClient.verify(username, password);
+                } else {
+                    adding = false;
+                    if (getView() != null)
+                        Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                }
             } else {
-                adding = false;
-                if (getView() != null)
-                    Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                if (adding) {
+                    addSeries(itemToBeChanged);
+                } else {
+                    removeSeries(itemToBeChanged);
+                }
             }
-        } else {
-            if (adding) {
-                addSeries(itemToBeChanged);
-            } else {
-                removeSeries(itemToBeChanged);
-            }
+        } catch (NullPointerException e){
+            FirebaseCrash.log("Series with MALID: '" + MALID + "' is null");
+            FirebaseCrash.report(e);
+
+            adding = false;
+            if (getView() != null)
+                Snackbar.make(getView(), "There was a problem adding or removing this show from your list.", Snackbar.LENGTH_LONG).show();
         }
+
     }
 
     @Override
