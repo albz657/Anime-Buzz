@@ -1,8 +1,8 @@
 package me.jakemoritz.animebuzz.receivers;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
 
 import java.util.Calendar;
 
@@ -10,16 +10,19 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
+import me.jakemoritz.animebuzz.helpers.WakeLocker;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class AlarmReceiver extends WakefulBroadcastReceiver {
+public class AlarmReceiver extends BroadcastReceiver {
 
     private final static String TAG = AlarmReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        WakeLocker.acquire(context);
+
         String intentExtra = intent.getStringExtra("id");
 
         Realm realm = Realm.getDefaultInstance();
@@ -63,7 +66,7 @@ public class AlarmReceiver extends WakefulBroadcastReceiver {
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
 
-        completeWakefulIntent(intent);
+        WakeLocker.release();
     }
 }
 
