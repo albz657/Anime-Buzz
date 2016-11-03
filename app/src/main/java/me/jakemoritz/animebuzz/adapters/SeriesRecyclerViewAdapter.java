@@ -90,7 +90,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
         Drawable dateImage;
         int dateImageColorId;
-        if ((holder.series.getNextEpisodeTimeFormatted().isEmpty() && holder.series.getStartedAiringDate().isEmpty()) || (!holder.series.getShowType().equals("TV") && !holder.series.isSingle())) {
+        if ((holder.series.getNextEpisodeTimeFormatted().isEmpty() && holder.series.getStartedAiringDate().isEmpty()) || (!holder.series.getShowType().equals("TV") && (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty()))))) {
             dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_close, null);
             dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.x_red);
         } else if (holder.series.getAiringStatus().equals("Airing")) {
@@ -106,7 +106,8 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         dateImage.setColorFilter(new PorterDuffColorFilter(dateImageColorId, PorterDuff.Mode.SRC_IN));
         holder.mDateImage.setImageDrawable(dateImage);
 
-        if (!holder.series.getShowType().equals("TV") && !holder.series.isSingle()) {
+        if (!holder.series.getShowType().equals("TV") &&
+                (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty())))) {
             holder.mDate.setText("No airing times available");
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.GONE);

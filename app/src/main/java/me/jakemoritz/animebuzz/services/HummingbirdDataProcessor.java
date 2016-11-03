@@ -53,7 +53,7 @@ public class HummingbirdDataProcessor extends IntentService {
 
         if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
             Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
-            if (season.getRelativeTime().equals(Season.PRESENT) || season.getRelativeTime().equals(Season.FUTURE)) {
+            if (season.getRelativeTime().equals(Season.PRESENT)) {
                 airingStatus = "Finished airing";
             } else {
                 airingStatus = "Not yet aired";
