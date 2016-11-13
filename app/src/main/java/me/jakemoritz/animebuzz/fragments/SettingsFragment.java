@@ -286,8 +286,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         malApiClient.getUserList();
 
-        if (mainActivity.findViewById(R.id.nav_view) != null)
-            Snackbar.make(mainActivity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+        if (mainActivity.findViewById(R.id.drawer_layout) != null)
+            Snackbar.make(mainActivity.findViewById(R.id.drawer_layout), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
     }
 
     public void signIn() {
@@ -310,8 +310,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             mainActivity.startFragment(currentlyWatchingFragment);
             new MalApiClient(currentlyWatchingFragment).getUserList();
 
-            if (mainActivity.findViewById(R.id.nav_view) != null)
-                Snackbar.make(mainActivity.findViewById(R.id.nav_view), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+            if (mainActivity.findViewById(R.id.drawer_layout) != null)
+                Snackbar.make(mainActivity.findViewById(R.id.drawer_layout), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
         }
 
         incrementPreference.setEnabled(true);

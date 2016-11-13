@@ -4,27 +4,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
-import com.squareup.picasso.Picasso;
+import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,13 +46,10 @@ import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
-    private NavigationView navigationView;
-    private DrawerLayout drawer;
     private CircularProgressView progressView;
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
@@ -66,7 +61,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         boolean justFailed = SharedPrefsHelper.getInstance().isJustFailed();
-        if (justFailed){
+        if (justFailed) {
 //            Realm.init(App.getInstance());
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
@@ -84,7 +79,7 @@ public class MainActivity extends AppCompatActivity
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
-            if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L){
+            if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L) {
                 DailyTimeGenerator.getInstance().setNextAlarm(false);
             }
 
@@ -114,25 +109,32 @@ public class MainActivity extends AppCompatActivity
 
         setSupportActionBar(toolbar);
 
-        // Set up drawer and nav view
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                navigationView.bringToFront();
-                drawer.requestLayout();
+            public void onTabSelected(@IdRes int tabId) {
+                Fragment newFragment = null;
+
+                if (tabId == R.id.nav_my_shows) {
+                    newFragment = CurrentlyWatchingFragment.newInstance();
+                } else if (tabId == R.id.nav_seasons) {
+                    newFragment = SeasonsFragment.newInstance();
+                } else if (tabId == R.id.nav_watching_queue) {
+                    newFragment = BacklogFragment.newInstance();
+                }
+
+                if (newFragment != null) {
+                    startFragment(newFragment);
+                }
             }
-        };
+        });
 
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-
-        navigationView.setNavigationItemSelectedListener(this);
+        // change nav bar color
+        if (Build.VERSION.SDK_INT >= 21){
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setNavigationBarColor(ContextCompat.getColor(App.getInstance(), R.color.colorPrimary));
+        }
 
         loadDrawerUserInfo();
 
@@ -161,9 +163,9 @@ public class MainActivity extends AppCompatActivity
         File appDir = new File(cache.getParent());
 
         // deletes images from cache
-        if (cache.exists()){
-            for (String file : cache.list()){
-                if (file.contains(".jpg")){
+        if (cache.exists()) {
+            for (String file : cache.list()) {
+                if (file.contains(".jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
                     imageFile.delete();
                 }
@@ -173,9 +175,9 @@ public class MainActivity extends AppCompatActivity
         File files = new File(appDir.getPath() + "/app_cache/images");
 
         // deletes images from old incorrect cache
-        if (files.exists()){
-            for (String file : files.list()){
-                if (file.contains(".jpg")){
+        if (files.exists()) {
+            for (String file : files.list()) {
+                if (file.contains(".jpg")) {
                     File imageFile = new File(files.getPath() + "/" + file);
                     imageFile.delete();
                 }
@@ -205,7 +207,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
 
-        if (App.getInstance().getRealm() != null && !App.getInstance().getRealm().isClosed()){
+        if (App.getInstance().getRealm() != null && !App.getInstance().getRealm().isClosed()) {
             App.getInstance().getRealm().close();
         }
     }
@@ -219,46 +221,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        int previousItemId = -1;
-        Menu navMenu = navigationView.getMenu();
-
-        for (int i = 0; i < navMenu.size(); i++) {
-            if (navMenu.getItem(i).isChecked()) {
-                previousItemId = navMenu.getItem(i).getItemId();
-            }
-        }
-
-        Fragment newFragment = null;
-
-        if (previousItemId != id) {
-            if (id == R.id.nav_my_shows) {
-                newFragment = CurrentlyWatchingFragment.newInstance();
-            } else if (id == R.id.nav_seasons) {
-                newFragment = SeasonsFragment.newInstance();
-            } else if (id == R.id.nav_watching_queue) {
-                newFragment = BacklogFragment.newInstance();
-            } else if (id == R.id.nav_settings) {
-                newFragment = SettingsFragment.newInstance();
-            } else if (id == R.id.nav_about) {
-                newFragment = AboutFragment.newInstance();
-            }
-        }
-
-        if (newFragment != null) {
-            startFragment(newFragment);
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     public void loadDrawerUserInfo() {
-        File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
+/*        File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
         ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
 
         if (avatarFile.exists()){
@@ -268,7 +232,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
-        drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());
+        drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());*/
     }
 
     private Fragment getCurrentFragment() {
@@ -324,12 +288,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+/*        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-        }
+        }*/
     }
 
     @Override
@@ -392,9 +356,9 @@ public class MainActivity extends AppCompatActivity
             menuIndex = 4;
         }
 
-        if (navigationView != null && menuIndex != -1) {
+/*        if (navigationView != null && menuIndex != -1) {
             navigationView.getMenu().getItem(menuIndex).setChecked(true);
-        }
+        }*/
     }
 
     public void fixToolbar(String fragment) {
@@ -437,10 +401,6 @@ public class MainActivity extends AppCompatActivity
 
     public CircularProgressView getProgressView() {
         return progressView;
-    }
-
-    public NavigationView getNavigationView() {
-        return navigationView;
     }
 
     public Toolbar getToolbar() {

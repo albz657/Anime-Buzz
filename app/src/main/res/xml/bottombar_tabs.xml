@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<tabs>
+    <tab
+        id="@+id/nav_my_shows"
+        icon="@drawable/ic_bookmark_trimmed"
+        title="@string/fragment_myshows" />
+    <tab
+        id="@+id/nav_watching_queue"
+        icon="@drawable/ic_assignment_late_trimmed"
+        title="@string/fragment_watching_queue" />
+    <tab
+        id="@+id/nav_seasons"
+        icon="@drawable/ic_explore_trimmed"
+        title="@string/fragment_seasons" />
+</tabs>

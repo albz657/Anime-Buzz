@@ -103,8 +103,8 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            if (mainActivity.getNavigationView() != null) {
-                Snackbar.make(mainActivity.getNavigationView(), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
+            if (mainActivity.findViewById(R.id.drawer_layout) != null) {
+                Snackbar.make(mainActivity.findViewById(R.id.drawer_layout), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
             }
         }
     }
