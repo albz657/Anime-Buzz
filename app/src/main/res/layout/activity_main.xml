@@ -24,7 +24,6 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottomBar"/>
 
-
     <RelativeLayout
         android:id="@+id/progress_view_holder"
         android:layout_width="match_parent"

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -22,6 +21,7 @@ import android.widget.Spinner;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.roughike.bottombar.BottomBar;
+import com.roughike.bottombar.BottomBarTab;
 import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
@@ -30,6 +30,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
+import io.realm.RealmChangeListener;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
@@ -45,6 +47,7 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,6 +57,16 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
     private boolean openRingtones = false;
+    private BottomBar bottomBar;
+
+    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
+        @Override
+        public void onChange(Object element) {
+            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
+            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
+            backlogTab.setBadgeCount(backlogItems.size());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
-        BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
@@ -129,12 +142,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // change nav bar color
-        if (Build.VERSION.SDK_INT >= 21){
-/*            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setNavigationBarColor(ContextCompat.getColor(App.getInstance(), R.color.colorPrimary));*/
-        }
+        RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAllAsync();
+        backlogItems.addChangeListener(backlogCountCallback);
 
         loadDrawerUserInfo();
 
@@ -167,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.action_settings:
                 startFragment(SettingsFragment.newInstance());
                 return true;
@@ -220,8 +229,6 @@ public class MainActivity extends AppCompatActivity {
             }
             openRingtones = false;
         }
-
-        setNavPositions(fragment);
     }
 
     @Override
@@ -308,23 +315,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-/*        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }*/
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
 
         if (intent.hasExtra("notificationClicked")) {
             if (!getSupportFragmentManager().getFragments().isEmpty()) {
                 if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
-
                 } else {
                     startFragment(BacklogFragment.newInstance());
                 }
@@ -349,8 +345,6 @@ public class MainActivity extends AppCompatActivity {
             id = "About";
         }
 
-        setNavPositions(fragment);
-
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.content_main, fragment, id)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -362,54 +356,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setNavPositions(Fragment fragment) {
-        int menuIndex = -1;
-
-        if (fragment instanceof BacklogFragment) {
-            menuIndex = 0;
-        } else if (fragment instanceof CurrentlyWatchingFragment) {
-            menuIndex = 1;
-        } else if (fragment instanceof SeasonsFragment) {
-            menuIndex = 2;
-        } else if (fragment instanceof SettingsFragment) {
-            menuIndex = 3;
-        } else if (fragment instanceof AboutFragment) {
-            menuIndex = 4;
-        }
-
-/*        if (navigationView != null && menuIndex != -1) {
-            navigationView.getMenu().getItem(menuIndex).setChecked(true);
-        }*/
-    }
-
     public void fixToolbar(String fragment) {
-        if (getSupportActionBar() != null) {
+        if (getSupportActionBar() != null && fragment.equals(SeasonsFragment.class.getSimpleName())) {
             Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
-
-            String actionBarTitle = "";
-            switch (fragment) {
-                case "SettingsFragment":
-                    actionBarTitle = getString(R.string.action_settings);
-                    break;
-                case "SeasonsFragment":
-                    actionBarTitle = getString(R.string.fragment_seasons);
-                    break;
-                case "BacklogFragment":
-                    actionBarTitle = getString(R.string.fragment_watching_queue);
-                    break;
-                case "AboutFragment":
-                    actionBarTitle = getString(R.string.fragment_about);
-                    break;
-                case "CurrentlyWatchingFragment":
-                    actionBarTitle = getString(R.string.fragment_myshows);
-                    break;
-            }
 
             if (toolbarSpinner != null) {
                 toolbarSpinner.setVisibility(View.GONE);
             }
 
-            getSupportActionBar().setTitle(actionBarTitle);
             getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
     }
