@@ -59,15 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private boolean openRingtones = false;
     private BottomBar bottomBar;
 
-    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
-        @Override
-        public void onChange(Object element) {
-            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
-            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
-            backlogTab.setBadgeCount(backlogItems.size());
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -166,6 +157,15 @@ public class MainActivity extends AppCompatActivity {
             startFragment(CurrentlyWatchingFragment.newInstance());
         }
     }
+
+    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
+        @Override
+        public void onChange(Object element) {
+            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
+            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
+            backlogTab.setBadgeCount(backlogItems.size());
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -350,21 +350,18 @@ public class MainActivity extends AppCompatActivity {
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .addToBackStack(id)
                 .commit();
-
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(id);
-        }
     }
 
     public void fixToolbar(String fragment) {
-        if (getSupportActionBar() != null && fragment.equals(SeasonsFragment.class.getSimpleName())) {
+        if (getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
+            if (!fragment.equals(SeasonsFragment.class.getSimpleName())) {
+                if (toolbarSpinner != null) {
+                    toolbarSpinner.setVisibility(View.GONE);
+                }
 
-            if (toolbarSpinner != null) {
-                toolbarSpinner.setVisibility(View.GONE);
+                getSupportActionBar().setDisplayShowTitleEnabled(true);
             }
-
-            getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
     }
 
