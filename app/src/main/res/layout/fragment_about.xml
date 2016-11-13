@@ -9,15 +9,16 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="40dp"
         android:text="Thanks to the following:" />
 
     <RelativeLayout
         android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/thanks"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:id="@+id/thanks_holder">
 
         <RelativeLayout
             android:id="@+id/about_senpai_holder"
@@ -90,8 +91,43 @@
                 android:autoLink="web"/>
         </RelativeLayout>
 
-
         <RelativeLayout
+            android:id="@+id/about_hb_holder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/about_mal_holder"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/bullet_hb"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet" />
+
+            <TextView
+                android:id="@+id/about_hb"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_hb"
+                android:text="@string/about_hb" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/about_hb_link"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:layout_below="@id/about_hb"
+                android:layout_marginTop="5dp"
+                android:layout_alignLeft="@id/about_hb"
+                android:text="@string/about_hb_url"
+                android:autoLink="web"/>
+        </RelativeLayout>
+
+       <!-- <RelativeLayout
             android:id="@+id/about_ann_holder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -126,8 +162,17 @@
                 android:text="@string/about_ann_url"
                 android:autoLink="web"/>
         </RelativeLayout>
-
+-->
 
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="test"
+        android:id="@+id/version_display"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 </RelativeLayout>
 
