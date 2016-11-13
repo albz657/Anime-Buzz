@@ -41,7 +41,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
     public void onRefresh() {
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
             if (App.getInstance().isNetworkAvailable()) {
@@ -55,17 +54,17 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 }
                 setUpdating(true);
             } else {
-                if (getSwipeRefreshLayout().isRefreshing()) {
+/*                if (getSeriesLayout().isRefreshing()) {
                     stopRefreshing();
-                }
+                }*/
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         } else {
-            if (getSwipeRefreshLayout().isRefreshing()) {
+/*            if (getSeriesLayout().isRefreshing()) {
                 stopRefreshing();
-            }
+            }*/
         }
     }
 
@@ -86,9 +85,9 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
-                if (getSwipeRefreshLayout().isRefreshing()) {
+/*                if (getSeriesLayout().isRefreshing()) {
                     stopRefreshing();
-                }
+                }*/
 
                 loadUserSortingPreference();
             }

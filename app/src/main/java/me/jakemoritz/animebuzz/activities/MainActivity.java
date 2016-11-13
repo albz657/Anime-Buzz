@@ -10,13 +10,13 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
@@ -131,9 +131,9 @@ public class MainActivity extends AppCompatActivity {
 
         // change nav bar color
         if (Build.VERSION.SDK_INT >= 21){
-            Window window = getWindow();
+/*            Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setNavigationBarColor(ContextCompat.getColor(App.getInstance(), R.color.colorPrimary));
+            window.setNavigationBarColor(ContextCompat.getColor(App.getInstance(), R.color.colorPrimary));*/
         }
 
         loadDrawerUserInfo();
@@ -156,6 +156,27 @@ public class MainActivity extends AppCompatActivity {
         } else {
             startFragment(CurrentlyWatchingFragment.newInstance());
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.overflow_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_settings:
+                startFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_about:
+                startFragment(AboutFragment.newInstance());
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void deleteOldImages() {

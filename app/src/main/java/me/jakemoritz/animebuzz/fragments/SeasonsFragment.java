@@ -77,7 +77,6 @@ public class SeasonsFragment extends SeriesFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
     public void onRefresh() {
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
             if (App.getInstance().isNetworkAvailable()) {
@@ -95,17 +94,17 @@ public class SeasonsFragment extends SeriesFragment {
                 }
                 setUpdating(true);
             } else {
-                if (getSwipeRefreshLayout().isRefreshing()) {
+/*                if (getSeriesLayout().isRefreshing()) {
                     stopRefreshing();
-                }
+                }*/
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         } else {
-            if (getSwipeRefreshLayout().isRefreshing()) {
+/*            if (getSeriesLayout().isRefreshing()) {
                 stopRefreshing();
-            }
+            }*/
         }
     }
 
@@ -154,9 +153,9 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (getSwipeRefreshLayout().isRefreshing()) {
+/*        if (getSeriesLayout().isRefreshing()) {
             stopRefreshing();
-        }
+        }*/
 
         if (App.getInstance().isInitializing()) {
             if (isVisible()) {
