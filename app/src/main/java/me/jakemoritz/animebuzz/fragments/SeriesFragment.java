@@ -129,6 +129,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         super.onViewCreated(view, savedInstanceState);
 
 //        seriesLayout.setOnRefreshListener(this);
+        mainActivity.getBottomBar().setVisibility(View.VISIBLE);
 
         if (App.getInstance().isJustLaunched()) {
 //            onRefresh();

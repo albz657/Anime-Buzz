@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -106,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             AlarmHelper.getInstance().setAlarmsOnBoot();
+        }
+
+        // change nav bar color
+        if (Build.VERSION.SDK_INT >= 21){
+/*            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimary));*/
         }
 
         // Initialize UI elements
@@ -345,11 +353,23 @@ public class MainActivity extends AppCompatActivity {
             id = "About";
         }
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, fragment, id)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .addToBackStack(id)
-                .commit();
+        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, fragment, id)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .addToBackStack(id)
+                    .commit();
+
+            bottomBar.setVisibility(View.GONE);
+        } else {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.content_main, fragment, id)
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                    .commit();
+
+            bottomBar.setVisibility(View.VISIBLE);
+        }
+
     }
 
     public void fixToolbar(String fragment) {
@@ -361,6 +381,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
+
+                if (fragment.equals(SettingsFragment.class.getSimpleName())){
+                    getSupportActionBar().setTitle(getString(R.string.action_settings));
+                } else if (fragment.equals(AboutFragment.class.getSimpleName())){
+                    getSupportActionBar().setTitle(getString(R.string.fragment_about));
+                }
             }
         }
     }
@@ -379,4 +405,7 @@ public class MainActivity extends AppCompatActivity {
         return toolbar;
     }
 
+    public BottomBar getBottomBar() {
+        return bottomBar;
+    }
 }

@@ -54,6 +54,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
     }
 
