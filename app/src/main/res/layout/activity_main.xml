@@ -13,7 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:visibility="gone"
         app:bb_behavior="shifting"
         app:bb_showShadow="false"
         app:bb_tabXmlResource="@xml/bottombar_tabs"

@@ -125,28 +125,9 @@ public class MainActivity extends AppCompatActivity {
         backlogItems.addChangeListener(backlogCountCallback);
 
         bottomBar = (BottomBar) findViewById(R.id.bottomBar);
-        bottomBar.setVisibility(View.INVISIBLE);
 
-        // Start relevant fragment
-        int defaultTabId = R.id.nav_my_shows;
-        if (App.getInstance().isInitializing()) {
-            progressViewHolder.bringToFront();
-            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
-                startFragment(currentlyWatchingFragment);
-            } else {
-                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
-                defaultTabId = R.id.nav_seasons;
-                startFragment(seasonsFragment);
-            }
-        } else {
-            startFragment(CurrentlyWatchingFragment.newInstance());
+        if (App.getInstance().isInitializing()){
+            bottomBar.setVisibility(View.GONE);
         }
 
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
@@ -167,6 +148,28 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // Start relevant fragment
+        int defaultTabId = R.id.nav_my_shows;
+        if (App.getInstance().isInitializing()) {
+            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
+                senpaiExportHelper.getLatestSeasonData();
+
+                startFragment(currentlyWatchingFragment);
+            } else {
+                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
+                senpaiExportHelper.getLatestSeasonData();
+
+                defaultTabId = R.id.nav_seasons;
+                startFragment(seasonsFragment);
+            }
+        } else {
+            startFragment(CurrentlyWatchingFragment.newInstance());
+        }
+
         bottomBar.setDefaultTab(defaultTabId);
     }
 
@@ -371,9 +374,10 @@ public class MainActivity extends AppCompatActivity {
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
 
-            bottomBar.setVisibility(View.VISIBLE);
+            if (!App.getInstance().isInitializing()){
+                bottomBar.setVisibility(View.VISIBLE);
+            }
         }
-
     }
 
     public void fixToolbar(String fragment) {
