@@ -68,6 +68,8 @@ public class SeasonsFragment extends SeriesFragment {
             }
         });
 
+        getMainActivity().fixToolbar(this.getClass().getSimpleName());
+
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
@@ -82,7 +84,7 @@ public class SeasonsFragment extends SeriesFragment {
             if (App.getInstance().isNetworkAvailable()) {
                 if (currentlyBrowsingSeason.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
                     Set<Season> nonCurrentAiringSeasons = new HashSet<>();
-                    RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").notEqualTo("seasonKey", currentlyBrowsingSeason.getKey()).findAll();
+                    RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").notEqualTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllAsync();
                     for (Series series : seriesRealmResults){
                         nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
                     }
@@ -129,14 +131,14 @@ public class SeasonsFragment extends SeriesFragment {
 
         OrderedRealmCollection<Series> seasonSeries;
         if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
+            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSortedAsync(sort);
         } else {
-            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
+            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSortedAsync(sort);
         }
 
         if (seasonSeries.isEmpty()) {
             if (getView() != null) {
-                Snackbar.make(getView(), "No series were found for that season.", Snackbar.LENGTH_LONG).show();
+//                Snackbar.make(getView(), "No series were found for that season.", Snackbar.LENGTH_LONG).show();
             }
         }
 
@@ -188,7 +190,7 @@ public class SeasonsFragment extends SeriesFragment {
         seasonsSpinnerAdapter.getSeasonNames().clear();
 
         RealmList<Season> allSeasons = new RealmList<>();
-        allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAll());
+        allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAllAsync());
         Collections.sort(allSeasons, new SeasonComparator());
 
         for (Season season : allSeasons) {

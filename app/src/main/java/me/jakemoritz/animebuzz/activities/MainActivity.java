@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // change nav bar color
-        if (Build.VERSION.SDK_INT >= 21){
+        if (Build.VERSION.SDK_INT >= 21) {
 /*            Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimary));*/
@@ -121,7 +121,34 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAllAsync();
+        backlogItems.addChangeListener(backlogCountCallback);
+
         bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar.setVisibility(View.INVISIBLE);
+
+        // Start relevant fragment
+        int defaultTabId = R.id.nav_my_shows;
+        if (App.getInstance().isInitializing()) {
+            progressViewHolder.bringToFront();
+            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
+                senpaiExportHelper.getLatestSeasonData();
+
+                startFragment(currentlyWatchingFragment);
+            } else {
+                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
+                senpaiExportHelper.getLatestSeasonData();
+
+                defaultTabId = R.id.nav_seasons;
+                startFragment(seasonsFragment);
+            }
+        } else {
+            startFragment(CurrentlyWatchingFragment.newInstance());
+        }
+
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
@@ -140,30 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAllAsync();
-        backlogItems.addChangeListener(backlogCountCallback);
-
-        loadDrawerUserInfo();
-
-        // Start relevant fragment
-        if (App.getInstance().isInitializing()) {
-            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
-                startFragment(currentlyWatchingFragment);
-            } else {
-                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
-                startFragment(seasonsFragment);
-            }
-        } else {
-            startFragment(CurrentlyWatchingFragment.newInstance());
-        }
+        bottomBar.setDefaultTab(defaultTabId);
     }
 
     private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
@@ -353,7 +357,7 @@ public class MainActivity extends AppCompatActivity {
             id = "About";
         }
 
-        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment){
+        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, fragment, id)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -382,9 +386,9 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
 
-                if (fragment.equals(SettingsFragment.class.getSimpleName())){
+                if (fragment.equals(SettingsFragment.class.getSimpleName())) {
                     getSupportActionBar().setTitle(getString(R.string.action_settings));
-                } else if (fragment.equals(AboutFragment.class.getSimpleName())){
+                } else if (fragment.equals(AboutFragment.class.getSimpleName())) {
                     getSupportActionBar().setTitle(getString(R.string.fragment_about));
                 }
             }

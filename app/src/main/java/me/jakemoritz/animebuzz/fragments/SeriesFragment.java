@@ -94,10 +94,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             sort = "name";
         }
         if (this instanceof SeasonsFragment) {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSorted(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSortedAsync(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSortedAsync(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
@@ -293,6 +293,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         if (mainActivity.getProgressView() != null) {
             mainActivity.getProgressView().stopAnimation();
         }
+
+        mainActivity.getBottomBar().setVisibility(View.VISIBLE);
     }
 
 //    Item modification
