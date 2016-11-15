@@ -51,6 +51,7 @@ import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse {
 
@@ -66,6 +67,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private boolean adding = false;
     private Series itemToBeChanged;
     private MainActivity mainActivity;
+    private MaterialProgressBar progressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +84,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         container.removeAllViews();
 
         seriesLayout = (CoordinatorLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
+
+        progressBar = (MaterialProgressBar) seriesLayout.findViewById(R.id.progress_bar);
+
         recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
 
         emptyView = (RelativeLayout) seriesLayout.findViewById(R.id.empty_view_included);
@@ -131,20 +136,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        seriesLayout.setOnRefreshListener(this);
         if (!App.getInstance().isInitializing()){
             mainActivity.getBottomBar().setVisibility(View.VISIBLE);
-        }
-
-        if (App.getInstance().isJustLaunched()) {
-//            onRefresh();
-/*            seriesLayout.post(new Runnable() {
-                @Override
-                public void run() {
-                    seriesLayout.setRefreshing(true);
-                }
-            });*/
-            App.getInstance().setJustLaunched(false);
         }
     }
 
@@ -305,9 +298,21 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             case R.id.action_about:
                 mainActivity.startFragment(AboutFragment.newInstance());
                 return true;
+            case R.id.action_sync:
+                updateData();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void updateData(){
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void stopUpdating(){
+        progressBar.setVisibility(View.GONE);
+        updating = false;
     }
 
     public void stopInitialSpinner() {

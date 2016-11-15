@@ -77,34 +77,39 @@ public class SeasonsFragment extends SeriesFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    public void onRefresh() {
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+    @Override
+    public void updateData() {
+        super.updateData();
+
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
             if (App.getInstance().isNetworkAvailable()) {
-                if (currentlyBrowsingSeason.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())){
+                if (currentlyBrowsingSeason.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
                     Set<Season> nonCurrentAiringSeasons = new HashSet<>();
                     RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").notEqualTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllAsync();
-                    for (Series series : seriesRealmResults){
+                    for (Series series : seriesRealmResults) {
                         nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
                     }
-                    for (Season season : nonCurrentAiringSeasons){
+
+                    if (!nonCurrentAiringSeasons.isEmpty()){
+                        setUpdating(true);
+                    } else {
+                        stopUpdating();
+                    }
+                    for (Season season : nonCurrentAiringSeasons) {
                         getSenpaiExportHelper().getSeasonData(season);
                     }
                 } else {
+                    setUpdating(true);
                     getSenpaiExportHelper().getSeasonData(currentlyBrowsingSeason);
                 }
-                setUpdating(true);
             } else {
-/*                if (getSeriesLayout().isRefreshing()) {
-                    stopRefreshing();
-                }*/
+                stopUpdating();
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         } else {
-/*            if (getSeriesLayout().isRefreshing()) {
-                stopRefreshing();
-            }*/
+            stopUpdating();
         }
     }
 
@@ -160,9 +165,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-/*        if (getSeriesLayout().isRefreshing()) {
-            stopRefreshing();
-        }*/
+        stopUpdating();
 
         if (App.getInstance().isInitializing()) {
             if (isVisible()) {

@@ -21,4 +21,15 @@
         android:visibility="visible"
         />
 
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:indeterminate="true"
+        android:id="@+id/progress_bar"
+        app:mpb_progressStyle="horizontal"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
+        app:mpb_useIntrinsicPadding="false"
+        android:visibility="gone"
+        />
+
 </android.support.design.widget.CoordinatorLayout>

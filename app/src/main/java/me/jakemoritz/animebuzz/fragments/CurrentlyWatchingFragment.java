@@ -41,7 +41,10 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    public void onRefresh() {
+    @Override
+    public void updateData() {
+        super.updateData();
+
         if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
             if (App.getInstance().isNetworkAvailable()) {
                 Set<Season> nonCurrentAiringSeasons = new HashSet<>();
@@ -54,17 +57,14 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
                 }
                 setUpdating(true);
             } else {
-/*                if (getSeriesLayout().isRefreshing()) {
-                    stopRefreshing();
-                }*/
+                stopUpdating();
+
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         } else {
-/*            if (getSeriesLayout().isRefreshing()) {
-                stopRefreshing();
-            }*/
+            stopUpdating();
         }
     }
 
@@ -85,10 +85,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
-/*                if (getSeriesLayout().isRefreshing()) {
-                    stopRefreshing();
-                }*/
-
+                stopUpdating();
                 loadUserSortingPreference();
             }
         }
@@ -134,9 +131,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-
-        getMainActivity().getMenuInflater().inflate(R.menu.myshows_menu, menu);
+        inflater.inflate(R.menu.myshows_menu, menu);
     }
 
     @Override
