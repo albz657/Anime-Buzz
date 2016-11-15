@@ -132,6 +132,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.myshows_menu, menu);
     }
 
