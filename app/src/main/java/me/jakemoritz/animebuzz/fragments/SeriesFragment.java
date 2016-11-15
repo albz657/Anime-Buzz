@@ -11,6 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -286,6 +289,25 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             seriesLayout.destroyDrawingCache();
             seriesLayout.clearAnimation();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.overflow_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                mainActivity.startFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_about:
+                mainActivity.startFragment(AboutFragment.newInstance());
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void stopInitialSpinner() {

@@ -8,6 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -41,6 +44,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     public static BacklogFragment newInstance() {
         BacklogFragment fragment = new BacklogFragment();
+        fragment.setHasOptionsMenu(true);
         return fragment;
     }
 
@@ -56,6 +60,25 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.overflow_menu_backlog, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                mainActivity.startFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_about:
+                mainActivity.startFragment(AboutFragment.newInstance());
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

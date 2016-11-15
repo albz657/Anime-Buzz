@@ -68,8 +68,6 @@ public class SeasonsFragment extends SeriesFragment {
             }
         });
 
-        getMainActivity().fixToolbar(this.getClass().getSimpleName());
-
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
@@ -108,6 +106,13 @@ public class SeasonsFragment extends SeriesFragment {
                 stopRefreshing();
             }*/
         }
+    }
+
+    @Override
+    public void stopInitialSpinner() {
+        super.stopInitialSpinner();
+
+        getMainActivity().fixToolbar(this.getClass().getSimpleName());
     }
 
     @Override

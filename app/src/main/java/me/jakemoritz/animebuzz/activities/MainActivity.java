@@ -12,9 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -181,27 +178,6 @@ public class MainActivity extends AppCompatActivity {
             backlogTab.setBadgeCount(backlogItems.size());
         }
     };
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.overflow_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                startFragment(SettingsFragment.newInstance());
-                return true;
-            case R.id.action_about:
-                startFragment(AboutFragment.newInstance());
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     private void deleteOldImages() {
         File cache = getCacheDir();
@@ -378,6 +354,8 @@ public class MainActivity extends AppCompatActivity {
                 bottomBar.setVisibility(View.VISIBLE);
             }
         }
+
+        invalidateOptionsMenu();
     }
 
     public void fixToolbar(String fragment) {
