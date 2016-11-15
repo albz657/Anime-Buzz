@@ -47,7 +47,7 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -355,7 +355,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        invalidateOptionsMenu();
     }
 
     public void fixToolbar(String fragment) {
@@ -370,11 +369,27 @@ public class MainActivity extends AppCompatActivity {
 
                 if (fragment.equals(SettingsFragment.class.getSimpleName())) {
                     getSupportActionBar().setTitle(getString(R.string.action_settings));
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else if (fragment.equals(AboutFragment.class.getSimpleName())) {
                     getSupportActionBar().setTitle(getString(R.string.fragment_about));
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                } else {
+                    getSupportActionBar().setTitle("Anime Buzz");
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 }
+            } else {
+                if (toolbarSpinner != null) {
+                    toolbarSpinner.setVisibility(View.VISIBLE);
+                }
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             }
         }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        getSupportFragmentManager().popBackStack();
+        return true;
     }
 
     /* Getters/setters */

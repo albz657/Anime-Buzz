@@ -31,6 +31,7 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
 
     public static CurrentlyWatchingFragment newInstance() {
         CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
+        fragment.setHasOptionsMenu(true);
         return fragment;
     }
 
