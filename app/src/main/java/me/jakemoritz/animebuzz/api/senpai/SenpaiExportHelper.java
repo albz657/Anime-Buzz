@@ -15,6 +15,7 @@ import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.Series;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -77,10 +78,6 @@ public class SenpaiExportHelper {
     public void getSeasonData(final Season season) {
         Log.d(TAG, "Getting season data for: '" + season.getName() + "'");
 
-        if (App.getInstance().isPostInitializing()) {
-            NotificationHelper.getInstance().createSeasonDataNotification(season.getName());
-        }
-
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
@@ -102,14 +99,8 @@ public class SenpaiExportHelper {
                     }
 
                     if (App.getInstance().isPostInitializing()) {
-                        if (App.getInstance().getSyncingSeasons() == null || App.getInstance().getSyncingSeasons().isEmpty()) {
-                            NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                            mNotificationManager.cancel(100);
-
-                            App.getInstance().setPostInitializing(false);
-                        } else {
-                            getSeasonData(App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1));
-                        }
+                        int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", response.body()).count();
+                        NotificationHelper.getInstance().incrementMaxSeries(seasonSeriesCount);
                     }
 
                     fragment.senpaiSeasonRetrieved(response.body());

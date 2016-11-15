@@ -1,13 +1,17 @@
 package me.jakemoritz.animebuzz.services;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 
 import java.util.Calendar;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
@@ -33,6 +37,23 @@ public class HummingbirdDataProcessor extends IntentService {
         String showType = intent.getStringExtra("showType");
 
         processSeries(MALID, englishTitle, episodeCount, finishedAiringDate, startedAiringDate, showType);
+
+        if (App.getInstance().isPostInitializing()){
+            Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+
+            if (!currSeries.getSeasonKey().equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
+                NotificationHelper.getInstance().incrementCurrSeries();
+
+                if (NotificationHelper.getInstance().getMaxSeries() == NotificationHelper.getInstance().getCurrSeries()){
+                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+                    mNotificationManager.cancel(100);
+
+                    App.getInstance().setPostInitializing(false);
+                } else {
+                    NotificationHelper.getInstance().createSeasonDataNotification();
+                }
+            }
+        }
 
         realm.close();
     }

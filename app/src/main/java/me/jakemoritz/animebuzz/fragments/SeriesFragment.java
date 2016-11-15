@@ -39,7 +39,6 @@ import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
@@ -203,19 +202,16 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void senpaiSeasonListReceived() {
-        NotificationHelper.getInstance().createSeasonDataNotification("Getting list of seasons...");
-
-        RealmList<Season> seasonList = new RealmList<>();
         RealmResults<Season> seasonsResults = App.getInstance().getRealm().where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll();
+        RealmList<Season> seasonsList = new RealmList<>();
+        seasonsList.addAll(seasonsResults);
 
-        seasonList.addAll(seasonsResults);
+        Collections.sort(seasonsList, new SeasonComparator());
+        Collections.reverse(seasonsList);
 
-        App.getInstance().setSyncingSeasons(seasonList);
-
-        Collections.sort(App.getInstance().getSyncingSeasons(), new SeasonComparator());
-        Season seasonMetadata = App.getInstance().getSyncingSeasons().remove(App.getInstance().getSyncingSeasons().size() - 1);
-        NotificationHelper.getInstance().createSeasonDataNotification(seasonMetadata.getName());
-        senpaiExportHelper.getSeasonData(seasonMetadata);
+        for (Season season : seasonsList) {
+            senpaiExportHelper.getSeasonData(season);
+        }
     }
 
     @Override

@@ -20,8 +20,9 @@ import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 public class NotificationHelper {
 
     private static NotificationHelper notificationHelper;
-
     private NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
+    private int maxSeries = 0;
+    private int currSeries = 0;
 
     public synchronized static NotificationHelper getInstance() {
         if (notificationHelper == null) {
@@ -30,14 +31,13 @@ public class NotificationHelper {
         return notificationHelper;
     }
 
-    public void createSeasonDataNotification(String seasonName) {
+    public void createSeasonDataNotification() {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle(App.getInstance().getString(R.string.notification_list_update))
-                        .setContentText(seasonName)
-                        .setOngoing(true)
-                        .setProgress(0, 0, true);
+                        .setContentText(currSeries + "/" + maxSeries)
+                        .setProgress(maxSeries, currSeries, false);
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
@@ -110,5 +110,21 @@ public class NotificationHelper {
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
         mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
+    }
+
+    public void incrementMaxSeries(int seriesCount){
+        this.maxSeries += seriesCount;
+    }
+
+    public void incrementCurrSeries(){
+        this.currSeries++;
+    }
+
+    public int getMaxSeries() {
+        return maxSeries;
+    }
+
+    public int getCurrSeries() {
+        return currSeries;
     }
 }

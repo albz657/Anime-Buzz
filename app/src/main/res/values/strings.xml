@@ -76,7 +76,7 @@
     <string name="file_avatar">malavatar.jpg</string>
 
     <!--Notifications-->
-    <string name="notification_list_update">Downloading other seasons&#8230;</string>
+    <string name="notification_list_update">Downloading off-season anime details&#8230;</string>
 
     <!--SharedPreferences-->
     <string name="shared_prefs_logged_in">isuserloggedin</string>
