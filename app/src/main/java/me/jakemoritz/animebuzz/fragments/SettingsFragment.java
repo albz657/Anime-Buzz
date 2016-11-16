@@ -258,9 +258,9 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     public void addToMAL(boolean add) {
-        CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
+        UserListFragment userListFragment = UserListFragment.newInstance();
 
-        MalApiClient malApiClient = new MalApiClient(currentlyWatchingFragment);
+        MalApiClient malApiClient = new MalApiClient(userListFragment);
 
         if (!add) {
             AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
@@ -282,7 +282,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         }
 
-        mainActivity.startFragment(currentlyWatchingFragment);
+        mainActivity.startFragment(userListFragment);
 
         malApiClient.getUserList();
 
@@ -305,10 +305,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (!App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll().isEmpty()) {
             importExistingSeries();
         } else {
-            CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
+            UserListFragment userListFragment = UserListFragment.newInstance();
 
-            mainActivity.startFragment(currentlyWatchingFragment);
-            new MalApiClient(currentlyWatchingFragment).getUserList();
+            mainActivity.startFragment(userListFragment);
+            new MalApiClient(userListFragment).getUserList();
 
             if (mainActivity.findViewById(R.id.drawer_layout) != null)
                 Snackbar.make(mainActivity.findViewById(R.id.drawer_layout), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();

@@ -86,7 +86,7 @@ public class SugarMigrator {
                     Season season = new Season();
                     season.setKey(seasonKey);
                     season.setName(seasonName);
-                    season.setStart_timestamp(startTimeStamp);
+                    season.setStartTimestamp(startTimeStamp);
 
                     App.getInstance().getRealm().insertOrUpdate(season);
                 }

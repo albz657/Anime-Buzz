@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -37,8 +36,9 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.fragments.CurrentlyWatchingFragment;
+import me.jakemoritz.animebuzz.fragments.UserListFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -106,13 +106,6 @@ public class MainActivity extends AppCompatActivity{
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
 
-        // change nav bar color
-        if (Build.VERSION.SDK_INT >= 21) {
-/*            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            getWindow().setNavigationBarColor(ContextCompat.getColor(this, R.color.colorPrimary));*/
-        }
-
         // Initialize UI elements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -133,7 +126,7 @@ public class MainActivity extends AppCompatActivity{
                 Fragment newFragment = null;
 
                 if (tabId == R.id.nav_my_shows) {
-                    newFragment = CurrentlyWatchingFragment.newInstance();
+                    newFragment = UserListFragment.newInstance();
                 } else if (tabId == R.id.nav_seasons) {
                     newFragment = SeasonsFragment.newInstance();
                 } else if (tabId == R.id.nav_watching_queue) {
@@ -149,22 +142,21 @@ public class MainActivity extends AppCompatActivity{
         // Start relevant fragment
         int defaultTabId = R.id.nav_my_shows;
         if (App.getInstance().isInitializing()) {
+            SeriesFragment seriesFragment;
+
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                CurrentlyWatchingFragment currentlyWatchingFragment = CurrentlyWatchingFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(currentlyWatchingFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
-                startFragment(currentlyWatchingFragment);
+                seriesFragment = UserListFragment.newInstance();
             } else {
-                SeasonsFragment seasonsFragment = SeasonsFragment.newInstance();
-                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seasonsFragment);
-                senpaiExportHelper.getLatestSeasonData();
-
+                seriesFragment = SeasonsFragment.newInstance();
                 defaultTabId = R.id.nav_seasons;
-                startFragment(seasonsFragment);
             }
+
+            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
+            senpaiExportHelper.getSeasonList();
+
+            startFragment(seriesFragment);
         } else {
-            startFragment(CurrentlyWatchingFragment.newInstance());
+            startFragment(UserListFragment.newInstance());
         }
 
         bottomBar.setDefaultTab(defaultTabId);
@@ -326,7 +318,7 @@ public class MainActivity extends AppCompatActivity{
 
         if (fragment instanceof BacklogFragment) {
             id = getString(R.string.fragment_watching_queue);
-        } else if (fragment instanceof CurrentlyWatchingFragment) {
+        } else if (fragment instanceof UserListFragment) {
             id = getString(R.string.fragment_myshows);
         } else if (fragment instanceof SeasonsFragment) {
             id = getString(R.string.fragment_seasons);

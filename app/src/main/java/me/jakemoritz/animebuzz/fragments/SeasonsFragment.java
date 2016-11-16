@@ -2,19 +2,15 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import io.realm.OrderedRealmCollection;
 import io.realm.RealmList;
-import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -31,7 +27,6 @@ public class SeasonsFragment extends SeriesFragment {
     private Spinner toolbarSpinner;
     private SeasonsSpinnerAdapter seasonsSpinnerAdapter;
     private int previousSpinnerIndex = 0;
-    private Season currentlyBrowsingSeason;
 
     public SeasonsFragment() {
 
@@ -46,7 +41,8 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
 
     @Override
@@ -78,42 +74,6 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
-    public void updateData() {
-        super.updateData();
-
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
-            if (App.getInstance().isNetworkAvailable()) {
-                if (currentlyBrowsingSeason.getName().equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-                    Set<Season> nonCurrentAiringSeasons = new HashSet<>();
-                    RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").notEqualTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllAsync();
-                    for (Series series : seriesRealmResults) {
-                        nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
-                    }
-
-                    if (!nonCurrentAiringSeasons.isEmpty()){
-                        setUpdating(true);
-                    } else {
-                        stopUpdating();
-                    }
-                    for (Season season : nonCurrentAiringSeasons) {
-                        getSenpaiExportHelper().getSeasonData(season);
-                    }
-                } else {
-                    setUpdating(true);
-                    getSenpaiExportHelper().getSeasonData(currentlyBrowsingSeason);
-                }
-            } else {
-                stopUpdating();
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        } else {
-            stopUpdating();
-        }
-    }
-
-    @Override
     public void stopInitialSpinner() {
         super.stopInitialSpinner();
 
@@ -123,14 +83,16 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
         if (App.getInstance().isInitializing()) {
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
+            Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
+            setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
         }
 
         super.senpaiSeasonRetrieved(seasonKey);
     }
 
     private void loadSeason(String seasonName) {
-        currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+        Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
+        setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
 
         String sort;
         if (SharedPrefsHelper.getInstance().prefersEnglish()) {
@@ -204,16 +166,12 @@ public class SeasonsFragment extends SeriesFragment {
         for (Season season : allSeasons) {
             seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
 
-            if (season.getName().equals(currentlyBrowsingSeason.getName())) {
+            if (season.getName().equals(getCurrentlyBrowsingSeason().getName())) {
                 previousSpinnerIndex = allSeasons.indexOf(season);
             }
         }
 
         toolbarSpinner.setSelection(previousSpinnerIndex);
         seasonsSpinnerAdapter.notifyDataSetChanged();
-    }
-
-    public Season getCurrentlyBrowsingSeason() {
-        return currentlyBrowsingSeason;
     }
 }

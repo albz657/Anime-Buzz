@@ -7,7 +7,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
-import java.io.IOException;
 
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -16,9 +15,6 @@ import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.services.HummingbirdDataProcessor;
 import me.jakemoritz.animebuzz.services.PosterDownloader;
-import okhttp3.Interceptor;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,24 +30,13 @@ public class HummingbirdApiClient {
 
     public HummingbirdApiClient(SeriesFragment callback) {
         this.callback = callback;
-        Interceptor interceptor = new Interceptor() {
-            @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
-                final Request request = chain.request().newBuilder()
-                        .addHeader("X-Client-Id", "683b6ab4486e5a7c612e")
-                        .build();
-
-                return chain.proceed(request);
-            }
-        };
-        OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(interceptor).build();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new HummingbirdAnimeDeserializer());
         Gson gson = gsonBuilder.create();
 
         this.retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
-                .client(okHttpClient)
+                .client(App.getInstance().getOkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }
@@ -62,6 +47,10 @@ public class HummingbirdApiClient {
         if (seriesRealmResults.isEmpty()) {
             callback.hummingbirdSeasonReceived();
         } else {
+            if (App.getInstance().isInitializing()){
+                App.getInstance().setTotalSyncingSeries(seriesRealmResults.size());
+            }
+
             for (Series series : seriesRealmResults) {
                 getSeriesData(series.getMALID());
             }
@@ -71,7 +60,7 @@ public class HummingbirdApiClient {
 
     private void getSeriesData(final String MALID) {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID);
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID, "683b6ab4486e5a7c612e");
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {

@@ -1,7 +1,9 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
@@ -22,11 +24,9 @@ import android.widget.TextView;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
-import java.util.Collections;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -40,7 +40,6 @@ import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
@@ -59,6 +58,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private SeriesRecyclerViewAdapter mAdapter;
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
+    private HummingbirdApiClient hummingbirdApiClient;
     private CoordinatorLayout seriesLayout;
     private RecyclerView recyclerView;
     private RelativeLayout emptyView;
@@ -67,6 +67,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private Series itemToBeChanged;
     private MainActivity mainActivity;
     private MaterialProgressBar progressBar;
+    private Season currentlyBrowsingSeason;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
+        hummingbirdApiClient = new HummingbirdApiClient(this);
     }
 
     @Override
@@ -135,17 +137,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (!App.getInstance().isInitializing()){
+        if (!App.getInstance().isInitializing()) {
             mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-/*        if (seriesLayout.isRefreshing()) {
-            stopRefreshing();
-        }*/
     }
 
     @Override
@@ -160,15 +154,22 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
 
             if (App.getInstance().isInitializing() && seriesRealmResults.isEmpty()) {
-                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-                failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
+                failedInitialization();
             } else {
                 if (App.getInstance().isNetworkAvailable()) {
-                    new HummingbirdApiClient(this).processSeriesList(seasonKey);
+                    if (App.getInstance().isInitializing()){
+                        IntentFilter intentFilter = new IntentFilter();
+                        intentFilter.addAction("FINISHED_INITIALIZING");
+                        BroadcastReceiver receiver = new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                Log.d(TAG, "s");
+                            }
+                        };
+                        mainActivity.registerReceiver(receiver, intentFilter);
+                    }
+                    hummingbirdApiClient.processSeriesList(seasonKey);
                 } else {
-/*                    if (seriesLayout.isRefreshing()) {
-                        stopRefreshing();
-                    }*/
                     if (getView() != null) {
                         Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                     }
@@ -179,20 +180,15 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
                 }
-
-/*                if (seriesLayout.isRefreshing()) {
-                    stopRefreshing();
-                }*/
             } else {
-                FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-                failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
+                failedInitialization();
             }
         }
     }
 
     @Override
     public void hummingbirdSeasonReceived() {
-        if (App.getInstance().isJustUpdated()){
+        if (App.getInstance().isJustUpdated()) {
             App.getInstance().setJustUpdated(false);
             App.getInstance().setInitializing(false);
             App.getInstance().setPostInitializing(true);
@@ -202,16 +198,20 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void senpaiSeasonListReceived() {
-        RealmResults<Season> seasonsResults = App.getInstance().getRealm().where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll();
+
+/*        RealmResults<Season> seasonsResults = App.getInstance().getRealm().where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll();
         RealmList<Season> seasonsList = new RealmList<>();
         seasonsList.addAll(seasonsResults);
 
         Collections.sort(seasonsList, new SeasonComparator());
-        Collections.reverse(seasonsList);
+
+        int indexOfLatestSeason = seasonsList.indexOf()
 
         for (Season season : seasonsList) {
             senpaiExportHelper.getSeasonData(season);
-        }
+        }*/
+
+        senpaiExportHelper.getSeasonData("raw");
     }
 
     @Override
@@ -302,11 +302,32 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateData(){
+    public void updateData() {
         progressBar.setVisibility(View.VISIBLE);
+
+        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
+            if (App.getInstance().isNetworkAvailable()) {
+                String seasonKey = currentlyBrowsingSeason.getKey();
+                if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
+                    seasonKey = "raw";
+                }
+
+                getSenpaiExportHelper().getSeasonData(seasonKey);
+
+                setUpdating(true);
+            } else {
+                stopUpdating();
+
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            stopUpdating();
+        }
     }
 
-    public void stopUpdating(){
+    public void stopUpdating() {
         progressBar.setVisibility(View.GONE);
         updating = false;
     }
@@ -320,6 +341,11 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
 
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
+    }
+
+    public void failedInitialization() {
+        FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+        failedInitializationFragment.show(mainActivity.getFragmentManager(), TAG);
     }
 
 //    Item modification
@@ -402,7 +428,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                     removeSeries(itemToBeChanged);
                 }
             }
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             FirebaseCrash.log("Series with MALID: '" + MALID + "' is null");
             FirebaseCrash.report(e);
 
@@ -475,5 +501,13 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public CoordinatorLayout getSeriesLayout() {
         return seriesLayout;
+    }
+
+    public Season getCurrentlyBrowsingSeason() {
+        return currentlyBrowsingSeason;
+    }
+
+    public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
+        this.currentlyBrowsingSeason = currentlyBrowsingSeason;
     }
 }

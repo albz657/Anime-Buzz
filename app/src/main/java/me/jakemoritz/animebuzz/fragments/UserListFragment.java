@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -10,27 +9,22 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class CurrentlyWatchingFragment extends SeriesFragment {
+public class UserListFragment extends SeriesFragment {
 
-    private static final String TAG = CurrentlyWatchingFragment.class.getSimpleName();
+    private static final String TAG = UserListFragment.class.getSimpleName();
 
-    public CurrentlyWatchingFragment() {
+    public UserListFragment() {
 
     }
 
-    public static CurrentlyWatchingFragment newInstance() {
-        CurrentlyWatchingFragment fragment = new CurrentlyWatchingFragment();
+    public static UserListFragment newInstance() {
+        UserListFragment fragment = new UserListFragment();
         fragment.setHasOptionsMenu(true);
         return fragment;
     }
@@ -40,33 +34,6 @@ public class CurrentlyWatchingFragment extends SeriesFragment {
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
         loadUserSortingPreference();
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void updateData() {
-        super.updateData();
-
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
-            if (App.getInstance().isNetworkAvailable()) {
-                Set<Season> nonCurrentAiringSeasons = new HashSet<>();
-                RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAll();
-                for (Series series : seriesRealmResults) {
-                    nonCurrentAiringSeasons.add(App.getInstance().getRealm().where(Season.class).equalTo("key", series.getSeasonKey()).findFirst());
-                }
-                for (Season season : nonCurrentAiringSeasons) {
-                    getSenpaiExportHelper().getSeasonData(season);
-                }
-                setUpdating(true);
-            } else {
-                stopUpdating();
-
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        } else {
-            stopUpdating();
-        }
     }
 
     @Override

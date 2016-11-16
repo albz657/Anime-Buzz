@@ -3,7 +3,6 @@ package me.jakemoritz.animebuzz.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 
@@ -12,13 +11,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 import me.jakemoritz.animebuzz.helpers.App;
 
-
-import static android.content.ContentValues.TAG;
-
-public class PosterDownloader extends IntentService{
+public class PosterDownloader extends IntentService {
 
     public PosterDownloader() {
         super(PosterDownloader.class.getSimpleName());
@@ -33,7 +28,7 @@ public class PosterDownloader extends IntentService{
         try {
             bitmap = Picasso.with(App.getInstance()).load(URL).get();
             cachePoster(bitmap, MALID);
-        } catch (IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -50,13 +45,9 @@ public class PosterDownloader extends IntentService{
     private void cachePoster(Bitmap bitmap, String MALID) {
         FileOutputStream fos = null;
         try {
-            File file = getCachedPosterFile(MALID);
-            if (file != null) {
-                fos = new FileOutputStream(file);
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-            } else {
-                Log.d(TAG, "null file");
-            }
+            File file = new File(App.getInstance().getFilesDir(), MALID + ".jpg");
+            fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } finally {

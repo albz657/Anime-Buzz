@@ -1,22 +1,12 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
-import android.app.NotificationManager;
-import android.content.Context;
-import android.util.Log;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import io.realm.RealmList;
-import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
-import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -27,137 +17,76 @@ public class SenpaiExportHelper {
     private final static String TAG = SenpaiExportHelper.class.getSimpleName();
 
     private final static String BASE_URL = "http://www.senpai.moe/";
-    private SeriesFragment fragment;
+    private SeriesFragment seriesFragment;
 
-    public SenpaiExportHelper(SeriesFragment fragment) {
-        this.fragment = fragment;
+    public SenpaiExportHelper(SeriesFragment seriesFragment) {
+        this.seriesFragment = seriesFragment;
     }
 
     public void getSeasonList() {
-        Log.d(TAG, "Getting season list");
-
-        RealmList<Season> typeList = new RealmList<>();
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(typeList.getClass(), new SeasonMetadataDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<RealmList<Season>> call = senpaiEndpointInterface.getSeasonList("json", "seasonlist");
-        call.enqueue(new Callback<RealmList<Season>>() {
-            @Override
-            public void onResponse(Call<RealmList<Season>> call, retrofit2.Response<RealmList<Season>> response) {
-                if (response.isSuccessful()) {
-                    fragment.senpaiSeasonListReceived();
-
-                    Log.d(TAG, "Got season list");
-                } else {
-                    if (App.getInstance().isInitializing()){
-                        FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(fragment);
-                        failedInitializationFragment.show(fragment.getMainActivity().getFragmentManager(), TAG);
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<RealmList<Season>> call, Throwable t) {
-                Log.d(TAG, "Failed getting season list");
-                if (App.getInstance().isInitializing()){
-                    FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(fragment);
-                    failedInitializationFragment.show(fragment.getMainActivity().getFragmentManager(), TAG);
-                }
-            }
-        });
-    }
-
-    public void getSeasonData(final Season season) {
-        Log.d(TAG, "Getting season data for: '" + season.getName() + "'");
-
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(new OkHttpClient())
+                .client(App.getInstance().getOkHttpClient())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<String> call = senpaiEndpointInterface.getSeasonData("json", season.getKey());
+        Call<String> call = senpaiEndpointInterface.getSeasonList("json", "seasonlist");
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, retrofit2.Response<String> response) {
                 if (response.isSuccessful()) {
-                    if (response.body().equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
+                    seriesFragment.senpaiSeasonListReceived();
+                } else {
+                    if (App.getInstance().isInitializing()){
+                        seriesFragment.failedInitialization();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                if (App.getInstance().isInitializing()){
+                    seriesFragment.failedInitialization();
+                }
+            }
+        });
+    }
+
+    public void getSeasonData(final String seasonKey) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(String.class, new AnimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(App.getInstance().getOkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
+        Call<String> call = senpaiEndpointInterface.getSeasonData("json", seasonKey);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (seasonKey.equals("raw")){
                         SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
                     }
 
-                    if (App.getInstance().isPostInitializing()) {
-                        int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", response.body()).count();
-                        NotificationHelper.getInstance().incrementMaxSeries(seasonSeriesCount);
-                    }
-
-                    fragment.senpaiSeasonRetrieved(response.body());
+                    seriesFragment.senpaiSeasonRetrieved(response.body());
                 } else {
-                    NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    manager.cancel(100);
-                    Log.d(TAG, "Failed getting season data for: '" + "" + "'");
-
-                    fragment.senpaiSeasonRetrieved(null);
+                    seriesFragment.senpaiSeasonRetrieved(null);
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                NotificationManager manager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(100);
-                Log.d(TAG, "Failed getting season data for: '" + "" + "'");
-
-                fragment.senpaiSeasonRetrieved(null);
-            }
-        });
-    }
-
-    public void getLatestSeasonData() {
-        Log.d(TAG, "Getting latest season data");
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(String.class, new SeasonDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(new OkHttpClient())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<String> call = senpaiEndpointInterface.getSeasonData("json", "raw");
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "Got latest season data");
-
-                    fragment.senpaiSeasonRetrieved(response.body());
-                } else {
-                    Log.d(TAG, "Failed getting latest season data");
-
-                    fragment.senpaiSeasonRetrieved(null);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.d(TAG, "Failed getting latest season data");
-
-                fragment.senpaiSeasonRetrieved(null);
+                seriesFragment.senpaiSeasonRetrieved(null);
             }
         });
     }

@@ -10,6 +10,7 @@ import com.squareup.picasso.Picasso;
 import io.realm.Realm;
 import io.realm.RealmList;
 import me.jakemoritz.animebuzz.models.Season;
+import okhttp3.OkHttpClient;
 
 public class App extends Application {
 
@@ -25,6 +26,9 @@ public class App extends Application {
     private boolean justLaunched = false;
     private boolean justUpdated = false;
     private Realm realm;
+    private int totalSyncingSeries;
+    private int currentSyncingSeries = 0;
+    private OkHttpClient okHttpClient;
 
     public static synchronized App getInstance() {
         return mInstance;
@@ -104,5 +108,28 @@ public class App extends Application {
             realm = Realm.getDefaultInstance();
         }
         return realm;
+    }
+
+    public int getTotalSyncingSeries() {
+        return totalSyncingSeries;
+    }
+
+    public int getCurrentSyncingSeries() {
+        return currentSyncingSeries;
+    }
+
+    public void incrementCurrentSyncingSeries(){
+        currentSyncingSeries++;
+    }
+
+    public void setTotalSyncingSeries(int totalSyncingSeries) {
+        this.totalSyncingSeries = totalSyncingSeries;
+    }
+
+    public OkHttpClient getOkHttpClient(){
+        if (okHttpClient == null){
+            okHttpClient = new OkHttpClient();
+        }
+        return okHttpClient;
     }
 }

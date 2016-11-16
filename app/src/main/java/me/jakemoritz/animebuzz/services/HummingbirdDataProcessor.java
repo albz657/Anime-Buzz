@@ -1,8 +1,6 @@
 package me.jakemoritz.animebuzz.services;
 
 import android.app.IntentService;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 
 import java.util.Calendar;
@@ -11,7 +9,6 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
@@ -38,24 +35,16 @@ public class HummingbirdDataProcessor extends IntentService {
 
         processSeries(MALID, englishTitle, episodeCount, finishedAiringDate, startedAiringDate, showType);
 
-        if (App.getInstance().isPostInitializing()){
-            Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+        realm.close();
 
-            if (!currSeries.getSeasonKey().equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
-                NotificationHelper.getInstance().incrementCurrSeries();
+        if (App.getInstance().isInitializing()){
+            App.getInstance().incrementCurrentSyncingSeries();
 
-                if (NotificationHelper.getInstance().getMaxSeries() == NotificationHelper.getInstance().getCurrSeries()){
-                    NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.cancel(100);
-
-                    App.getInstance().setPostInitializing(false);
-                } else {
-                    NotificationHelper.getInstance().createSeasonDataNotification();
-                }
+            if (App.getInstance().getCurrentSyncingSeries() == App.getInstance().getTotalSyncingSeries()){
+                Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
+                startService(finishedInitializingIntent);
             }
         }
-
-        realm.close();
     }
 
     private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType) {

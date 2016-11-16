@@ -1,18 +1,33 @@
 package me.jakemoritz.animebuzz.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import javax.annotation.Generated;
+
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 
+@Generated("org.jsonschema2pojo")
 public class Series extends RealmObject{
 
+    @Expose
     @PrimaryKey
     private String MALID = "";
+
+    @Expose
     private String name = "";
+
+    @SerializedName("simulcast")
+    @Expose
     private String simulcastProvider = "";
+
     @Index
     private String seasonKey;
+
+    @Expose
     private String ANNID  = "";
     private double simulcastDelay = 0;
     private long nextEpisodeAirtime = 0L;
