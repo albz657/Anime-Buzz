@@ -62,19 +62,32 @@ public class AlarmHelper {
         alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(Integer.valueOf(alarm.getMALID())));
     }
 
+    public void generateNextEpisodeTimes(String MALID, int airdate, int simulcastAirdate) {
+        DateFormatHelper dateFormatHelper = new DateFormatHelper();
+
+        if (airdate > 0) {
+            Calendar airdateCalendar = dateFormatHelper.getCalFromSeconds(airdate);
+            calculateNextEpisodeTime(MALID, airdateCalendar, false);
+        }
+
+        if (simulcastAirdate > 0) {
+            Calendar simulcastAidateCalendar = dateFormatHelper.getCalFromSeconds(simulcastAirdate);
+            calculateNextEpisodeTime(MALID, simulcastAidateCalendar, true);
+        }
+    }
+
     public void generateNextEpisodeTimes(Series series, int airdate, int simulcastAirdate) {
         DateFormatHelper dateFormatHelper = new DateFormatHelper();
 
         if (airdate > 0) {
             Calendar airdateCalendar = dateFormatHelper.getCalFromSeconds(airdate);
-            calculateNextEpisodeTime(series.getMALID(), airdateCalendar, false);
+            calculateNextEpisodeTime(series, airdateCalendar, false);
         }
 
         if (simulcastAirdate > 0) {
             Calendar simulcastAidateCalendar = dateFormatHelper.getCalFromSeconds(simulcastAirdate);
-            calculateNextEpisodeTime(series.getMALID(), simulcastAidateCalendar, true);
+            calculateNextEpisodeTime(series, simulcastAidateCalendar, true);
         }
-
     }
 
     public void calculateNextEpisodeTime(String MALID, Calendar calendar, boolean simulcast) {
@@ -119,6 +132,35 @@ public class AlarmHelper {
         }
 
         realm.close();
+    }
+
+    public void calculateNextEpisodeTime(Series series, Calendar calendar, boolean simulcast) {
+        final Calendar nextEpisode = Calendar.getInstance();
+        nextEpisode.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
+        nextEpisode.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
+        nextEpisode.set(Calendar.DAY_OF_WEEK, calendar.get(Calendar.DAY_OF_WEEK));
+        nextEpisode.set(Calendar.SECOND, 0);
+        nextEpisode.set(Calendar.MILLISECOND, 0);
+
+        Calendar currentTime = Calendar.getInstance();
+        currentTime.set(Calendar.SECOND, 0);
+        currentTime.set(Calendar.MILLISECOND, 0);
+        if (currentTime.compareTo(nextEpisode) >= 0) {
+            nextEpisode.add(Calendar.WEEK_OF_MONTH, 1);
+        }
+
+        final String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
+        final String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
+
+        if (simulcast) {
+            series.setNextEpisodeSimulcastTimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
+            series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
+        } else {
+            series.setNextEpisodeAirtimeFormatted(nextEpisodeTimeFormatted);
+            series.setNextEpisodeAirtimeFormatted24(nextEpisodeTimeFormatted24);
+            series.setNextEpisodeAirtime(nextEpisode.getTimeInMillis());
+        }
     }
 
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {

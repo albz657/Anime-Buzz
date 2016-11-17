@@ -65,7 +65,7 @@ class AnimeDeserializer implements JsonDeserializer<String> {
                         simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
                     }
 
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(realm.where(Series.class).equalTo("MALID", series.getMALID()).findFirst(), airdate, simulcast_airdate);
+                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
 
 
 /*                Intent episodeTimeIntent = new Intent(App.getInstance(), EpisodeTimeGenerator.class);
