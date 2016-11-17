@@ -102,12 +102,7 @@ public class SeasonsFragment extends SeriesFragment {
             sort = "name";
         }
 
-        OrderedRealmCollection<Series> seasonSeries;
-        if (seasonName.equals(SharedPrefsHelper.getInstance().getLatestSeasonName())) {
-            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSortedAsync(sort);
-        } else {
-            seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSortedAsync(sort);
-        }
+        OrderedRealmCollection<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
 
         if (seasonSeries.isEmpty()) {
             if (getView() != null) {

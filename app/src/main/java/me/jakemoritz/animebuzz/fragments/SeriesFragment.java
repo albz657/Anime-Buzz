@@ -130,6 +130,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         } else if (!element.isEmpty() && emptyView.getVisibility() == View.VISIBLE) {
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
+        } else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
         }
     }
 
