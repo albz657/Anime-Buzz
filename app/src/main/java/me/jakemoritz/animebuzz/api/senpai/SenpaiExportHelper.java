@@ -78,6 +78,8 @@ public class SenpaiExportHelper {
                 if (response.isSuccessful()) {
                     if (seasonKey.equals("raw")){
                         SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
+                        SharedPrefsHelper.getInstance().setLatestSeasonKey(response.body().getSeasonKey());
+                        SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonName());
                     }
 
                     App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {

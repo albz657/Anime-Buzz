@@ -33,15 +33,6 @@ public class PosterDownloader extends IntentService {
         }
     }
 
-    private File getCachedPosterFile(String MALID) {
-        File cacheDirectory = App.getInstance().getCacheDir();
-
-        if (cacheDirectory.exists()) {
-            return new File(cacheDirectory, MALID + ".jpg");
-        }
-        return null;
-    }
-
     private void cachePoster(Bitmap bitmap, String MALID) {
         FileOutputStream fos = null;
         try {

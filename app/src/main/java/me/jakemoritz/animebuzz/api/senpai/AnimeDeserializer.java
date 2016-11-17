@@ -39,6 +39,7 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
         realm.close();
 
         SeasonHolder seasonHolder = new SeasonHolder(seasonKey);
+        seasonHolder.setSeasonName(seasonName);
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
@@ -70,13 +71,6 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
                     }
 
                     AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
-
-
-/*                Intent episodeTimeIntent = new Intent(App.getInstance(), EpisodeTimeGenerator.class);
-                episodeTimeIntent.putExtra("MALID", MALID);
-                episodeTimeIntent.putExtra("airdate", airdate);
-                episodeTimeIntent.putExtra("simulcast_airdate", simulcast_airdate);
-                App.getInstance().startService(episodeTimeIntent);*/
                 } else {
                     Log.d(TAG, "'" + series.getName() + "' has no MALID, ignoring");
                 }
