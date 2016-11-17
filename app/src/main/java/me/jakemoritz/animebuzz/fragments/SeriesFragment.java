@@ -324,7 +324,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void updateData() {
         progressBar.setVisibility(View.VISIBLE);
 
-        if (!App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()) {
+        if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
                 String seasonKey = currentlyBrowsingSeason.getKey();
                 if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
