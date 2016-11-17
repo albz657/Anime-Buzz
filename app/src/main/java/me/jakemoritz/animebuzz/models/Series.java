@@ -29,6 +29,7 @@ public class Series extends RealmObject{
 
     @Expose
     private String ANNID  = "";
+
     private double simulcastDelay = 0;
     private long nextEpisodeAirtime = 0L;
     private long nextEpisodeSimulcastTime = 0L;

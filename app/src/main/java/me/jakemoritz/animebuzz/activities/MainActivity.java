@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity{
         bottomBar = (BottomBar) findViewById(R.id.bottomBar);
 
         if (App.getInstance().isInitializing()){
-            bottomBar.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.INVISIBLE);
         }
 
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity{
                     .addToBackStack(id)
                     .commit();
 
-            bottomBar.setVisibility(View.GONE);
+            bottomBar.setVisibility(View.INVISIBLE);
         } else {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, fragment, id)

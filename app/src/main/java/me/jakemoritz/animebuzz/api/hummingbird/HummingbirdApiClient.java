@@ -60,7 +60,7 @@ public class HummingbirdApiClient {
 
     private void getSeriesData(final String MALID) {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID, "683b6ab4486e5a7c612e");
+        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID);
         call.enqueue(new Callback<HummingbirdAnimeHolder>() {
             @Override
             public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {

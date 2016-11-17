@@ -328,7 +328,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void stopUpdating() {
-        progressBar.setVisibility(View.GONE);
+        progressBar.setVisibility(View.INVISIBLE);
         updating = false;
     }
 

@@ -29,7 +29,7 @@
         app:mpb_progressStyle="horizontal"
         style="@style/Widget.MaterialProgressBar.ProgressBar.Horizontal"
         app:mpb_useIntrinsicPadding="false"
-        android:visibility="gone"
+        android:visibility="invisible"
         />
 
 </android.support.design.widget.CoordinatorLayout>
