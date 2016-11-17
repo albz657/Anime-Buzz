@@ -378,7 +378,7 @@ public class MainActivity extends AppCompatActivity{
                 if (toolbarSpinner != null) {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
             }
         }
     }

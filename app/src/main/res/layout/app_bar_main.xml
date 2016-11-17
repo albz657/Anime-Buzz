@@ -24,7 +24,7 @@
                 android:layout_height="match_parent"
                 android:id="@+id/toolbar_spinner"
                 style="@style/Widget.AnimeBuzz.Toolbar.Spinner"
-                android:visibility="gone" />
+                android:visibility="gone"/>
 
         </android.support.v7.widget.Toolbar>
 

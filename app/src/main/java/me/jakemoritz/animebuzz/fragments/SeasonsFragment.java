@@ -104,12 +104,6 @@ public class SeasonsFragment extends SeriesFragment {
 
         OrderedRealmCollection<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
 
-        if (seasonSeries.isEmpty()) {
-            if (getView() != null) {
-//                Snackbar.make(getView(), "No series were found for that season.", Snackbar.LENGTH_LONG).show();
-            }
-        }
-
         getmAdapter().updateData(seasonSeries);
     }
 
@@ -132,8 +126,6 @@ public class SeasonsFragment extends SeriesFragment {
 
             stopInitialSpinner();
             DailyTimeGenerator.getInstance().setNextAlarm(false);
-//            App.getInstance().setInitializing(false);
-//            App.getInstance().setPostInitializing(true);
         }
     }
 
@@ -155,7 +147,7 @@ public class SeasonsFragment extends SeriesFragment {
         seasonsSpinnerAdapter.getSeasonNames().clear();
 
         RealmList<Season> allSeasons = new RealmList<>();
-        allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAllAsync());
+        allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAll());
         Collections.sort(allSeasons, new SeasonComparator());
 
         for (Season season : allSeasons) {
