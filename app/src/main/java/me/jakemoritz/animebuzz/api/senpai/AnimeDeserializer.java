@@ -18,13 +18,14 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.models.gson.SeasonHolder;
 
-class AnimeDeserializer implements JsonDeserializer<String> {
+class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
 
     private static final String TAG = AnimeDeserializer.class.getSimpleName();
 
     @Override
-    public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public SeasonHolder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         final JsonObject jsonObject = json.getAsJsonObject();
 
         Realm realm = Realm.getDefaultInstance();
@@ -35,6 +36,9 @@ class AnimeDeserializer implements JsonDeserializer<String> {
 
         Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
         String seasonKey = season.getKey();
+        realm.close();
+
+        SeasonHolder seasonHolder = new SeasonHolder(seasonKey);
 
         // Parse Series
         JsonArray seriesArray = jsonObject.getAsJsonArray("items");
@@ -78,14 +82,9 @@ class AnimeDeserializer implements JsonDeserializer<String> {
                 }
             }
         }
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                realm.insertOrUpdate(seriesList);
-            }
-        });
 
-        realm.close();
-        return seasonKey;
+        seasonHolder.setSeriesList(seriesList);
+
+        return seasonHolder;
     }
 }

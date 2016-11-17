@@ -3,10 +3,12 @@ package me.jakemoritz.animebuzz.api.senpai;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.realm.Realm;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
+import me.jakemoritz.animebuzz.models.gson.SeasonHolder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -59,7 +61,7 @@ public class SenpaiExportHelper {
 
     public void getSeasonData(final String seasonKey) {
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(String.class, new AnimeDeserializer());
+        gsonBuilder.registerTypeAdapter(SeasonHolder.class, new AnimeDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -69,23 +71,30 @@ public class SenpaiExportHelper {
                 .build();
 
         SenpaiEndpointInterface senpaiEndpointInterface = retrofit.create(SenpaiEndpointInterface.class);
-        Call<String> call = senpaiEndpointInterface.getSeasonData("json", seasonKey);
-        call.enqueue(new Callback<String>() {
+        Call<SeasonHolder> call = senpaiEndpointInterface.getSeasonData("json", seasonKey);
+        call.enqueue(new Callback<SeasonHolder>() {
             @Override
-            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+            public void onResponse(Call<SeasonHolder> call, final retrofit2.Response<SeasonHolder> response) {
                 if (response.isSuccessful()) {
                     if (seasonKey.equals("raw")){
                         SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
                     }
 
-                    seriesFragment.senpaiSeasonRetrieved(response.body());
+                    App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            realm.insertOrUpdate(response.body().getSeriesList());
+                        }
+                    });
+
+                    seriesFragment.senpaiSeasonRetrieved(response.body().getSeasonKey());
                 } else {
                     seriesFragment.senpaiSeasonRetrieved(null);
                 }
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<SeasonHolder> call, Throwable t) {
                 seriesFragment.senpaiSeasonRetrieved(null);
             }
         });
