@@ -36,10 +36,10 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.fragments.UserListFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
+import me.jakemoritz.animebuzz.fragments.UserListFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity{
             SharedPrefsHelper.getInstance().setCompletedSetup(true);
 
             App.getInstance().setInitializing(true);
+
+
 
             progressView = (CircularProgressView) findViewById(R.id.progress_view);
             progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);

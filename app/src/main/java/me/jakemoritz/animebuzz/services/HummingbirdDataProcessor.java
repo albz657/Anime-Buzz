@@ -42,7 +42,7 @@ public class HummingbirdDataProcessor extends IntentService {
 
             if (App.getInstance().getCurrentSyncingSeries() == App.getInstance().getTotalSyncingSeries()){
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
-                startService(finishedInitializingIntent);
+                sendBroadcast(finishedInitializingIntent);
             }
         }
     }

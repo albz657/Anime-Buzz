@@ -24,6 +24,9 @@ import android.widget.TextView;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -40,6 +43,7 @@ import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
@@ -68,6 +72,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private MainActivity mainActivity;
     private MaterialProgressBar progressBar;
     private Season currentlyBrowsingSeason;
+    private BroadcastReceiver initialReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -163,13 +168,28 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                     if (App.getInstance().isInitializing()){
                         IntentFilter intentFilter = new IntentFilter();
                         intentFilter.addAction("FINISHED_INITIALIZING");
-                        BroadcastReceiver receiver = new BroadcastReceiver() {
+                        initialReceiver = new BroadcastReceiver() {
                             @Override
                             public void onReceive(Context context, Intent intent) {
-                                Log.d(TAG, "s");
+                                App.getInstance().setInitializing(false);
+                                App.getInstance().setPostInitializing(true);
+
+                                RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
+                                Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                                List<Season> seasons = new ArrayList<>(results);
+
+                                Collections.sort(seasons, new SeasonComparator());
+
+                                int indexOfLatestSeason = results.indexOf(latestSeason);
+
+                                seasons = seasons.subList(indexOfLatestSeason + 1, seasons.size());
+
+                                for (Season season : seasons){
+                                    senpaiExportHelper.getSeasonData(season.getKey());
+                                }
                             }
                         };
-                        mainActivity.registerReceiver(receiver, intentFilter);
+                        mainActivity.registerReceiver(initialReceiver, intentFilter);
                     }
                     hummingbirdApiClient.processSeriesList(seasonKey);
                 } else {
@@ -186,6 +206,15 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             } else {
                 failedInitialization();
             }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (initialReceiver != null){
+            mainActivity.unregisterReceiver(initialReceiver);
         }
     }
 
