@@ -123,18 +123,21 @@ public class MainActivity extends AppCompatActivity{
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                Fragment newFragment = null;
+                if (!App.getInstance().isInitializing()){
+                    Fragment newFragment = null;
 
-                if (tabId == R.id.nav_my_shows) {
-                    newFragment = UserListFragment.newInstance();
-                } else if (tabId == R.id.nav_seasons) {
-                    newFragment = SeasonsFragment.newInstance();
-                } else if (tabId == R.id.nav_watching_queue) {
-                    newFragment = BacklogFragment.newInstance();
-                }
+                    Fragment currentFragment = getCurrentFragment();
+                    if (tabId == R.id.nav_my_shows && !(currentFragment instanceof UserListFragment)) {
+                        newFragment = UserListFragment.newInstance();
+                    } else if (tabId == R.id.nav_seasons && !(currentFragment instanceof SeasonsFragment)) {
+                        newFragment = SeasonsFragment.newInstance();
+                    } else if (tabId == R.id.nav_watching_queue && !(currentFragment instanceof BacklogFragment)) {
+                        newFragment = BacklogFragment.newInstance();
+                    }
 
-                if (newFragment != null) {
-                    startFragment(newFragment);
+                    if (newFragment != null) {
+                        startFragment(newFragment);
+                    }
                 }
             }
         });
@@ -247,7 +250,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private Fragment getCurrentFragment() {
-        if (!getSupportFragmentManager().getFragments().isEmpty()) {
+        if (getSupportFragmentManager().getFragments() != null && !getSupportFragmentManager().getFragments().isEmpty()) {
             Iterator iterator = getSupportFragmentManager().getFragments().iterator();
             Fragment fragment = (Fragment) iterator.next();
             Fragment previousFragment = fragment;

@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
@@ -89,21 +87,15 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         }
 
         Drawable dateImage;
-        int dateImageColorId;
         if ((holder.series.getNextEpisodeTimeFormatted().isEmpty() && holder.series.getStartedAiringDate().isEmpty()) || (!holder.series.getShowType().equals("TV") && (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty()))))) {
-            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_close, null);
-            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.x_red);
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_clear_red, null);
         } else if (holder.series.getAiringStatus().equals("Airing")) {
-            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_watch_later, null);
-            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal);
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_watch_later_gunmetal, null);
         } else if (holder.series.getAiringStatus().equals("Not yet aired")) {
-            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_event, null);
-            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.calendar_blue);
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_event_blue, null);
         } else {
-            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_done, null);
-            dateImageColorId = ContextCompat.getColor(App.getInstance(), R.color.check_green);
+            dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_done_green, null);
         }
-        dateImage.setColorFilter(new PorterDuffColorFilter(dateImageColorId, PorterDuff.Mode.SRC_IN));
         holder.mDateImage.setImageDrawable(dateImage);
 
         if (!holder.series.getShowType().equals("TV") &&

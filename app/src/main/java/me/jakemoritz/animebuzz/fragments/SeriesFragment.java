@@ -103,7 +103,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             sort = "name";
         }
         if (this instanceof SeasonsFragment) {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("airingStatus", "Airing").findAllSortedAsync(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
             realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSortedAsync(sort);
@@ -198,19 +198,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void senpaiSeasonListReceived() {
-
-/*        RealmResults<Season> seasonsResults = App.getInstance().getRealm().where(Season.class).notEqualTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findAll();
-        RealmList<Season> seasonsList = new RealmList<>();
-        seasonsList.addAll(seasonsResults);
-
-        Collections.sort(seasonsList, new SeasonComparator());
-
-        int indexOfLatestSeason = seasonsList.indexOf()
-
-        for (Season season : seasonsList) {
-            senpaiExportHelper.getSeasonData(season);
-        }*/
-
         senpaiExportHelper.getSeasonData("raw");
     }
 
