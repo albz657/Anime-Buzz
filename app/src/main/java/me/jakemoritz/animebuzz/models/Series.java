@@ -49,6 +49,29 @@ public class Series extends RealmObject{
     private boolean isInUserList = false;
     private int episodesWatched = 0;
 
+    public void duplicateRealmValues(Series realmSeries){
+        this.name = realmSeries.getName();
+        this.simulcastProvider = realmSeries.getSimulcastProvider();
+        this.seasonKey = realmSeries.getSeasonKey();
+        this.ANNID = realmSeries.getANNID();
+        this.simulcastDelay = realmSeries.getSimulcastDelay();
+        this.nextEpisodeAirtime = realmSeries.getNextEpisodeAirtime();
+        this.nextEpisodeSimulcastTime = realmSeries.getNextEpisodeSimulcastTime();
+        this.nextEpisodeAirtimeFormatted = realmSeries.getNextEpisodeTimeFormatted();
+        this.nextEpisodeSimulcastTimeFormatted = realmSeries.getNextEpisodeSimulcastTimeFormatted();
+        this.nextEpisodeAirtimeFormatted24 = realmSeries.getNextEpisodeAirtimeFormatted24();
+        this.nextEpisodeSimulcastTimeFormatted24 = realmSeries.getNextEpisodeSimulcastTimeFormatted24();
+        this.lastNotificationTime = realmSeries.getLastNotificationTime();
+        this.englishTitle = realmSeries.getEnglishTitle();
+        this.airingStatus = realmSeries.getAiringStatus();
+        this.showType = realmSeries.getShowType();
+        this.single = realmSeries.isSingle();
+        this.startedAiringDate = realmSeries.getStartedAiringDate();
+        this.finishedAiringDate = realmSeries.getFinishedAiringDate();
+        this.isInUserList = realmSeries.isInUserList();
+        this.episodesWatched = realmSeries.getEpisodesWatched();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -102,6 +125,22 @@ public class Series extends RealmObject{
 
     public void setNextEpisodeSimulcastTimeFormatted24(String nextEpisodeSimulcastTimeFormatted24) {
         this.nextEpisodeSimulcastTimeFormatted24 = nextEpisodeSimulcastTimeFormatted24;
+    }
+
+    public String getNextEpisodeSimulcastTimeFormatted24() {
+        return nextEpisodeSimulcastTimeFormatted24;
+    }
+
+    public String getNextEpisodeAirtimeFormatted24() {
+        return nextEpisodeAirtimeFormatted24;
+    }
+
+    public String getNextEpisodeSimulcastTimeFormatted() {
+        return nextEpisodeSimulcastTimeFormatted;
+    }
+
+    public String getNextEpisodeAirtimeFormatted() {
+        return nextEpisodeAirtimeFormatted;
     }
 
     public String getFinishedAiringDate() {

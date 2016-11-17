@@ -36,7 +36,6 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
 
         Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
         String seasonKey = season.getKey();
-        realm.close();
 
         SeasonHolder seasonHolder = new SeasonHolder(seasonKey);
         seasonHolder.setSeasonName(seasonName);
@@ -50,32 +49,34 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
         for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
-            final Series series = gson.fromJson(seriesObject, Series.class);
+            Series series = gson.fromJson(seriesObject, Series.class);
+            Series realmSeries = realm.where(Series.class).equalTo("MALID", series.getMALID()).findFirst();
+            if (realmSeries != null) {
+                series.duplicateRealmValues(realmSeries);
+            }
 
-            if (series != null) {
+            if (series.getMALID().matches("^-?\\d+$")) {
+                series.setSeasonKey(seasonKey);
 
-                if (series.getMALID().matches("^-?\\d+$")) {
-                    series.setSeasonKey(seasonKey);
+                seriesList.add(series);
 
-                    seriesList.add(series);
-
-                    boolean missingAirdate = seriesObject.get("missingAirtime").getAsBoolean();
-                    int airdate;
-                    int simulcast_airdate;
-                    if (missingAirdate) {
-                        airdate = -1;
-                        simulcast_airdate = -1;
-                    } else {
-                        airdate = seriesObject.get("airdate_u").getAsInt();
-                        simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
-                    }
-
-                    AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
+                boolean missingAirdate = seriesObject.get("missingAirtime").getAsBoolean();
+                int airdate;
+                int simulcast_airdate;
+                if (missingAirdate) {
+                    airdate = -1;
+                    simulcast_airdate = -1;
                 } else {
-                    Log.d(TAG, "'" + series.getName() + "' has no MALID, ignoring");
+                    airdate = seriesObject.get("airdate_u").getAsInt();
+                    simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
                 }
+
+                AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
+            } else {
+                Log.d(TAG, "'" + series.getName() + "' has no MALID, ignoring");
             }
         }
+        realm.close();
 
         seasonHolder.setSeriesList(seriesList);
 

@@ -148,13 +148,20 @@ public class SeasonsFragment extends SeriesFragment {
 
         RealmList<Season> allSeasons = new RealmList<>();
         allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAll());
+
         Collections.sort(allSeasons, new SeasonComparator());
 
         for (Season season : allSeasons) {
-            seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
+            int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", season.getKey()).count();
 
-            if (season.getName().equals(getCurrentlyBrowsingSeason().getName())) {
-                previousSpinnerIndex = allSeasons.indexOf(season);
+            if (seasonSeriesCount > 0){
+                seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
+            }
+        }
+
+        for (String seasonName : seasonsSpinnerAdapter.getSeasonNames()){
+            if (seasonName.equals(getCurrentlyBrowsingSeason().getName())) {
+                previousSpinnerIndex = seasonsSpinnerAdapter.getSeasonNames().indexOf(seasonName);
             }
         }
 
