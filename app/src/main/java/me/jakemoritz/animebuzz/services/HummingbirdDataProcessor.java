@@ -9,6 +9,7 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
@@ -39,8 +40,11 @@ public class HummingbirdDataProcessor extends IntentService {
 
         if (App.getInstance().isInitializing()){
             App.getInstance().incrementCurrentSyncingSeries();
+            NotificationHelper.getInstance().createInitialNotification();
 
             if (App.getInstance().getCurrentSyncingSeries() == App.getInstance().getTotalSyncingSeries()){
+
+
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
                 sendBroadcast(finishedInitializingIntent);
             }

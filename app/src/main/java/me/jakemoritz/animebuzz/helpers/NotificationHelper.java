@@ -31,6 +31,32 @@ public class NotificationHelper {
         return notificationHelper;
     }
 
+    public void createInitialNotification() {
+        String contentTitle;
+        String contextText;
+        if (App.getInstance().getTotalSyncingSeries() == App.getInstance().getCurrentSyncingSeries()){
+            contentTitle = "Finished downloading current season info.";
+            contextText = "";
+        } else {
+            contentTitle = "Downloading current season info.";
+            contextText = App.getInstance().getCurrentSyncingSeries() + "/" + App.getInstance().getTotalSyncingSeries();
+        }
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(App.getInstance())
+                        .setSmallIcon(R.drawable.ic_get_app_black_24dp)
+                        .setContentTitle(contentTitle)
+                        .setContentText(contextText)
+                        .setAutoCancel(true)
+                        .setProgress(App.getInstance().getTotalSyncingSeries(), App.getInstance().getCurrentSyncingSeries(), false);
+
+        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(resultPendingIntent);
+
+        mNotificationManager.notify("initial".hashCode(), mBuilder.build());
+    }
+
     public void createSeasonDataNotification() {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
