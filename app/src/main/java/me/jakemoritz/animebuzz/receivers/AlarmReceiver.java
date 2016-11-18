@@ -3,10 +3,13 @@ package me.jakemoritz.animebuzz.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.Calendar;
 
 import io.realm.Realm;
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
@@ -38,8 +41,14 @@ public class AlarmReceiver extends BroadcastReceiver {
                 lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                 if (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR)){
-                    NotificationHelper helper = new NotificationHelper();
-                    helper.createNewEpisodeNotification(series);
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                    boolean prefersNotification = sharedPreferences.getBoolean(context.getString(R.string.pref_notification_key), true);
+
+                    if (prefersNotification){
+                        NotificationHelper helper = new NotificationHelper();
+                        helper.createNewEpisodeNotification(series);
+                    }
+
 
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override

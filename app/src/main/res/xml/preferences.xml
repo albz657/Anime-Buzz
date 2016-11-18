@@ -5,6 +5,11 @@
         android:title="@string/pref_category_notifications_title">
 
         <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_notification_key"
+            android:title="@string/pref_notification_title" />
+
+        <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_simulcast_key"
             android:summary="@string/pref_simulcast_off_summary"
