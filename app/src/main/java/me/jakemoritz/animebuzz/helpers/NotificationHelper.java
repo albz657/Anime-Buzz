@@ -33,22 +33,18 @@ public class NotificationHelper {
 
     public void createInitialNotification() {
         String contentTitle;
-        String contextText;
-        if (App.getInstance().getTotalSyncingSeries() == App.getInstance().getCurrentSyncingSeries()){
-            contentTitle = "Finished downloading current season info.";
-            contextText = "";
+        if (App.getInstance().getTotalSyncingSeriesInitial() == App.getInstance().getCurrentSyncingSeriesInitial()){
+            contentTitle = "Finished download additional data for this season";
         } else {
-            contentTitle = "Downloading current season info.";
-            contextText = App.getInstance().getCurrentSyncingSeries() + "/" + App.getInstance().getTotalSyncingSeries();
+            contentTitle = "Downloading additional data for this season";
         }
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.ic_get_app_black_24dp)
                         .setContentTitle(contentTitle)
-                        .setContentText(contextText)
                         .setAutoCancel(true)
-                        .setProgress(App.getInstance().getTotalSyncingSeries(), App.getInstance().getCurrentSyncingSeries(), false);
+                        .setProgress(App.getInstance().getTotalSyncingSeriesInitial(), App.getInstance().getCurrentSyncingSeriesInitial(), false);
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
@@ -58,12 +54,24 @@ public class NotificationHelper {
     }
 
     public void createSeasonDataNotification() {
+        String contentTitle;
+        String contextText;
+        if (App.getInstance().getTotalSyncingSeriesPost() == App.getInstance().getCurrentSyncingSeriesPost()){
+            contentTitle = "Finished downloading future season info";
+            contextText = "";
+            App.getInstance().setPostInitializing(false);
+        } else {
+            contentTitle = "Downloading future season info";
+            contextText = App.getInstance().getCurrentSyncingSeriesPost() + "/" + App.getInstance().getTotalSyncingSeriesPost();
+        }
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.ic_sync)
-                        .setContentTitle(App.getInstance().getString(R.string.notification_list_update))
-                        .setContentText(currSeries + "/" + maxSeries)
-                        .setProgress(maxSeries, currSeries, false);
+                        .setContentTitle(contentTitle)
+                        .setContentText(contextText)
+                        .setAutoCancel(true)
+                        .setProgress(App.getInstance().getTotalSyncingSeriesPost(), App.getInstance().getCurrentSyncingSeriesPost(), false);
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);

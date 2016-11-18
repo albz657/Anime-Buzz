@@ -48,7 +48,7 @@ public class HummingbirdApiClient {
             callback.hummingbirdSeasonReceived();
         } else {
             if (App.getInstance().isInitializing()){
-                App.getInstance().setTotalSyncingSeries(seriesRealmResults.size());
+                App.getInstance().setTotalSyncingSeriesInitial(seriesRealmResults.size());
             }
 
             for (Series series : seriesRealmResults) {

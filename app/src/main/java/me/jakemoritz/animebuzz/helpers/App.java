@@ -28,8 +28,10 @@ public class App extends Application {
     private boolean justLaunched = false;
     private boolean justUpdated = false;
     private Realm realm;
-    private int totalSyncingSeries;
-    private int currentSyncingSeries = 0;
+    private int totalSyncingSeriesInitial;
+    private int currentSyncingSeriesInitial = 0;
+    private int totalSyncingSeriesPost;
+    private int currentSyncingSeriesPost = 0;
     private OkHttpClient okHttpClient;
 
     public static synchronized App getInstance() {
@@ -112,20 +114,36 @@ public class App extends Application {
         return realm;
     }
 
-    public int getTotalSyncingSeries() {
-        return totalSyncingSeries;
+    public int getCurrentSyncingSeriesPost() {
+        return currentSyncingSeriesPost;
     }
 
-    public int getCurrentSyncingSeries() {
-        return currentSyncingSeries;
+    public int getTotalSyncingSeriesPost() {
+        return totalSyncingSeriesPost;
     }
 
-    public void incrementCurrentSyncingSeries(){
-        currentSyncingSeries++;
+    public int getTotalSyncingSeriesInitial() {
+        return totalSyncingSeriesInitial;
     }
 
-    public void setTotalSyncingSeries(int totalSyncingSeries) {
-        this.totalSyncingSeries = totalSyncingSeries;
+    public int getCurrentSyncingSeriesInitial() {
+        return currentSyncingSeriesInitial;
+    }
+
+    public void incrementTotalSyncingSeriesPost(int seriesCount){
+        totalSyncingSeriesPost += seriesCount;
+    }
+
+    public void incrementCurrentSyncingSeriesPost(){
+        currentSyncingSeriesPost++;
+    }
+
+    public void incrementCurrentSyncingSeriesInitial(){
+        currentSyncingSeriesInitial++;
+    }
+
+    public void setTotalSyncingSeriesInitial(int totalSyncingSeriesInitial) {
+        this.totalSyncingSeriesInitial = totalSyncingSeriesInitial;
     }
 
     public OkHttpClient getOkHttpClient(){

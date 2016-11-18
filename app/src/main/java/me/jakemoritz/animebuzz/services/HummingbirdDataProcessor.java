@@ -39,15 +39,16 @@ public class HummingbirdDataProcessor extends IntentService {
         realm.close();
 
         if (App.getInstance().isInitializing()){
-            App.getInstance().incrementCurrentSyncingSeries();
+            App.getInstance().incrementCurrentSyncingSeriesInitial();
             NotificationHelper.getInstance().createInitialNotification();
 
-            if (App.getInstance().getCurrentSyncingSeries() == App.getInstance().getTotalSyncingSeries()){
-
-
+            if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
                 sendBroadcast(finishedInitializingIntent);
             }
+        } else if (App.getInstance().isPostInitializing()){
+            App.getInstance().incrementCurrentSyncingSeriesPost();
+            NotificationHelper.getInstance().createSeasonDataNotification();
         }
     }
 

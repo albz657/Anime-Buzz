@@ -82,6 +82,10 @@ public class SenpaiExportHelper {
                         SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonName());
                     }
 
+                    if (App.getInstance().isPostInitializing()){
+                        App.getInstance().incrementTotalSyncingSeriesPost(response.body().getSeriesList().size());
+                    }
+
                     App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
