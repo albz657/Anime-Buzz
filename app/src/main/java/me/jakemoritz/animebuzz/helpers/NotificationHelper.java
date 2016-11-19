@@ -33,10 +33,13 @@ public class NotificationHelper {
 
     public void createInitialNotification() {
         String contentTitle;
+        String contextText;
         if (App.getInstance().getTotalSyncingSeriesInitial() == App.getInstance().getCurrentSyncingSeriesInitial()){
             contentTitle = "Finished download additional data for this season";
+            contextText = "";
         } else {
             contentTitle = "Downloading additional data for this season";
+            contextText = App.getInstance().getCurrentSyncingSeriesInitial() + "/" + App.getInstance().getTotalSyncingSeriesInitial();
         }
 
         NotificationCompat.Builder mBuilder =
@@ -55,21 +58,17 @@ public class NotificationHelper {
 
     public void createSeasonDataNotification() {
         String contentTitle;
-        String contextText;
         if (App.getInstance().getTotalSyncingSeriesPost() == App.getInstance().getCurrentSyncingSeriesPost()){
             contentTitle = "Finished downloading future season info";
-            contextText = "";
             App.getInstance().setPostInitializing(false);
         } else {
             contentTitle = "Downloading future season info";
-            contextText = App.getInstance().getCurrentSyncingSeriesPost() + "/" + App.getInstance().getTotalSyncingSeriesPost();
         }
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.ic_sync)
                         .setContentTitle(contentTitle)
-                        .setContentText(contextText)
                         .setAutoCancel(true)
                         .setProgress(App.getInstance().getTotalSyncingSeriesPost(), App.getInstance().getCurrentSyncingSeriesPost(), false);
 

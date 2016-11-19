@@ -9,8 +9,8 @@ import android.widget.Spinner;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import io.realm.OrderedRealmCollection;
 import io.realm.RealmList;
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -102,7 +102,7 @@ public class SeasonsFragment extends SeriesFragment {
             sort = "name";
         }
 
-        OrderedRealmCollection<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
+        RealmResults<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
 
         getmAdapter().updateData(seasonSeries);
     }

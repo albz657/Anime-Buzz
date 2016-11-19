@@ -294,8 +294,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setVisible(false);
         signOutPreference.setVisible(true);
 
-        App.getInstance().setJustLaunched(true);
-
         String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";

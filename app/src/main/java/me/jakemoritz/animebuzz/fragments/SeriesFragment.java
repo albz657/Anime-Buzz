@@ -111,7 +111,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSortedAsync(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
@@ -129,7 +129,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     private void setVisibility(RealmResults<Series> element) {
-        if (element.isEmpty()) {
+        if (element.isEmpty() && recyclerView.getVisibility() == View.VISIBLE) {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
         } else if (!element.isEmpty()) {

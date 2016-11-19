@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -56,6 +55,14 @@ public class MainActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private BottomBar bottomBar;
+    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
+        @Override
+        public void onChange(Object element) {
+            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
+            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
+            backlogTab.setBadgeCount(backlogItems.size());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,15 +75,36 @@ public class MainActivity extends AppCompatActivity{
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
 
+        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+
+        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelected(@IdRes int tabId) {
+                if (SharedPrefsHelper.getInstance().hasCompletedSetup()){
+                    Fragment newFragment = null;
+
+                    Fragment currentFragment = getCurrentFragment();
+                    if (tabId == R.id.nav_my_shows && !(currentFragment instanceof UserListFragment)) {
+                        newFragment = UserListFragment.newInstance();
+                    } else if (tabId == R.id.nav_seasons && !(currentFragment instanceof SeasonsFragment)) {
+                        newFragment = SeasonsFragment.newInstance();
+                    } else if (tabId == R.id.nav_watching_queue && !(currentFragment instanceof BacklogFragment)) {
+                        newFragment = BacklogFragment.newInstance();
+                    }
+
+                    if (newFragment != null) {
+                        startFragment(newFragment);
+                    }
+                }
+            }
+        });
+
         // Check if user has completed setup
         if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || justFailed) {
             // Just finished setup
 
             SharedPrefsHelper.getInstance().setCompletedSetup(true);
-
             App.getInstance().setInitializing(true);
-
-
 
             progressView = (CircularProgressView) findViewById(R.id.progress_view);
             progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
@@ -86,9 +114,6 @@ public class MainActivity extends AppCompatActivity{
             if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L) {
                 DailyTimeGenerator.getInstance().setNextAlarm(false);
             }
-
-            // Default startup procedure
-            App.getInstance().setJustLaunched(true);
 
             // fix old database
             if (doesOldDatabaseExist()) {
@@ -108,6 +133,10 @@ public class MainActivity extends AppCompatActivity{
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
 
+        if (App.getInstance().isInitializing()){
+            bottomBar.setVisibility(View.INVISIBLE);
+        }
+
         // Initialize UI elements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
@@ -115,34 +144,6 @@ public class MainActivity extends AppCompatActivity{
 
         RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAllAsync();
         backlogItems.addChangeListener(backlogCountCallback);
-
-        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
-
-        if (App.getInstance().isInitializing()){
-            bottomBar.setVisibility(View.INVISIBLE);
-        }
-
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
-            @Override
-            public void onTabSelected(@IdRes int tabId) {
-                if (!App.getInstance().isInitializing()){
-                    Fragment newFragment = null;
-
-                    Fragment currentFragment = getCurrentFragment();
-                    if (tabId == R.id.nav_my_shows && !(currentFragment instanceof UserListFragment)) {
-                        newFragment = UserListFragment.newInstance();
-                    } else if (tabId == R.id.nav_seasons && !(currentFragment instanceof SeasonsFragment)) {
-                        newFragment = SeasonsFragment.newInstance();
-                    } else if (tabId == R.id.nav_watching_queue && !(currentFragment instanceof BacklogFragment)) {
-                        newFragment = BacklogFragment.newInstance();
-                    }
-
-                    if (newFragment != null) {
-                        startFragment(newFragment);
-                    }
-                }
-            }
-        });
 
         // Start relevant fragment
         int defaultTabId = R.id.nav_my_shows;
@@ -165,42 +166,6 @@ public class MainActivity extends AppCompatActivity{
         }
 
         bottomBar.setDefaultTab(defaultTabId);
-    }
-
-    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
-        @Override
-        public void onChange(Object element) {
-            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
-            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
-            backlogTab.setBadgeCount(backlogItems.size());
-        }
-    };
-
-    private void deleteOldImages() {
-        File cache = getCacheDir();
-        File appDir = new File(cache.getParent());
-
-        // deletes images from cache
-        if (cache.exists()) {
-            for (String file : cache.list()) {
-                if (file.contains(".jpg")) {
-                    File imageFile = new File(cache.getPath() + "/" + file);
-                    imageFile.delete();
-                }
-            }
-        }
-
-        File files = new File(appDir.getPath() + "/app_cache/images");
-
-        // deletes images from old incorrect cache
-        if (files.exists()) {
-            for (String file : files.list()) {
-                if (file.contains(".jpg")) {
-                    File imageFile = new File(files.getPath() + "/" + file);
-                    imageFile.delete();
-                }
-            }
-        }
     }
 
     @Override
@@ -285,21 +250,6 @@ public class MainActivity extends AppCompatActivity{
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean doesOldDatabaseExist() {
-        File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
-        return dbFile.exists();
-    }
-
-    private boolean doesSugarDatabaseExist() {
-        File dbFile = App.getInstance().getDatabasePath("buzz_sugar.db");
-        return dbFile.exists();
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return App.getInstance().isInitializing() || super.dispatchTouchEvent(ev);
     }
 
     @Override
@@ -388,6 +338,43 @@ public class MainActivity extends AppCompatActivity{
     public boolean onSupportNavigateUp() {
         getSupportFragmentManager().popBackStack();
         return true;
+    }
+
+    private boolean doesOldDatabaseExist() {
+        File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
+        return dbFile.exists();
+    }
+
+    private boolean doesSugarDatabaseExist() {
+        File dbFile = App.getInstance().getDatabasePath("buzz_sugar.db");
+        return dbFile.exists();
+    }
+
+    private void deleteOldImages() {
+        File cache = getCacheDir();
+        File appDir = new File(cache.getParent());
+
+        // deletes images from cache
+        if (cache.exists()) {
+            for (String file : cache.list()) {
+                if (file.contains(".jpg")) {
+                    File imageFile = new File(cache.getPath() + "/" + file);
+                    imageFile.delete();
+                }
+            }
+        }
+
+        File files = new File(appDir.getPath() + "/app_cache/images");
+
+        // deletes images from old incorrect cache
+        if (files.exists()) {
+            for (String file : files.list()) {
+                if (file.contains(".jpg")) {
+                    File imageFile = new File(files.getPath() + "/" + file);
+                    imageFile.delete();
+                }
+            }
+        }
     }
 
     /* Getters/setters */

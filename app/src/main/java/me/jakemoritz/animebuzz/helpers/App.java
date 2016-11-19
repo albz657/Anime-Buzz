@@ -10,8 +10,6 @@ import com.squareup.picasso.Picasso;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import io.realm.Realm;
-import io.realm.RealmList;
-import me.jakemoritz.animebuzz.models.Season;
 import okhttp3.OkHttpClient;
 
 public class App extends Application {
@@ -20,12 +18,9 @@ public class App extends Application {
 
     private static App mInstance;
 
-    private RealmList<Season> syncingSeasons;
-
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
-    private boolean justLaunched = false;
     private boolean justUpdated = false;
     private Realm realm;
     private int totalSyncingSeriesInitial;
@@ -81,22 +76,6 @@ public class App extends Application {
 
     public void setTryingToVerify(boolean tryingToVerify) {
         this.tryingToVerify = tryingToVerify;
-    }
-
-    public boolean isJustLaunched() {
-        return justLaunched;
-    }
-
-    public void setJustLaunched(boolean justLaunched) {
-        this.justLaunched = justLaunched;
-    }
-
-    public RealmList<Season> getSyncingSeasons() {
-        return syncingSeasons;
-    }
-
-    public void setSyncingSeasons(RealmList<Season> syncingSeasons) {
-        this.syncingSeasons = syncingSeasons;
     }
 
     public boolean isJustUpdated() {

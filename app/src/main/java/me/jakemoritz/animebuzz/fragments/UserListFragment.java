@@ -67,9 +67,6 @@ public class UserListFragment extends SeriesFragment {
             stopInitialSpinner();
 
             DailyTimeGenerator.getInstance().setNextAlarm(false);
-            App.getInstance().setInitializing(false);
-            App.getInstance().setPostInitializing(true);
-            getSenpaiExportHelper().getSeasonList();
         }
 
         loadUserSortingPreference();
