@@ -129,6 +129,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
 
         previousRealmResults = realmResults;
+        setVisibility(realmResults);
         previousRealmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
             @Override
             public void onChange(RealmResults<Series> element) {
