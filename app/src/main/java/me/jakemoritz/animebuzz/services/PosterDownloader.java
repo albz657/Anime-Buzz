@@ -38,7 +38,7 @@ public class PosterDownloader extends IntentService {
         try {
             File file = new File(App.getInstance().getFilesDir(), MALID + ".jpg");
             fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, fos);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } finally {
