@@ -40,7 +40,7 @@ public class SeasonDataHelper {
                     Season season = new Season();
                     season.setKey(seasonKey);
                     season.setName(seasonName);
-                    season.setStartTimestamp(startTimeStamp);
+                    season.setStart_timestamp(startTimeStamp);
 
                     App.getInstance().getRealm().insertOrUpdate(season);
                 }

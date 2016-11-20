@@ -45,7 +45,7 @@ class SeasonDeserializer implements JsonDeserializer<String> {
                 final Season season = new Season();
                 season.setKey(seasonKey);
                 season.setName(seasonName);
-                season.setStartTimestamp(startTimestamp);
+                season.setStart_timestamp(startTimestamp);
                 season.setRelativeTime(Season.calculateRelativeTime(seasonName));
 
                 realm.executeTransaction(new Realm.Transaction() {
