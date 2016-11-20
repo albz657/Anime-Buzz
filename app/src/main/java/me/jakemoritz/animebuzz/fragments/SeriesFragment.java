@@ -139,12 +139,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     private void setVisibility(RealmResults<Series> element) {
-        if (element.isEmpty() && recyclerView.getVisibility() == View.VISIBLE) {
+        if (element.isEmpty()) {
             recyclerView.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
-        } else if (!element.isEmpty()) {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
         } else {
             recyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
