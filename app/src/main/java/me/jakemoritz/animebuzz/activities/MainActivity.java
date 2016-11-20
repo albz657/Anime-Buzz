@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity{
         }
 
         if (App.getInstance().isInitializing()){
-            bottomBar.setVisibility(View.INVISIBLE);
+            bottomBar.setVisibility(View.GONE);
         }
 
         // Initialize UI elements
@@ -164,7 +164,12 @@ public class MainActivity extends AppCompatActivity{
 
             startFragment(seriesFragment);
         } else {
-            startFragment(UserListFragment.newInstance());
+            if (getIntent() != null && getIntent().hasExtra("notificationClicked")){
+                defaultTabId = R.id.nav_watching_queue;
+                startFragment(BacklogFragment.newInstance());
+            } else {
+                startFragment(UserListFragment.newInstance());
+            }
         }
 
         App.getInstance().setSetDefaultTabId(true);
@@ -294,7 +299,7 @@ public class MainActivity extends AppCompatActivity{
                     .addToBackStack(id)
                     .commit();
 
-            bottomBar.setVisibility(View.INVISIBLE);
+            bottomBar.setVisibility(View.GONE);
         } else {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, fragment, id)

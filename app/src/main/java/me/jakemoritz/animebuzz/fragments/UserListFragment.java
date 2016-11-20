@@ -14,6 +14,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 public class UserListFragment extends SeriesFragment {
@@ -27,6 +28,10 @@ public class UserListFragment extends SeriesFragment {
     public static UserListFragment newInstance() {
         UserListFragment fragment = new UserListFragment();
         fragment.setHasOptionsMenu(true);
+
+        Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+        fragment.setCurrentlyBrowsingSeason(currentSeason);
+
         return fragment;
     }
 
