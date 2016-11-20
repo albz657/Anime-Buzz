@@ -1,7 +1,9 @@
 package me.jakemoritz.animebuzz.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -55,14 +57,19 @@ public class MainActivity extends AppCompatActivity{
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private BottomBar bottomBar;
-    private RealmChangeListener backlogCountCallback = new RealmChangeListener() {
-        @Override
-        public void onChange(Object element) {
-            RealmResults<BacklogItem> backlogItems = (RealmResults) element;
+    private RealmChangeListener backlogCountCallback;
+    private BroadcastReceiver notificationReceiver;
+
+    private void setBacklogBadge(){
+        if (bottomBar != null){
+            RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+
             BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
             backlogTab.setBadgeCount(backlogItems.size());
         }
-    };
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +81,15 @@ public class MainActivity extends AppCompatActivity{
 //            Realm.init(App.getInstance());
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
+
+        notificationReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                setBacklogBadge();
+            }
+        };
+
+        registerReceiver(notificationReceiver, new IntentFilter("NOTIFICATION_RECEIVED"));
 
         App.getInstance().setSetDefaultTabId(false);
 
@@ -144,9 +160,6 @@ public class MainActivity extends AppCompatActivity{
 
         setSupportActionBar(toolbar);
 
-        RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAllAsync();
-        backlogItems.addChangeListener(backlogCountCallback);
-
         // Start relevant fragment
         int defaultTabId = R.id.nav_my_shows;
         if (App.getInstance().isInitializing()) {
@@ -191,6 +204,8 @@ public class MainActivity extends AppCompatActivity{
             }
             openRingtones = false;
         }
+
+        setBacklogBadge();
     }
 
     @Override
@@ -199,6 +214,10 @@ public class MainActivity extends AppCompatActivity{
 
         if (App.getInstance().getRealm() != null && !App.getInstance().getRealm().isClosed()) {
             App.getInstance().getRealm().close();
+        }
+
+        if (notificationReceiver != null){
+            unregisterReceiver(notificationReceiver);
         }
     }
 
@@ -269,7 +288,8 @@ public class MainActivity extends AppCompatActivity{
             if (!getSupportFragmentManager().getFragments().isEmpty()) {
                 if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
                 } else {
-                    startFragment(BacklogFragment.newInstance());
+//                    startFragment(BacklogFragment.newInstance());
+                    bottomBar.selectTabWithId(R.id.nav_watching_queue);
                 }
             }
         }
