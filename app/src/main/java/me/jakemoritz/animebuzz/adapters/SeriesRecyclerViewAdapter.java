@@ -100,7 +100,14 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
         if (!holder.series.getShowType().equals("TV") &&
                 (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty())))) {
-            holder.mDate.setText("No airing times available");
+            if (App.getInstance().isInitializing()){
+                holder.mDate.setText("Updating episode release time");
+                dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_sync, null);
+                holder.mDateImage.setImageDrawable(dateImage);
+            } else {
+                holder.mDate.setText("No airing times available");
+            }
+
             holder.mAddButton.setVisibility(View.GONE);
             holder.mMinusButton.setVisibility(View.GONE);
         } else if (!holder.series.getAiringStatus().equals("Finished airing")) {
