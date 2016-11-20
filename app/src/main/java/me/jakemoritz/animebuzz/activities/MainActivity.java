@@ -75,12 +75,14 @@ public class MainActivity extends AppCompatActivity{
             SharedPrefsHelper.getInstance().setJustFailed(false);
         }
 
+        App.getInstance().setSetDefaultTabId(false);
+
         bottomBar = (BottomBar) findViewById(R.id.bottomBar);
 
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                if (SharedPrefsHelper.getInstance().hasCompletedSetup()){
+                if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()){
                     Fragment newFragment = null;
 
                     Fragment currentFragment = getCurrentFragment();
@@ -165,7 +167,9 @@ public class MainActivity extends AppCompatActivity{
             startFragment(UserListFragment.newInstance());
         }
 
+        App.getInstance().setSetDefaultTabId(true);
         bottomBar.setDefaultTab(defaultTabId);
+        App.getInstance().setSetDefaultTabId(false);
     }
 
     @Override

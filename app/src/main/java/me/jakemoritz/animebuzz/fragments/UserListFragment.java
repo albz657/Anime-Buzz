@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
@@ -91,7 +92,9 @@ public class UserListFragment extends SeriesFragment {
             }
         }
 
-        getmAdapter().updateData(App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort));
+        RealmResults realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
+        resetListener(realmResults);
+        getmAdapter().updateData(realmResults);
     }
 
     @Override

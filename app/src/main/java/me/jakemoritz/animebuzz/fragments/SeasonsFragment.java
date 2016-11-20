@@ -104,6 +104,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         RealmResults<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
 
+        resetListener(seasonSeries);
         getmAdapter().updateData(seasonSeries);
     }
 

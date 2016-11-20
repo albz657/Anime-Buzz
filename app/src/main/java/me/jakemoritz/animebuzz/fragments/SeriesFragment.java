@@ -73,6 +73,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private MaterialProgressBar progressBar;
     private Season currentlyBrowsingSeason;
     private BroadcastReceiver initialReceiver;
+    private RealmResults<Series> previousRealmResults;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,15 +118,23 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         mAdapter = new SeriesRecyclerViewAdapter(this, realmResults);
         recyclerView.setAdapter(mAdapter);
-        setVisibility(realmResults);
-        realmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
+        resetListener(realmResults);
+
+        return seriesLayout;
+    }
+
+    public void resetListener(RealmResults<Series> realmResults){
+        if (previousRealmResults != null){
+            previousRealmResults.removeChangeListeners();
+        }
+
+        previousRealmResults = realmResults;
+        previousRealmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
             @Override
             public void onChange(RealmResults<Series> element) {
                 setVisibility(element);
             }
         });
-
-        return seriesLayout;
     }
 
     private void setVisibility(RealmResults<Series> element) {

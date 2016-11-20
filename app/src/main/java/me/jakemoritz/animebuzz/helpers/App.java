@@ -22,6 +22,7 @@ public class App extends Application {
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
     private boolean justUpdated = false;
+    private boolean setDefaultTabId = false;
     private Realm realm;
     private int totalSyncingSeriesInitial;
     private int currentSyncingSeriesInitial = 0;
@@ -123,6 +124,14 @@ public class App extends Application {
 
     public void setTotalSyncingSeriesInitial(int totalSyncingSeriesInitial) {
         this.totalSyncingSeriesInitial = totalSyncingSeriesInitial;
+    }
+
+    public boolean isSetDefaultTabId() {
+        return setDefaultTabId;
+    }
+
+    public void setSetDefaultTabId(boolean setDefaultTabId) {
+        this.setDefaultTabId = setDefaultTabId;
     }
 
     public OkHttpClient getOkHttpClient(){
