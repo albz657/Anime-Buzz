@@ -145,6 +145,10 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void refreshSpinnerItems() {
+        if (seasonsSpinnerAdapter == null){
+            seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(App.getInstance(), new ArrayList<String>(), this);
+        }
+
         seasonsSpinnerAdapter.getSeasonNames().clear();
 
         RealmList<Season> allSeasons = new RealmList<>();
