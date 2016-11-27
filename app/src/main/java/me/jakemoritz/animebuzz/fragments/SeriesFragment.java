@@ -68,7 +68,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private RelativeLayout emptyView;
     private MalApiClient malApiClient;
     private boolean adding = false;
-    private Series itemToBeChanged;
     private MainActivity mainActivity;
     private MaterialProgressBar progressBar;
     private Season currentlyBrowsingSeason;
@@ -123,8 +122,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         return seriesLayout;
     }
 
-    public void resetListener(RealmResults<Series> realmResults){
-        if (previousRealmResults != null){
+    public void resetListener(RealmResults<Series> realmResults) {
+        if (previousRealmResults != null) {
             previousRealmResults.removeChangeListeners();
         }
 
@@ -172,7 +171,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 failedInitialization();
             } else {
                 if (App.getInstance().isNetworkAvailable()) {
-                    if (App.getInstance().isInitializing()){
+                    if (App.getInstance().isInitializing()) {
                         IntentFilter intentFilter = new IntentFilter();
                         intentFilter.addAction("FINISHED_INITIALIZING");
                         initialReceiver = new BroadcastReceiver() {
@@ -191,7 +190,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
                                 seasons = seasons.subList(indexOfLatestSeason + 1, seasons.size());
 
-                                for (Season season : seasons){
+                                for (Season season : seasons) {
                                     senpaiExportHelper.getSeasonData(season.getKey());
                                 }
                             }
@@ -220,7 +219,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void onDestroy() {
         super.onDestroy();
 
-        if (initialReceiver != null){
+        if (initialReceiver != null) {
             mainActivity.unregisterReceiver(initialReceiver);
         }
     }
@@ -334,7 +333,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
                 String seasonKey = currentlyBrowsingSeason.getKey();
-                if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())){
+                if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())) {
                     seasonKey = "raw";
                 }
 
@@ -377,9 +376,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 //    Item modification
 
     @Override
-    public void itemAdded(boolean added) {
-        if (added) {
-            addSeries(itemToBeChanged);
+    public void itemAdded(String MALID) {
+        if (MALID != null) {
+            addSeries(MALID);
         } else {
             adding = false;
             if (getView() != null)
@@ -387,40 +386,57 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
     }
 
-    private void addSeries(final Series item) {
+    private void addSeries(final String MALID) {
         adding = false;
 
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                item.setInUserList(true);
+        final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
+        try {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    series.setInUserList(true);
+                }
+            });
+        } catch (NullPointerException e) {
+            String errorMALID = MALID;
+            if (errorMALID == null){
+                errorMALID = "null";
             }
-        });
-        AlarmHelper.getInstance().makeAlarm(item);
+
+            FirebaseCrash.log("Series with MALID: '" + errorMALID + "' is null");
+            FirebaseCrash.report(e);
+
+            adding = false;
+            if (getView() != null)
+                Snackbar.make(getView(), "There was a problem adding or removing this show from your list.", Snackbar.LENGTH_LONG).show();
+        }
+
+        AlarmHelper.getInstance().makeAlarm(series);
 
         if (getView() != null)
-            Snackbar.make(getView(), "Added '" + item.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), "Added '" + series.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
 
     }
 
-    private void removeSeries(final Series item) {
+    private void removeSeries(String MALID) {
+        final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(Realm realm) {
-                item.setInUserList(false);
+                series.setInUserList(false);
             }
         });
 
-        AlarmHelper.getInstance().removeAlarm(item);
+        AlarmHelper.getInstance().removeAlarm(series);
 
         if (getView() != null)
-            Snackbar.make(getView(), "Removed '" + item.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(getView(), "Removed '" + series.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
     }
 
     @Override
-    public void itemDeleted(boolean deleted) {
-        if (deleted) {
-            removeSeries(itemToBeChanged);
+    public void itemDeleted(String MALID) {
+        if (MALID != null) {
+            removeSeries(MALID);
         } else {
             if (getView() != null)
                 Snackbar.make(getView(), App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_LONG).show();
@@ -433,36 +449,24 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     private void itemStatusChangeHelper(String MALID) {
-        itemToBeChanged = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
+        if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+            if (App.getInstance().isNetworkAvailable()) {
+                String username = SharedPrefsHelper.getInstance().getUsername();
+                String password = SharedPrefsHelper.getInstance().getPassword();
 
-        try {
-            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                if (App.getInstance().isNetworkAvailable()) {
-                    String username = SharedPrefsHelper.getInstance().getUsername();
-                    String password = SharedPrefsHelper.getInstance().getPassword();
-
-                    malApiClient.verify(username, password);
-                } else {
-                    adding = false;
-                    if (getView() != null)
-                        Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                }
+                malApiClient.verify(username, password);
             } else {
-                if (adding) {
-                    addSeries(itemToBeChanged);
-                } else {
-                    removeSeries(itemToBeChanged);
-                }
+                adding = false;
+                if (getView() != null)
+                    Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
             }
-        } catch (NullPointerException e) {
-            FirebaseCrash.log("Series with MALID: '" + MALID + "' is null");
-            FirebaseCrash.report(e);
-
-            adding = false;
-            if (getView() != null)
-                Snackbar.make(getView(), "There was a problem adding or removing this show from your list.", Snackbar.LENGTH_LONG).show();
+        } else {
+            if (adding) {
+                addSeries(MALID);
+            } else {
+                removeSeries(MALID);
+            }
         }
-
     }
 
     @Override
@@ -474,18 +478,23 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
+    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
         if (verified) {
             if (adding) {
-                malApiClient.addAnime(String.valueOf(itemToBeChanged.getMALID()));
+                malApiClient.addAnime(String.valueOf(MALID));
             } else {
-                malApiClient.deleteAnime(String.valueOf(itemToBeChanged.getMALID()));
+                malApiClient.deleteAnime(String.valueOf(MALID));
             }
         } else {
             adding = false;
             VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this, mainActivity);
             dialogFragment.show(mainActivity.getFragmentManager(), "SeriesRecyclerViewAdapter");
         }
+    }
+
+    @Override
+    public void verifyCredentialsResponseReceived(boolean verified) {
+
     }
 
     @Override

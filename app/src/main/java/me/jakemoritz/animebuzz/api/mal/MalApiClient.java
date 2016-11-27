@@ -63,23 +63,23 @@ public class MalApiClient {
         this.verifyListener = verifyListener;
     }
 
-    public void addAnime(String MALID) {
+    public void addAnime(final String MALID) {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() && response.raw().message().equals("Created")) {
-                    seriesFragment.itemAdded(true);
+                    seriesFragment.itemAdded(MALID);
                     Log.d(TAG, response.toString());
                 } else {
-                    seriesFragment.itemAdded(false);
+                    seriesFragment.itemAdded(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                seriesFragment.itemAdded(false);
+                seriesFragment.itemAdded(null);
                 Log.d(TAG, t.toString());
             }
         });
@@ -106,23 +106,23 @@ public class MalApiClient {
         }
     }
 
-    public void deleteAnime(String MALID) {
+    public void deleteAnime(final String MALID) {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.deleteAnime(MALID);
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() && response.raw().message().equals("OK")) {
-                    seriesFragment.itemDeleted(true);
+                    seriesFragment.itemDeleted(MALID);
                     Log.d(TAG, response.toString());
                 } else {
-                    seriesFragment.itemDeleted(false);
+                    seriesFragment.itemDeleted(MALID);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                seriesFragment.itemDeleted(false);
+                seriesFragment.itemDeleted(MALID);
                 Log.d(TAG, t.toString());
             }
         });
@@ -240,6 +240,38 @@ public class MalApiClient {
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
                 verifyListener.verifyCredentialsResponseReceived(false);
+
+                App.getInstance().setTryingToVerify(false);
+                Log.d(TAG, "error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void verify(String username, String password, final String MALID) {
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
+        Call<VerifyHolder> call = malEndpointInterface.verifyCredentials();
+        call.enqueue(new Callback<VerifyHolder>() {
+            @Override
+            public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
+                if (response.isSuccessful()) {
+                    verifyListener.verifyCredentialsResponseReceived(true, MALID);
+
+                    if (response.body().getUsername() != null) {
+                        SharedPrefsHelper.getInstance().setMalUsernameFormatted(response.body().getUsername());
+                    }
+                    if (response.body().getUserID() != null) {
+                        SharedPrefsHelper.getInstance().setMalId(response.body().getUserID());
+                    }
+                } else {
+                    verifyListener.verifyCredentialsResponseReceived(false, MALID);
+                }
+                App.getInstance().setTryingToVerify(false);
+
+            }
+
+            @Override
+            public void onFailure(Call<VerifyHolder> call, Throwable t) {
+                verifyListener.verifyCredentialsResponseReceived(false, MALID);
 
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());

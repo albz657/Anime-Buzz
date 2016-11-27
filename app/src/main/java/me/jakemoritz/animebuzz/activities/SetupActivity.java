@@ -151,4 +151,9 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                 Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_failed), Snackbar.LENGTH_LONG).show();
         }
     }
+
+    @Override
+    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
+
+    }
 }

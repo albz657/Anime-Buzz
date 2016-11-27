@@ -134,6 +134,11 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         }
     }
 
+    @Override
+    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
+
+    }
+
     public interface SignInFragmentListener {
         void verified(boolean verified);
     }
