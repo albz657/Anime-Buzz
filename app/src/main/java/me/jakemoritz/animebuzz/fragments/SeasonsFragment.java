@@ -67,6 +67,11 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
+            if (SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()){
+                Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                SharedPrefsHelper.getInstance().setLatestSeasonName(currentlyBrowsingSeason.getName());
+            }
+
             loadSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
         }
 
