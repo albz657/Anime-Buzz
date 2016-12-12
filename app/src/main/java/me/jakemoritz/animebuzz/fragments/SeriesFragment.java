@@ -124,7 +124,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public void resetListener(RealmResults<Series> realmResults) {
         if (previousRealmResults != null) {
-            previousRealmResults.removeChangeListeners();
+            mainActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    previousRealmResults.removeChangeListeners();
+                }
+            });
         }
 
         previousRealmResults = realmResults;
