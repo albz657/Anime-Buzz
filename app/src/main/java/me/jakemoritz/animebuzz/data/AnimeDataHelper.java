@@ -131,12 +131,11 @@ public class AnimeDataHelper {
                 }
             });
 
-            final Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
-
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     for (final Long alarmTime : backlog) {
+                        Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
                         BacklogItem backlogItem = App.getInstance().getRealm().createObject(BacklogItem.class);
                         backlogItem.setAlarmTime(alarmTime);
                         backlogItem.setSeries(series);
@@ -145,7 +144,7 @@ public class AnimeDataHelper {
             });
 
             if (airingStatus.equals("Airing")) {
-                AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
+                AlarmHelper.getInstance().generateNextEpisodeTimes(MALID, airdate, simulcastAirdate);
             }
 
             cursor.moveToNext();

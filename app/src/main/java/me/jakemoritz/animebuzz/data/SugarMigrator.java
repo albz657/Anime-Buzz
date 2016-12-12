@@ -178,10 +178,8 @@ public class SugarMigrator {
                 }
             });
 
-            Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
-
             if (airingStatus.equals("Airing")) {
-                AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcastAirdate);
+                AlarmHelper.getInstance().generateNextEpisodeTimes(MALID, airdate, simulcastAirdate);
             }
 
             cursor.moveToNext();
