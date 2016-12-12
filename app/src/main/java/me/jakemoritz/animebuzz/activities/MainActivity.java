@@ -48,7 +48,7 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
@@ -60,16 +60,14 @@ public class MainActivity extends AppCompatActivity{
     private RealmChangeListener backlogCountCallback;
     private BroadcastReceiver notificationReceiver;
 
-    private void setBacklogBadge(){
-        if (bottomBar != null){
+    private void setBacklogBadge() {
+        if (bottomBar != null) {
             RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
 
             BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
             backlogTab.setBadgeCount(backlogItems.size());
         }
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity{
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
-                if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()){
+                if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
                     Fragment newFragment = null;
 
                     Fragment currentFragment = getCurrentFragment();
@@ -151,7 +149,7 @@ public class MainActivity extends AppCompatActivity{
             AlarmHelper.getInstance().setAlarmsOnBoot();
         }
 
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             bottomBar.setVisibility(View.GONE);
         }
 
@@ -177,11 +175,13 @@ public class MainActivity extends AppCompatActivity{
 
             startFragment(seriesFragment);
         } else {
-            if (getIntent() != null && getIntent().hasExtra("notificationClicked")){
-                defaultTabId = R.id.nav_watching_queue;
-                startFragment(BacklogFragment.newInstance());
-            } else {
-                startFragment(UserListFragment.newInstance());
+            if (getCurrentFragment() == null) {
+                if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
+                    defaultTabId = R.id.nav_watching_queue;
+                    startFragment(BacklogFragment.newInstance());
+                } else {
+                    startFragment(UserListFragment.newInstance());
+                }
             }
         }
 
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity{
             App.getInstance().getRealm().close();
         }
 
-        if (notificationReceiver != null){
+        if (notificationReceiver != null) {
             unregisterReceiver(notificationReceiver);
         }
     }
@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity{
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
 
-            if (!App.getInstance().isInitializing()){
+            if (!App.getInstance().isInitializing()) {
                 bottomBar.setVisibility(View.VISIBLE);
             }
         }
