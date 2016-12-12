@@ -11,6 +11,7 @@ import java.io.File;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.services.HummingbirdDataProcessor;
@@ -85,12 +86,20 @@ public class HummingbirdApiClient {
                     }
                 } else {
                     Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
+                    if (App.getInstance().isPostInitializing()){
+                        App.getInstance().incrementCurrentSyncingSeriesPost();
+                        NotificationHelper.getInstance().createSeasonDataNotification();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
                 Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
+                if (App.getInstance().isPostInitializing()){
+                    App.getInstance().incrementCurrentSyncingSeriesPost();
+                    NotificationHelper.getInstance().createSeasonDataNotification();
+                }
             }
         });
     }

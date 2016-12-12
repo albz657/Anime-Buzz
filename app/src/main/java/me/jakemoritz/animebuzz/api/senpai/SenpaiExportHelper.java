@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.fragments.UserListFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
+import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.gson.SeasonHolder;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -80,6 +82,11 @@ public class SenpaiExportHelper {
                         SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
                         SharedPrefsHelper.getInstance().setLatestSeasonKey(response.body().getSeasonKey());
                         SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonName());
+
+                        if (seriesFragment instanceof UserListFragment && App.getInstance().isInitializing()){
+                            Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                            seriesFragment.setCurrentlyBrowsingSeason(currentSeason);
+                        }
                     }
 
                     if (App.getInstance().isPostInitializing()){
