@@ -5,7 +5,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import io.realm.Realm;
 import okhttp3.OkHttpClient;
@@ -39,10 +41,10 @@ public class App extends Application {
         mInstance = this;
         Picasso.with(this);
         Realm.init(this);
-/*        Stetho.initialize(Stetho.newInitializerBuilder(this)
+        Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                .build());*/
+                .build());
     }
 
     public boolean isNetworkAvailable() {
