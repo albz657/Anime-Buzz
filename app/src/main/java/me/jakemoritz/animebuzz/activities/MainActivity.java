@@ -7,12 +7,14 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -188,6 +190,22 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(true);
         bottomBar.setDefaultTab(defaultTabId);
         App.getInstance().setSetDefaultTabId(false);
+    }
+
+    class CustomBottomBar extends BottomBar {
+
+        public CustomBottomBar(Context context) {
+            super(context);
+        }
+
+        public CustomBottomBar(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        @Override
+        public void onRestoreInstanceState(Parcelable state) {
+            super.onRestoreInstanceState(state);
+        }
     }
 
     @Override
