@@ -7,22 +7,18 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
+import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
-import com.roughike.bottombar.BottomBar;
-import com.roughike.bottombar.BottomBarTab;
-import com.roughike.bottombar.OnTabSelectListener;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
     private boolean openRingtones = false;
-    private BottomBar bottomBar;
+    private AHBottomNavigation bottomBar;
     private RealmChangeListener backlogCountCallback;
     private BroadcastReceiver notificationReceiver;
 
@@ -66,8 +62,7 @@ public class MainActivity extends AppCompatActivity {
         if (bottomBar != null) {
             RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
 
-            BottomBarTab backlogTab = bottomBar.getTabWithId(R.id.nav_watching_queue);
-            backlogTab.setBadgeCount(backlogItems.size());
+            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
         }
     }
 
@@ -93,20 +88,35 @@ public class MainActivity extends AppCompatActivity {
 
         App.getInstance().setSetDefaultTabId(false);
 
-        bottomBar = (BottomBar) findViewById(R.id.bottomBar);
+        bottomBar = (AHBottomNavigation) findViewById(R.id.bottomBar);
+        bottomBar.setTitleState(AHBottomNavigation.TitleState.SHOW_WHEN_ACTIVE);
 
-        bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
+        AHBottomNavigationItem watchingItem = new AHBottomNavigationItem(getString(R.string.fragment_myshows), R.drawable.ic_bookmark_trimmed);
+        AHBottomNavigationItem backlogItem = new AHBottomNavigationItem(getString(R.string.fragment_watching_queue), R.drawable.ic_assignment_late_trimmed);
+        AHBottomNavigationItem browserItem = new AHBottomNavigationItem(getString(R.string.fragment_seasons), R.drawable.ic_explore_trimmed);
+
+        bottomBar.addItem(watchingItem);
+        bottomBar.addItem(backlogItem);
+        bottomBar.addItem(browserItem);
+
+        bottomBar.setDefaultBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        bottomBar.setInactiveColor(getResources().getColor(android.R.color.white));
+        bottomBar.setAccentColor(getResources().getColor(android.R.color.white));
+
+        bottomBar.setTitleState(AHBottomNavigation.TitleState.SHOW_WHEN_ACTIVE);
+
+        bottomBar.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
-            public void onTabSelected(@IdRes int tabId) {
+            public boolean onTabSelected(int position, boolean wasSelected) {
                 if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
                     Fragment newFragment = null;
 
                     Fragment currentFragment = getCurrentFragment();
-                    if (tabId == R.id.nav_my_shows && !(currentFragment instanceof UserListFragment)) {
+                    if (position == 0 && !(currentFragment instanceof UserListFragment)) {
                         newFragment = UserListFragment.newInstance();
-                    } else if (tabId == R.id.nav_seasons && !(currentFragment instanceof SeasonsFragment)) {
+                    } else if (position == 2 && !(currentFragment instanceof SeasonsFragment)) {
                         newFragment = SeasonsFragment.newInstance();
-                    } else if (tabId == R.id.nav_watching_queue && !(currentFragment instanceof BacklogFragment)) {
+                    } else if (position == 1 && !(currentFragment instanceof BacklogFragment)) {
                         newFragment = BacklogFragment.newInstance();
                     }
 
@@ -114,6 +124,8 @@ public class MainActivity extends AppCompatActivity {
                         startFragment(newFragment);
                     }
                 }
+
+                return true;
             }
         });
 
@@ -161,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // Start relevant fragment
-        int defaultTabId = R.id.nav_my_shows;
+        int defaultTabId = 0;
         if (App.getInstance().isInitializing()) {
             SeriesFragment seriesFragment;
 
@@ -169,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 seriesFragment = UserListFragment.newInstance();
             } else {
                 seriesFragment = SeasonsFragment.newInstance();
-                defaultTabId = R.id.nav_seasons;
+                defaultTabId = 2;
             }
 
             SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
@@ -179,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if (getCurrentFragment() == null) {
                 if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
-                    defaultTabId = R.id.nav_watching_queue;
+                    defaultTabId = 1;
                     startFragment(BacklogFragment.newInstance());
                 } else {
                     startFragment(UserListFragment.newInstance());
@@ -188,24 +200,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         App.getInstance().setSetDefaultTabId(true);
-        bottomBar.setDefaultTab(defaultTabId);
+        bottomBar.setCurrentItem(defaultTabId);
         App.getInstance().setSetDefaultTabId(false);
-    }
-
-    class CustomBottomBar extends BottomBar {
-
-        public CustomBottomBar(Context context) {
-            super(context);
-        }
-
-        public CustomBottomBar(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        @Override
-        public void onRestoreInstanceState(Parcelable state) {
-            super.onRestoreInstanceState(state);
-        }
     }
 
     @Override
@@ -307,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                 if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
                 } else {
 //                    startFragment(BacklogFragment.newInstance());
-                    bottomBar.selectTabWithId(R.id.nav_watching_queue);
+                    bottomBar.setCurrentItem(1);
                 }
             }
         }
@@ -438,7 +434,7 @@ public class MainActivity extends AppCompatActivity {
         return toolbar;
     }
 
-    public BottomBar getBottomBar() {
+    public AHBottomNavigation getBottomBar() {
         return bottomBar;
     }
 }
