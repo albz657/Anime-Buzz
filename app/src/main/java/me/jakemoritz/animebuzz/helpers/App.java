@@ -9,7 +9,11 @@ import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
+import io.realm.DynamicRealm;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmMigration;
+import io.realm.RealmSchema;
 import okhttp3.OkHttpClient;
 
 public class App extends Application {
@@ -41,6 +45,29 @@ public class App extends Application {
         mInstance = this;
         Picasso.with(this);
         Realm.init(this);
+
+        RealmMigration migration = new RealmMigration() {
+            @Override
+            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                RealmSchema schema = realm.getSchema();
+
+                if (oldVersion == 0){
+                    schema.get("Series")
+                            .addField("kitsuID", String.class);
+                    oldVersion++;
+                }
+            }
+        };
+
+        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+                .schemaVersion(1)
+                .migration(migration)
+                .build();
+
+        realm = Realm.getInstance(realmConfiguration);
+        Realm.setDefaultConfiguration(realmConfiguration);
+        realm.close();
+
         Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())

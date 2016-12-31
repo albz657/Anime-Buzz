@@ -30,6 +30,7 @@ public class Series extends RealmObject{
     @Expose
     private String ANNID  = "";
 
+    private String kitsuID = "";
     private double simulcastDelay = 0;
     private long nextEpisodeAirtime = 0L;
     private long nextEpisodeSimulcastTime = 0L;
@@ -70,6 +71,7 @@ public class Series extends RealmObject{
         this.finishedAiringDate = realmSeries.getFinishedAiringDate();
         this.isInUserList = realmSeries.isInUserList();
         this.episodesWatched = realmSeries.getEpisodesWatched();
+        this.kitsuID = realmSeries.getKitsuID();
     }
 
     @Override
@@ -271,5 +273,13 @@ public class Series extends RealmObject{
 
     public void setAiringStatus(String airingStatus) {
         this.airingStatus = airingStatus;
+    }
+
+    public String getKitsuID() {
+        return kitsuID;
+    }
+
+    public void setKitsuID(String kitsuID) {
+        this.kitsuID = kitsuID;
     }
 }
