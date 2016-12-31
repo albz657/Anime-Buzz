@@ -93,7 +93,7 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    backlogFragment.episodeCountIncremented(response.isSuccessful() && response.raw().message().equals("OK"));
+                    backlogFragment.episodeCountIncremented(response.isSuccessful());
                 }
 
                 @Override

@@ -50,13 +50,17 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         }
 
         @Override
-        public boolean isItemViewSwipeEnabled() {
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             if (!backlogFragment.isCountsCurrent()){
                 if (backlogFragment.getView() != null){
                     Snackbar.make(backlogFragment.getView(), "Getting your episode counts, please try again in a few seconds.", Snackbar.LENGTH_LONG).show();
                 }
-            }
-            return backlogFragment.isCountsCurrent();
+
+                return makeMovementFlags(0, 0);
+            } else {
+                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+                int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
+                return makeMovementFlags(dragFlags, swipeFlags);            }
         }
     }
 
