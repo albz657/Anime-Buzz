@@ -115,6 +115,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
             if (App.getInstance().isNetworkAvailable()) {
                 malApiClient.syncEpisodeCounts();
                 updating = true;
+                countsCurrent = false;
             } else {
                 stopUpdating();
 

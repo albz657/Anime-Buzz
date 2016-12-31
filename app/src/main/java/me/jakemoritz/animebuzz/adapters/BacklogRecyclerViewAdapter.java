@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.adapters;
 
 import android.graphics.drawable.GradientDrawable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -50,6 +51,11 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
         @Override
         public boolean isItemViewSwipeEnabled() {
+            if (!backlogFragment.isCountsCurrent()){
+                if (backlogFragment.getView() != null){
+                    Snackbar.make(backlogFragment.getView(), "Getting your episode counts, please try again in a few seconds.", Snackbar.LENGTH_LONG).show();
+                }
+            }
             return backlogFragment.isCountsCurrent();
         }
     }
