@@ -59,14 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private RealmChangeListener backlogCountCallback;
     private BroadcastReceiver notificationReceiver;
 
-    private void setBacklogBadge() {
-        if (bottomBar != null) {
-            RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
-
-            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,6 +194,8 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(true);
         bottomBar.setCurrentItem(defaultTabId);
         App.getInstance().setSetDefaultTabId(false);
+
+        setBacklogBadge();
     }
 
     @Override
@@ -218,8 +212,6 @@ public class MainActivity extends AppCompatActivity {
             }
             openRingtones = false;
         }
-
-        setBacklogBadge();
     }
 
     @Override
@@ -232,6 +224,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (notificationReceiver != null) {
             unregisterReceiver(notificationReceiver);
+        }
+    }
+
+    public void setBacklogBadge() {
+        if (bottomBar != null) {
+            RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
         }
     }
 
@@ -306,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
                     bottomBar.setCurrentItem(1);
                 }
             }
+            setBacklogBadge();
         }
     }
 

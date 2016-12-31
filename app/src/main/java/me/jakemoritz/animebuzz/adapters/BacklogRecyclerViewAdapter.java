@@ -169,6 +169,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                         removedItem.deleteFromRealm();
                     }
                 });
+                fragment.getMainActivity().setBacklogBadge();
             }
         }
     }
@@ -190,6 +191,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                     removedItem.deleteFromRealm();
                 }
             });
+            fragment.getMainActivity().setBacklogBadge();
         }
     }
 

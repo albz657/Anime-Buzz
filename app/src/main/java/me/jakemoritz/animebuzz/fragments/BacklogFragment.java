@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
@@ -27,7 +26,6 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
-import me.jakemoritz.animebuzz.models.Series;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse, MalDataImportedListener {
@@ -113,7 +111,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public void updateData() {
         progressBar.setVisibility(View.VISIBLE);
 
-        if (!false){
+/*        if (false){
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -125,7 +123,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
                     }
                 }
             });
-        }
+        }*/
 
         if (!updating) {
             if (App.getInstance().isNetworkAvailable()) {
