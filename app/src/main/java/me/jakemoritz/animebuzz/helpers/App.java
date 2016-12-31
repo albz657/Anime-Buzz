@@ -13,7 +13,9 @@ import io.realm.DynamicRealm;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmMigration;
+import io.realm.RealmResults;
 import io.realm.RealmSchema;
+import me.jakemoritz.animebuzz.models.Series;
 import okhttp3.OkHttpClient;
 
 public class App extends Application {
@@ -33,6 +35,7 @@ public class App extends Application {
     private int totalSyncingSeriesPost;
     private int currentSyncingSeriesPost = 0;
     private OkHttpClient okHttpClient;
+    private boolean migratedTo1 = false;
 
     public static synchronized App getInstance() {
         return mInstance;
@@ -54,7 +57,9 @@ public class App extends Application {
                 if (oldVersion == 0){
                     schema.get("Series")
                             .addField("kitsuID", String.class);
+
                     oldVersion++;
+                    migratedTo1 = true;
                 }
             }
         };
@@ -67,6 +72,21 @@ public class App extends Application {
         realm = Realm.getInstance(realmConfiguration);
         Realm.setDefaultConfiguration(realmConfiguration);
         realm.close();
+
+        if (migratedTo1){
+            getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<Series> seriesRealmResults = realm.where(Series.class).findAll();
+
+                    for (Series series : seriesRealmResults){
+                        series.setKitsuID("");
+                    }
+                }
+            });
+
+            migratedTo1 = false;
+        }
 
         Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
