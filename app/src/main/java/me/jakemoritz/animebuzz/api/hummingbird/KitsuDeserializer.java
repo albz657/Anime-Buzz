@@ -70,7 +70,7 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
         }
 
         try {
-            posterImagePrimitive = posterObject.getAsJsonPrimitive("medium");
+            posterImagePrimitive = posterObject.getAsJsonPrimitive("original");
             imageURL = posterImagePrimitive.getAsString();
         } catch (ClassCastException e){
 

@@ -52,7 +52,7 @@ public class KitsuApiClient {
         }
     }
 
-    private void getKitsuID(final String MALID, final Call<KitsuAnimeHolder> kitsuCall){
+    private void getKitsuID(final String MALID){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(String.class, new KitsuMappingDeserializer());
         Gson gson = gsonBuilder.create();
@@ -68,46 +68,17 @@ public class KitsuApiClient {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()){
-                    kitsuCall.enqueue(new Callback<KitsuAnimeHolder>() {
-                        @Override
-                        public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
-                            if (response.isSuccessful()) {
-                                Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
-                                hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
-                                hbIntent.putExtra("MALID", MALID);
-                                hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
-                                hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
-                                hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
-                                hbIntent.putExtra("showType", response.body().getShowType());
-                                App.getInstance().startService(hbIntent);
+                    final String kitsuId = response.body();
 
-                                String imageURL = response.body().getImageURL();
-                                File cacheDirectory = App.getInstance().getCacheDir();
-                                File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
-                                if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
-                                    Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
-                                    imageIntent.putExtra("url", imageURL);
-                                    imageIntent.putExtra("MALID", MALID);
-                                    App.getInstance().startService(imageIntent);
-                                }
-                            } else {
-                                Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
-                                if (App.getInstance().isPostInitializing()){
-                                    App.getInstance().incrementCurrentSyncingSeriesPost();
-                                    NotificationHelper.getInstance().createSeasonDataNotification();
-                                }
-                            }
-                        }
-
+                    App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                         @Override
-                        public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
-                            Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
-                            if (App.getInstance().isPostInitializing()){
-                                App.getInstance().incrementCurrentSyncingSeriesPost();
-                                NotificationHelper.getInstance().createSeasonDataNotification();
-                            }
+                        public void execute(Realm realm) {
+                            Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                            series.setKitsuID(kitsuId);
                         }
                     });
+
+                    executeGetSeriesData(kitsuId, MALID);
                 }
             }
 
@@ -118,7 +89,19 @@ public class KitsuApiClient {
         });
     }
 
-    private void getSeriesData(final String MALID) {
+    private void getSeriesData(String MALID) {
+        Realm realm = Realm.getDefaultInstance();
+        Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+        realm.close();
+
+        if (currSeries.getKitsuID().isEmpty()){
+            getKitsuID(MALID);
+        } else {
+            executeGetSeriesData(currSeries.getKitsuID(), MALID);
+        }
+    }
+
+    private void executeGetSeriesData(String kitsuId, final String MALID){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(KitsuAnimeHolder.class, new KitsuDeserializer());
         Gson gson = gsonBuilder.create();
@@ -129,56 +112,46 @@ public class KitsuApiClient {
                 .build();
 
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
+        Call<KitsuAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(kitsuId);
+        call.enqueue(new Callback<KitsuAnimeHolder>() {
+            @Override
+            public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
+                if (response.isSuccessful()) {
+                    Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
+                    hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
+                    hbIntent.putExtra("MALID", MALID);
+                    hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
+                    hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
+                    hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
+                    hbIntent.putExtra("showType", response.body().getShowType());
+                    App.getInstance().startService(hbIntent);
 
-        Realm realm = Realm.getDefaultInstance();
-        Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-        realm.close();
-
-        Call<KitsuAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(currSeries.getKitsuID());
-
-        if (currSeries.getKitsuID().isEmpty()){
-            getKitsuID(MALID, call);
-        } else {
-            call.enqueue(new Callback<KitsuAnimeHolder>() {
-                @Override
-                public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
-                    if (response.isSuccessful()) {
-                        Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
-                        hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
-                        hbIntent.putExtra("MALID", MALID);
-                        hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
-                        hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
-                        hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
-                        hbIntent.putExtra("showType", response.body().getShowType());
-                        App.getInstance().startService(hbIntent);
-
-                        String imageURL = response.body().getImageURL();
-                        File cacheDirectory = App.getInstance().getCacheDir();
-                        File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
-                        if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
-                            Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
-                            imageIntent.putExtra("url", imageURL);
-                            imageIntent.putExtra("MALID", MALID);
-                            App.getInstance().startService(imageIntent);
-                        }
-                    } else {
-                        Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
-                        if (App.getInstance().isPostInitializing()){
-                            App.getInstance().incrementCurrentSyncingSeriesPost();
-                            NotificationHelper.getInstance().createSeasonDataNotification();
-                        }
+                    String imageURL = response.body().getImageURL();
+                    File cacheDirectory = App.getInstance().getCacheDir();
+                    File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
+                    if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
+                        Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
+                        imageIntent.putExtra("url", imageURL);
+                        imageIntent.putExtra("MALID", MALID);
+                        App.getInstance().startService(imageIntent);
                     }
-                }
-
-                @Override
-                public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
+                } else {
                     Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
                     if (App.getInstance().isPostInitializing()){
                         App.getInstance().incrementCurrentSyncingSeriesPost();
                         NotificationHelper.getInstance().createSeasonDataNotification();
                     }
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
+                Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
+                if (App.getInstance().isPostInitializing()){
+                    App.getInstance().incrementCurrentSyncingSeriesPost();
+                    NotificationHelper.getInstance().createSeasonDataNotification();
+                }
+            }
+        });
     }
 }
