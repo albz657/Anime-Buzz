@@ -66,6 +66,8 @@ public class KitsuDataProcessor extends IntentService {
             showType = "TV";
         }
 
+        showType = showType.substring(0, 1).toUpperCase() + showType.substring(1);
+
         if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
             Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
             if (season.getRelativeTime().equals(Season.PRESENT)) {
