@@ -15,12 +15,12 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 
-public class HummingbirdDataProcessor extends IntentService {
+public class KitsuDataProcessor extends IntentService {
 
     private Realm realm;
 
-    public HummingbirdDataProcessor() {
-        super(HummingbirdDataProcessor.class.getSimpleName());
+    public KitsuDataProcessor() {
+        super(KitsuDataProcessor.class.getSimpleName());
     }
 
     @Override

@@ -10,10 +10,10 @@ import com.google.gson.JsonPrimitive;
 import java.lang.reflect.Type;
 
 
-class HummingbirdAnimeDeserializer implements JsonDeserializer<HummingbirdAnimeHolder> {
+class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
     @Override
-    public HummingbirdAnimeHolder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public KitsuAnimeHolder deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         String englishTitle = "";
         String finishedAiringDate = "";
         String startedAiringDate = "";
@@ -22,9 +22,11 @@ class HummingbirdAnimeDeserializer implements JsonDeserializer<HummingbirdAnimeH
         int episodeCount = 0;
 
         final JsonObject responseObject = json.getAsJsonObject();
-        JsonObject animeObject = responseObject.getAsJsonObject("anime");
+        JsonObject dataObject = responseObject.getAsJsonObject("data");
+        JsonObject attributesObject = dataObject.getAsJsonObject("attributes");
+        JsonObject titlesObject = attributesObject.getAsJsonObject("titles");
+        JsonObject posterObject = attributesObject.getAsJsonObject("posterImage");
 
-        JsonObject titlesObject = animeObject.getAsJsonObject("titles");
         JsonPrimitive englishPrimitive = null;
         JsonPrimitive posterImagePrimitive = null;
         JsonPrimitive finishedAiringDatePrimitive = null;
@@ -33,48 +35,47 @@ class HummingbirdAnimeDeserializer implements JsonDeserializer<HummingbirdAnimeH
         JsonPrimitive episodeCountPrimitive = null;
 
         try {
-            finishedAiringDatePrimitive = animeObject.getAsJsonPrimitive("finished_airing_date");
+            finishedAiringDatePrimitive = attributesObject.getAsJsonPrimitive("endDate");
             finishedAiringDate = finishedAiringDatePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
         try {
-            episodeCountPrimitive = animeObject.getAsJsonPrimitive("episode_count");
+            episodeCountPrimitive = attributesObject.getAsJsonPrimitive("episodeCount");
             episodeCount = episodeCountPrimitive.getAsInt();
         } catch (ClassCastException e){
 
         }
 
         try {
-            startedAiringDatePrimitive = animeObject.getAsJsonPrimitive("started_airing_date");
+            startedAiringDatePrimitive = attributesObject.getAsJsonPrimitive("startDate");
             startedAiringDate = startedAiringDatePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
         try {
-            showTypePrimitive = animeObject.getAsJsonPrimitive("show_type");
+            showTypePrimitive = attributesObject.getAsJsonPrimitive("showType");
             showType = showTypePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
         try {
-            englishPrimitive = titlesObject.getAsJsonPrimitive("english");
-
+            englishPrimitive = titlesObject.getAsJsonPrimitive("en");
             englishTitle = englishPrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
         try {
-            posterImagePrimitive = animeObject.getAsJsonPrimitive("poster_image");
+            posterImagePrimitive = posterObject.getAsJsonPrimitive("medium");
             imageURL = posterImagePrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
-        return new HummingbirdAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate, showType, episodeCount);
+        return new KitsuAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate, showType, episodeCount);
     }/**/
 }

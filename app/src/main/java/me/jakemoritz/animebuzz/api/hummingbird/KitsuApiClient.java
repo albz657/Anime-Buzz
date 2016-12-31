@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
+import java.io.IOException;
 
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
@@ -14,32 +15,67 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.services.HummingbirdDataProcessor;
+import me.jakemoritz.animebuzz.services.KitsuDataProcessor;
 import me.jakemoritz.animebuzz.services.PosterDownloader;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class HummingbirdApiClient {
-    private final static String TAG = HummingbirdApiClient.class.getSimpleName();
+public class KitsuApiClient {
+    private final static String TAG = KitsuApiClient.class.getSimpleName();
 
-    private static final String BASE_URL = "https://hummingbird.me/";
+    private static final String BASE_URL = " https://kitsu.io/api/";
+    private static final String clientId = "***REMOVED***";
+    private static final String clientSecret = "***REMOVED***";
     private SeriesFragment callback;
     private Retrofit retrofit;
+    private static Retrofit.Builder retrofitBuilder;
 
-    public HummingbirdApiClient(SeriesFragment callback) {
+    public KitsuApiClient(SeriesFragment callback) {
         this.callback = callback;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(HummingbirdAnimeHolder.class, new HummingbirdAnimeDeserializer());
+        gsonBuilder.registerTypeAdapter(KitsuAnimeHolder.class, new KitsuDeserializer());
         Gson gson = gsonBuilder.create();
 
-        this.retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+        retrofitBuilder = new Retrofit.Builder().baseUrl(BASE_URL)
                 .client(App.getInstance().getOkHttpClient())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+                .addConverterFactory(GsonConverterFactory.create(gson));
+
+        this.retrofit = retrofitBuilder.build();
+    }
+
+    private void login(){
+//        TokenService tokenService =
+    }
+
+    private static <S> S createService(Class<S> serviceClass, final AccessToken token) {
+        if (token != null) {
+            OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+            okHttpClientBuilder.addInterceptor(new Interceptor() {
+                @Override
+                public okhttp3.Response intercept(Chain chain) throws IOException {
+                    Request original = chain.request();
+                    Request.Builder requestBuilder = original.newBuilder()
+                            .header("Authorization", token.getTokenType() + " " + token.getAccessToken())
+                            .method(original.method(), original.body());
+
+                    Request request = requestBuilder.build();
+                    return chain.proceed(request);
+                }
+            });
+
+            OkHttpClient client = okHttpClientBuilder.build();
+            Retrofit retrofit = retrofitBuilder.client(client).build();
+            return retrofit.create(serviceClass);
+        }
+
+        return null;
     }
 
     public void processSeriesList(String seasonKey) {
@@ -61,12 +97,12 @@ public class HummingbirdApiClient {
 
     private void getSeriesData(final String MALID) {
         HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<HummingbirdAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(MALID);
-        call.enqueue(new Callback<HummingbirdAnimeHolder>() {
+        Call<KitsuAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData("7442");
+        call.enqueue(new Callback<KitsuAnimeHolder>() {
             @Override
-            public void onResponse(Call<HummingbirdAnimeHolder> call, Response<HummingbirdAnimeHolder> response) {
+            public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
                 if (response.isSuccessful()) {
-                    Intent hbIntent = new Intent(App.getInstance(), HummingbirdDataProcessor.class);
+                    Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
                     hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
                     hbIntent.putExtra("MALID", MALID);
                     hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
@@ -94,7 +130,7 @@ public class HummingbirdApiClient {
             }
 
             @Override
-            public void onFailure(Call<HummingbirdAnimeHolder> call, Throwable t) {
+            public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
                 Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
                 if (App.getInstance().isPostInitializing()){
                     App.getInstance().incrementCurrentSyncingSeriesPost();

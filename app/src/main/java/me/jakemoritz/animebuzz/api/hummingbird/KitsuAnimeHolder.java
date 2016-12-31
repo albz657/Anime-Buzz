@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.api.hummingbird;
 
-public class HummingbirdAnimeHolder {
+public class KitsuAnimeHolder {
 
     private String englishTitle;
     private String imageURL;
@@ -9,7 +9,7 @@ public class HummingbirdAnimeHolder {
     private String showType;
     private int episodeCount;
 
-    HummingbirdAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
+    KitsuAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
         this.englishTitle = englishTitle;
         this.imageURL = imageURL;
         this.finishedAiringDate = finishedAiringDate;

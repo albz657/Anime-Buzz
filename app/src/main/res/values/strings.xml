@@ -150,8 +150,8 @@
     <string name="about_mal"><b>MyAnimeList</b> allows users to sign in with their MAL accounts to access and update the anime they\'re currently watching.</string>
     <string name="about_mal_url">http://myanimelist.net</string>
 
-    <string name="about_hb"><b>Hummingbird</b> provides the images and additional anime details.</string>
-    <string name="about_hb_url">https://hummingbird.me</string>
+    <string name="about_hb"><b>Kitsu</b> provides the images and additional anime details.</string>
+    <string name="about_hb_url">https://kitsu.io</string>
 
     <string name="about_ann"><b>Anime News Network</b> provides the anime images and English titles used in this app.</string>
     <string name="about_ann_url">http://www.animenewsnetwork.com</string>

@@ -34,7 +34,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
-import me.jakemoritz.animebuzz.api.hummingbird.HummingbirdApiClient;
+import me.jakemoritz.animebuzz.api.hummingbird.KitsuApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
@@ -62,7 +62,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private SeriesRecyclerViewAdapter mAdapter;
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
-    private HummingbirdApiClient hummingbirdApiClient;
+    private KitsuApiClient kitsuApiClient;
     private CoordinatorLayout seriesLayout;
     private RecyclerView recyclerView;
     private RelativeLayout emptyView;
@@ -80,7 +80,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
-        hummingbirdApiClient = new HummingbirdApiClient(this);
+        kitsuApiClient = new KitsuApiClient(this);
     }
 
     @Override
@@ -202,7 +202,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                         };
                         mainActivity.registerReceiver(initialReceiver, intentFilter);
                     }
-                    hummingbirdApiClient.processSeriesList(seasonKey);
+                    kitsuApiClient.processSeriesList(seasonKey);
                 } else {
                     if (getView() != null) {
                         Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
