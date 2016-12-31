@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         bottomBar = (AHBottomNavigation) findViewById(R.id.bottomBar);
-        bottomBar.setTitleState(AHBottomNavigation.TitleState.SHOW_WHEN_ACTIVE);
 
         AHBottomNavigationItem watchingItem = new AHBottomNavigationItem(getString(R.string.fragment_myshows), R.drawable.ic_bookmark_trimmed);
         AHBottomNavigationItem backlogItem = new AHBottomNavigationItem(getString(R.string.fragment_watching_queue), R.drawable.ic_assignment_late_trimmed);
@@ -100,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.addItem(browserItem);
 
         bottomBar.setDefaultBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        bottomBar.setInactiveColor(getResources().getColor(android.R.color.white));
         bottomBar.setAccentColor(getResources().getColor(android.R.color.white));
+        bottomBar.setInactiveColor(Color.parseColor("#8CFFFFFF"));
 
         bottomBar.setTitleState(AHBottomNavigation.TitleState.SHOW_WHEN_ACTIVE);
 
