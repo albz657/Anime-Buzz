@@ -12,10 +12,10 @@ import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
+import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
@@ -38,7 +38,7 @@ public class MalApiClient {
     private SeriesFragment seriesFragment;
     private VerifyCredentialsResponse verifyListener;
     private MalDataImportedListener malDataImportedListener;
-    private IncrementEpisodeCountResponse incrementListener;
+    private BacklogFragment backlogFragment;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -49,8 +49,8 @@ public class MalApiClient {
     public MalApiClient() {
     }
 
-    public MalApiClient(IncrementEpisodeCountResponse incrementListener) {
-        this.incrementListener = incrementListener;
+    public MalApiClient(BacklogFragment backlogFragment) {
+        this.backlogFragment = backlogFragment;
     }
 
     public MalApiClient(SeriesFragment seriesFragment) {
@@ -93,12 +93,12 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    incrementListener.episodeCountIncremented(response.isSuccessful() && response.raw().message().equals("OK"));
+                    backlogFragment.episodeCountIncremented(response.isSuccessful() && response.raw().message().equals("OK"));
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    incrementListener.episodeCountIncremented(false);
+                    backlogFragment.episodeCountIncremented(false);
                     Log.d(TAG, t.toString());
 
                 }
@@ -152,7 +152,7 @@ public class MalApiClient {
                                 }
                             }
                         }
-                        MalImportHelper helper = new MalImportHelper(seriesFragment, malDataImportedListener);
+                        MalImportHelper helper = new MalImportHelper(malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
                         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
@@ -176,6 +176,41 @@ public class MalApiClient {
             @Override
             public void onFailure(Call<UserListHolder> call, Throwable t) {
                 seriesFragment.malDataImported(false);
+                Log.d(TAG, "error: " + t.getMessage());
+            }
+        });
+    }
+
+    public void syncEpisodeCounts() {
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
+
+        call.enqueue(new Callback<UserListHolder>() {
+            @Override
+            public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {
+                if (response.isSuccessful()) {
+//                    getUserAvatar();
+
+                    if (response.body().getAnimeList() != null) {
+                        List<MatchHolder> matchList = new ArrayList<>();
+                        for (AnimeListHolder list : response.body().getAnimeList()) {
+                            if (list.getMALID() != null && list.getMy_status() != null) {
+                                if (list.getMy_status().equals("1")) {
+                                    matchList.add(new MatchHolder(list.getMALID(), Integer.valueOf(list.getMy_watched_episodes()), list.getSeries_image()));
+                                }
+                            }
+                        }
+                        MalImportHelper helper = new MalImportHelper(backlogFragment);
+                        helper.updateEpisodeCounts(matchList);
+                    }
+                } else {
+                    backlogFragment.malDataImported(false);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserListHolder> call, Throwable t) {
+                backlogFragment.malDataImported(false);
                 Log.d(TAG, "error: " + t.getMessage());
             }
         });

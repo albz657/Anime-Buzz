@@ -19,7 +19,6 @@ import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
@@ -31,15 +30,28 @@ import me.jakemoritz.animebuzz.models.Series;
 public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogRecyclerViewAdapter.ViewHolder> implements ItemTouchHelperCallback.ItemTouchHelperAdapter, IncrementFragment.IncrementDialogListener {
 
     public ItemTouchHelper touchHelper;
-    private MalApiClient malApiClient;
     private BacklogFragment fragment;
 
     public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(parent.getContext(), backlogItems, true);
-        this.malApiClient = new MalApiClient(parent);
         this.fragment = parent;
-        ItemTouchHelper.Callback callback = new ItemTouchHelperCallback(this);
+        ItemTouchHelper.Callback callback = new SwipeCallback(this, parent);
         this.touchHelper = new ItemTouchHelper(callback);
+    }
+
+    private class SwipeCallback extends ItemTouchHelperCallback{
+        private BacklogFragment backlogFragment;
+
+
+        public SwipeCallback(ItemTouchHelperAdapter mAdapter, BacklogFragment backlogFragment) {
+            super(mAdapter);
+            this.backlogFragment = backlogFragment;
+        }
+
+        @Override
+        public boolean isItemViewSwipeEnabled() {
+            return backlogFragment.isCountsCurrent();
+        }
     }
 
     @Override
@@ -154,7 +166,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
     @Override
     public void incrementDialogClosed(int response, Series series, int position) {
         if (response == 1) {
-            malApiClient.updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
+            fragment.getMalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
         } else if (response == -1) {
             SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
         }

@@ -21,11 +21,14 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse {
+public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse, MalDataImportedListener {
 
     private static final String TAG = BacklogFragment.class.getSimpleName();
 
@@ -34,6 +37,10 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     private MainActivity mainActivity;
     private RecyclerView recyclerView;
     private RelativeLayout emptyView;
+    private MaterialProgressBar progressBar;
+    private boolean updating = false;
+    private MalApiClient malApiClient;
+    private boolean countsCurrent = false;
 
     public BacklogRecyclerViewAdapter getmAdapter() {
         return mAdapter;
@@ -45,6 +52,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public static BacklogFragment newInstance() {
         BacklogFragment fragment = new BacklogFragment();
         fragment.setHasOptionsMenu(true);
+        fragment.malApiClient = new MalApiClient(fragment);
         return fragment;
     }
 
@@ -60,25 +68,8 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
-    }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.overflow_menu_backlog, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                mainActivity.startFragment(SettingsFragment.newInstance());
-                return true;
-            case R.id.action_about:
-                mainActivity.startFragment(AboutFragment.newInstance());
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        updateData();
     }
 
     @Override
@@ -88,6 +79,9 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         container.clearDisappearingChildren();
 
         backlogLayout = inflater.inflate(R.layout.fragment_backlog, container, false);
+
+        progressBar = (MaterialProgressBar) backlogLayout.findViewById(R.id.progress_bar);
+
         recyclerView = (RecyclerView) backlogLayout.findViewById(R.id.list);
         emptyView = (RelativeLayout) backlogLayout.findViewById(R.id.empty_view_included);
 
@@ -114,6 +108,42 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         return backlogLayout;
     }
 
+    public void updateData() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        if (!updating) {
+            if (App.getInstance().isNetworkAvailable()) {
+                malApiClient.syncEpisodeCounts();
+                updating = true;
+            } else {
+                stopUpdating();
+
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                }
+            }
+        } else {
+            stopUpdating();
+        }
+    }
+
+    @Override
+    public void malDataImported(boolean received) {
+        countsCurrent = received;
+        if (!received) {
+            if (getView() != null) {
+                Snackbar.make(getView(), "There was a problem updating your episode counts. Please try syncing your info again later.", Snackbar.LENGTH_LONG).show();
+            }
+        }
+
+        stopUpdating();
+    }
+
+    public void stopUpdating() {
+        progressBar.setVisibility(View.INVISIBLE);
+        updating = false;
+    }
+
     private void setVisibility(RealmResults<BacklogItem> element) {
         if (element.isEmpty() && recyclerView.getVisibility() == View.VISIBLE) {
             recyclerView.setVisibility(View.GONE);
@@ -125,6 +155,29 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.overflow_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                mainActivity.startFragment(SettingsFragment.newInstance());
+                return true;
+            case R.id.action_about:
+                mainActivity.startFragment(AboutFragment.newInstance());
+                return true;
+            case R.id.action_sync:
+                updateData();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
     public void episodeCountIncremented(boolean incremented) {
         if (!incremented && backlogLayout != null) {
             Snackbar.make(backlogLayout, App.getInstance().getString(R.string.increment_failed), Snackbar.LENGTH_LONG).show();
@@ -133,5 +186,13 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     public MainActivity getMainActivity() {
         return mainActivity;
+    }
+
+    public MalApiClient getMalApiClient() {
+        return malApiClient;
+    }
+
+    public boolean isCountsCurrent() {
+        return countsCurrent;
     }
 }

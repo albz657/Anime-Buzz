@@ -6,7 +6,6 @@ import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
@@ -16,11 +15,28 @@ import me.jakemoritz.animebuzz.models.Series;
 class MalImportHelper {
 
     private MalDataImportedListener malDataImportedListener;
-    private SeriesFragment fragment;
 
-    MalImportHelper(SeriesFragment seriesFragment, MalDataImportedListener malDataImportedListener) {
-        this.fragment = seriesFragment;
+    MalImportHelper(MalDataImportedListener malDataImportedListener) {
         this.malDataImportedListener = malDataImportedListener;
+    }
+
+    void updateEpisodeCounts(final List<MatchHolder> matchList){
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
+                for (MatchHolder matchHolder : matchList){
+                    Series matchedSeries = realm.where(Series.class).equalTo("MALID", matchHolder.getMALID()).findFirst();
+                    if (matchedSeries != null && userList.contains(matchedSeries)){
+                        matchedSeries.setEpisodesWatched(matchHolder.getEpisodesWatched());
+                    }
+                }
+            }
+        });
+
+        if (malDataImportedListener != null){
+            malDataImportedListener.malDataImported(true);
+        }
     }
 
     void matchSeries(final List<MatchHolder> matchList) {
