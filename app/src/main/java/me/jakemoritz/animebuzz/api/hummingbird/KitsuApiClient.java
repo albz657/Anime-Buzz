@@ -13,7 +13,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
-import me.jakemoritz.animebuzz.interfaces.retrofit.HummingbirdEndpointInterface;
+import me.jakemoritz.animebuzz.interfaces.retrofit.KitsuEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.services.KitsuDataProcessor;
 import me.jakemoritz.animebuzz.services.PosterDownloader;
@@ -62,8 +62,8 @@ public class KitsuApiClient {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<String> call = hummingbirdEndpointInterface.getKitsuId("myanimelist/anime", MALID);
+        KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
+        Call<String> call = kitsuEndpointInterface.getKitsuId("myanimelist/anime", MALID);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -111,8 +111,8 @@ public class KitsuApiClient {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-        HummingbirdEndpointInterface hummingbirdEndpointInterface = retrofit.create(HummingbirdEndpointInterface.class);
-        Call<KitsuAnimeHolder> call = hummingbirdEndpointInterface.getAnimeData(kitsuId);
+        KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
+        Call<KitsuAnimeHolder> call = kitsuEndpointInterface.getAnimeData(kitsuId);
         call.enqueue(new Callback<KitsuAnimeHolder>() {
             @Override
             public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {

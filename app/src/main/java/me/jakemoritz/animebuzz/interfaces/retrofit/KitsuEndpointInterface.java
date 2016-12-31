@@ -7,7 +7,7 @@ import retrofit2.http.Headers;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface HummingbirdEndpointInterface {
+public interface KitsuEndpointInterface {
     @Headers({"Accept: application/vnd.api+json", "Content-Type: application/vnd.api+json"})
     @GET("edge/anime/{ID}")
     Call<KitsuAnimeHolder> getAnimeData(@Path("ID") String ID);
