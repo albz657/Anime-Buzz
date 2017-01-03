@@ -124,7 +124,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void resetListener(RealmResults<Series> realmResults) {
-        if (previousRealmResults != null) {
+        if (previousRealmResults != null && previousRealmResults.isValid()) {
             mainActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -340,7 +340,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
-                String seasonKey = currentlyBrowsingSeason.getKey();
+                String seasonKey = "";
+
+                if (currentlyBrowsingSeason != null){
+                    currentlyBrowsingSeason.getKey();
+                } else if (this instanceof UserListFragment){
+                    seasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
+                }
+
                 if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())) {
                     seasonKey = "raw";
                 }

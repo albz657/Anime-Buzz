@@ -23,6 +23,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -125,7 +126,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
             });
         }*/
 
-        if (!updating) {
+        if (!updating && SharedPrefsHelper.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {
                 malApiClient.syncEpisodeCounts();
                 updating = true;
