@@ -8,14 +8,16 @@ public class KitsuAnimeHolder {
     private String startedAiringDate;
     private String showType;
     private int episodeCount;
+    private String kitsuId;
 
-    KitsuAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount) {
+    KitsuAnimeHolder(String englishTitle, String imageURL, String finishedAiringDate, String startedAiringDate, String showType, int episodeCount, String kitsuId) {
         this.englishTitle = englishTitle;
         this.imageURL = imageURL;
         this.finishedAiringDate = finishedAiringDate;
         this.startedAiringDate = startedAiringDate;
         this.showType = showType;
         this.episodeCount = episodeCount;
+        this.kitsuId = kitsuId;
     }
 
     public int getEpisodeCount() {
@@ -40,5 +42,9 @@ public class KitsuAnimeHolder {
 
     public String getShowType() {
         return showType;
+    }
+
+    public String getKitsuId() {
+        return kitsuId;
     }
 }

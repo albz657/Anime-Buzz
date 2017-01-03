@@ -52,9 +52,9 @@ public class KitsuApiClient {
         }
     }
 
-    private void getKitsuID(final String MALID){
+    private void getKitsuId(final String MALID){
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(String.class, new KitsuMappingDeserializer());
+        gsonBuilder.registerTypeAdapter(String.class, new KitsuFilterDeserializer());
         Gson gson = gsonBuilder.create();
 
         Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
@@ -63,21 +63,12 @@ public class KitsuApiClient {
                 .build();
 
         KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
-        Call<String> call = kitsuEndpointInterface.getKitsuId("myanimelist/anime", MALID);
+        Call<String> call = kitsuEndpointInterface.getKitsuMappingId("myanimelist/anime", MALID);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()){
                     final String kitsuId = response.body();
-
-                    App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm realm) {
-                            Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-                            series.setKitsuID(kitsuId);
-                        }
-                    });
-
                     executeGetSeriesData(kitsuId, MALID);
                 }
             }
@@ -95,7 +86,7 @@ public class KitsuApiClient {
         realm.close();
 
         if (currSeries.getKitsuID().isEmpty()){
-            getKitsuID(MALID);
+            getKitsuId(MALID);
         } else {
             executeGetSeriesData(currSeries.getKitsuID(), MALID);
         }
@@ -112,7 +103,7 @@ public class KitsuApiClient {
                 .build();
 
         KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
-        Call<KitsuAnimeHolder> call = kitsuEndpointInterface.getAnimeData(kitsuId);
+        Call<KitsuAnimeHolder> call = kitsuEndpointInterface.getKitsuId(kitsuId);
         call.enqueue(new Callback<KitsuAnimeHolder>() {
             @Override
             public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
@@ -124,6 +115,7 @@ public class KitsuApiClient {
                     hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
                     hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
                     hbIntent.putExtra("showType", response.body().getShowType());
+                    hbIntent.putExtra("kitsuId", response.body().getKitsuId());
                     App.getInstance().startService(hbIntent);
 
                     String imageURL = response.body().getImageURL();

@@ -11,11 +11,11 @@ import com.google.gson.JsonPrimitive;
 import java.lang.reflect.Type;
 
 
-class KitsuMappingDeserializer implements JsonDeserializer<String> {
+class KitsuFilterDeserializer implements JsonDeserializer<String> {
 
     @Override
     public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        String kitsuId = "";
+        String kitsuMappingId = "";
 
         final JsonObject mappingsObject = json.getAsJsonObject();
         JsonArray dataArray = mappingsObject.getAsJsonArray("data");
@@ -25,11 +25,11 @@ class KitsuMappingDeserializer implements JsonDeserializer<String> {
 
         try {
             kitsuIdPrimitive = dataObject.getAsJsonPrimitive("id");
-            kitsuId = kitsuIdPrimitive.getAsString();
+            kitsuMappingId = kitsuIdPrimitive.getAsString();
         } catch (ClassCastException e){
 
         }
 
-        return kitsuId;
+        return kitsuMappingId;
     }/**/
 }

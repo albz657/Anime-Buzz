@@ -20,6 +20,7 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
         String imageURL = "";
         String showType = "";
         int episodeCount = 0;
+        String kitsuId = "";
 
         final JsonObject responseObject = json.getAsJsonObject();
         JsonObject dataObject = responseObject.getAsJsonObject("data");
@@ -27,12 +28,20 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
         JsonObject titlesObject = attributesObject.getAsJsonObject("titles");
         JsonObject posterObject = attributesObject.getAsJsonObject("posterImage");
 
+        JsonPrimitive kitsuIdPrimitive = null;
         JsonPrimitive englishPrimitive = null;
         JsonPrimitive posterImagePrimitive = null;
         JsonPrimitive finishedAiringDatePrimitive = null;
         JsonPrimitive startedAiringDatePrimitive = null;
         JsonPrimitive showTypePrimitive = null;
         JsonPrimitive episodeCountPrimitive = null;
+
+        try {
+            kitsuIdPrimitive = dataObject.getAsJsonPrimitive("id");
+            kitsuId = kitsuIdPrimitive.getAsString();
+        } catch (ClassCastException e){
+
+        }
 
         try {
             finishedAiringDatePrimitive = attributesObject.getAsJsonPrimitive("endDate");
@@ -43,7 +52,9 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         try {
             episodeCountPrimitive = attributesObject.getAsJsonPrimitive("episodeCount");
-            episodeCount = episodeCountPrimitive.getAsInt();
+            if (episodeCountPrimitive != null){
+                episodeCount = episodeCountPrimitive.getAsInt();
+            }
         } catch (ClassCastException e){
 
         }
@@ -57,7 +68,9 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         try {
             showTypePrimitive = attributesObject.getAsJsonPrimitive("showType");
-            showType = showTypePrimitive.getAsString();
+            if (showTypePrimitive != null){
+                showType = showTypePrimitive.getAsString();
+            }
         } catch (ClassCastException e){
 
         }
@@ -76,6 +89,6 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         }
 
-        return new KitsuAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate, showType, episodeCount);
+        return new KitsuAnimeHolder(englishTitle, imageURL, finishedAiringDate, startedAiringDate, showType, episodeCount, kitsuId);
     }/**/
 }

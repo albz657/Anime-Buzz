@@ -33,8 +33,9 @@ public class KitsuDataProcessor extends IntentService {
         String finishedAiringDate = intent.getStringExtra("finishedAiringDate");
         String startedAiringDate = intent.getStringExtra("startedAiringDate");
         String showType = intent.getStringExtra("showType");
+        String kitsuId = intent.getStringExtra("kitsuId");
 
-        processSeries(MALID, englishTitle, episodeCount, finishedAiringDate, startedAiringDate, showType);
+        processSeries(MALID, englishTitle, episodeCount, finishedAiringDate, startedAiringDate, showType, kitsuId);
 
         realm.close();
 
@@ -52,7 +53,7 @@ public class KitsuDataProcessor extends IntentService {
         }
     }
 
-    private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType) {
+    private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType, final String kitsuId) {
         final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
         String currentAiringStatus = currSeries.getAiringStatus();
@@ -129,6 +130,7 @@ public class KitsuDataProcessor extends IntentService {
                 currSeries.setAiringStatus(finalAiringStatus);
                 currSeries.setStartedAiringDate(finalStartAiringDate);
                 currSeries.setFinishedAiringDate(finalfinishedAiringDate);
+                currSeries.setKitsuID(kitsuId);
             }
         });
 
