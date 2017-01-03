@@ -70,12 +70,26 @@ public class KitsuApiClient {
                 if (response.isSuccessful()){
                     final String kitsuId = response.body();
                     executeGetSeriesData(kitsuId, MALID);
+                } else {
+                    Log.d(TAG, "s");
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.d(TAG, t.getMessage());
+                if (App.getInstance().isInitializing()){
+                    App.getInstance().incrementCurrentSyncingSeriesInitial();
+                    NotificationHelper.getInstance().createInitialNotification();
+
+                    if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
+                        Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
+                        callback.getMainActivity().sendBroadcast(finishedInitializingIntent);
+                    }
+                } else if (App.getInstance().isPostInitializing()){
+                    App.getInstance().incrementCurrentSyncingSeriesPost();
+                    NotificationHelper.getInstance().createSeasonDataNotification();
+                }
             }
         });
     }
