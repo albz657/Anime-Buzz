@@ -34,7 +34,7 @@ public class NotificationHelper {
     public void createInitialNotification() {
         String contentTitle;
         String contextText;
-        if (App.getInstance().getTotalSyncingSeriesInitial() == App.getInstance().getCurrentSyncingSeriesInitial()){
+        if (App.getInstance().getTotalSyncingSeriesInitial() == App.getInstance().getCurrentSyncingSeriesInitial() || App.getInstance().isPostInitializing()) {
             contentTitle = "Finished download additional data for this season";
             contextText = "";
         } else {
@@ -58,7 +58,7 @@ public class NotificationHelper {
 
     public void createSeasonDataNotification() {
         String contentTitle;
-        if (App.getInstance().getTotalSyncingSeriesPost() == App.getInstance().getCurrentSyncingSeriesPost()){
+        if (App.getInstance().getTotalSyncingSeriesPost() == App.getInstance().getCurrentSyncingSeriesPost()) {
             contentTitle = "Finished downloading future season info";
             App.getInstance().setPostInitializing(false);
         } else {
@@ -107,7 +107,7 @@ public class NotificationHelper {
 
         String seriesName = series.getName();
 
-        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()){
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()) {
             seriesName = series.getEnglishTitle();
         }
 
@@ -145,11 +145,11 @@ public class NotificationHelper {
         mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
     }
 
-    public void incrementMaxSeries(int seriesCount){
+    public void incrementMaxSeries(int seriesCount) {
         this.maxSeries += seriesCount;
     }
 
-    public void incrementCurrSeries(){
+    public void incrementCurrSeries() {
         this.currSeries++;
     }
 
