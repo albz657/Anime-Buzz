@@ -216,6 +216,9 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
             holder.mShowType.setVisibility(View.GONE);
         }
 
+        // REMOVE WHEN API UPDATES
+        holder.mShowType.setVisibility(View.GONE);
+
         int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz");
         if (imageId != 0) {
             Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
