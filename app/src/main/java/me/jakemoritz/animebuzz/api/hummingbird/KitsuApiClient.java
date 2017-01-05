@@ -12,7 +12,6 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.interfaces.retrofit.KitsuEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.services.KitsuDataProcessor;
@@ -80,7 +79,7 @@ public class KitsuApiClient {
                 setDefaultEnglishTitle(MALID);
                 if (App.getInstance().isInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesInitial();
-                    NotificationHelper.getInstance().createInitialNotification();
+//                    NotificationHelper.getInstance().createInitialNotification();
 
                     if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()) {
                         Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
@@ -88,7 +87,7 @@ public class KitsuApiClient {
                     }
                 } else if (App.getInstance().isPostInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesPost();
-                    NotificationHelper.getInstance().createSeasonDataNotification();
+//                    NotificationHelper.getInstance().createSeasonDataNotification();
                 }
             }
         });
@@ -158,7 +157,7 @@ public class KitsuApiClient {
                     setDefaultEnglishTitle(MALID);
                     if (App.getInstance().isPostInitializing()) {
                         App.getInstance().incrementCurrentSyncingSeriesPost();
-                        NotificationHelper.getInstance().createSeasonDataNotification();
+//                        NotificationHelper.getInstance().createSeasonDataNotification();
                     }
                 }
             }
@@ -169,7 +168,7 @@ public class KitsuApiClient {
                 setDefaultEnglishTitle(MALID);
                 if (App.getInstance().isPostInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesPost();
-                    NotificationHelper.getInstance().createSeasonDataNotification();
+//                    NotificationHelper.getInstance().createSeasonDataNotification();
                 }
             }
         });

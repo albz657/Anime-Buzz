@@ -42,7 +42,6 @@ import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.hummingbird.ReadHummingbirdDataResponse;
@@ -186,7 +185,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                                 App.getInstance().setInitializing(false);
                                 App.getInstance().setPostInitializing(true);
 
-                                NotificationHelper.getInstance().createInitialNotification();
+//                                NotificationHelper.getInstance().createInitialNotification();
 
                                 RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
                                 Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
