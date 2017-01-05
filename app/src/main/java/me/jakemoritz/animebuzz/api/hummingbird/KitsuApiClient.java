@@ -41,7 +41,7 @@ public class KitsuApiClient {
         if (seriesRealmResults.isEmpty()) {
             callback.hummingbirdSeasonReceived();
         } else {
-            if (App.getInstance().isInitializing()){
+            if (App.getInstance().isInitializing()) {
                 App.getInstance().setTotalSyncingSeriesInitial(seriesRealmResults.size());
             }
 
@@ -52,7 +52,7 @@ public class KitsuApiClient {
         }
     }
 
-    private void getKitsuId(final String MALID){
+    private void getKitsuId(final String MALID) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(String.class, new KitsuFilterDeserializer());
         Gson gson = gsonBuilder.create();
@@ -67,28 +67,40 @@ public class KitsuApiClient {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()){
+                if (response.isSuccessful()) {
                     final String kitsuId = response.body();
                     executeGetSeriesData(kitsuId, MALID);
                 } else {
-                    Log.d(TAG, "s");
+                    setDefaultEnglishTitle(MALID);
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d(TAG, t.getMessage());
-                if (App.getInstance().isInitializing()){
+                setDefaultEnglishTitle(MALID);
+                if (App.getInstance().isInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesInitial();
                     NotificationHelper.getInstance().createInitialNotification();
 
-                    if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
+                    if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()) {
                         Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
                         callback.getMainActivity().sendBroadcast(finishedInitializingIntent);
                     }
-                } else if (App.getInstance().isPostInitializing()){
+                } else if (App.getInstance().isPostInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesPost();
                     NotificationHelper.getInstance().createSeasonDataNotification();
+                }
+            }
+        });
+    }
+
+    private void setDefaultEnglishTitle(final String MALID) {
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                if (series.getEnglishTitle().isEmpty()){
+                    series.setEnglishTitle(series.getName());
                 }
             }
         });
@@ -99,14 +111,14 @@ public class KitsuApiClient {
         Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
         realm.close();
 
-        if (currSeries.getKitsuID().isEmpty()){
+        if (currSeries.getKitsuID().isEmpty()) {
             getKitsuId(MALID);
         } else {
             executeGetSeriesData(currSeries.getKitsuID(), MALID);
         }
     }
 
-    private void executeGetSeriesData(String kitsuId, final String MALID){
+    private void executeGetSeriesData(String kitsuId, final String MALID) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(KitsuAnimeHolder.class, new KitsuDeserializer());
         Gson gson = gsonBuilder.create();
@@ -143,7 +155,8 @@ public class KitsuApiClient {
                     }
                 } else {
                     Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
-                    if (App.getInstance().isPostInitializing()){
+                    setDefaultEnglishTitle(MALID);
+                    if (App.getInstance().isPostInitializing()) {
                         App.getInstance().incrementCurrentSyncingSeriesPost();
                         NotificationHelper.getInstance().createSeasonDataNotification();
                     }
@@ -153,7 +166,8 @@ public class KitsuApiClient {
             @Override
             public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
                 Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
-                if (App.getInstance().isPostInitializing()){
+                setDefaultEnglishTitle(MALID);
+                if (App.getInstance().isPostInitializing()) {
                     App.getInstance().incrementCurrentSyncingSeriesPost();
                     NotificationHelper.getInstance().createSeasonDataNotification();
                 }
