@@ -117,7 +117,7 @@ public class KitsuApiClient {
         }
     }
 
-    private void executeGetSeriesData(String kitsuId, final String MALID) {
+    private void executeGetSeriesData(final String kitsuId, final String MALID) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(KitsuAnimeHolder.class, new KitsuDeserializer());
         Gson gson = gsonBuilder.create();
@@ -140,7 +140,7 @@ public class KitsuApiClient {
                     hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
                     hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
                     hbIntent.putExtra("showType", response.body().getShowType());
-                    hbIntent.putExtra("kitsuId", response.body().getKitsuId());
+                    hbIntent.putExtra("kitsuId", kitsuId);
                     App.getInstance().startService(hbIntent);
 
                     String imageURL = response.body().getImageURL();
