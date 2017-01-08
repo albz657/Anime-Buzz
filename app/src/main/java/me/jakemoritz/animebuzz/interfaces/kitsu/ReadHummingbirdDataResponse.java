@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.interfaces.hummingbird;
+package me.jakemoritz.animebuzz.interfaces.kitsu;
 
 public interface ReadHummingbirdDataResponse {
     void hummingbirdSeasonReceived();

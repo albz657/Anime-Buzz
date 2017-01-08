@@ -1,7 +1,6 @@
-package me.jakemoritz.animebuzz.api.hummingbird;
+package me.jakemoritz.animebuzz.api.kitsu;
 
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -51,59 +50,6 @@ public class KitsuApiClient {
         }
     }
 
-    private void getKitsuId(final String MALID) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(String.class, new KitsuFilterDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
-                .client(App.getInstance().getOkHttpClient())
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
-        Call<String> call = kitsuEndpointInterface.getKitsuMappingId("myanimelist/anime", MALID);
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    final String kitsuId = response.body();
-                    executeGetSeriesData(kitsuId, MALID);
-                } else {
-                    setDefaultEnglishTitle(MALID);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                setDefaultEnglishTitle(MALID);
-                if (App.getInstance().isInitializing()) {
-                    App.getInstance().incrementCurrentSyncingSeriesInitial();
-//                    NotificationHelper.getInstance().createInitialNotification();
-
-                    if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()) {
-                        Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
-                        callback.getMainActivity().sendBroadcast(finishedInitializingIntent);
-                    }
-                } else if (App.getInstance().isPostInitializing()) {
-                    App.getInstance().incrementCurrentSyncingSeriesPost();
-//                    NotificationHelper.getInstance().createSeasonDataNotification();
-                }
-            }
-        });
-    }
-
-    private void setDefaultEnglishTitle(final String MALID) {
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
-                if (series.getEnglishTitle().isEmpty()){
-                    series.setEnglishTitle(series.getName());
-                }
-            }
-        });
-    }
 
     private void getSeriesData(String MALID) {
         Realm realm = Realm.getDefaultInstance();
@@ -111,13 +57,13 @@ public class KitsuApiClient {
         realm.close();
 
         if (currSeries.getKitsuID().isEmpty()) {
-            getKitsuId(MALID);
+            getKitsuMapping(MALID);
         } else {
-            executeGetSeriesData(currSeries.getKitsuID(), MALID);
+            getKitsuData(currSeries.getKitsuID(), MALID);
         }
     }
 
-    private void executeGetSeriesData(final String kitsuId, final String MALID) {
+    private void getKitsuData(final String kitsuId, final String MALID) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(KitsuAnimeHolder.class, new KitsuDeserializer());
         Gson gson = gsonBuilder.create();
@@ -128,7 +74,7 @@ public class KitsuApiClient {
                 .build();
 
         KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
-        Call<KitsuAnimeHolder> call = kitsuEndpointInterface.getKitsuId(kitsuId);
+        Call<KitsuAnimeHolder> call = kitsuEndpointInterface.getAnimeData(kitsuId);
         call.enqueue(new Callback<KitsuAnimeHolder>() {
             @Override
             public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
@@ -140,7 +86,6 @@ public class KitsuApiClient {
                     hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
                     hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
                     hbIntent.putExtra("showType", response.body().getShowType());
-                    hbIntent.putExtra("kitsuId", kitsuId);
                     App.getInstance().startService(hbIntent);
 
                     String imageURL = response.body().getImageURL();
@@ -153,24 +98,97 @@ public class KitsuApiClient {
                         App.getInstance().startService(imageIntent);
                     }
                 } else {
-                    Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
                     setDefaultEnglishTitle(MALID);
-                    if (App.getInstance().isPostInitializing()) {
-                        App.getInstance().incrementCurrentSyncingSeriesPost();
-//                        NotificationHelper.getInstance().createSeasonDataNotification();
-                    }
                 }
             }
 
             @Override
             public void onFailure(Call<KitsuAnimeHolder> call, Throwable t) {
-                Log.d(TAG, "Failed getting Hummingbird data for '" + MALID + "'");
                 setDefaultEnglishTitle(MALID);
-                if (App.getInstance().isPostInitializing()) {
-                    App.getInstance().incrementCurrentSyncingSeriesPost();
-//                    NotificationHelper.getInstance().createSeasonDataNotification();
+            }
+        });
+    }
+
+    private void getKitsuMapping(final String MALID) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(String.class, new KitsuFilterDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+                .client(App.getInstance().getOkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
+        Call<String> call = kitsuEndpointInterface.getKitsuMapping("myanimelist/anime", MALID);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    final String kitsuMapping = response.body();
+                    getKitsuId(kitsuMapping, MALID);
+                } else {
+                    setDefaultEnglishTitle(MALID);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                setDefaultEnglishTitle(MALID);
+            }
+        });
+    }
+
+    private void getKitsuId(final String kitsuMappingId, final String MALID) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(String.class, new KitsuMappingDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
+                .client(App.getInstance().getOkHttpClient())
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .build();
+
+        KitsuEndpointInterface kitsuEndpointInterface = retrofit.create(KitsuEndpointInterface.class);
+        Call<String> call = kitsuEndpointInterface.getKitsuId(kitsuMappingId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    final String kitsuId = response.body();
+                    getKitsuData(kitsuId, MALID);
+                } else {
+                    setDefaultEnglishTitle(MALID);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                setDefaultEnglishTitle(MALID);
+            }
+        });
+    }
+
+    private void setDefaultEnglishTitle(final String MALID) {
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                if (series.getEnglishTitle().isEmpty()) {
+                    series.setEnglishTitle(series.getName());
                 }
             }
         });
+
+        if (App.getInstance().isInitializing()) {
+            App.getInstance().incrementCurrentSyncingSeriesInitial();
+
+            if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()) {
+                Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
+                callback.getMainActivity().sendBroadcast(finishedInitializingIntent);
+            }
+        } else if (App.getInstance().isPostInitializing()) {
+            App.getInstance().incrementCurrentSyncingSeriesPost();
+        }
     }
 }

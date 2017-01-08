@@ -1,35 +1,29 @@
-package me.jakemoritz.animebuzz.api.hummingbird;
+package me.jakemoritz.animebuzz.api.kitsu;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 
 import java.lang.reflect.Type;
 
-
-class KitsuFilterDeserializer implements JsonDeserializer<String> {
+public class KitsuMappingDeserializer implements JsonDeserializer<String> {
 
     @Override
     public String deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         String kitsuMappingId = "";
 
         final JsonObject mappingsObject = json.getAsJsonObject();
-        JsonArray dataArray = mappingsObject.getAsJsonArray("data");
-        JsonObject dataObject = dataArray.get(0).getAsJsonObject();
-
-        JsonPrimitive kitsuIdPrimitive;
+        JsonObject dataObject = mappingsObject.getAsJsonObject("data");
+        JsonElement data = dataObject.get("id");
 
         try {
-            kitsuIdPrimitive = dataObject.getAsJsonPrimitive("id");
-            kitsuMappingId = kitsuIdPrimitive.getAsString();
+            kitsuMappingId = data.getAsString();
         } catch (ClassCastException e){
 
         }
 
         return kitsuMappingId;
-    }/**/
+    }
 }

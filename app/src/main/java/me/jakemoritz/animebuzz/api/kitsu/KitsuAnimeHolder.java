@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.api.hummingbird;
+package me.jakemoritz.animebuzz.api.kitsu;
 
 public class KitsuAnimeHolder {
 
