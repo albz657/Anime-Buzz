@@ -51,10 +51,20 @@ public class KitsuApiClient {
     }
 
 
-    private void getSeriesData(String MALID) {
+    private void getSeriesData(final String MALID) {
         Realm realm = Realm.getDefaultInstance();
         Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
         realm.close();
+
+        if (currSeries.getKitsuID() == null){
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                    currSeries.setKitsuID("");
+                }
+            });
+        }
 
         if (currSeries.getKitsuID().isEmpty()) {
             getKitsuMapping(MALID);
@@ -156,6 +166,15 @@ public class KitsuApiClient {
             public void onResponse(Call<String> call, Response<String> response) {
                 if (response.isSuccessful()) {
                     final String kitsuId = response.body();
+
+                    App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm realm) {
+                            Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
+                            series.setKitsuID(kitsuId);
+                        }
+                    });
+
                     getKitsuData(kitsuId, MALID);
                 } else {
                     setDefaultEnglishTitle(MALID);

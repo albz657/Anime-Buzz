@@ -129,7 +129,6 @@ public class KitsuDataProcessor extends IntentService {
                 currSeries.setAiringStatus(finalAiringStatus);
                 currSeries.setStartedAiringDate(finalStartAiringDate);
                 currSeries.setFinishedAiringDate(finalfinishedAiringDate);
-                currSeries.setKitsuID(kitsuId);
             }
         });
 
