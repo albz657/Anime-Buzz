@@ -45,7 +45,9 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         try {
             finishedAiringDatePrimitive = attributesObject.getAsJsonPrimitive("endDate");
-            finishedAiringDate = finishedAiringDatePrimitive.getAsString();
+            if (finishedAiringDatePrimitive != null){
+                finishedAiringDate = finishedAiringDatePrimitive.getAsString();
+            }
         } catch (ClassCastException e){
 
         }
@@ -61,7 +63,9 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         try {
             startedAiringDatePrimitive = attributesObject.getAsJsonPrimitive("startDate");
-            startedAiringDate = startedAiringDatePrimitive.getAsString();
+            if (startedAiringDatePrimitive != null){
+                startedAiringDate = startedAiringDatePrimitive.getAsString();
+            }
         } catch (ClassCastException e){
 
         }
@@ -77,14 +81,18 @@ class KitsuDeserializer implements JsonDeserializer<KitsuAnimeHolder> {
 
         try {
             englishPrimitive = titlesObject.getAsJsonPrimitive("en");
-            englishTitle = englishPrimitive.getAsString();
+            if (englishPrimitive != null){
+                englishTitle = englishPrimitive.getAsString();
+            }
         } catch (ClassCastException e){
 
         }
 
         try {
             posterImagePrimitive = posterObject.getAsJsonPrimitive("original");
-            imageURL = posterImagePrimitive.getAsString();
+            if (posterImagePrimitive != null){
+                imageURL = posterImagePrimitive.getAsString();
+            }
         } catch (ClassCastException e){
 
         }
