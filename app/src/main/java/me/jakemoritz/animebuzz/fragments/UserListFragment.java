@@ -71,8 +71,11 @@ public class UserListFragment extends SeriesFragment {
 
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
-
             DailyTimeGenerator.getInstance().setNextAlarm(false);
+        }
+
+        if (isUpdating()){
+            stopUpdating();
         }
 
         loadUserSortingPreference();

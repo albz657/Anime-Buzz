@@ -335,14 +335,15 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void updateData() {
-        progressBar.setVisibility(View.VISIBLE);
 
         if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
+                progressBar.setVisibility(View.VISIBLE);
+
                 String seasonKey = "";
 
                 if (currentlyBrowsingSeason != null){
-                    currentlyBrowsingSeason.getKey();
+                    seasonKey = currentlyBrowsingSeason.getKey();
                 } else if (this instanceof UserListFragment){
                     seasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
                 }
@@ -361,8 +362,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
-        } else {
-            stopUpdating();
         }
     }
 
