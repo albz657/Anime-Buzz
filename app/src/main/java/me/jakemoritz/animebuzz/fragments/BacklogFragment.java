@@ -128,6 +128,10 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
         if (!updating && SharedPrefsHelper.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {
+                if (malApiClient == null){
+                    malApiClient = new MalApiClient(this);
+                }
+
                 malApiClient.syncEpisodeCounts();
                 updating = true;
                 countsCurrent = false;
