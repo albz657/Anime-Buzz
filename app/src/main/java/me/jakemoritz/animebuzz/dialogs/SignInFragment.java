@@ -121,7 +121,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
             getDialog().cancel();
         } else {
-            if (dialogView != null) {
+            if (dialogView != null && isAdded()) {
                 Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.verification_failed), Snackbar.LENGTH_LONG);
                 View view = failSnackbar.getView();
                 FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
