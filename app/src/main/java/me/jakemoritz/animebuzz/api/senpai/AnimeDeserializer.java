@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.api.senpai;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -45,20 +44,38 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
 
         final List<Series> seriesList = new ArrayList<>();
 
-        Gson gson = new Gson();
         for (JsonElement seriesElement : seriesArray) {
             JsonObject seriesObject = seriesElement.getAsJsonObject();
 
-            Series series = gson.fromJson(seriesObject, Series.class);
-            Series realmSeries = realm.where(Series.class).equalTo("MALID", series.getMALID()).findFirst();
-            if (realmSeries != null) {
-                series.duplicateRealmValues(realmSeries);
-            }
+            String seriesName = seriesObject.get("name").getAsString();
 
-            if (series.getMALID().matches("^-?\\d+$")) {
-                series.setSeasonKey(seasonKey);
+            String MALID = null;
+            try {
+                MALID = seriesObject.get("MALID").getAsString();
 
-                seriesList.add(series);
+                Series series = new Series();
+                series.setMALID(MALID);
+
+                Series realmSeries = realm.where(Series.class).equalTo("MALID", series.getMALID()).findFirst();
+                if (realmSeries != null) {
+                    series.duplicateRealmValues(realmSeries);
+                }
+
+                String ANNID;
+                try {
+                    ANNID = seriesObject.get("ANNID").getAsString();
+                } catch (NumberFormatException e) {
+                    ANNID = "";
+//                    Log.d(TAG, "'" + seriesName + "' has no ANNID.");
+                }
+
+                String simulcast;
+                try {
+                    simulcast = seriesObject.get("simulcast").getAsString();
+                } catch (ClassCastException e) {
+                    simulcast = "";
+                    Log.d(TAG, "'" + seriesName + "' is not simulcast.");
+                }
 
                 boolean missingAirdate = seriesObject.get("missingAirtime").getAsBoolean();
                 int airdate;
@@ -71,9 +88,16 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
                     simulcast_airdate = seriesObject.get("simulcast_airdate_u").getAsInt();
                 }
 
+                series.setName(seriesName);
+                series.setSeasonKey(seasonKey);
+                series.setSimulcastProvider(simulcast);
+                series.setANNID(ANNID);
+
                 AlarmHelper.getInstance().generateNextEpisodeTimes(series, airdate, simulcast_airdate);
-            } else {
-                Log.d(TAG, "'" + series.getName() + "' has no MALID, ignoring");
+
+                seriesList.add(series);
+            } catch (NumberFormatException e) {
+                Log.d(TAG, "'" + seriesName + "' has no MALID, ignoring");
             }
         }
         realm.close();

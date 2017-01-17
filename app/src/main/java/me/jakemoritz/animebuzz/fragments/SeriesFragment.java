@@ -335,7 +335,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void updateData() {
-
         if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
                 progressBar.setVisibility(View.VISIBLE);
