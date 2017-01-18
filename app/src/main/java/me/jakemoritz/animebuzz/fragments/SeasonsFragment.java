@@ -77,6 +77,8 @@ public class SeasonsFragment extends SeriesFragment {
         }
 
         if (App.getInstance().isJustLaunchedBrowser() && !App.getInstance().isInitializing()){
+            App.getInstance().setJustLaunchedBrowser(false);
+
             Calendar currentCal = Calendar.getInstance();
 
             Calendar lastUpdatedCal = Calendar.getInstance();
@@ -85,8 +87,6 @@ public class SeasonsFragment extends SeriesFragment {
             if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
                 updateData();
             }
-
-            App.getInstance().setJustLaunchedBrowser(false);
         }
 
         super.onViewCreated(view, savedInstanceState);

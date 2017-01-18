@@ -43,6 +43,9 @@ public class UserListFragment extends SeriesFragment {
         loadUserSortingPreference();
 
         if (App.getInstance().isJustLaunchedWatching() && !App.getInstance().isInitializing()){
+            App.getInstance().setJustLaunchedWatching(false);
+            App.getInstance().setJustLaunchedBrowser(false);
+
             Calendar currentCal = Calendar.getInstance();
 
             Calendar lastUpdatedCal = Calendar.getInstance();
@@ -51,9 +54,6 @@ public class UserListFragment extends SeriesFragment {
             if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
                 updateData();
             }
-
-            App.getInstance().setJustLaunchedWatching(false);
-            App.getInstance().setJustLaunchedBrowser(false);
         }
 
         super.onViewCreated(view, savedInstanceState);
