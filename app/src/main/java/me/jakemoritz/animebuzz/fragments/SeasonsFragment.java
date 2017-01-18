@@ -123,7 +123,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        stopUpdating();
+        stopRefreshing();
 
         if (App.getInstance().isInitializing()) {
             if (isVisible()) {

@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -53,9 +54,8 @@ import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
-import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse {
+public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -63,16 +63,17 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private boolean updating = false;
     private SenpaiExportHelper senpaiExportHelper;
     private KitsuApiClient kitsuApiClient;
-    private CoordinatorLayout seriesLayout;
     private RecyclerView recyclerView;
     private RelativeLayout emptyView;
     private MalApiClient malApiClient;
     private boolean adding = false;
     private MainActivity mainActivity;
-    private MaterialProgressBar progressBar;
     private Season currentlyBrowsingSeason;
     private BroadcastReceiver initialReceiver;
     private RealmResults<Series> previousRealmResults;
+    private FrameLayout seriesLayout;
+    private SwipeRefreshLayout swipeRefreshLayoutRecycler;
+    private SwipeRefreshLayout swipeRefreshLayoutEmpty;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,13 +90,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         container.clearDisappearingChildren();
         container.removeAllViews();
 
-        seriesLayout = (CoordinatorLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
+        seriesLayout = (FrameLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
 
-        progressBar = (MaterialProgressBar) seriesLayout.findViewById(R.id.progress_bar);
+        swipeRefreshLayoutRecycler = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_recycler);
+        swipeRefreshLayoutEmpty = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_empty);
 
-        recyclerView = (RecyclerView) seriesLayout.findViewById(R.id.list);
+        recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
-        emptyView = (RelativeLayout) seriesLayout.findViewById(R.id.empty_view_included);
+        emptyView = (RelativeLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -122,6 +124,11 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         return seriesLayout;
     }
 
+    @Override
+    public void onRefresh() {
+        updateData();
+    }
+
     public void resetListener(RealmResults<Series> realmResults) {
         if (previousRealmResults != null && previousRealmResults.isValid()) {
             mainActivity.runOnUiThread(new Runnable() {
@@ -144,11 +151,16 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     private void setVisibility(RealmResults<Series> element) {
         if (element.isEmpty()) {
-            recyclerView.setVisibility(View.GONE);
-            emptyView.setVisibility(View.VISIBLE);
+            swipeRefreshLayoutRecycler.setVisibility(View.GONE);
+            swipeRefreshLayoutRecycler.setEnabled(false);
+            swipeRefreshLayoutEmpty.setVisibility(View.VISIBLE);
+            swipeRefreshLayoutEmpty.setEnabled(true);
+
         } else {
-            recyclerView.setVisibility(View.VISIBLE);
-            emptyView.setVisibility(View.GONE);
+            swipeRefreshLayoutRecycler.setVisibility(View.VISIBLE);
+            swipeRefreshLayoutRecycler.setEnabled(true);
+            swipeRefreshLayoutEmpty.setVisibility(View.GONE);
+            swipeRefreshLayoutEmpty.setEnabled(false);
         }
     }
 
@@ -304,11 +316,16 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void stopRefreshing() {
+        updating = false;
+
         if (getView() != null) {
-//            seriesLayout.setRefreshing(false);
-            updating = false;
-            seriesLayout.destroyDrawingCache();
-            seriesLayout.clearAnimation();
+            swipeRefreshLayoutRecycler.setRefreshing(false);
+            swipeRefreshLayoutRecycler.destroyDrawingCache();
+            swipeRefreshLayoutRecycler.clearAnimation();
+
+            swipeRefreshLayoutEmpty.setRefreshing(false);
+            swipeRefreshLayoutEmpty.destroyDrawingCache();
+            swipeRefreshLayoutEmpty.clearAnimation();
         }
     }
 
@@ -326,9 +343,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             case R.id.action_about:
                 mainActivity.startFragment(AboutFragment.newInstance());
                 return true;
-            case R.id.action_sync:
-                updateData();
-                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -337,8 +351,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void updateData() {
         if (!isUpdating()) {
             if (App.getInstance().isNetworkAvailable()) {
-                progressBar.setVisibility(View.VISIBLE);
-
                 String seasonKey = "";
 
                 if (currentlyBrowsingSeason != null){
@@ -355,18 +367,13 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
                 setUpdating(true);
             } else {
-                stopUpdating();
+                stopRefreshing();
 
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
                 }
             }
         }
-    }
-
-    public void stopUpdating() {
-        progressBar.setVisibility(View.INVISIBLE);
-        updating = false;
     }
 
     public void stopInitialSpinner() {
@@ -544,10 +551,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public MainActivity getMainActivity() {
         return mainActivity;
-    }
-
-    public CoordinatorLayout getSeriesLayout() {
-        return seriesLayout;
     }
 
     public Season getCurrentlyBrowsingSeason() {

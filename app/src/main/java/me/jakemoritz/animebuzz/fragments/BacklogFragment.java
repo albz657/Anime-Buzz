@@ -188,9 +188,6 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
             case R.id.action_about:
                 mainActivity.startFragment(AboutFragment.newInstance());
                 return true;
-            case R.id.action_sync:
-                updateData();
-                return true;
         }
 
         return super.onOptionsItemSelected(item);

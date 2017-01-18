@@ -59,7 +59,7 @@ public class UserListFragment extends SeriesFragment {
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
-                stopUpdating();
+                stopRefreshing();
                 loadUserSortingPreference();
             }
         }
@@ -75,7 +75,7 @@ public class UserListFragment extends SeriesFragment {
         }
 
         if (isUpdating()){
-            stopUpdating();
+            stopRefreshing();
         }
 
         loadUserSortingPreference();
