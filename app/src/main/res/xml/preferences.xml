@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
+        android:key="@string/pref_category_account_key"
+        android:title="@string/pref_category_account_title">
+
+        <me.jakemoritz.animebuzz.misc.AccountPreference
+            android:summary="You are currently signed in."
+            android:title="Sign out from your MAL account"
+            android:layout="@layout/account_preference"/>
+
+        <me.jakemoritz.animebuzz.misc.AccountPreference
+            android:summary="You are currently signed out."
+            android:title="Sign in to your MAL account"
+            android:layout="@layout/account_preference" />
+    </PreferenceCategory>
+    <PreferenceCategory
         android:key="@string/pref_category_notifications_key"
         android:title="@string/pref_category_notifications_title">
 
@@ -62,18 +76,5 @@
             android:summary="@string/pref_firebase_summary"
             android:title="@string/pref_firebase_title"/>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:key="@string/pref_category_account_key"
-        android:title="@string/pref_category_account_title">
-
-        <Preference
-            android:summary="You are currently signed in."
-            android:title="Sign out from your MAL account" />
-
-        <Preference
-            android:summary="You are currently signed out."
-            android:title="Sign in to your MAL account" />
     </PreferenceCategory>
 </PreferenceScreen>

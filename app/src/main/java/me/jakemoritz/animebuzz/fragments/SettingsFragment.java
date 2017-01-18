@@ -35,6 +35,7 @@ import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.AccountPreference;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
@@ -45,8 +46,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
     private SettingsFragment self;
-    private Preference signInPreference;
-    private Preference signOutPreference;
+    private AccountPreference signInPreference;
+    private AccountPreference signOutPreference;
     private MainActivity mainActivity;
 
     private SwitchPreference simulcastPreference;
@@ -109,7 +110,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         firebasePreference = (SwitchPreference) findPreference(getString(R.string.pref_firebase_key));
 
         PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_category_account_key));
-        signOutPreference = preferenceCategory.getPreference(0);
+        signOutPreference = (AccountPreference) preferenceCategory.getPreference(0);
         String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
@@ -124,7 +125,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         });
 
-        signInPreference = preferenceCategory.getPreference(1);
+        signInPreference = (AccountPreference) preferenceCategory.getPreference(1);
         signInPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
