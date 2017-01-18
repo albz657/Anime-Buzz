@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
@@ -129,7 +130,15 @@ public class MalApiClient {
     }
 
     private void getUserAvatar() {
-        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(seriesFragment.getMainActivity());
+        MainActivity mainActivity;
+
+        if (seriesFragment == null){
+            mainActivity = backlogFragment.getMainActivity();
+        } else {
+            mainActivity = seriesFragment.getMainActivity();
+        }
+
+        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(mainActivity);
         getUserAvatarTask.execute();
     }
 

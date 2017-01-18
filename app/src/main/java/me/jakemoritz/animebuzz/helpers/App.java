@@ -5,9 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
-import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import io.realm.DynamicRealm;
 import io.realm.Realm;
@@ -93,10 +91,10 @@ public class App extends Application {
             migratedTo1 = false;
         }
 
-        Stetho.initialize(Stetho.newInitializerBuilder(this)
+/*        Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                .build());
+                .build());*/
     }
 
     public boolean isNetworkAvailable() {
