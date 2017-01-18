@@ -1,7 +1,9 @@
 package me.jakemoritz.animebuzz.dialogs;
 
+import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -96,6 +98,27 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         });
 
         return dialogView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Dialog dialog = getDialog();
+
+        if (dialog != null){
+            int width = (int) (400 * Resources.getSystem().getDisplayMetrics().density);
+            int height = (int) (350 * Resources.getSystem().getDisplayMetrics().density);
+            dialog.getWindow().setLayout(width, height);
+
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
     }
 
     private void attemptVerification(String username, String password) {
