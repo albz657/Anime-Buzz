@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 import io.realm.RealmList;
@@ -73,6 +74,19 @@ public class SeasonsFragment extends SeriesFragment {
             }
 
             loadSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
+        }
+
+        if (App.getInstance().isJustLaunchedBrowser() && !App.getInstance().isInitializing()){
+            Calendar currentCal = Calendar.getInstance();
+
+            Calendar lastUpdatedCal = Calendar.getInstance();
+            lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
+
+            if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
+                updateData();
+            }
+
+            App.getInstance().setJustLaunchedBrowser(false);
         }
 
         super.onViewCreated(view, savedInstanceState);

@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import java.util.Calendar;
+
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -39,6 +41,21 @@ public class UserListFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
         loadUserSortingPreference();
+
+        if (App.getInstance().isJustLaunchedWatching() && !App.getInstance().isInitializing()){
+            Calendar currentCal = Calendar.getInstance();
+
+            Calendar lastUpdatedCal = Calendar.getInstance();
+            lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
+
+            if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
+                updateData();
+            }
+
+            App.getInstance().setJustLaunchedWatching(false);
+            App.getInstance().setJustLaunchedBrowser(false);
+        }
+
         super.onViewCreated(view, savedInstanceState);
     }
 

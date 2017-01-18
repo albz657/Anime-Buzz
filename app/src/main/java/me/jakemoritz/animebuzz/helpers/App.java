@@ -36,6 +36,8 @@ public class App extends Application {
     private int currentSyncingSeriesPost = 0;
     private OkHttpClient okHttpClient;
     private boolean migratedTo1 = false;
+    private boolean justLaunchedBrowser = false;
+    private boolean justLaunchedWatching = false;
 
     public static synchronized App getInstance() {
         return mInstance;
@@ -48,6 +50,9 @@ public class App extends Application {
         mInstance = this;
         Picasso.with(this);
         Realm.init(this);
+
+        justLaunchedBrowser = true;
+        justLaunchedWatching = true;
 
         RealmMigration migration = new RealmMigration() {
             @Override
@@ -186,5 +191,21 @@ public class App extends Application {
             okHttpClient = new OkHttpClient();
         }
         return okHttpClient;
+    }
+
+    public boolean isJustLaunchedBrowser() {
+        return justLaunchedBrowser;
+    }
+
+    public void setJustLaunchedBrowser(boolean justLaunchedBrowser) {
+        this.justLaunchedBrowser = justLaunchedBrowser;
+    }
+
+    public boolean isJustLaunchedWatching() {
+        return justLaunchedWatching;
+    }
+
+    public void setJustLaunchedWatching(boolean justLaunchedWatching) {
+        this.justLaunchedWatching = justLaunchedWatching;
     }
 }
