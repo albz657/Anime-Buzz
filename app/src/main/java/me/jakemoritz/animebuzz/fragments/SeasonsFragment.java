@@ -85,6 +85,14 @@ public class SeasonsFragment extends SeriesFragment {
             lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
 
             if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
+                if (getSwipeRefreshLayoutEmpty().isEnabled()){
+                    getSwipeRefreshLayoutEmpty().setRefreshing(true);
+                }
+
+                if (getSwipeRefreshLayoutRecycler().isEnabled()){
+                    getSwipeRefreshLayoutRecycler().setRefreshing(true);
+                }
+
                 updateData();
             }
         }

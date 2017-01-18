@@ -570,4 +570,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
         this.currentlyBrowsingSeason = currentlyBrowsingSeason;
     }
+
+    public SwipeRefreshLayout getSwipeRefreshLayoutRecycler() {
+        return swipeRefreshLayoutRecycler;
+    }
+
+    public SwipeRefreshLayout getSwipeRefreshLayoutEmpty() {
+        return swipeRefreshLayoutEmpty;
+    }
 }
