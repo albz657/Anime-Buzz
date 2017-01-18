@@ -265,20 +265,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void loadDrawerUserInfo() {
-/*        File avatarFile = new File(getFilesDir(), getString(R.string.file_avatar));
-        ImageView drawerAvatar = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.drawer_avatar);
-
-        if (avatarFile.exists()){
-            Picasso.with(App.getInstance()).load(avatarFile).placeholder(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        } else {
-            Picasso.with(App.getInstance()).load(R.drawable.drawer_icon_copy).fit().centerCrop().into(drawerAvatar);
-        }
-
-        TextView drawerUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.drawer_username);
-        drawerUsername.setText(SharedPrefsHelper.getInstance().getMalUsernameFormatted());*/
-    }
-
     private Fragment getCurrentFragment() {
         if (getSupportFragmentManager().getFragments() != null && !getSupportFragmentManager().getFragments().isEmpty()) {
             Iterator iterator = getSupportFragmentManager().getFragments().iterator();
@@ -306,8 +292,6 @@ public class MainActivity extends AppCompatActivity {
             FileOutputStream fos = openFileOutput(getString(R.string.file_avatar), Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.close();
-
-            loadDrawerUserInfo();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

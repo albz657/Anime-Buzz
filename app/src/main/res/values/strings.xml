@@ -138,7 +138,7 @@
 
     <string name="pref_account">prefaccount</string>
     <string name="pref_account_title">MAL Account</string>
-    <string name="pref_account_summary_on">You are currently signed in as \'</string>
+    <string name="pref_account_summary_on">You are signed in as \'</string>
     <string name="pref_account_summary_off">You are not signed in.</string>
     <string name="pref_account_cancel">Cancel</string>
     <string name="pref_account_signin">Sign In</string>

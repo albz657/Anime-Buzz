@@ -189,7 +189,7 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {
                 if (response.isSuccessful()) {
-//                    getUserAvatar();
+                    getUserAvatar();
 
                     if (response.body().getAnimeList() != null) {
                         List<MatchHolder> matchList = new ArrayList<>();

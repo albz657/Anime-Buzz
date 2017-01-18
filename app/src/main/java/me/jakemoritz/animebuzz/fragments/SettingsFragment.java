@@ -242,7 +242,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         if (avatarFile.exists()) {
             avatarFile.delete();
         }
-        mainActivity.loadDrawerUserInfo();
 
         if (getView() != null)
             Snackbar.make(getView(), "You have signed out.", Snackbar.LENGTH_LONG).show();

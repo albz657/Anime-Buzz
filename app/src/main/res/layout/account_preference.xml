@@ -4,6 +4,7 @@
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:layout_marginBottom="6dp"
+              android:layout_marginLeft="2dp"
               android:layout_marginTop="8dp"
               android:gravity="center_vertical"
               android:minHeight="?android:attr/listPreferredItemHeight"
@@ -12,11 +13,12 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/account_avatar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:layout_marginLeft="12dp"
-        app:civ_border_color="#7c7c7c"
         app:civ_border_width="1dp"
+        app:civ_border_color="#515151"
+
         />
 
     <RelativeLayout
@@ -25,7 +27,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="6dp"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="8dp"
         android:layout_weight="1">
 
         <TextView
