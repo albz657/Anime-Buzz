@@ -93,7 +93,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         seriesLayout = (FrameLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
 
         swipeRefreshLayoutRecycler = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_recycler);
+        swipeRefreshLayoutRecycler.setOnRefreshListener(this);
         swipeRefreshLayoutEmpty = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_empty);
+        swipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
         recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
@@ -224,6 +226,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 }
             }
         } else {
+            if (isUpdating()){
+                stopRefreshing();
+            }
+
             if (!App.getInstance().isInitializing()) {
                 if (getView() != null) {
                     Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
@@ -353,19 +359,23 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             if (App.getInstance().isNetworkAvailable()) {
                 String seasonKey = "";
 
-                if (currentlyBrowsingSeason != null){
+                if (currentlyBrowsingSeason != null) {
                     seasonKey = currentlyBrowsingSeason.getKey();
-                } else if (this instanceof UserListFragment){
+                } else if (this instanceof UserListFragment) {
                     seasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
                 }
 
-                if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())) {
-                    seasonKey = "raw";
+                if (!seasonKey.isEmpty()) {
+                    if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())) {
+                        seasonKey = "raw";
+                    }
+
+                    getSenpaiExportHelper().getSeasonData(seasonKey);
+
+                    setUpdating(true);
+                } else {
+                    stopRefreshing();
                 }
-
-                getSenpaiExportHelper().getSeasonData(seasonKey);
-
-                setUpdating(true);
             } else {
                 stopRefreshing();
 
@@ -418,7 +428,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             });
         } catch (NullPointerException e) {
             String errorMALID = MALID;
-            if (errorMALID == null){
+            if (errorMALID == null) {
                 errorMALID = "null";
             }
 
