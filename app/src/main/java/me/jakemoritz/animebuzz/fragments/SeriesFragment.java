@@ -78,6 +78,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null){
+            updating = savedInstanceState.getBoolean("updating");
+        }
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
@@ -172,6 +175,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         if (!App.getInstance().isInitializing()) {
             mainActivity.getBottomBar().setVisibility(View.VISIBLE);
+        }
+
+        if (updating){
+            if (swipeRefreshLayoutEmpty.isEnabled() && !swipeRefreshLayoutEmpty.isRefreshing()){
+                swipeRefreshLayoutEmpty.setRefreshing(true);
+            } else if (swipeRefreshLayoutRecycler.isEnabled() && !swipeRefreshLayoutRecycler.isRefreshing()){
+                swipeRefreshLayoutRecycler.setRefreshing(true);
+            }
         }
     }
 
@@ -372,7 +383,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
                     getSenpaiExportHelper().getSeasonData(seasonKey);
 
-                    setUpdating(true);
+                    updating = true;
                 } else {
                     stopRefreshing();
                 }
@@ -384,6 +395,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 }
             }
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("updating", updating);
+        super.onSaveInstanceState(outState);
     }
 
     public void stopInitialSpinner() {
