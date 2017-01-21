@@ -221,6 +221,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
 
@@ -338,8 +343,6 @@ public class MainActivity extends AppCompatActivity {
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .addToBackStack(id)
                     .commit();
-
-            bottomBar.setVisibility(View.GONE);
         } else {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, fragment, id)

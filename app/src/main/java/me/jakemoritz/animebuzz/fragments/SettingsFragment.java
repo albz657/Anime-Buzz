@@ -78,8 +78,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         container.removeAllViews();
         container.clearDisappearingChildren();
-        return super.onCreateView(inflater, container, savedInstanceState);
 
+        mainActivity.getBottomBar().setVisibility(View.GONE);
+
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
 

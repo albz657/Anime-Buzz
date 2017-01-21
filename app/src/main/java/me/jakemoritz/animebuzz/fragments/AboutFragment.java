@@ -57,6 +57,8 @@ public class AboutFragment extends Fragment {
         String versionText = "App version: " + getVersionName();
         versionNumber.setText(versionText);
 
+        mainActivity.getBottomBar().setVisibility(View.GONE);
+
         return view;
     }
 
