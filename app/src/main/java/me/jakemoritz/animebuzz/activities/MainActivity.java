@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -30,7 +31,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
@@ -60,13 +60,51 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private boolean openRingtones = false;
     private AHBottomNavigation bottomBar;
-    private RealmChangeListener backlogCountCallback;
     private BroadcastReceiver notificationReceiver;
+    private OrientationEventListener orientationEventListener;
+    private OrientationChangedListener orientationChangedListener;
+    private int oldOrientation = -1;
+
+    public interface OrientationChangedListener {
+        void orientationChanged(boolean portrait);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("orientation", oldOrientation);
+        super.onSaveInstanceState(outState);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState != null){
+            oldOrientation = savedInstanceState.getInt("orientation");
+        }
+        orientationEventListener = new OrientationEventListener(this) {
+            @Override
+            public void onOrientationChanged(int i) {
+                boolean portrait = true;
+
+                if (oldOrientation != -1 && oldOrientation != i){
+                    oldOrientation = i;
+
+                    if (i == 90 || i == 270){
+                        portrait = false;
+                    }
+
+                    if (orientationChangedListener != null){
+                        orientationChangedListener.orientationChanged(portrait);
+                    }
+                } else {
+                    oldOrientation = i;
+                }
+            }
+        };
+
+        orientationEventListener.enable();
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean justUpdatedTo1_3_5 = sharedPreferences.getBoolean(getString(R.string.updated_to_1_3_5), true);
@@ -223,6 +261,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+
+        Fragment fragment = getCurrentFragment();
+
+        if (fragment instanceof SeriesFragment){
+            SeriesFragment seriesFragment = (SeriesFragment) fragment;
+
+            orientationChangedListener = seriesFragment;
+        }
     }
 
     @Override

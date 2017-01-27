@@ -55,7 +55,7 @@ import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse {
+public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -74,13 +74,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private FrameLayout seriesLayout;
     private SwipeRefreshLayout swipeRefreshLayoutRecycler;
     private SwipeRefreshLayout swipeRefreshLayoutEmpty;
+    private String currentlyBrowsingSeasonKey;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null){
-            updating = savedInstanceState.getBoolean("updating");
-        }
+
+        setRetainInstance(true);
+
         setHasOptionsMenu(true);
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
@@ -398,9 +399,18 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putBoolean("updating", updating);
-        super.onSaveInstanceState(outState);
+    public void orientationChanged(boolean portrait) {
+
+//        updating = savedInstanceState.getBoolean("updating");
+
+        if (this instanceof UserListFragment){
+            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+        } else {
+            if (currentlyBrowsingSeason != null){
+                currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
+            }
+            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
+        }
     }
 
     public void stopInitialSpinner() {
