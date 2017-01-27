@@ -7,7 +7,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,7 +79,6 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     @Override
     public void orientationChanged(boolean portrait) {
-        Log.d(TAG, "");
     }
 
     @Override
