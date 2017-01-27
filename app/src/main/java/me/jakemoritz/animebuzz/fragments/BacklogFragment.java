@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,7 +30,7 @@ import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse, MalDataImportedListener {
+public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse, MalDataImportedListener, MainActivity.OrientationChangedListener {
 
     private static final String TAG = BacklogFragment.class.getSimpleName();
 
@@ -70,7 +71,16 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
 
-        updateData();
+        if (!updating){
+            updateData();
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void orientationChanged(boolean portrait) {
+        Log.d(TAG, "");
     }
 
     @Override
@@ -111,20 +121,6 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     public void updateData() {
         progressBar.setVisibility(View.VISIBLE);
-
-/*        if (false){
-            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    RealmResults<Series> userList = realm.where(Series.class).equalTo("isInUserList", true).findAll();
-                    for (Series series : userList){
-                        BacklogItem backlogItem = realm.createObject(BacklogItem.class);
-                        backlogItem.setAlarmTime(System.currentTimeMillis());
-                        backlogItem.setSeries(series);
-                    }
-                }
-            });
-        }*/
 
         if (!updating && SharedPrefsHelper.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {

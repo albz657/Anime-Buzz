@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("orientation", oldOrientation);
+        orientationEventListener.disable();
         super.onSaveInstanceState(outState);
     }
 
@@ -241,12 +242,21 @@ public class MainActivity extends AppCompatActivity {
 
             startFragment(seriesFragment);
         } else {
-            if (getCurrentFragment() == null) {
+            Fragment fragment = getCurrentFragment();
+            if (fragment == null) {
                 if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
                     defaultTabId = 1;
                     startFragment(BacklogFragment.newInstance());
                 } else {
                     startFragment(UserListFragment.newInstance());
+                }
+            } else {
+                if (fragment instanceof UserListFragment){
+                    defaultTabId = 0;
+                } else if (fragment instanceof SeriesFragment){
+                    defaultTabId = 2;
+                } else if (fragment instanceof BacklogFragment){
+                    defaultTabId = 1;
                 }
             }
         }
@@ -266,8 +276,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (fragment instanceof SeriesFragment){
             SeriesFragment seriesFragment = (SeriesFragment) fragment;
-
             orientationChangedListener = seriesFragment;
+        } else if (fragment instanceof BacklogFragment){
+            orientationChangedListener = (BacklogFragment) fragment;
         }
     }
 
