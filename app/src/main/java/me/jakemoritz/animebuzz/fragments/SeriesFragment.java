@@ -371,10 +371,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             if (App.getInstance().isNetworkAvailable()) {
                 String seasonKey = "";
 
-                if (currentlyBrowsingSeason != null) {
-                    seasonKey = currentlyBrowsingSeason.getKey();
-                } else if (this instanceof UserListFragment) {
+                if (currentlyBrowsingSeason != null && this instanceof UserListFragment) {
                     seasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
+                } else if (currentlyBrowsingSeason != null) {
+                    seasonKey = currentlyBrowsingSeason.getKey();
                 }
 
                 if (!seasonKey.isEmpty()) {
