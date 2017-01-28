@@ -178,6 +178,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         }
 
+        if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
+            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
+        }
+
         if (updating){
             if (swipeRefreshLayoutEmpty.isEnabled() && !swipeRefreshLayoutEmpty.isRefreshing()){
                 swipeRefreshLayoutEmpty.setRefreshing(true);
@@ -404,12 +408,11 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 //        updating = savedInstanceState.getBoolean("updating");
 
         if (this instanceof UserListFragment){
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+            currentlyBrowsingSeasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
         } else {
             if (currentlyBrowsingSeason != null){
                 currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
             }
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
         }
     }
 

@@ -39,6 +39,8 @@ public class UserListFragment extends SeriesFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
         loadUserSortingPreference();
 
@@ -63,8 +65,6 @@ public class UserListFragment extends SeriesFragment {
                 updateData();
             }
         }
-
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override

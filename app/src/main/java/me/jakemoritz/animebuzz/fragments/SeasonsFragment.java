@@ -48,6 +48,8 @@ public class SeasonsFragment extends SeriesFragment {
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
         // initialize views
         toolbarSpinner = (Spinner) getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
         toolbarSpinner.setAdapter(seasonsSpinnerAdapter);
@@ -96,8 +98,6 @@ public class SeasonsFragment extends SeriesFragment {
                 updateData();
             }
         }
-
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
