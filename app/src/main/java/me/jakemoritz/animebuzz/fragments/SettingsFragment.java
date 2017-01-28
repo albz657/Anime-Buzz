@@ -63,6 +63,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
     public static SettingsFragment newInstance() {
         SettingsFragment fragment = new SettingsFragment();
+        fragment.setRetainInstance(true);
         return fragment;
     }
 

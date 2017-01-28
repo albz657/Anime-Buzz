@@ -25,7 +25,7 @@ public class AboutFragment extends Fragment {
 
     public static AboutFragment newInstance() {
         AboutFragment fragment = new AboutFragment();
-
+        fragment.setRetainInstance(true);
         return fragment;
     }
 

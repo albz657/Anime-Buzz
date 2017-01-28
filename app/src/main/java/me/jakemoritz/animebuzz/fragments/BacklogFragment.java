@@ -53,6 +53,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public static BacklogFragment newInstance() {
         BacklogFragment fragment = new BacklogFragment();
         fragment.setHasOptionsMenu(true);
+        fragment.setRetainInstance(true);
         fragment.malApiClient = new MalApiClient(fragment);
         return fragment;
     }
