@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null){
             oldOrientation = savedInstanceState.getInt("orientation");
         }
+
         orientationEventListener = new OrientationEventListener(this) {
             @Override
             public void onOrientationChanged(int i) {
@@ -275,8 +276,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = getCurrentFragment();
 
         if (fragment instanceof SeriesFragment){
-            SeriesFragment seriesFragment = (SeriesFragment) fragment;
-            orientationChangedListener = seriesFragment;
+            orientationChangedListener = (SeriesFragment) fragment;
         } else if (fragment instanceof BacklogFragment){
             orientationChangedListener = (BacklogFragment) fragment;
         }
@@ -405,6 +405,12 @@ public class MainActivity extends AppCompatActivity {
                     .replace(R.id.content_main, fragment, id)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
+
+            if (fragment instanceof SeriesFragment){
+                orientationChangedListener = (SeriesFragment) fragment;
+            } else if (fragment instanceof BacklogFragment){
+                orientationChangedListener = (BacklogFragment) fragment;
+            }
 
             if (!App.getInstance().isInitializing()) {
                 bottomBar.setVisibility(View.VISIBLE);
