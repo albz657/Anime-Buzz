@@ -17,8 +17,20 @@ public class ImportFragment extends DialogFragment {
 
     public static ImportFragment newInstance(SettingsFragment callback) {
         ImportFragment fragment = new ImportFragment();
+        fragment.setRetainInstance(true);
         fragment.callback = callback;
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override

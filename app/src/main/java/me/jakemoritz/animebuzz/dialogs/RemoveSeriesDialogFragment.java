@@ -7,23 +7,34 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class RemoveSeriesDialogFragment extends DialogFragment {
 
     private RemoveSeriesDialogListener listener;
-    private Series series;
     private int position;
+    private String MALID;
 
     public RemoveSeriesDialogFragment() {
     }
 
-    public static RemoveSeriesDialogFragment newInstance(RemoveSeriesDialogListener listener, Series series, int position) {
+    public static RemoveSeriesDialogFragment newInstance(RemoveSeriesDialogListener listener, String MALID, int position) {
         RemoveSeriesDialogFragment fragment = new RemoveSeriesDialogFragment();
+        fragment.setRetainInstance(true);
         fragment.listener = listener;
-        fragment.series = series;
+        fragment.MALID = MALID;
         fragment.position = position;
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override
@@ -32,13 +43,13 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
                 builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.removeSeriesDialogClosed(true, series, position);
+                        listener.removeSeriesDialogClosed(true, MALID, position);
                     }
                 })
                 .setNegativeButton("Keep", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        listener.removeSeriesDialogClosed(false, series, position);
+                        listener.removeSeriesDialogClosed(false, MALID, position);
                     }
                 });
 
@@ -53,6 +64,6 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
     }
 
     public interface RemoveSeriesDialogListener {
-        void removeSeriesDialogClosed(boolean accepted, Series series, int position);
+        void removeSeriesDialogClosed(boolean accepted, String MALID, int position);
     }
 }

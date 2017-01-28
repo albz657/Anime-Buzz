@@ -22,7 +22,19 @@ public class FailedInitializationFragment extends DialogFragment {
     public static FailedInitializationFragment newInstance(SeriesFragment seriesFragment) {
         FailedInitializationFragment fragment = new FailedInitializationFragment();
         fragment.seriesFragment = seriesFragment;
+        fragment.setRetainInstance(true);
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override

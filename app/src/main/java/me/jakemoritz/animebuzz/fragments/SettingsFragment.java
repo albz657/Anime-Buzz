@@ -198,6 +198,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         } else {
             incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
         }
+
+
     }
 
     @Override

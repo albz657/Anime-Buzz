@@ -261,7 +261,11 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         super.onDestroy();
 
         if (initialReceiver != null) {
-            mainActivity.unregisterReceiver(initialReceiver);
+            try {
+                mainActivity.unregisterReceiver(initialReceiver);
+            } catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -404,9 +408,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void orientationChanged(boolean portrait) {
-
-//        updating = savedInstanceState.getBoolean("updating");
-
         if (this instanceof UserListFragment){
             currentlyBrowsingSeasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
         } else {

@@ -235,16 +235,16 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         holder.mMinusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series, position);
+                RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series.getMALID(), position);
                 dialogFragment.show(seriesFragment.getMainActivity().getFragmentManager(), TAG);
             }
         });
     }
 
     @Override
-    public void removeSeriesDialogClosed(boolean accepted, Series series, int position) {
+    public void removeSeriesDialogClosed(boolean accepted, String MALID, int position) {
         if (accepted) {
-            modifyListener.modifyItem(series.getMALID());
+            modifyListener.modifyItem(MALID);
         }
     }
 

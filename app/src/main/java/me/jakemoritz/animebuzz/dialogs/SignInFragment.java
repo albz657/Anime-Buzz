@@ -38,6 +38,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
     public static SignInFragment newInstance(SignInFragmentListener listener, MainActivity mainActivity) {
         SignInFragment fragment = new SignInFragment();
+        fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.mainActivity = mainActivity;
         return fragment;
@@ -98,6 +99,17 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
         });
 
         return dialogView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override

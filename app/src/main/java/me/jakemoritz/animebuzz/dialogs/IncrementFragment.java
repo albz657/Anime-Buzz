@@ -23,10 +23,22 @@ public class IncrementFragment extends DialogFragment {
 
     public static IncrementFragment newInstance(IncrementDialogListener listener, Series series, int position) {
         IncrementFragment fragment = new IncrementFragment();
+        fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.series = series;
         fragment.position = position;
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override

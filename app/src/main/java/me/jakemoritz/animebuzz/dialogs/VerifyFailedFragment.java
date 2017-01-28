@@ -22,6 +22,7 @@ public class VerifyFailedFragment extends DialogFragment {
 
     public static VerifyFailedFragment newInstance(SignInAgainListener listener, MainActivity mainActivity) {
         VerifyFailedFragment fragment = new VerifyFailedFragment();
+        fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.mainActivity = mainActivity;
         return fragment;
@@ -47,6 +48,17 @@ public class VerifyFailedFragment extends DialogFragment {
                 .setCancelable(false);
 
         return builder.create();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Nullable

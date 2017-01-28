@@ -19,9 +19,21 @@ public class SignOutFragment extends DialogFragment {
 
     public static SignOutFragment newInstance(SettingsFragment callback, Preference preference) {
         SignOutFragment fragment = new SignOutFragment();
+        fragment.setRetainInstance(true);
         fragment.callback = callback;
         fragment.preference = preference;
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override
