@@ -11,9 +11,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:width="300dp"
+        android:width="400dp"
         android:gravity="center"
-        android:textColor="#59000000" />
+        android:textColor="#59000000"
+        android:text="placeholder"/>
 
     <ImageView
         android:id="@+id/empty_image"

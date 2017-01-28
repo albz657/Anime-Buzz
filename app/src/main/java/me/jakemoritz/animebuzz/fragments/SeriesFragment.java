@@ -19,7 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.crash.FirebaseCrash;
@@ -64,7 +64,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private SenpaiExportHelper senpaiExportHelper;
     private KitsuApiClient kitsuApiClient;
     private RecyclerView recyclerView;
-    private RelativeLayout emptyView;
+    private LinearLayout emptyView;
     private MalApiClient malApiClient;
     private boolean adding = false;
     private MainActivity mainActivity;
@@ -103,7 +103,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
-        emptyView = (RelativeLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
+        emptyView = (LinearLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

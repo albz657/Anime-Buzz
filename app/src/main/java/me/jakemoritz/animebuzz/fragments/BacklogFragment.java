@@ -13,7 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import io.realm.RealmChangeListener;
@@ -37,7 +37,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     private View backlogLayout;
     private MainActivity mainActivity;
     private RecyclerView recyclerView;
-    private RelativeLayout emptyView;
+    private LinearLayout emptyView;
     private MaterialProgressBar progressBar;
     private boolean updating = false;
     private MalApiClient malApiClient;
@@ -92,7 +92,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         progressBar = (MaterialProgressBar) backlogLayout.findViewById(R.id.progress_bar);
 
         recyclerView = (RecyclerView) backlogLayout.findViewById(R.id.list);
-        emptyView = (RelativeLayout) backlogLayout.findViewById(R.id.empty_view_included);
+        emptyView = (LinearLayout) backlogLayout.findViewById(R.id.empty_view_included);
 
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
         emptyText.setText(getString(R.string.empty_text_backlog));

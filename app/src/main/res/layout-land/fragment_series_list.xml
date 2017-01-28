@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/seriesLayout"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/swipe_refresh_layout_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView xmlns:tools="http://schemas.android.com/tools"
+                                                android:id="@+id/list"
+                                                android:name="me.jakemoritz.animebuzz.fragments.SeriesFragment"
+                                                android:layout_width="match_parent"
+                                                android:layout_height="match_parent"
+                                                android:scrollbars="vertical"
+                                                app:layoutManager="LinearLayoutManager"
+                                                tools:context=".fragments.SeriesFragment"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/swipe_refresh_layout_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp">
+
+        <include
+            android:id="@+id/empty_view_included"
+            layout="@layout/empty_view"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
+</FrameLayout>
+
+
+
+
