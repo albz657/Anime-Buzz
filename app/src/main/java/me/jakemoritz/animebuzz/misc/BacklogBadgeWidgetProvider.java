@@ -8,8 +8,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.RemoteViews;
 
+import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 
 public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
 
@@ -25,7 +28,10 @@ public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
 
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
+            RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.backlog_badge_widget);
+            remoteViews.setTextViewText(R.id.backlog_wiget_count, String.valueOf(realmResults.size()));
             remoteViews.setOnClickPendingIntent(R.id.backlog_widget, pendingIntent);
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews);

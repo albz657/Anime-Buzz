@@ -63,6 +63,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     });
 
                     context.sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
+                    context.sendBroadcast(new Intent("ACTION_APPWIDGET_UPDATE"));
 
                     AlarmHelper.getInstance().makeAlarm(series);
                 }
