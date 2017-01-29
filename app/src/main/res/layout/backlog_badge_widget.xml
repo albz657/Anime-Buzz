@@ -1,42 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/backlog_widget"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@mipmap/ic_launcher"
         android:id="@+id/backlog_widget_icon"
-        android:layout_centerInParent="true"
-        android:adjustViewBounds="true"/>
-
-    <RelativeLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginRight="60dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginTop="166dp">
+        android:layout_height="0dp"
+        android:adjustViewBounds="true"
+        android:src="@mipmap/ic_launcher"/>
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            app:civ_fill_color="#AC3B0F"
-            android:layout_centerInParent="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1"
-            android:layout_centerInParent="true"
-            android:textColor="#FFFFFF"/>
-
-
-    </RelativeLayout>
-
+    <TextView
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_alignEnd="@+id/backlog_widget_icon"
+        android:layout_alignRight="@+id/backlog_widget_icon"
+        android:layout_alignTop="@+id/backlog_widget_icon"
+        android:background="@drawable/backlog_badge_widget"
+        android:gravity="center"
+        android:text="99"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"/>
 
 </RelativeLayout>

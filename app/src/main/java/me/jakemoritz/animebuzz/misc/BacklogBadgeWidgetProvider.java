@@ -1,10 +1,15 @@
 package me.jakemoritz.animebuzz.misc;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.RemoteViews;
+
+import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.activities.MainActivity;
 
 public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
 
@@ -15,7 +20,15 @@ public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
         for (int i = 0; i < appWidgetIds.length; i++){
             int appWidgetId = appWidgetIds[i];
 
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.putExtra("backlog_widget", true);
 
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+
+            RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.backlog_badge_widget);
+            remoteViews.setOnClickPendingIntent(R.id.backlog_widget, pendingIntent);
+
+            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
         }
     }
 
@@ -37,10 +50,5 @@ public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         super.onDisabled(context);
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        super.onReceive(context, intent);
     }
 }

@@ -374,6 +374,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             setBacklogBadge();
+        } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)){
+            startFragment(BacklogFragment.newInstance());
+            bottomBar.setCurrentItem(1);
         }
     }
 
