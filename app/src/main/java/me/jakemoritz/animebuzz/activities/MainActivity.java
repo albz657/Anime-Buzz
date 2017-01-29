@@ -1,6 +1,5 @@
 package me.jakemoritz.animebuzz.activities;
 
-import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,7 +47,6 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -172,12 +170,6 @@ public class MainActivity extends AppCompatActivity {
                         newFragment = UserListFragment.newInstance();
                     } else if (position == 2 && !(currentFragment instanceof SeasonsFragment)) {
                         newFragment = SeasonsFragment.newInstance();
-
-                        Intent intent = new Intent(getApplicationContext(), BacklogBadgeWidgetProvider.class);
-                        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                        int[] ids = {R.xml.backlog_badge_widget_info};
-                        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                        sendBroadcast(intent);
                     } else if (position == 1 && !(currentFragment instanceof BacklogFragment)) {
                         newFragment = BacklogFragment.newInstance();
                     }

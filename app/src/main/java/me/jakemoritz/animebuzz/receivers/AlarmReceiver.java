@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.receivers;
 
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.NotificationHelper;
 import me.jakemoritz.animebuzz.helpers.WakeLocker;
+import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -63,7 +65,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                     });
 
                     context.sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
-                    context.sendBroadcast(new Intent("ACTION_APPWIDGET_UPDATE"));
+
+                    Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
+                    wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                    int[] ids = {R.xml.backlog_badge_widget_info};
+                    wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+                    context.sendBroadcast(wigetIntent);
 
                     AlarmHelper.getInstance().makeAlarm(series);
                 }

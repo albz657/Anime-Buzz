@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.adapters;
 
+import android.appwidget.AppWidgetManager;
+import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +27,7 @@ import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -170,6 +173,12 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                     }
                 });
                 fragment.getMainActivity().setBacklogBadge();
+
+                Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
+                wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                int[] ids = {R.xml.backlog_badge_widget_info};
+                wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+                context.sendBroadcast(wigetIntent);
             }
         }
     }
@@ -192,6 +201,12 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                 }
             });
             fragment.getMainActivity().setBacklogBadge();
+
+            Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
+            wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            int[] ids = {R.xml.backlog_badge_widget_info};
+            wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            context.sendBroadcast(wigetIntent);
         }
     }
 
