@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.receivers;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -68,7 +69,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
                     Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
                     wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                    int[] ids = {R.xml.backlog_badge_widget_info};
+                    int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, BacklogBadgeWidgetProvider.class));
                     wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                     context.sendBroadcast(wigetIntent);
 

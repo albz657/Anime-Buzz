@@ -16,6 +16,7 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.models.Alarm;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -33,7 +34,7 @@ public class AlarmHelper {
     }
 
     private void dummyAlarm() {
-        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
+/*        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
         if (!alarms.isEmpty()) {
             final long time = System.currentTimeMillis() + 5000L;
 
@@ -45,7 +46,27 @@ public class AlarmHelper {
 
                 }
             });
-        }
+        }*/
+
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Series> userList = realm.where(Series.class).findAll();
+
+                for (int i = 0; i < 1; i++){
+                    int random = (int) (Math.random() * userList.size() + 1);
+                    Series series = userList.get(random);
+
+                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                    backlogItem.setSeries(series);
+                    backlogItem.setAlarmTime(System.currentTimeMillis());
+
+                    Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
+                    alarm.setAlarmTime(System.currentTimeMillis());
+                    alarm.setSeries(series);
+                }
+            }
+        });
     }
 
     public void setAlarmsOnBoot() {

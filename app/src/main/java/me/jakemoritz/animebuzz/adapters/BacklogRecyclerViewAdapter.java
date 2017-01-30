@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.adapters;
 
 import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.Snackbar;
@@ -176,7 +177,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
                 Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
                 wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = {R.xml.backlog_badge_widget_info};
+                int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, BacklogBadgeWidgetProvider.class));
                 wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                 context.sendBroadcast(wigetIntent);
             }
@@ -204,7 +205,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
             Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
             wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            int[] ids = {R.xml.backlog_badge_widget_info};
+            int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, BacklogBadgeWidgetProvider.class));
             wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             context.sendBroadcast(wigetIntent);
         }

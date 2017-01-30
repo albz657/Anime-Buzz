@@ -23,9 +23,9 @@
         android:layout_alignTop="@+id/backlog_widget_icon"
         android:background="@drawable/backlog_badge_widget"
         android:gravity="center"
-        android:text="99"
+        android:text="0"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="normal"/>
 
 </RelativeLayout>
