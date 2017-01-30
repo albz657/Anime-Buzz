@@ -2,17 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/backlog_widget"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="top"
+                android:paddingTop="4dp">
 
     <ImageView
         android:id="@+id/backlog_widget_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:adjustViewBounds="true"
         android:src="@mipmap/ic_launcher"/>
 
     <TextView
+        android:id="@+id/backlog_wiget_count"
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:layout_alignEnd="@+id/backlog_widget_icon"
@@ -23,7 +26,6 @@
         android:text="99"
         android:textColor="#FFFFFF"
         android:textSize="18sp"
-        android:textStyle="bold"
-        android:id="@+id/backlog_wiget_count"/>
+        android:textStyle="normal"/>
 
 </RelativeLayout>
