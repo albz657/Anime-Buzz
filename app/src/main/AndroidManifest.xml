@@ -49,7 +49,8 @@
                 <action android:name="GENERATE_TIME"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".misc.BacklogBadgeWidgetProvider">
+        <receiver android:name=".misc.BacklogBadgeWidgetProvider"
+            android:label="Backlog count">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
