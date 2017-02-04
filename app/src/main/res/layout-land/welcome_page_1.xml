@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.redbooth.WelcomePageLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/welcome"
+            style="@style/Base.TextAppearance.AppCompat.Display2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="30dp"
+            android:width="500dp"
+            android:text="@string/welcome_text"
+            android:gravity="center"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/explanation"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/welcome"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="40dp"
+            android:width="280dp"
+            android:text="@string/explanation_text"
+            android:gravity="center"
+            android:textColor="#FFFFFF" />
+
+        <RelativeLayout
+            android:layout_height="wrap_content"
+            android:layout_below="@id/explanation"
+            android:layout_centerHorizontal="true"
+            android:layout_width="400dp">
+
+            <TextView
+                android:id="@+id/bullet_notification"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/benefit_notification"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/bullet_notification"
+                android:text="@string/benefit_notification_text"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/benefit_backlog"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/benefit_notification"
+                android:layout_toRightOf="@id/bullet_notification"
+                android:text="@string/benefit_backlog_text"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_backlog"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/benefit_notification"
+                android:layout_toLeftOf="@id/benefit_backlog"
+                android:text="@string/bullet"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/benefit_browse"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/benefit_backlog"
+                android:layout_toRightOf="@id/bullet_backlog"
+                android:text="@string/benefit_browse_text"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/bullet_browse"
+                style="@style/Base.TextAppearance.AppCompat.Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/benefit_backlog"
+                android:layout_toLeftOf="@id/benefit_browse"
+                android:text="@string/bullet"
+                android:textColor="#FFFFFF" />
+        </RelativeLayout>
+
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:text="@string/swipe_left_setup"
+            android:gravity="center"
+            android:textColor="#B3FFFFFF"
+            android:layout_marginBottom="30dp" />
+    </RelativeLayout>
+</com.redbooth.WelcomePageLayout>

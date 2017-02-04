@@ -1,14 +1,19 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -17,13 +22,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.redbooth.WelcomeCoordinatorLayout;
-
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.misc.SetupObject;
 
 public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
 
@@ -32,6 +36,47 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     private EditText usernameField;
     private EditText passwordField;
     private MalApiClient malApiClient;
+    private PagerAdapter pagerAdapter;
+
+
+
+    private class SetupPagerAdapter extends PagerAdapter {
+
+        private Context mContext;
+
+        public SetupPagerAdapter(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            SetupObject setupObject = SetupObject.values()[position];
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            ViewGroup layout = (ViewGroup) inflater.inflate(setupObject.getLayoutId(), container, false);
+            container.addView(layout);
+            return layout;
+        }
+
+        @Override
+        public int getCount() {
+            return SetupObject.values().length;
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            return view == object;
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            container.removeView((View) object);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return String.valueOf(mContext.getString(SetupObject.values()[position].getLayoutId()));
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,11 +90,12 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         final Activity activity = this;
         malApiClient = new MalApiClient(this);
 
-        final WelcomeCoordinatorLayout coordinatorLayout = (WelcomeCoordinatorLayout) findViewById(R.id.coordinator);
-        coordinatorLayout.addPage(R.layout.welcome_page_3);
-        coordinatorLayout.addPage(R.layout.welcome_page_2);
-        coordinatorLayout.addPage(R.layout.welcome_page_1);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.coordinator);
+        pagerAdapter = new SetupPagerAdapter(this);
 
+        viewPager.setAdapter(pagerAdapter);
+
+/*
         Button startButton = (Button) findViewById(R.id.start_button);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +162,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                 SharedPrefsHelper.getInstance().setPrefersEnglish(b);
             }
         });
+*/
 
     }
 
