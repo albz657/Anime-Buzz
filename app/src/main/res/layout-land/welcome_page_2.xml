@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.redbooth.WelcomePageLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/mal_sign_in"
+            style="@style/Base.TextAppearance.AppCompat.Headline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/mal_sign_in_text"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/mal_sign_in_optional"
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:text="@string/mal_sign_in_optional_text"
+            android:layout_below="@id/mal_sign_in"
+            android:textColor="#80FFFFFF" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/sign_in_checkmark"
+            android:src="@drawable/ic_check_circle"
+            android:tint="@color/colorAccent"
+            android:layout_below="@id/mal_sign_in_optional"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+
+            android:layout_marginBottom="80dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/mal_or_no_later"
+            style="@style/Base.TextAppearance.AppCompat.Body2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="30dp"
+            android:text="@string/sign_in_later"
+            android:textColor="#80FFFFFF" />
+
+        <RelativeLayout
+            android:id="@+id/mal_sign_in_container"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:layout_below="@+id/mal_sign_in_optional"
+            android:layout_centerHorizontal="true">
+
+            <RelativeLayout
+                android:id="@+id/username_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true">
+
+                <TextView
+                    android:id="@+id/label_username"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/label_username_text"
+                    android:textColor="#FFFFFF" />
+
+                <EditText
+                    android:id="@+id/edit_username"
+                    android:theme="@style/Theme.App.Base"
+
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="10dp"
+                    android:layout_toRightOf="@id/label_username"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true"
+                    android:layout_width="wrap_content" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/password_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/username_container"
+                android:layout_alignParentRight="true">
+
+                <TextView
+                    android:id="@+id/label_password"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/label_password_text"
+                    android:textColor="#FFFFFF" />
+
+                <EditText
+                    android:id="@+id/edit_password"
+                    android:theme="@style/Theme.App.Base"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/label_password"
+                    android:inputType="textPassword"
+                    android:textColor="#FFFFFF"
+                    android:singleLine="true" />
+
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/sign_in_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_below="@id/password_container"
+                android:layout_centerHorizontal="true"
+                android:text="@string/sign_in" />
+
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</com.redbooth.WelcomePageLayout>
