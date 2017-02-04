@@ -39,7 +39,6 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     private PagerAdapter pagerAdapter;
 
 
-
     private class SetupPagerAdapter extends PagerAdapter {
 
         private Context mContext;
@@ -54,6 +53,81 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             LayoutInflater inflater = LayoutInflater.from(mContext);
             ViewGroup layout = (ViewGroup) inflater.inflate(setupObject.getLayoutId(), container, false);
             container.addView(layout);
+
+            switch (position){
+                case 1:
+                    usernameField = (EditText) layout.findViewById(R.id.edit_username);
+                    passwordField = (EditText) layout.findViewById(R.id.edit_password);
+
+                    passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                        @Override
+                        public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                            if (i == EditorInfo.IME_ACTION_DONE) {
+                                if (App.getInstance().isNetworkAvailable()) {
+                                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                                } else {
+                                    if (findViewById(R.id.coordinator) != null) {
+                                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                            return false;
+                        }
+                    });
+
+                    Button signInButton = (Button) layout.findViewById(R.id.sign_in_button);
+                    signInButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (App.getInstance().isNetworkAvailable()) {
+                                attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                            } else {
+                                if (findViewById(R.id.coordinator) != null) {
+                                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+
+                    break;
+                case 2:
+                    Button startButton = (Button) layout.findViewById(R.id.start_button);
+                    startButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(mContext, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+
+                    SwitchCompat timeFormatSwitch = (SwitchCompat) layout.findViewById(R.id.switch_24hour);
+                    timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefers24hour(b);
+                        }
+                    });
+
+                    SwitchCompat simulcastPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_simulcast);
+                    simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
+                        }
+                    });
+
+                    SwitchCompat englishPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_english);
+                    englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefersEnglish(b);
+                        }
+                    });
+
+                    break;
+            }
+
             return layout;
         }
 
@@ -87,83 +161,12 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 //        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getSupportActionBar().hide();
 
-        final Activity activity = this;
         malApiClient = new MalApiClient(this);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.coordinator);
         pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
-
-/*
-        Button startButton = (Button) findViewById(R.id.start_button);
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(activity, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        });
-
-        usernameField = (EditText) findViewById(R.id.edit_username);
-        passwordField = (EditText) findViewById(R.id.edit_password);
-
-        passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-                    if (App.getInstance().isNetworkAvailable()) {
-                        attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
-                    } else {
-                        if (findViewById(R.id.coordinator) != null) {
-                            Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                        }
-                    }
-                }
-                return false;
-            }
-        });
-
-        Button signInButton = (Button) findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (App.getInstance().isNetworkAvailable()) {
-                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
-                } else {
-                    if (findViewById(R.id.coordinator) != null) {
-                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            }
-        });
-
-        SwitchCompat timeFormatSwitch = (SwitchCompat) findViewById(R.id.switch_24hour);
-        timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPrefsHelper.getInstance().setPrefers24hour(b);
-            }
-        });
-
-        SwitchCompat simulcastPrefSwitch = (SwitchCompat) findViewById(R.id.switch_simulcast);
-        simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
-            }
-        });
-
-        SwitchCompat englishPrefSwitch = (SwitchCompat) findViewById(R.id.switch_english);
-        englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SharedPrefsHelper.getInstance().setPrefersEnglish(b);
-            }
-        });
-*/
-
     }
 
     private void attemptVerification(String username, String password) {
