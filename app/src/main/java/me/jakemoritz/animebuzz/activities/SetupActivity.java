@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
@@ -22,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -39,14 +42,131 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     private PagerAdapter pagerAdapter;
 
 
-    private class SetupPagerAdapter extends PagerAdapter {
+    private class SetupPagerAdapter extends ViewStatePagerAdapter {
 
         private Context mContext;
+
+        @Override
+        protected void destroyView(ViewGroup container, int position, View view) {
+            container.removeView(view);
+        }
+
+        @Override
+        protected View createView(ViewGroup container, int position) {
+            SetupObject setupObject = SetupObject.values()[position];
+            LayoutInflater inflater = LayoutInflater.from(mContext);
+            ViewGroup layout = (ViewGroup) inflater.inflate(setupObject.getLayoutId(), container, false);
+            container.addView(layout);
+
+            switch (position){
+                case 1:
+                    usernameField = (EditText) layout.findViewById(R.id.edit_username);
+                    passwordField = (EditText) layout.findViewById(R.id.edit_password);
+
+                    passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                        @Override
+                        public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                            if (i == EditorInfo.IME_ACTION_DONE) {
+                                if (App.getInstance().isNetworkAvailable()) {
+                                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                                } else {
+                                    if (findViewById(R.id.coordinator) != null) {
+                                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                            return false;
+                        }
+                    });
+
+                    Button signInButton = (Button) layout.findViewById(R.id.sign_in_button);
+                    signInButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if (App.getInstance().isNetworkAvailable()) {
+                                attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
+                            } else {
+                                if (findViewById(R.id.coordinator) != null) {
+                                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    });
+
+                    break;
+                case 2:
+                    Button startButton = (Button) layout.findViewById(R.id.start_button);
+                    startButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent intent = new Intent(mContext, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+
+                    SwitchCompat timeFormatSwitch = (SwitchCompat) layout.findViewById(R.id.switch_24hour);
+                    timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefers24hour(b);
+                        }
+                    });
+
+                    SwitchCompat simulcastPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_simulcast);
+                    simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
+                        }
+                    });
+
+                    SwitchCompat englishPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_english);
+                    englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                        @Override
+                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                            SharedPrefsHelper.getInstance().setPrefersEnglish(b);
+                        }
+                    });
+
+                    break;
+            }
+
+
+
+            return layout;
+        }
+
+
+
+/*        @Override
+        public Parcelable saveState() {
+            Bundle bundle = new Bundle();
+            if (usernameField != null && !usernameField.getText().toString().isEmpty()) {
+                bundle.putString("username", usernameField.getText().toString());
+            }
+
+            return bundle;
+        }
+
+        @Override
+        public void restoreState(Parcelable state, ClassLoader loader) {
+            if (state instanceof Bundle){
+                Bundle bundle = (Bundle) state;
+
+                String username = bundle.getString("username");
+                if (username != null && !username.isEmpty() && usernameField != null){
+                    usernameField.setText(username);
+                }
+            }
+            super.restoreState(state, loader);
+        }*/
 
         public SetupPagerAdapter(Context context) {
             mContext = context;
         }
 
+/*
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             SetupObject setupObject = SetupObject.values()[position];
@@ -130,13 +250,14 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
             return layout;
         }
+*/
 
         @Override
         public int getCount() {
             return SetupObject.values().length;
         }
 
-        @Override
+/*        @Override
         public boolean isViewFromObject(View view, Object object) {
             return view == object;
         }
@@ -144,7 +265,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
             container.removeView((View) object);
-        }
+        }*/
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -167,6 +288,11 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     private void attemptVerification(String username, String password) {
