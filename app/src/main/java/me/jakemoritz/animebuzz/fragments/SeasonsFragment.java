@@ -42,7 +42,15 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+
+        Season currentlyBrowsingSeason;
+
+        if (!SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()){
+            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        } else {
+            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+        }
+
         setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
 
