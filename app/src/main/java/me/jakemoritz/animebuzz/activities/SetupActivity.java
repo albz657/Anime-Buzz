@@ -285,6 +285,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         malApiClient = new MalApiClient(this);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.coordinator);
+        viewPager.setOffscreenPageLimit(3);
         pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
