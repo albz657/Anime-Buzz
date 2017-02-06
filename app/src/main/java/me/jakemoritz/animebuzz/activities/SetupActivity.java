@@ -41,7 +41,6 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     private MalApiClient malApiClient;
     private PagerAdapter pagerAdapter;
 
-
     private class SetupPagerAdapter extends ViewStatePagerAdapter {
 
         private Context mContext;
@@ -92,6 +91,10 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                             }
                         }
                     });
+
+                    if (SharedPrefsHelper.getInstance().isLoggedIn()){
+                        hideLoginForm();
+                    }
 
                     break;
                 case 2:
@@ -307,15 +310,19 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         }
     }
 
+    private void hideLoginForm(){
+        RelativeLayout malSignInContainer = (RelativeLayout) findViewById(R.id.mal_sign_in_container);
+        malSignInContainer.setVisibility(View.GONE);
+        malSignInContainer.setEnabled(false);
+
+        ImageView signInCheckmark = (ImageView) findViewById(R.id.sign_in_checkmark);
+        signInCheckmark.setVisibility(View.VISIBLE);
+    }
+
     @Override
     public void verifyCredentialsResponseReceived(boolean verified) {
         if (verified) {
-            RelativeLayout malSignInContainer = (RelativeLayout) findViewById(R.id.mal_sign_in_container);
-            malSignInContainer.setVisibility(View.GONE);
-            malSignInContainer.setEnabled(false);
-
-            ImageView signInCheckmark = (ImageView) findViewById(R.id.sign_in_checkmark);
-            signInCheckmark.setVisibility(View.VISIBLE);
+            hideLoginForm();
 
             SharedPrefsHelper.getInstance().setUsername(usernameField.getText().toString().trim());
             SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
