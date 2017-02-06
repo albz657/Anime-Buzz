@@ -1,13 +1,20 @@
 package me.jakemoritz.animebuzz.helpers;
 
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
 import com.facebook.stetho.Stetho;
+import com.google.firebase.FirebaseApp;
 import com.squareup.picasso.Picasso;
 import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
+
+import java.util.Iterator;
+import java.util.List;
 
 import io.realm.DynamicRealm;
 import io.realm.Realm;
@@ -54,49 +61,81 @@ public class App extends Application {
         justLaunchedBrowser = true;
         justLaunchedWatching = true;
 
-        RealmMigration migration = new RealmMigration() {
-            @Override
-            public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
-                RealmSchema schema = realm.getSchema();
-
-                if (oldVersion == 0){
-                    schema.get("Series")
-                            .addField("kitsuID", String.class);
-
-                    oldVersion++;
-                    migratedTo1 = true;
-                }
-            }
-        };
-
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-                .schemaVersion(1)
-                .migration(migration)
-                .build();
-
-        realm = Realm.getInstance(realmConfiguration);
-        Realm.setDefaultConfiguration(realmConfiguration);
-        realm.close();
-
-        if (migratedTo1){
-            getRealm().executeTransaction(new Realm.Transaction() {
+        if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")){
+            RealmMigration migration = new RealmMigration() {
                 @Override
-                public void execute(Realm realm) {
-                    RealmResults<Series> seriesRealmResults = realm.where(Series.class).findAll();
+                public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
+                    RealmSchema schema = realm.getSchema();
 
-                    for (Series series : seriesRealmResults){
-                        series.setKitsuID("");
+                    if (oldVersion == 0){
+                        schema.get("Series")
+                                .addField("kitsuID", String.class);
+
+                        oldVersion++;
+                        migratedTo1 = true;
                     }
                 }
-            });
+            };
 
-            migratedTo1 = false;
+            RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+                    .schemaVersion(1)
+                    .migration(migration)
+                    .build();
+
+            realm = Realm.getInstance(realmConfiguration);
+            Realm.setDefaultConfiguration(realmConfiguration);
+            realm.close();
+
+            if (migratedTo1){
+                getRealm().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        RealmResults<Series> seriesRealmResults = realm.where(Series.class).findAll();
+
+                        for (Series series : seriesRealmResults){
+                            series.setKitsuID("");
+                        }
+                    }
+                });
+
+                migratedTo1 = false;
+            }
+        } else {
+            Log.d(TAG, "not normal process");
         }
 
         Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
                 .build());
+    }
+
+    private String getAppName(int pID)
+    {
+        String processName = "";
+        ActivityManager am = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+        List l = am.getRunningAppProcesses();
+        Iterator i = l.iterator();
+        PackageManager pm = this.getPackageManager();
+        while(i.hasNext())
+        {
+            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo)(i.next());
+            try
+            {
+                if(info.pid == pID)
+                {
+                    CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
+                    //Log.d("Process", "Id: "+ info.pid +" ProcessName: "+ info.processName +"  Label: "+c.toString());
+                    //processName = c.toString();
+                    processName = info.processName;
+                }
+            }
+            catch(Exception e)
+            {
+                //Log.d("Process", "Error>> :"+ e.toString());
+            }
+        }
+        return processName;
     }
 
     public boolean isNetworkAvailable() {
