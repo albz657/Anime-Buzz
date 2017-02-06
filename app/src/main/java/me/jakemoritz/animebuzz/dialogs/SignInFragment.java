@@ -154,6 +154,10 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
 
             listener.verified(true);
 
+            if (getDialog() == null){
+                mainActivity.getSupportFragmentManager().executePendingTransactions();
+            }
+
             getDialog().cancel();
         } else {
             if (dialogView != null && isAdded()) {
