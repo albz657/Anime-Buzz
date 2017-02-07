@@ -6,6 +6,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -228,6 +230,15 @@ public class MalApiClient {
                         modifiedUserXml = removeTag(modifiedUserXml, "<user_days_spent_watching>");
 
                         modifiedUserXml = addTag(modifiedUserXml, "</user_export_type>", "<user_total_anime>", userTotalAnime);
+
+                        Pattern pattern = Pattern.compile("\\<anime\\>(.+?)\\<\\/anime\\>");
+                        Matcher matcher = pattern.matcher(modifiedUserXml);
+
+                        int count = 0;
+                        while (matcher.find()){
+                            String animeEntryXml = matcher.group(count);
+                            Log.d(TAG, "s");
+                        }
                         Log.d(TAG, "s");
                     } catch (IOException e){
                         e.printStackTrace();
