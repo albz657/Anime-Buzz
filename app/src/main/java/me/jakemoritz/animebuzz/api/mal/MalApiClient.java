@@ -197,6 +197,19 @@ public class MalApiClient {
         return newXml;
     }
 
+    private String replaceValue(String xml, String openingTag, String value){
+        String newXml = "";
+        for (String s : xml.split(openingTag)){
+            if (newXml.isEmpty()){
+                newXml = s;
+            } else {
+                newXml = newXml.concat(openingTag).concat(value).concat(s.substring(1, newXml.length()));
+            }
+        }
+
+        return newXml;
+    }
+
     public void getUserXml(){
 
 
@@ -237,6 +250,22 @@ public class MalApiClient {
                         int count = 0;
                         while (matcher.find()){
                             String animeEntryXml = matcher.group(count);
+
+                            animeEntryXml = removeTag(animeEntryXml, "<series_synonyms>");
+                            animeEntryXml = removeTag(animeEntryXml, "<series_status>");
+                            animeEntryXml = removeTag(animeEntryXml, "<series_start>");
+                            animeEntryXml = removeTag(animeEntryXml, "<series_end>");
+                            animeEntryXml = removeTag(animeEntryXml, "<series_image>");
+
+                            int seriesType = getIntFromTag(animeEntryXml, "<series_type>");
+                            String seriesTypeString = "";
+                            switch (seriesType){
+                                case 1:
+                                    seriesTypeString = "TV";
+                            }
+
+                            animeEntryXml = replaceValue(animeEntryXml, "<series_type>", seriesTypeString);
+
                             Log.d(TAG, "s");
                         }
                         Log.d(TAG, "s");
