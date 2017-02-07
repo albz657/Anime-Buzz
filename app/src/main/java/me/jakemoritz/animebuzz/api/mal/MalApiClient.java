@@ -203,7 +203,7 @@ public class MalApiClient {
             if (newXml.isEmpty()){
                 newXml = s;
             } else {
-                newXml = newXml.concat(openingTag).concat(value).concat(s.substring(1, newXml.length()));
+                newXml = newXml.concat(openingTag).concat(value).concat(s.substring(1, s.length()));
             }
         }
 
@@ -244,12 +244,17 @@ public class MalApiClient {
 
                         modifiedUserXml = addTag(modifiedUserXml, "</user_export_type>", "<user_total_anime>", userTotalAnime);
 
+                        String modifiedUserXmlWithoutAnime = modifiedUserXml;
+
+                        while (modifiedUserXmlWithoutAnime.contains("<anime>")){
+                            modifiedUserXmlWithoutAnime = removeTag(modifiedUserXmlWithoutAnime, "<anime>");
+                        }
+
                         Pattern pattern = Pattern.compile("\\<anime\\>(.+?)\\<\\/anime\\>");
                         Matcher matcher = pattern.matcher(modifiedUserXml);
 
-                        int count = 0;
-                        while (matcher.find()){
-                            String animeEntryXml = matcher.group(count);
+                        while (matcher.find() && !matcher.hitEnd()){
+                            String animeEntryXml = matcher.group();
 
                             animeEntryXml = removeTag(animeEntryXml, "<series_synonyms>");
                             animeEntryXml = removeTag(animeEntryXml, "<series_status>");
@@ -262,12 +267,55 @@ public class MalApiClient {
                             switch (seriesType){
                                 case 1:
                                     seriesTypeString = "TV";
+                                    break;
+                                case 2:
+                                    seriesTypeString = "OVA";
+                                    break;
+                                case 3:
+                                    seriesTypeString = "Movie";
+                                    break;
+                                case 6:
+                                    seriesTypeString = "Music";
+                                    break;
+                                case 4:
+                                    seriesTypeString = "Special";
+                                    break;
+                                case 5:
+                                    seriesTypeString = "ONA";
+                                    break;
                             }
 
                             animeEntryXml = replaceValue(animeEntryXml, "<series_type>", seriesTypeString);
 
-                            Log.d(TAG, "s");
+                            int myStatus = getIntFromTag(animeEntryXml, "<my_status>");
+                            String myStatusString = "";
+                            switch (myStatus){
+                                case 1:
+                                    myStatusString = "Watching";
+                                    break;
+                                case 2:
+                                    myStatusString = "Completed";
+                                    break;
+                                case 3:
+                                    myStatusString = "On-Hold";
+                                    break;
+                                case 4:
+                                    myStatusString = "Dropped";
+                                    break;
+                                case 6:
+                                    myStatusString = "Plan To Watch";
+                                    break;
+                            }
+
+                            animeEntryXml = replaceValue(animeEntryXml, "<my_status>", myStatusString);
+                            animeEntryXml = removeTag(animeEntryXml, "<my_last_updated>");
+                            animeEntryXml = addTag(animeEntryXml, "</my_rewatching_ep>", "<update_on_import>", 1);
+                            modifiedUserXmlWithoutAnime = modifiedUserXmlWithoutAnime.concat(animeEntryXml);
                         }
+
+                        String endingTag = "</myanimelist>";
+                        modifiedUserXml = modifiedUserXmlWithoutAnime.concat(endingTag);
+
                         Log.d(TAG, "s");
                     } catch (IOException e){
                         e.printStackTrace();
