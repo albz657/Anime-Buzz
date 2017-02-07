@@ -160,13 +160,13 @@ public class MalApiClient {
                         String exportType = "<user_export_type>1</user_export_type>";
                         String userName = "</user_name>";
 
-                        String xmlWithExport = "";
+                        String modifiedUserXml = "";
 
                         for (String s : userXml.split(userName)){
-                            if (xmlWithExport.isEmpty()){
-                                xmlWithExport = s;
+                            if (modifiedUserXml.isEmpty()){
+                                modifiedUserXml = s;
                             } else {
-                                xmlWithExport = xmlWithExport.concat(userName).concat(exportType).concat(s);
+                                modifiedUserXml = modifiedUserXml.concat(userName).concat(exportType).concat(s);
                             }
                         }
 
@@ -217,6 +217,45 @@ public class MalApiClient {
 
                         int userTotalAnime = userWatching + userCompleted + userOnHold + userDropped + userPlanToWatch;
 
+                        modifiedUserXml = modifiedUserXml.replace("user_watching", "user_total_watching");
+                        modifiedUserXml = modifiedUserXml.replace("user_completed", "user_total_completed");
+                        modifiedUserXml = modifiedUserXml.replace("user_onhold", "user_total_onhold");
+                        modifiedUserXml = modifiedUserXml.replace("user_dropped", "user_total_dropped");
+                        modifiedUserXml = modifiedUserXml.replace("user_plantowatch", "user_total_plantowatch");
+
+                        String xmlWithoutDays1 = "";
+                        for (String s : modifiedUserXml.split("<user_days_spent_watching>")){
+                            if (xmlWithoutDays1.isEmpty()){
+                                xmlWithoutDays1 = s;
+                            }
+                        }
+
+                        String xmlWithoutDays2 = "";
+                        count = 0;
+                        for (String s : modifiedUserXml.split("</user_days_spent_watching>")){
+                            if (count == 1){
+                                xmlWithoutDays2 = s;
+                            }
+                            count++;
+                        }
+
+                        modifiedUserXml = xmlWithoutDays1.concat(xmlWithoutDays2);
+
+                        String totalAnime1 = "<user_total_anime>";
+                        String totalAnime2 = "</user_total_anime>";
+                        String totalAnime = totalAnime1.concat(String.valueOf(userTotalAnime)).concat(totalAnime2);
+
+                        String userWatchingTag = "<user_total_watching>";
+
+                        count = 0;
+                        for (String s : modifiedUserXml.split(userWatchingTag)){
+                            if (count == 0){
+                                modifiedUserXml = s.concat(totalAnime);
+                            } else {
+                                modifiedUserXml = modifiedUserXml.concat(userWatchingTag).concat(s);
+                            }
+                            count++;
+                        }
                         Log.d(TAG, "s");
                     } catch (IOException e){
                         e.printStackTrace();
