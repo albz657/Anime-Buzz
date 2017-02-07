@@ -191,7 +191,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
                 case "Hulu":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
                     break;
-                case "The Anime Network":
+                case "The MALAnimeXMLModel Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
                     holder.mSimulcast.setText(seriesFragment.getString(R.string.simulcast_anime_network));
                     break;

@@ -8,10 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.facebook.stetho.Stetho;
-import com.google.firebase.FirebaseApp;
 import com.squareup.picasso.Picasso;
-import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.util.Iterator;
 import java.util.List;

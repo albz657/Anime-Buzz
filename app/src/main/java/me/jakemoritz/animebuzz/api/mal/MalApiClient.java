@@ -24,6 +24,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -142,10 +143,91 @@ public class MalApiClient {
         getUserAvatarTask.execute();
     }
 
+    public void getUserXml(){
+
+
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+        Call<ResponseBody> call = malEndpointInterface.getUserXml(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    String userXml;
+                    try {
+                        userXml = response.body().string();
+
+                        String exportType = "<user_export_type>1</user_export_type>";
+                        String userName = "</user_name>";
+
+                        String xmlWithExport = "";
+
+                        for (String s : userXml.split(userName)){
+                            if (xmlWithExport.isEmpty()){
+                                xmlWithExport = s;
+                            } else {
+                                xmlWithExport = xmlWithExport.concat(userName).concat(exportType).concat(s);
+                            }
+                        }
+
+                        int userWatching = -1;
+
+                        int count = 0;
+                        for (String s : userXml.split("<user_watching>")){
+                            if (count == 1){
+                                userWatching = Integer.parseInt(s.substring(0, 1));
+                            }
+                            count++;
+                        }
+
+                        Log.d(TAG, "s");
+                    } catch (IOException e){
+                        e.printStackTrace();
+                    }
+
+/*                    if (response.body().getAnimeList() != null) {
+                        List<MatchHolder> matchList = new ArrayList<>();
+                        for (AnimeListHolder list : response.body().getAnimeList()) {
+                            if (list.getMALID() != null && list.getMy_status() != null) {
+                                if (list.getMy_status().equals("1")) {
+                                    matchList.add(new MatchHolder(list.getMALID(), Integer.valueOf(list.getMy_watched_episodes()), list.getSeries_image()));
+                                }
+                            }
+                        }
+                        MalImportHelper helper = new MalImportHelper(malDataImportedListener);
+                        helper.matchSeries(matchList);
+                    } else {
+                        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm realm) {
+                                for (Series series : realm.where(Series.class).equalTo("isInUserList", true).findAll()) {
+                                    series.setInUserList(false);
+                                }
+                            }
+                        });
+
+                        seriesFragment.malDataImported(true);
+                    }*/
+                } else {
+                    seriesFragment.malDataImported(false);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                seriesFragment.malDataImported(false);
+                Log.d(TAG, "error: " + t.getMessage());
+            }
+        });
+    }
+
     public void getUserList() {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
 
+        getUserXml();
         call.enqueue(new Callback<UserListHolder>() {
             @Override
             public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {
@@ -256,6 +338,11 @@ public class MalApiClient {
 
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
+
+        if (true){
+            builder.addConverterFactory(SimpleXmlConverterFactory.create());
+        }
+
         return retrofit.create(serviceClass);
     }
 

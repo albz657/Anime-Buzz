@@ -24,7 +24,7 @@ public class AnimeDataHelper {
 
     private static String TABLE_ANIME = "TABLE_ANIME";
 
-    // Anime columns
+    // MALAnimeXMLModel columns
     private static final String KEY_AIRDATE = "airdate";
     private static final String KEY_NAME = "title";
     private static final String KEY_MALID = "_id";

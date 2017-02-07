@@ -39,7 +39,7 @@ public class SugarMigrator {
     private static final String SEASON_NAME = "NAME";
     private static final String START_TIMESTAMP = "STARTTIMESTAMP";
 
-    // Anime columns
+    // MALAnimeXMLModel columns
     private static final String ID = "ID";
     private static final String ANNID = "ANNID";
     private static final String AIRDATE = "AIRDATE";

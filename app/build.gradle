@@ -1,9 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'myandroidkey'
+            keyPassword '***REMOVED***'
+            storeFile file('C:/Users/jakem/Documents/MALAnimeXMLModel Buzz/android.jks')
+            storePassword '***REMOVED***'
+        }
+    }
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
-
     defaultConfig {
         applicationId "me.jakemoritz.animebuzz"
         minSdkVersion 15
@@ -19,10 +26,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dataBinding{
+    dataBinding {
         enabled = false
     }
-
     configurations.all {
         resolutionStrategy.force 'com.android.support:support-annotations:25.0.0'
     }
@@ -65,15 +71,13 @@ dependencies {
     debugCompile 'com.android.support:appcompat-v7:25.1.1'
     debugCompile 'com.facebook.stetho:stetho:1.4.1'
     debugCompile 'com.uphyca:stetho_realm:2.0.0'
-
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
-    androidTestCompile ('com.android.support.test.espresso:espresso-contrib:2.2.2'){
+    androidTestCompile('com.android.support.test.espresso:espresso-contrib:2.2.2') {
         exclude module: 'recyclerview-v7'
         exclude module: 'appcompat-v7'
         exclude module: 'support-v4'
         exclude module: 'design'
     }
-
     testCompile 'junit:junit:4.12'
 }
 
