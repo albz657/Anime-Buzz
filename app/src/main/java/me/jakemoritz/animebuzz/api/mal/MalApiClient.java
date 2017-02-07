@@ -171,7 +171,6 @@ public class MalApiClient {
                         }
 
                         int userWatching = -1;
-
                         int count = 0;
                         for (String s : userXml.split("<user_watching>")){
                             if (count == 1){
@@ -179,6 +178,44 @@ public class MalApiClient {
                             }
                             count++;
                         }
+
+                        int userCompleted = -1;
+                        count = 0;
+                        for (String s : userXml.split("<user_completed>")){
+                            if (count == 1){
+                                userCompleted = Integer.parseInt(s.substring(0, 1));
+                            }
+                            count++;
+                        }
+
+                        int userOnHold = -1;
+                        count = 0;
+                        for (String s : userXml.split("<user_onhold>")){
+                            if (count == 1){
+                                userOnHold = Integer.parseInt(s.substring(0, 1));
+                            }
+                            count++;
+                        }
+
+                        int userDropped = -1;
+                        count = 0;
+                        for (String s : userXml.split("<user_dropped>")){
+                            if (count == 1){
+                                userDropped = Integer.parseInt(s.substring(0, 1));
+                            }
+                            count++;
+                        }
+
+                        int userPlanToWatch = -1;
+                        count = 0;
+                        for (String s : userXml.split("<user_plantowatch>")){
+                            if (count == 1){
+                                userPlanToWatch = Integer.parseInt(s.substring(0, 1));
+                            }
+                            count++;
+                        }
+
+                        int userTotalAnime = userWatching + userCompleted + userOnHold + userDropped + userPlanToWatch;
 
                         Log.d(TAG, "s");
                     } catch (IOException e){
