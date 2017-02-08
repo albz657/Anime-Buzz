@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -188,10 +189,10 @@ public class ExportFragment extends Fragment {
     }
 
     private File createExportDirectory(){
-        File externalAppStorage = mainActivity.getExternalFilesDir(null);
+        File externalPublicDocuments = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        if (externalAppStorage != null){
-            String externalAppStoragePath = externalAppStorage.getPath().concat(File.separator).concat("mal_exports");
+        if (externalPublicDocuments != null){
+            String externalAppStoragePath = externalPublicDocuments.getPath().concat(File.separator).concat("Anime Buzz - MAL Exports");
 
             File exportDirectory = new File(externalAppStoragePath);
             if (!exportDirectory.exists()){
