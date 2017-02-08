@@ -363,6 +363,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_export:
+                mainActivity.startFragment(ExportFragment.newInstance());
+                return true;
             case R.id.action_settings:
                 mainActivity.startFragment(SettingsFragment.newInstance());
                 return true;

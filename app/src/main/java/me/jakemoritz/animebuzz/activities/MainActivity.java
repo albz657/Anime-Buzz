@@ -39,6 +39,7 @@ import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
+import me.jakemoritz.animebuzz.fragments.ExportFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             oldOrientation = savedInstanceState.getInt("orientation");
         }
 
@@ -90,14 +91,14 @@ public class MainActivity extends AppCompatActivity {
             public void onOrientationChanged(int i) {
                 boolean portrait = true;
 
-                if (oldOrientation != -1 && oldOrientation != i){
+                if (oldOrientation != -1 && oldOrientation != i) {
                     oldOrientation = i;
 
-                    if (i == 90 || i == 270){
+                    if (i == 90 || i == 270) {
                         portrait = false;
                     }
 
-                    if (orientationChangedListener != null){
+                    if (orientationChangedListener != null) {
                         orientationChangedListener.orientationChanged(portrait);
                     }
                 } else {
@@ -110,12 +111,12 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         boolean justUpdatedTo1_3_5 = sharedPreferences.getBoolean(getString(R.string.updated_to_1_3_5), true);
-        if (justUpdatedTo1_3_5){
+        if (justUpdatedTo1_3_5) {
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
                     RealmResults<Series> allSeries = realm.where(Series.class).findAll();
-                    for (Series series : allSeries){
+                    for (Series series : allSeries) {
                         series.setKitsuID("");
                     }
                 }
@@ -252,11 +253,11 @@ public class MainActivity extends AppCompatActivity {
                     startFragment(UserListFragment.newInstance());
                 }
             } else {
-                if (fragment instanceof UserListFragment){
+                if (fragment instanceof UserListFragment) {
                     defaultTabId = 0;
-                } else if (fragment instanceof SeriesFragment){
+                } else if (fragment instanceof SeriesFragment) {
                     defaultTabId = 2;
-                } else if (fragment instanceof BacklogFragment){
+                } else if (fragment instanceof BacklogFragment) {
                     defaultTabId = 1;
                 }
             }
@@ -275,9 +276,9 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment fragment = getCurrentFragment();
 
-        if (fragment instanceof SeriesFragment){
+        if (fragment instanceof SeriesFragment) {
             orientationChangedListener = (SeriesFragment) fragment;
-        } else if (fragment instanceof BacklogFragment){
+        } else if (fragment instanceof BacklogFragment) {
             orientationChangedListener = (BacklogFragment) fragment;
         }
     }
@@ -374,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             setBacklogBadge();
-        } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)){
+        } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
             startFragment(BacklogFragment.newInstance());
             bottomBar.setCurrentItem(1);
         }
@@ -395,9 +396,11 @@ public class MainActivity extends AppCompatActivity {
             id = getString(R.string.action_settings);
         } else if (fragment instanceof AboutFragment) {
             id = "About";
+        } else if (fragment instanceof ExportFragment) {
+            id = "Export MAL List";
         }
 
-        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment) {
+        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment || fragment instanceof ExportFragment) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content_main, fragment, id)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -409,9 +412,9 @@ public class MainActivity extends AppCompatActivity {
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                     .commit();
 
-            if (fragment instanceof SeriesFragment){
+            if (fragment instanceof SeriesFragment) {
                 orientationChangedListener = (SeriesFragment) fragment;
-            } else if (fragment instanceof BacklogFragment){
+            } else if (fragment instanceof BacklogFragment) {
                 orientationChangedListener = (BacklogFragment) fragment;
             }
 
@@ -437,6 +440,9 @@ public class MainActivity extends AppCompatActivity {
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else if (fragment.equals(AboutFragment.class.getSimpleName())) {
                     getSupportActionBar().setTitle(getString(R.string.fragment_about));
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                } else if (fragment.equals(ExportFragment.class.getSimpleName())) {
+                    getSupportActionBar().setTitle("Export MAL List");
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else {
                     getSupportActionBar().setTitle("Anime Buzz");

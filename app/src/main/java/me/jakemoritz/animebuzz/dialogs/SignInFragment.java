@@ -23,6 +23,7 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 
 public class SignInFragment extends DialogFragment implements VerifyCredentialsResponse {
@@ -138,9 +139,7 @@ public class SignInFragment extends DialogFragment implements VerifyCredentialsR
             new MalApiClient(this).verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            if (mainActivity.findViewById(R.id.drawer_layout) != null) {
-                Snackbar.make(mainActivity.findViewById(R.id.drawer_layout), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
-            }
+            SnackbarHelper.getInstance().makeSnackbar(mainActivity.findViewById(R.id.drawer_layout), R.string.trying_to_verify);
         }
     }
 

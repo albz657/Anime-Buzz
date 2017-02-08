@@ -1,12 +1,9 @@
 package me.jakemoritz.animebuzz.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +26,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.misc.SetupObject;
 
@@ -57,7 +55,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             ViewGroup layout = (ViewGroup) inflater.inflate(setupObject.getLayoutId(), container, false);
             container.addView(layout);
 
-            switch (position){
+            switch (position) {
                 case 1:
                     usernameField = (EditText) layout.findViewById(R.id.edit_username);
                     passwordField = (EditText) layout.findViewById(R.id.edit_password);
@@ -69,9 +67,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                                 if (App.getInstance().isNetworkAvailable()) {
                                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                                 } else {
-                                    if (findViewById(R.id.coordinator) != null) {
-                                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                                    }
+                                    SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.no_network_available);
                                 }
                             }
                             return false;
@@ -85,14 +81,12 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                             if (App.getInstance().isNetworkAvailable()) {
                                 attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                             } else {
-                                if (findViewById(R.id.coordinator) != null) {
-                                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                                }
+                                SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.no_network_available);
                             }
                         }
                     });
 
-                    if (SharedPrefsHelper.getInstance().isLoggedIn()){
+                    if (SharedPrefsHelper.getInstance().isLoggedIn()) {
                         hideLoginForm();
                     }
 
@@ -136,139 +130,17 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             }
 
 
-
             return layout;
         }
-
-
-
-/*        @Override
-        public Parcelable saveState() {
-            Bundle bundle = new Bundle();
-            if (usernameField != null && !usernameField.getText().toString().isEmpty()) {
-                bundle.putString("username", usernameField.getText().toString());
-            }
-
-            return bundle;
-        }
-
-        @Override
-        public void restoreState(Parcelable state, ClassLoader loader) {
-            if (state instanceof Bundle){
-                Bundle bundle = (Bundle) state;
-
-                String username = bundle.getString("username");
-                if (username != null && !username.isEmpty() && usernameField != null){
-                    usernameField.setText(username);
-                }
-            }
-            super.restoreState(state, loader);
-        }*/
 
         public SetupPagerAdapter(Context context) {
             mContext = context;
         }
 
-/*
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            SetupObject setupObject = SetupObject.values()[position];
-            LayoutInflater inflater = LayoutInflater.from(mContext);
-            ViewGroup layout = (ViewGroup) inflater.inflate(setupObject.getLayoutId(), container, false);
-            container.addView(layout);
-
-            switch (position){
-                case 1:
-                    usernameField = (EditText) layout.findViewById(R.id.edit_username);
-                    passwordField = (EditText) layout.findViewById(R.id.edit_password);
-
-                    passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                        @Override
-                        public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                            if (i == EditorInfo.IME_ACTION_DONE) {
-                                if (App.getInstance().isNetworkAvailable()) {
-                                    attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
-                                } else {
-                                    if (findViewById(R.id.coordinator) != null) {
-                                        Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                                    }
-                                }
-                            }
-                            return false;
-                        }
-                    });
-
-                    Button signInButton = (Button) layout.findViewById(R.id.sign_in_button);
-                    signInButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if (App.getInstance().isNetworkAvailable()) {
-                                attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
-                            } else {
-                                if (findViewById(R.id.coordinator) != null) {
-                                    Snackbar.make(findViewById(R.id.coordinator), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                                }
-                            }
-                        }
-                    });
-
-                    break;
-                case 2:
-                    Button startButton = (Button) layout.findViewById(R.id.start_button);
-                    startButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            Intent intent = new Intent(mContext, MainActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
-
-                    SwitchCompat timeFormatSwitch = (SwitchCompat) layout.findViewById(R.id.switch_24hour);
-                    timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefers24hour(b);
-                        }
-                    });
-
-                    SwitchCompat simulcastPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_simulcast);
-                    simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
-                        }
-                    });
-
-                    SwitchCompat englishPrefSwitch = (SwitchCompat) layout.findViewById(R.id.switch_english);
-                    englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                        @Override
-                        public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefersEnglish(b);
-                        }
-                    });
-
-                    break;
-            }
-
-            return layout;
-        }
-*/
-
         @Override
         public int getCount() {
             return SetupObject.values().length;
         }
-
-/*        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
-        }*/
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -282,7 +154,6 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup);
 
-//        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
         getSupportActionBar().hide();
 
         malApiClient = new MalApiClient(this);
@@ -304,13 +175,11 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             malApiClient.verify(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            if (findViewById(R.id.coordinator) != null) {
-                Snackbar.make(findViewById(R.id.coordinator), getString(R.string.trying_to_verify), Snackbar.LENGTH_LONG).show();
-            }
+            SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.trying_to_verify);
         }
     }
 
-    private void hideLoginForm(){
+    private void hideLoginForm() {
         RelativeLayout malSignInContainer = (RelativeLayout) findViewById(R.id.mal_sign_in_container);
         malSignInContainer.setVisibility(View.GONE);
         malSignInContainer.setEnabled(false);
@@ -328,11 +197,9 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
             SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
             SharedPrefsHelper.getInstance().setLoggedIn(true);
 
-            if (findViewById(R.id.coordinator) != null)
-                Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_successful), Snackbar.LENGTH_SHORT).show();
+            SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.verification_successful);
         } else {
-            if (findViewById(R.id.coordinator) != null)
-                Snackbar.make(findViewById(R.id.coordinator), getString(R.string.verification_failed), Snackbar.LENGTH_LONG).show();
+            SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.verification_failed);
         }
     }
 

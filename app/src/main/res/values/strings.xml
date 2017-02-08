@@ -156,4 +156,8 @@
 
     <string name="about_ann"><b>Anime News Network</b> provides the anime images and English titles used in this app.</string>
     <string name="about_ann_url">http://www.animenewsnetwork.com</string>
+
+    <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
+    <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
+
 </resources>

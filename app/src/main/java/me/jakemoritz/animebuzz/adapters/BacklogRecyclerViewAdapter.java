@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -28,6 +27,7 @@ import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -56,10 +56,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             if (!backlogFragment.isCountsCurrent()){
-                if (backlogFragment.getView() != null){
-                    Snackbar.make(backlogFragment.getView(), "Getting your episode counts, please try again in a few seconds.", Snackbar.LENGTH_LONG).show();
-                }
-
+                SnackbarHelper.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
                 return makeMovementFlags(0, 0);
             } else {
                 int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
