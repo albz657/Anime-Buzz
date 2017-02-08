@@ -26,14 +26,17 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_gravity="center">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="6dp"
-                android:text="@string/bullet" />
+                android:text="@string/bullet"
+                android:layout_gravity="top"
+                />
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
@@ -45,20 +48,22 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="6dp"
-                android:text="@string/bullet" />
+                android:text="@string/bullet"
+                android:layout_gravity="top"/>
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/export_permission" />
+                android:text="@string/export_permission"/>
 
 
         </LinearLayout>
@@ -66,14 +71,17 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+
+            android:gravity="center">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="6dp"
-                android:text="@string/bullet" />
+                android:text="@string/bullet"
+                android:layout_gravity="top"/>
 
             <TextView
                 android:id="@+id/export_path"
