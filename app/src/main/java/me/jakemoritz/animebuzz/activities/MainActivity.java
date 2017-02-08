@@ -331,7 +331,12 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = getCurrentFragment();
                 if (fragment instanceof SettingsFragment) {
                     openRingtones = true;
-                } else if (fragment instanceof ExportFragment) {
+                }
+            }
+        } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST) {
+            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
+                Fragment fragment = getCurrentFragment();
+                if (fragment instanceof ExportFragment) {
                     startExport = true;
                 }
             }
