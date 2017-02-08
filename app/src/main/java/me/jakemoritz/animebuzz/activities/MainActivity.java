@@ -37,6 +37,8 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
+import me.jakemoritz.animebuzz.dialogs.NoExternalDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.PermissionFailedDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
@@ -297,15 +299,15 @@ public class MainActivity extends AppCompatActivity {
 
             openRingtones = false;
         } else if (startExport && fragment instanceof ExportFragment) {
-            if (App.getInstance().isExternalStorageWritable()){
+            if (App.getInstance().isExternalStorageWritable()) {
                 ExportFragment exportFragment = (ExportFragment) fragment;
                 exportFragment.getMalApiClient().getUserXml();
 
                 startExport = false;
             } else {
-                // create alrt no exetrnal
+                NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+                dialogFragment.show(getFragmentManager(), TAG);
             }
-
         }
     }
 
@@ -332,17 +334,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
-            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
-                Fragment fragment = getCurrentFragment();
-                if (fragment instanceof SettingsFragment) {
-                    openRingtones = true;
+            if (grantResults.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Fragment fragment = getCurrentFragment();
+                    if (fragment instanceof SettingsFragment) {
+                        openRingtones = true;
+                    }
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    PermissionFailedDialogFragment dialogFragment = PermissionFailedDialogFragment.newInstance(R.string.permission_failed_read_external);
+                    dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
         } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST) {
-            if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
-                Fragment fragment = getCurrentFragment();
-                if (fragment instanceof ExportFragment) {
-                    startExport = true;
+            if (grantResults.length > 0) {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Fragment fragment = getCurrentFragment();
+                    if (fragment instanceof ExportFragment) {
+                        startExport = true;
+                    }
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    PermissionFailedDialogFragment dialogFragment = PermissionFailedDialogFragment.newInstance(R.string.permission_failed_write_external);
+                    dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
         }

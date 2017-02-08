@@ -159,6 +159,9 @@
 
     <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
     <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
-    <string name="snackbar_export_permission_failed">You must grant Anime Buzz permission to write to your phone\'s storage in order to export your MAL list.</string>
+    <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your phone\'s storage in order to export your MAL list.</string>
+    <string name="permission_failed_read_external">You must grant Anime Buzz permission to read to your phone\'s storage in order to search for custom ringtones.</string>
+    <string name="snackbar_export_success">Export successful.</string>
+    <string name="dialog_no_external">No external storage was detected. Please try again when external storage is available.</string>
 
 </resources>

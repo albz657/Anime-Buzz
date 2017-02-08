@@ -29,6 +29,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.constants;
+import me.jakemoritz.animebuzz.dialogs.NoExternalDialogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 
@@ -66,10 +67,9 @@ public class ExportFragment extends Fragment {
                     if (App.getInstance().isExternalStorageWritable()) {
                         malApiClient.getUserXml();
                     } else {
-                        // create alert no external
+                        NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+                        dialogFragment.show(getActivity().getFragmentManager(), TAG);
                     }
-                } else {
-                    //create alert permission ont rgranted
                 }
             }
         });
@@ -188,15 +188,15 @@ public class ExportFragment extends Fragment {
 
     }
 
-    private File createExportDirectory(){
+    private File createExportDirectory() {
         File externalPublicDocuments = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
-        if (externalPublicDocuments != null){
+        if (externalPublicDocuments != null) {
             String externalAppStoragePath = externalPublicDocuments.getPath().concat(File.separator).concat("Anime Buzz - MAL Exports");
 
             File exportDirectory = new File(externalAppStoragePath);
-            if (!exportDirectory.exists()){
-                if (exportDirectory.mkdir()){
+            if (!exportDirectory.exists()) {
+                if (exportDirectory.mkdir()) {
                     return exportDirectory;
                 }
             } else {
@@ -227,11 +227,11 @@ public class ExportFragment extends Fragment {
             try {
                 File backupFile = new File(backupFilePath);
 
-                if (backupFile.exists()){
+                if (backupFile.exists()) {
                     SimpleDateFormat timeFormatMS = new SimpleDateFormat("kS");
 
                     String ms = timeFormatMS.format(calendar.getTime());
-                    backupFileName.concat(":").concat(ms);
+                    backupFileName = backupFileName.concat(":").concat(ms);
 
                     backupFilePath = backupDirectory.getPath().concat(File.separator).concat(backupFileName).concat(".xml");
 
@@ -245,15 +245,16 @@ public class ExportFragment extends Fragment {
 
                 outputStreamWriter.flush();
                 outputStreamWriter.close();
+
+                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
         } else {
-            // alert no external storage
+            NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+            dialogFragment.show(getActivity().getFragmentManager(), TAG);
         }
     }
 
