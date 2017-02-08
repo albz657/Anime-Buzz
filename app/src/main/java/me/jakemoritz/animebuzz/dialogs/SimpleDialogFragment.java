@@ -10,15 +10,15 @@ import android.os.Bundle;
  * Created by jakem on 2/8/2017.
  */
 
-public class PermissionFailedDialogFragment extends DialogFragment {
+public class SimpleDialogFragment extends DialogFragment {
 
     private int messageResId;
 
-    public PermissionFailedDialogFragment() {
+    public SimpleDialogFragment() {
     }
 
-    public static PermissionFailedDialogFragment newInstance(int stringResId) {
-        PermissionFailedDialogFragment fragment = new PermissionFailedDialogFragment();
+    public static SimpleDialogFragment newInstance(int stringResId) {
+        SimpleDialogFragment fragment = new SimpleDialogFragment();
         fragment.setRetainInstance(true);
         fragment.messageResId = stringResId;
         return fragment;

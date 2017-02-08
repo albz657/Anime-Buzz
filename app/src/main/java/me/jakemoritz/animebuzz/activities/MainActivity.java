@@ -37,8 +37,7 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
-import me.jakemoritz.animebuzz.dialogs.NoExternalDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.PermissionFailedDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
@@ -305,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
 
                 startExport = false;
             } else {
-                NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
                 dialogFragment.show(getFragmentManager(), TAG);
             }
         }
@@ -341,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
                         openRingtones = true;
                     }
                 } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    PermissionFailedDialogFragment dialogFragment = PermissionFailedDialogFragment.newInstance(R.string.permission_failed_read_external);
+                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_read_external);
                     dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
@@ -353,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                         startExport = true;
                     }
                 } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    PermissionFailedDialogFragment dialogFragment = PermissionFailedDialogFragment.newInstance(R.string.permission_failed_write_external);
+                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_write_external);
                     dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
