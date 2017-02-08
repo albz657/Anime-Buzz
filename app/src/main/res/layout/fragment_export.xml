@@ -3,4 +3,91 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/explanation"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:width="280dp"
+            android:text="A few things to note about your MAL list export file:"
+            android:gravity="center"/>
+
+        <TextView
+            android:id="@+id/bullet_notification"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="6dp"
+            android:text="@string/bullet"
+            android:layout_below="@id/explanation"
+            />
+
+        <TextView
+            android:id="@+id/benefit_notification"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/bullet_notification"
+            android:text="Due to limitations of the MAL API, the following fields will not be included in your export file: storage type, comments, rewatch value"
+            android:layout_below="@id/explanation"
+            />
+
+        <TextView
+            android:id="@+id/benefit_backlog"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/benefit_notification"
+            android:layout_toRightOf="@id/bullet_notification"
+            android:text="External storage permissions are required to save your export file" />
+
+        <TextView
+            android:id="@+id/bullet_backlog"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/benefit_notification"
+            android:layout_toLeftOf="@id/benefit_backlog"
+            android:text="@string/bullet" />
+
+        <TextView
+            android:id="@+id/benefit_browse"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/benefit_backlog"
+            android:layout_toRightOf="@id/bullet_backlog"
+            android:text="Other shit"/>
+
+        <TextView
+            android:id="@+id/bullet_browse"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/benefit_backlog"
+            android:layout_toLeftOf="@id/benefit_browse"
+            android:text="@string/bullet" />
+    </RelativeLayout>
+
+    <Button
+        android:text="Export"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/export_button"
+        android:layout_gravity="center"/>
 </LinearLayout>

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout progressViewHolder;
     private Toolbar toolbar;
     private boolean openRingtones = false;
+    private boolean startExport = false;
     private AHBottomNavigation bottomBar;
     private BroadcastReceiver notificationReceiver;
     private OrientationEventListener orientationEventListener;
@@ -296,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 customRingtonePreference.performClick();
             }
             openRingtones = false;
+        } else if (startExport){
+
         }
     }
 
@@ -323,7 +326,12 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
             if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
-                openRingtones = true;
+                Fragment fragment = getCurrentFragment();
+                if (fragment instanceof SettingsFragment){
+                    openRingtones = true;
+                } else if (fragment instanceof ExportFragment){
+                    startExport = true;
+                }
             }
         }
     }

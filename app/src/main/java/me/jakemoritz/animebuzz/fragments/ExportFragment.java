@@ -1,13 +1,18 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +20,8 @@ import java.util.regex.Pattern;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.constants;
+import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 
 public class ExportFragment extends Fragment {
@@ -42,7 +49,28 @@ public class ExportFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_export, container, false);
         mainActivity.getBottomBar().setVisibility(View.GONE);
+
+        Button exportButton = (Button) view.findViewById(R.id.export_button);
+        exportButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (checkExternalPermissions()){
+                    malApiClient.getUserXml();
+                }
+            }
+        });
         return view;
+    }
+
+    private boolean checkExternalPermissions(){
+        int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, constants.READ_EXTERNAL_STORAGE_REQUEST);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public void fixCompatibility(String xml){
@@ -145,8 +173,6 @@ public class ExportFragment extends Fragment {
         }
 
     }
-
-
 
     private int getIntFromTag(String xml, String openingTag){
         int value = -1;
