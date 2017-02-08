@@ -239,6 +239,13 @@ public class ExportFragment extends Fragment {
         return newXml;
     }
 
+    public MalApiClient getMalApiClient() {
+        if (malApiClient == null){
+            malApiClient = new MalApiClient(this);
+        }
+        return malApiClient;
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);

@@ -289,16 +289,18 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
 
         final Fragment fragment = getCurrentFragment();
-        if (openRingtones) {
-            if (fragment instanceof SettingsFragment) {
-                SettingsFragment settingsFragment = (SettingsFragment) fragment;
-                CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
-                customRingtonePreference.setOpenList(true);
-                customRingtonePreference.performClick();
-            }
-            openRingtones = false;
-        } else if (startExport){
+        if (openRingtones && fragment instanceof SettingsFragment) {
+            SettingsFragment settingsFragment = (SettingsFragment) fragment;
+            CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
+            customRingtonePreference.setOpenList(true);
+            customRingtonePreference.performClick();
 
+            openRingtones = false;
+        } else if (startExport && fragment instanceof ExportFragment) {
+            ExportFragment exportFragment = (ExportFragment) fragment;
+            exportFragment.getMalApiClient().getUserXml();
+
+            startExport = false;
         }
     }
 
@@ -327,9 +329,9 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
             if (grantResults.length > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED || grantResults[0] == PackageManager.PERMISSION_DENIED)) {
                 Fragment fragment = getCurrentFragment();
-                if (fragment instanceof SettingsFragment){
+                if (fragment instanceof SettingsFragment) {
                     openRingtones = true;
-                } else if (fragment instanceof ExportFragment){
+                } else if (fragment instanceof ExportFragment) {
                     startExport = true;
                 }
             }

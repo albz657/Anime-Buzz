@@ -41,7 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/bullet_notification"
-            android:text="Due to limitations of the MAL API, the following fields will not be included in your export file: storage type, comments, rewatch value"
+            android:text="Due to limitations of the MAL API, the following fields will not be included in your export file: storage type, comments, and rewatch value."
             android:layout_below="@id/explanation"
             />
 
