@@ -297,10 +297,15 @@ public class MainActivity extends AppCompatActivity {
 
             openRingtones = false;
         } else if (startExport && fragment instanceof ExportFragment) {
-            ExportFragment exportFragment = (ExportFragment) fragment;
-            exportFragment.getMalApiClient().getUserXml();
+            if (App.getInstance().isExternalStorageWritable()){
+                ExportFragment exportFragment = (ExportFragment) fragment;
+                exportFragment.getMalApiClient().getUserXml();
 
-            startExport = false;
+                startExport = false;
+            } else {
+                // create alrt
+            }
+
         }
     }
 

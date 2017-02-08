@@ -54,8 +54,14 @@ public class ExportFragment extends Fragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkExternalPermissions()){
-                    malApiClient.getUserXml();
+                if (checkExternalPermissions() ){
+                    if (App.getInstance().isExternalStorageWritable()){
+                        malApiClient.getUserXml();
+                    } else {
+                        // create alert
+                    }
+                } else {
+                    //create alert
                 }
             }
         });

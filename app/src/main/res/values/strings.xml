@@ -159,5 +159,6 @@
 
     <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
     <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
+    <string name="snackbar_export_permission_failed">You must grant Anime Buzz permission to write to your phone's storage in order to export your MAL list.</string>
 
 </resources>
