@@ -29,6 +29,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.constants;
+import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 
@@ -38,6 +39,7 @@ public class ExportFragment extends Fragment {
 
     private MainActivity mainActivity;
     private MalApiClient malApiClient;
+    private boolean exporting = false;
 
     public static ExportFragment newInstance() {
         ExportFragment exportFragment = new ExportFragment();
@@ -66,12 +68,13 @@ public class ExportFragment extends Fragment {
                     if (App.getInstance().isExternalStorageWritable()) {
                         malApiClient.getUserXml();
                     } else {
-                        NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+                        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
                         dialogFragment.show(getActivity().getFragmentManager(), TAG);
                     }
                 }
             }
         });
+
         return view;
     }
 
@@ -227,7 +230,7 @@ public class ExportFragment extends Fragment {
                 File backupFile = new File(backupFilePath);
 
                 if (backupFile.exists()) {
-                    SimpleDateFormat timeFormatMS = new SimpleDateFormat("kS");
+                    SimpleDateFormat timeFormatMS = new SimpleDateFormat("S");
 
                     String ms = timeFormatMS.format(calendar.getTime());
                     backupFileName = backupFileName.concat(":").concat(ms);
@@ -252,7 +255,7 @@ public class ExportFragment extends Fragment {
                 e.printStackTrace();
             }
         } else {
-            NoExternalDialogFragment dialogFragment = NoExternalDialogFragment.newInstance();
+            SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
             dialogFragment.show(getActivity().getFragmentManager(), TAG);
         }
     }

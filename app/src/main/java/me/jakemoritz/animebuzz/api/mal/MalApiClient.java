@@ -183,7 +183,6 @@ public class MalApiClient {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
 
-        getUserXml();
         call.enqueue(new Callback<UserListHolder>() {
             @Override
             public void onResponse(Call<UserListHolder> call, Response<UserListHolder> response) {

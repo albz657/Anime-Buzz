@@ -163,5 +163,8 @@
     <string name="permission_failed_read_external">You must grant Anime Buzz permission to read to your phone\'s storage in order to search for custom ringtones.</string>
     <string name="snackbar_export_success">Export successful.</string>
     <string name="dialog_no_external">No external storage was detected. Please try again when external storage is available.</string>
+    <string name="export_limitation">Due to limitations of the MAL API, the following fields will not be included in your export file: <b>storage type, comments, and rewatch value</b>.</string>
+    <string name="export_permission">External storage permissions are required to save your export file.</string>
+    <string name="export_path">Your export files will be located in <b>\'Downloads/Anime Buzz - MAL Exports\'</b> on your phone\'s external storage.</string>
 
 </resources>
