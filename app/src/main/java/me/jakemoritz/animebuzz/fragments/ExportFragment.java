@@ -8,12 +8,19 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,24 +61,24 @@ public class ExportFragment extends Fragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkExternalPermissions() ){
-                    if (App.getInstance().isExternalStorageWritable()){
+                if (checkExternalPermissions()) {
+                    if (App.getInstance().isExternalStorageWritable()) {
                         malApiClient.getUserXml();
                     } else {
-                        // create alert
+                        // create alert no external
                     }
                 } else {
-                    //create alert
+                    //create alert permission ont rgranted
                 }
             }
         });
         return view;
     }
 
-    private boolean checkExternalPermissions(){
+    private boolean checkExternalPermissions() {
         int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED){
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, constants.WRITE_EXTERNAL_STORAGE_REQUEST);
             return false;
         } else {
@@ -79,8 +86,8 @@ public class ExportFragment extends Fragment {
         }
     }
 
-    public void fixCompatibility(String xml){
-        if (xml != null){
+    public void fixCompatibility(String xml) {
+        if (xml != null) {
             String modifiedUserXml = addTag(xml, "</user_name>", "<user_export_type>", 1);
 
             int userWatching = getIntFromTag(modifiedUserXml, "<user_watching>");
@@ -103,14 +110,14 @@ public class ExportFragment extends Fragment {
 
             String modifiedUserXmlWithoutAnime = modifiedUserXml;
 
-            while (modifiedUserXmlWithoutAnime.contains("<anime>")){
+            while (modifiedUserXmlWithoutAnime.contains("<anime>")) {
                 modifiedUserXmlWithoutAnime = removeTag(modifiedUserXmlWithoutAnime, "<anime>");
             }
 
             Pattern pattern = Pattern.compile("\\<anime\\>(.+?)\\<\\/anime\\>");
             Matcher matcher = pattern.matcher(modifiedUserXml);
 
-            while (matcher.find() && !matcher.hitEnd()){
+            while (matcher.find() && !matcher.hitEnd()) {
                 String animeEntryXml = matcher.group();
 
                 animeEntryXml = removeTag(animeEntryXml, "<series_synonyms>");
@@ -121,7 +128,7 @@ public class ExportFragment extends Fragment {
 
                 int seriesType = getIntFromTag(animeEntryXml, "<series_type>");
                 String seriesTypeString = "";
-                switch (seriesType){
+                switch (seriesType) {
                     case 1:
                         seriesTypeString = "TV";
                         break;
@@ -146,7 +153,7 @@ public class ExportFragment extends Fragment {
 
                 int myStatus = getIntFromTag(animeEntryXml, "<my_status>");
                 String myStatusString = "";
-                switch (myStatus){
+                switch (myStatus) {
                     case 1:
                         myStatusString = "Watching";
                         break;
@@ -173,19 +180,88 @@ public class ExportFragment extends Fragment {
             String endingTag = "</myanimelist>";
             modifiedUserXml = modifiedUserXmlWithoutAnime.concat(endingTag);
 
-            Log.d(TAG, "s");
+            saveXmlToStorage(modifiedUserXml);
         } else {
             SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_fail);
         }
 
     }
 
-    private int getIntFromTag(String xml, String openingTag){
+    private File createExportDirectory(){
+        File externalAppStorage = mainActivity.getExternalFilesDir(null);
+
+        if (externalAppStorage != null){
+            String externalAppStoragePath = externalAppStorage.getPath().concat(File.separator).concat("mal_exports");
+
+            File exportDirectory = new File(externalAppStoragePath);
+            if (!exportDirectory.exists()){
+                if (exportDirectory.mkdir()){
+                    return exportDirectory;
+                }
+            } else {
+                return exportDirectory;
+            }
+        } else {
+            return null;
+        }
+
+        return null;
+    }
+
+    private void saveXmlToStorage(String xml) {
+        File backupDirectory = createExportDirectory();
+
+        if (backupDirectory != null) {
+            String backupFileName = "animebuzz_mal_export_";
+
+            Calendar calendar = Calendar.getInstance();
+            String month = new DateFormatSymbols().getShortMonths()[calendar.get(Calendar.MONTH) - 1];
+            month = month.toLowerCase();
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("k:m:s");
+            String dateString = timeFormat.format(calendar.getTime());
+            backupFileName = backupFileName.concat(month).concat("-").concat(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))).concat("_").concat(dateString);
+
+            String backupFilePath = backupDirectory.getPath().concat(File.separator).concat(backupFileName).concat(".xml");
+            try {
+                File backupFile = new File(backupFilePath);
+
+                if (backupFile.exists()){
+                    SimpleDateFormat timeFormatMS = new SimpleDateFormat("kS");
+
+                    String ms = timeFormatMS.format(calendar.getTime());
+                    backupFileName.concat(":").concat(ms);
+
+                    backupFilePath = backupDirectory.getPath().concat(File.separator).concat(backupFileName).concat(".xml");
+
+                    backupFile = new File(backupFilePath);
+                }
+
+                FileOutputStream fileOutputStream = new FileOutputStream(backupFile);
+                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
+
+                outputStreamWriter.write(xml);
+
+                outputStreamWriter.flush();
+                outputStreamWriter.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+        } else {
+            // alert no external storage
+        }
+    }
+
+    private int getIntFromTag(String xml, String openingTag) {
         int value = -1;
 
         int count = 0;
-        for (String s : xml.split(openingTag)){
-            if (count == 1){
+        for (String s : xml.split(openingTag)) {
+            if (count == 1) {
                 value = Integer.parseInt(s.substring(0, 1));
             }
             count++;
@@ -194,10 +270,10 @@ public class ExportFragment extends Fragment {
         return value;
     }
 
-    private String removeTag(String xml, String openingTag){
+    private String removeTag(String xml, String openingTag) {
         String xmlWithoutTag1 = "";
-        for (String s : xml.split(openingTag)){
-            if (xmlWithoutTag1.isEmpty()){
+        for (String s : xml.split(openingTag)) {
+            if (xmlWithoutTag1.isEmpty()) {
                 xmlWithoutTag1 = s;
             }
         }
@@ -205,8 +281,8 @@ public class ExportFragment extends Fragment {
         String closingTag = openingTag.substring(0, 1) + "/" + openingTag.substring(1, openingTag.length());
         String xmlWithoutTag2 = "";
         int count = 0;
-        for (String s : xml.split(closingTag)){
-            if (count == 1){
+        for (String s : xml.split(closingTag)) {
+            if (count == 1) {
                 xmlWithoutTag2 = s;
             }
             count++;
@@ -215,14 +291,14 @@ public class ExportFragment extends Fragment {
         return xmlWithoutTag1.concat(xmlWithoutTag2);
     }
 
-    private String addTag(String xml, String precedingClosingTag, String openingTag, int value){
+    private String addTag(String xml, String precedingClosingTag, String openingTag, int value) {
         String closingTag = openingTag.substring(0, 1) + "/" + openingTag.substring(1, openingTag.length());
 
         String tag = openingTag.concat(String.valueOf(value)).concat(closingTag);
 
         String newXml = "";
-        for (String s : xml.split(precedingClosingTag)){
-            if (newXml.isEmpty()){
+        for (String s : xml.split(precedingClosingTag)) {
+            if (newXml.isEmpty()) {
                 newXml = s;
             } else {
                 newXml = newXml.concat(precedingClosingTag).concat(tag).concat(s);
@@ -232,10 +308,10 @@ public class ExportFragment extends Fragment {
         return newXml;
     }
 
-    private String replaceValue(String xml, String openingTag, String value){
+    private String replaceValue(String xml, String openingTag, String value) {
         String newXml = "";
-        for (String s : xml.split(openingTag)){
-            if (newXml.isEmpty()){
+        for (String s : xml.split(openingTag)) {
+            if (newXml.isEmpty()) {
                 newXml = s;
             } else {
                 newXml = newXml.concat(openingTag).concat(value).concat(s.substring(1, s.length()));
@@ -246,7 +322,7 @@ public class ExportFragment extends Fragment {
     }
 
     public MalApiClient getMalApiClient() {
-        if (malApiClient == null){
+        if (malApiClient == null) {
             malApiClient = new MalApiClient(this);
         }
         return malApiClient;

@@ -303,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
                 startExport = false;
             } else {
-                // create alrt
+                // create alrt no exetrnal
             }
 
         }
