@@ -285,6 +285,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void setOrientationChangedListener(OrientationChangedListener orientationChangedListener){
+        this.orientationChangedListener = orientationChangedListener;
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

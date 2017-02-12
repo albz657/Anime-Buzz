@@ -37,17 +37,19 @@ import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 
-public class ExportFragment extends Fragment {
+public class ExportFragment extends Fragment implements MainActivity.OrientationChangedListener{
 
     private final static String TAG = ExportFragment.class.getSimpleName();
 
     private MainActivity mainActivity;
     private MalApiClient malApiClient;
     private ImageView checkmark;
-    private ImageView error;
+    private ImageView errorImage;
     private Button exportButton;
     private CircularProgressView progressView;
     private boolean exporting;
+    private String status = "";
+    private boolean errorDisplayed = false;
 
     public static ExportFragment newInstance() {
         ExportFragment exportFragment = new ExportFragment();
@@ -61,40 +63,56 @@ public class ExportFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
 
-        setProgressVisibility("start");
+        if (status.isEmpty()){
+            setProgressVisibility("start");
+        } else {
+            setProgressVisibility(status);
+        }
     }
 
     public void setProgressVisibility(String status){
+        this.status = status;
+
         switch (status){
             case "start":
                 exportButton.setVisibility(View.VISIBLE);
                 checkmark.setVisibility(View.GONE);
-                error.setVisibility(View.GONE);
+                errorImage.setVisibility(View.GONE);
                 progressView.setVisibility(View.GONE);
                 break;
             case "success":
                 exportButton.setVisibility(View.GONE);
                 checkmark.setVisibility(View.VISIBLE);
-                error.setVisibility(View.GONE);
+                errorImage.setVisibility(View.GONE);
                 progressView.setVisibility(View.GONE);
 
-                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
                 break;
             case "error":
                 exportButton.setVisibility(View.GONE);
                 checkmark.setVisibility(View.GONE);
-                error.setVisibility(View.VISIBLE);
+                errorImage.setVisibility(View.VISIBLE);
                 progressView.setVisibility(View.GONE);
 
-                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_error);
-                dialogFragment.show(getActivity().getFragmentManager(), TAG);
+                if (!errorDisplayed) {
+                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_error);
+                    dialogFragment.show(getActivity().getFragmentManager(), TAG);
+
+                    errorDisplayed = true;
+                }
                 break;
             case "inprogress":
                 exportButton.setVisibility(View.GONE);
                 checkmark.setVisibility(View.GONE);
-                error.setVisibility(View.GONE);
+                errorImage.setVisibility(View.GONE);
                 progressView.setVisibility(View.VISIBLE);
                 break;
+        }
+    }
+
+    @Override
+    public void orientationChanged(boolean portrait) {
+        if (!status.isEmpty()){
+            setProgressVisibility(status);
         }
     }
 
@@ -126,7 +144,7 @@ public class ExportFragment extends Fragment {
         });
 
         checkmark = (ImageView) view.findViewById(R.id.export_checkmark);
-        error = (ImageView) view.findViewById(R.id.export_error);
+        errorImage = (ImageView) view.findViewById(R.id.export_error);
         progressView = (CircularProgressView) view.findViewById(R.id.progress_view_export);
 
         return view;
@@ -303,6 +321,7 @@ public class ExportFragment extends Fragment {
                 outputStreamWriter.close();
 
                 setProgressVisibility("success");
+                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -390,6 +409,7 @@ public class ExportFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) context;
+        mainActivity.setOrientationChangedListener(this);
     }
 
     public boolean isExporting() {
