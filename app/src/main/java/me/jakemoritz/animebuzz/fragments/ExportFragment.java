@@ -31,6 +31,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
 
 public class ExportFragment extends Fragment {
@@ -64,14 +65,19 @@ public class ExportFragment extends Fragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (checkExternalPermissions()) {
-                    if (App.getInstance().isExternalStorageWritable()) {
-                        malApiClient.getUserXml();
-                    } else {
-                        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-                        dialogFragment.show(getActivity().getFragmentManager(), TAG);
+                if (SharedPrefsHelper.getInstance().isLoggedIn()){
+                    if (checkExternalPermissions()) {
+                        if (App.getInstance().isExternalStorageWritable()) {
+                            malApiClient.getUserXml();
+                        } else {
+
+                        }
                     }
+                } else {
+                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_not_logged_in);
+                    dialogFragment.show(getActivity().getFragmentManager(), TAG);
                 }
+
             }
         });
 
