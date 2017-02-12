@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:layout_gravity="center"
     android:layout_marginBottom="20dp"
     android:layout_marginLeft="30dp"
     android:layout_marginRight="30dp"
-    android:layout_marginTop="40dp">
+    android:layout_marginTop="40dp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,25 +19,25 @@
             style="@style/Base.TextAppearance.AppCompat.Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="20dp"
             android:width="280dp"
             android:gravity="center"
-            android:text="A few things to note about your MAL list export file:" />
+            android:text="@string/export_details" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="6dp"
-                android:text="@string/bullet"
                 android:layout_gravity="top"
-                />
+                android:layout_marginRight="6dp"
+                android:text="@string/bullet" />
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
@@ -48,22 +49,22 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="top"
                 android:layout_marginRight="6dp"
-                android:text="@string/bullet"
-                android:layout_gravity="top"/>
+                android:text="@string/bullet" />
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Subhead"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/export_permission"/>
+                android:text="@string/export_permission" />
 
 
         </LinearLayout>
@@ -71,17 +72,17 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:gravity="center"
 
-            android:gravity="center">
+            android:orientation="horizontal">
 
             <TextView
                 style="@style/Base.TextAppearance.AppCompat.Title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="top"
                 android:layout_marginRight="6dp"
-                android:text="@string/bullet"
-                android:layout_gravity="top"/>
+                android:text="@string/bullet" />
 
             <TextView
                 android:id="@+id/export_path"
@@ -95,11 +96,42 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/export_button"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
-        android:text="Export" />
+        >
+
+        <Button
+            android:id="@+id/export_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Export"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/export_checkmark"
+            android:src="@drawable/ic_check_circle"
+            android:tint="@color/colorPrimary"
+            android:layout_centerHorizontal="true"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/export_error"
+            android:src="@drawable/ic_error_black_48dp"
+            android:tint="@color/x_red"
+            android:layout_centerHorizontal="true"/>
+
+        <com.github.rahatarmanahmed.cpv.CircularProgressView
+            android:id="@+id/progress_view_export"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            app:cpv_animAutostart="true"
+            app:cpv_indeterminate="true"/>
+    </RelativeLayout>
+
 </LinearLayout>

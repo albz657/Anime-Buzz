@@ -43,6 +43,7 @@ public class MalApiClient {
     private MalDataImportedListener malDataImportedListener;
     private BacklogFragment backlogFragment;
     private ExportFragment exportFragment;
+    private boolean exporting = false;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
@@ -153,6 +154,8 @@ public class MalApiClient {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<ResponseBody> call = malEndpointInterface.getUserXml(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
 
+        exporting = true;
+        exportFragment.setProgressVisibility("inprogress");
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -163,10 +166,14 @@ public class MalApiClient {
                         exportFragment.fixCompatibility(userXml);
                     } catch (IOException e){
                         exportFragment.fixCompatibility(null);
+                        exporting = false;
+                        exportFragment.setProgressVisibility("error");
                     }
 
                 } else {
                     exportFragment.fixCompatibility(null);
+                    exporting = false;
+                    exportFragment.setProgressVisibility("error");
                 }
 
 
@@ -175,6 +182,8 @@ public class MalApiClient {
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 exportFragment.fixCompatibility(null);
+                exporting = false;
+                exportFragment.setProgressVisibility("error");
             }
         });
     }

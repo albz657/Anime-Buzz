@@ -13,6 +13,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,7 +43,11 @@ public class ExportFragment extends Fragment {
 
     private MainActivity mainActivity;
     private MalApiClient malApiClient;
-    private boolean exporting = false;
+    private ImageView checkmark;
+    private ImageView error;
+    private Button exportButton;
+    private CircularProgressView progressView;
+    private boolean exporting;
 
     public static ExportFragment newInstance() {
         ExportFragment exportFragment = new ExportFragment();
@@ -53,6 +60,42 @@ public class ExportFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
+
+        setProgressVisibility("start");
+    }
+
+    public void setProgressVisibility(String status){
+        switch (status){
+            case "start":
+                exportButton.setVisibility(View.VISIBLE);
+                checkmark.setVisibility(View.GONE);
+                error.setVisibility(View.GONE);
+                progressView.setVisibility(View.GONE);
+                break;
+            case "success":
+                exportButton.setVisibility(View.GONE);
+                checkmark.setVisibility(View.VISIBLE);
+                error.setVisibility(View.GONE);
+                progressView.setVisibility(View.GONE);
+
+                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
+                break;
+            case "error":
+                exportButton.setVisibility(View.GONE);
+                checkmark.setVisibility(View.GONE);
+                error.setVisibility(View.VISIBLE);
+                progressView.setVisibility(View.GONE);
+
+                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_error);
+                dialogFragment.show(getActivity().getFragmentManager(), TAG);
+                break;
+            case "inprogress":
+                exportButton.setVisibility(View.GONE);
+                checkmark.setVisibility(View.GONE);
+                error.setVisibility(View.GONE);
+                progressView.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 
     @Nullable
@@ -61,7 +104,7 @@ public class ExportFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_export, container, false);
         mainActivity.getBottomBar().setVisibility(View.GONE);
 
-        Button exportButton = (Button) view.findViewById(R.id.export_button);
+        exportButton = (Button) view.findViewById(R.id.export_button);
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,7 +113,8 @@ public class ExportFragment extends Fragment {
                         if (App.getInstance().isExternalStorageWritable()) {
                             malApiClient.getUserXml();
                         } else {
-
+                            SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
+                            dialogFragment.show(getActivity().getFragmentManager(), TAG);
                         }
                     }
                 } else {
@@ -80,6 +124,10 @@ public class ExportFragment extends Fragment {
 
             }
         });
+
+        checkmark = (ImageView) view.findViewById(R.id.export_checkmark);
+        error = (ImageView) view.findViewById(R.id.export_error);
+        progressView = (CircularProgressView) view.findViewById(R.id.progress_view_export);
 
         return view;
     }
@@ -254,7 +302,7 @@ public class ExportFragment extends Fragment {
                 outputStreamWriter.flush();
                 outputStreamWriter.close();
 
-                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
+                setProgressVisibility("success");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -342,5 +390,13 @@ public class ExportFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mainActivity = (MainActivity) context;
+    }
+
+    public boolean isExporting() {
+        return exporting;
+    }
+
+    public void setExporting(boolean exporting) {
+        this.exporting = exporting;
     }
 }

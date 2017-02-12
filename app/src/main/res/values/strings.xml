@@ -166,6 +166,8 @@
     <string name="export_limitation">Due to limitations of the MAL API, the following fields will not be included in your export file: <b>storage type, comments, and rewatch value</b>.</string>
     <string name="export_permission">External storage permissions are required to save your export file.</string>
     <string name="export_path">Your export files will be located in <b>\'Downloads/Anime Buzz - MAL Exports\'</b> on your phone\'s external storage.</string>
+    <string name="export_details">A few things to note about your MAL list export file:</string>
+    <string name="export_error">There was an error backing up your MAL list.</string>
     <string name="export_not_logged_in">You are not logged in to your MyAnimeList account.</string>
 
 </resources>
