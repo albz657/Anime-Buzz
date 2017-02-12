@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.drawable.GradientDrawable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -36,6 +37,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
     public ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
+    private boolean episodeCountSnackbarVisible = false;
 
     public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(parent.getContext(), backlogItems, true);
@@ -56,7 +58,19 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             if (!backlogFragment.isCountsCurrent()){
-                SnackbarHelper.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
+                if (!episodeCountSnackbarVisible){
+                    episodeCountSnackbarVisible = true;
+                    Snackbar snackbar = SnackbarHelper.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
+                    snackbar.addCallback(new Snackbar.Callback(){
+
+                        @Override
+                        public void onDismissed(Snackbar transientBottomBar, int event) {
+                            super.onDismissed(transientBottomBar, event);
+                            episodeCountSnackbarVisible = false;
+                        }
+                    });
+                }
+
                 return makeMovementFlags(0, 0);
             } else {
                 int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;

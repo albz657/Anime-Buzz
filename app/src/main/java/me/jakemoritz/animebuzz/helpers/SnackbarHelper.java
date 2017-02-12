@@ -13,9 +13,13 @@ public class SnackbarHelper {
         return snackbarHelper;
     }
 
-    public void makeSnackbar(View rootView, int stringResId){
+    public Snackbar makeSnackbar(View rootView, int stringResId){
+        Snackbar snackbar = null;
         if (rootView != null) {
-            Snackbar.make(rootView, App.getInstance().getString(stringResId), Snackbar.LENGTH_LONG).show();
+            snackbar = Snackbar.make(rootView, App.getInstance().getString(stringResId), Snackbar.LENGTH_LONG);
+            snackbar.show();
         }
+
+        return snackbar;
     }
 }

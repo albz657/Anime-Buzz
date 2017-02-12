@@ -53,7 +53,7 @@ public class AlarmHelper {
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
 
-                for (int i = 0; i < 1; i++){
+                for (int i = 0; i < 3; i++){
                     int random = (int) (Math.random() * userList.size() + 1);
                     Series series = userList.get(random);
 
