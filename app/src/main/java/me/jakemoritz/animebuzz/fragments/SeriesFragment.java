@@ -414,7 +414,11 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         if (this instanceof UserListFragment){
             currentlyBrowsingSeasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
         } else {
-            if (currentlyBrowsingSeason != null){
+            if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
+                currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
+            }
+
+            if (currentlyBrowsingSeason != null  && currentlyBrowsingSeason.isValid()){
                 currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
             }
         }
