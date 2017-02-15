@@ -2,7 +2,6 @@ package me.jakemoritz.animebuzz.fragments;
 
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.helpers.App;
 
 public class AboutFragment extends Fragment {
 
@@ -53,7 +53,7 @@ public class AboutFragment extends Fragment {
         aboutMalLink.setMovementMethod(LinkMovementMethod.getInstance());
 
         TextView versionNumber = (TextView) view.findViewById(R.id.version_display);
-        String versionText = "App version: " + getVersionName();
+        String versionText = "App version: " + App.getInstance().getVersionName();
         versionNumber.setText(versionText);
 
         mainActivity.getBottomBar().setVisibility(View.GONE);
@@ -61,15 +61,5 @@ public class AboutFragment extends Fragment {
         return view;
     }
 
-    public String getVersionName() {
-        String versionName = "";
 
-        try {
-            versionName = mainActivity.getPackageManager().getPackageInfo(mainActivity.getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e){
-            e.printStackTrace();
-        }
-
-        return versionName;
-    }
 }

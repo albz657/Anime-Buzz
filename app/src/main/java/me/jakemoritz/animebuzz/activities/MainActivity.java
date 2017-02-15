@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import io.realm.Realm;
@@ -37,6 +39,7 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.SugarMigrator;
+import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
@@ -270,6 +273,27 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         setBacklogBadge();
+
+        String versionName = App.getInstance().getVersionName();
+
+        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) || true){
+            // mismatched app versions, check if changelog file exists
+
+            String changelogFilename = versionName.concat(".txt");
+            changelogFilename = "1.3.8".concat(".txt");
+
+            try {
+                String[] changelogs = getResources().getAssets().list("changelogs");
+                ArrayList<String> changelogArray = new ArrayList<>(Arrays.asList(changelogs));
+
+                if (changelogArray.contains(changelogFilename)){
+                    ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance(changelogFilename);
+                    dialogFragment.show(getFragmentManager(), TAG);
+                }
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

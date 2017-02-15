@@ -161,6 +161,17 @@ public class App extends Application {
         return false;
     }
 
+    public String getVersionName() {
+        String versionName = "";
+
+        try {
+            versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e){
+            e.printStackTrace();
+        }
+
+        return versionName;
+    }
 
     /* Getters/Setters */
 

@@ -179,4 +179,14 @@ public class SharedPrefsHelper {
         editor.putString(App.getInstance().getString(R.string.credentials_password), password);
         editor.apply();
     }
+
+    public String getLastAppVersion(){
+        return sharedPrefs.getString(App.getInstance().getString(R.string.last_app_version), "");
+    }
+
+    public void setLastAppVersion(String appVersion){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(App.getInstance().getString(R.string.last_app_version), appVersion);
+        editor.apply();
+    }
 }
