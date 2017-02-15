@@ -1,0 +1,5 @@
+New
+- Added an option to export your MyAnimeList anime list
+
+Fixes
+- Multiple bug fixes

@@ -36,7 +36,7 @@ public class ChangelogDialogFragment extends DialogFragment {
     public ChangelogDialogFragment() {
     }
 
-    public static ChangelogDialogFragment newInstance(String assetFileName) {
+    public static ChangelogDialogFragment newInstance() {
         ChangelogDialogFragment fragment = new ChangelogDialogFragment();
         fragment.setRetainInstance(true);
         return fragment;

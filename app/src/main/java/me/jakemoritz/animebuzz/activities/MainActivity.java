@@ -276,18 +276,18 @@ public class MainActivity extends AppCompatActivity {
 
         String versionName = App.getInstance().getVersionName();
 
-        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) || true){
+        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName)){
             // mismatched app versions, check if changelog file exists
 
             String changelogFilename = versionName.concat(".txt");
-            changelogFilename = "1.3.8".concat(".txt");
-
             try {
                 String[] changelogs = getResources().getAssets().list("changelogs");
                 ArrayList<String> changelogArray = new ArrayList<>(Arrays.asList(changelogs));
 
                 if (changelogArray.contains(changelogFilename)){
-                    ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance(changelogFilename);
+                    SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
+
+                    ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance();
                     dialogFragment.show(getFragmentManager(), TAG);
                 }
             } catch (IOException e){

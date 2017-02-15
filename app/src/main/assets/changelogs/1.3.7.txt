@@ -1,0 +1,6 @@
+New
+- Added a widget to display your backlog count
+- Reworked UI for landscape compatibility
+
+Fixes
+- Multiple bug fixes
