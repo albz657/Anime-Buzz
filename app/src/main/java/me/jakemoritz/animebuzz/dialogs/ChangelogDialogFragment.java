@@ -4,7 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -146,6 +149,9 @@ public class ChangelogDialogFragment extends DialogFragment {
 
             if (position == 0){
                 holder.mNew.setVisibility(View.VISIBLE);
+                int color = ContextCompat.getColor(getActivity(), R.color.colorAccent);
+                ColorFilter colorFilter = new LightingColorFilter(color, color);
+                holder.mNew.setColorFilter(colorFilter);
             }
         }
 
