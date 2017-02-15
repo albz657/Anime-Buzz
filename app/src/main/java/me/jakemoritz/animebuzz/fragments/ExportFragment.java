@@ -339,7 +339,12 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
         int count = 0;
         for (String s : xml.split(openingTag)) {
             if (count == 1) {
-                value = Integer.parseInt(s.substring(0, 1));
+                Pattern pattern = Pattern.compile("\\d+");
+                Matcher matcher = pattern.matcher(s);
+
+                if (matcher.find()){
+                    value = Integer.parseInt(matcher.group());
+                }
             }
             count++;
         }
