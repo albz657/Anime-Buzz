@@ -1,5 +1,6 @@
 New
 - Added an option to export your MyAnimeList anime list
+- This "What's New?" popup
 
 Fixes
 - Multiple bug fixes
