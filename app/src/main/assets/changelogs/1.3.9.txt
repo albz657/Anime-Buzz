@@ -1,0 +1,5 @@
+New
+- Episode notifications now show the series' image (if available)
+
+Fixes
+
