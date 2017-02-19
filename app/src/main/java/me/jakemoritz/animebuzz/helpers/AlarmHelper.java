@@ -61,16 +61,19 @@ public class AlarmHelper {
                     backlogItem.setSeries(series);
                     backlogItem.setAlarmTime(System.currentTimeMillis());
 
-                    Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
-                    alarm.setAlarmTime(System.currentTimeMillis());
-                    alarm.setSeries(series);
+                    if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0){
+                        Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
+                        alarm.setAlarmTime(System.currentTimeMillis());
+                        alarm.setSeries(series);
+                    }
+
                 }
             }
         });
     }
 
     public void setAlarmsOnBoot() {
-//        dummyAlarm();
+        dummyAlarm();
         DailyTimeGenerator.getInstance().setNextAlarm(true);
         Realm realm = Realm.getDefaultInstance();
         for (Alarm alarm : realm.where(Alarm.class).findAll()) {

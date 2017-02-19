@@ -5,6 +5,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -13,7 +20,6 @@ import android.support.v4.app.NotificationCompat;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.models.Series;
-
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
@@ -111,12 +117,18 @@ public class NotificationHelper {
             seriesName = series.getEnglishTitle();
         }
 
+        Bitmap notificationIcon = createCircleBitmap(series.getMALID());
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
                         .setSmallIcon(R.drawable.bolt_copy)
                         .setAutoCancel(true)
                         .setContentText(seriesName)
                         .setContentTitle("New episode released");
+
+        if (notificationIcon != null) {
+            mBuilder.setLargeIcon(notificationIcon);
+        }
 
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         resultIntent.putExtra("notificationClicked", true);
@@ -143,6 +155,38 @@ public class NotificationHelper {
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
         mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
+    }
+
+    private Bitmap createCircleBitmap(String MALID) {
+        int posterId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz");
+
+        if (posterId == 0){
+            return null;
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), posterId);
+
+        if (bitmap == null){
+            return null;
+        }
+
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(),
+                bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        // paint.setColor(color);
+        canvas.drawCircle(bitmap.getWidth() / 2,
+                bitmap.getHeight() / 2, bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
     }
 
     public void incrementMaxSeries(int seriesCount) {
