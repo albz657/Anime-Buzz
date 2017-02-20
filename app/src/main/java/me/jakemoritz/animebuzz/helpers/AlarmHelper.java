@@ -73,7 +73,7 @@ public class AlarmHelper {
     }
 
     public void setAlarmsOnBoot() {
-        dummyAlarm();
+//        dummyAlarm();
         DailyTimeGenerator.getInstance().setNextAlarm(true);
         Realm realm = Realm.getDefaultInstance();
         for (Alarm alarm : realm.where(Alarm.class).findAll()) {

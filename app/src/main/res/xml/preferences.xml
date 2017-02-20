@@ -77,4 +77,12 @@
             android:title="@string/pref_firebase_title"/>
 
     </PreferenceCategory>
+    <PreferenceCategory
+        android:key="@string/pref_category_other_key"
+        android:title="@string/pref_category_other_title">
+
+        <Preference
+            android:key="@string/pref_privacy_policy_key"
+            android:title="@string/pref_privacy_policy_title"/>
+    </PreferenceCategory>
 </PreferenceScreen>
