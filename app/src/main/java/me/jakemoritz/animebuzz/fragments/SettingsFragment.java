@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -85,7 +86,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -141,6 +141,17 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 }
 
                 return false;
+            }
+        });
+
+        Preference privayPolicyPreference = findPreference(getString(R.string.pref_privacy_policy_key));
+        privayPolicyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Uri uri = Uri.parse("https://www.iubenda.com/privacy-policy/8041024");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+                return true;
             }
         });
 
