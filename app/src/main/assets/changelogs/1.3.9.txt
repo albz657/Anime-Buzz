@@ -1,5 +1,7 @@
 New
 - Episode notifications now show the series' image (if available)
+- Changelog can now be viewed in settings
+- Added link to privacy policy in settings
 
 Fixes
 
