@@ -82,6 +82,10 @@
         android:title="@string/pref_category_other_title">
 
         <Preference
+            android:key="@string/pref_changelog_key"
+            android:title="@string/pref_changelog_title"/>
+
+        <Preference
             android:key="@string/pref_privacy_policy_key"
             android:title="@string/pref_privacy_policy_title"/>
     </PreferenceCategory>

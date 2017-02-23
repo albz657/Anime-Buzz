@@ -30,6 +30,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
+import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.ImportFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
@@ -151,6 +152,16 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 Uri uri = Uri.parse("https://www.iubenda.com/privacy-policy/8041024");
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
+                return true;
+            }
+        });
+
+        Preference changelogPreference = findPreference(getString(R.string.pref_changelog_key));
+        changelogPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance();
+                dialogFragment.show(getActivity().getFragmentManager(), TAG);
                 return true;
             }
         });
