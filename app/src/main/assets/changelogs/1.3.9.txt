@@ -4,4 +4,4 @@ New
 - Added link to privacy policy in settings
 
 Fixes
-
+- Auto-refresh should now be more reliable

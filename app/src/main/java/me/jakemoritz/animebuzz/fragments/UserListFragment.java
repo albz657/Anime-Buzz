@@ -44,9 +44,10 @@ public class UserListFragment extends SeriesFragment {
         getMainActivity().fixToolbar(this.getClass().getSimpleName());
         loadUserSortingPreference();
 
-        if (App.getInstance().isJustLaunchedWatching() && !App.getInstance().isInitializing()){
-            App.getInstance().setJustLaunchedWatching(false);
-            App.getInstance().setJustLaunchedBrowser(false);
+        // check if need to auto-refresh
+        if (!App.getInstance().isInitializing()){
+//            App.getInstance().setJustLaunchedWatching(false);
+//            App.getInstance().setJustLaunchedBrowser(false);
 
             Calendar currentCal = Calendar.getInstance();
 

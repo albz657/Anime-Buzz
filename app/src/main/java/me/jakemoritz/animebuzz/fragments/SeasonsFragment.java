@@ -84,11 +84,8 @@ public class SeasonsFragment extends SeriesFragment {
             }
 
             loadSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
-        }
 
-        if (App.getInstance().isJustLaunchedBrowser() && !App.getInstance().isInitializing()){
-            App.getInstance().setJustLaunchedBrowser(false);
-
+            // check if need to auto-refresh
             Calendar currentCal = Calendar.getInstance();
 
             Calendar lastUpdatedCal = Calendar.getInstance();

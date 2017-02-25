@@ -56,8 +56,8 @@ public class App extends Application {
         Picasso.with(this);
         Realm.init(this);
 
-        justLaunchedBrowser = true;
-        justLaunchedWatching = true;
+//        justLaunchedBrowser = true;
+//        justLaunchedWatching = true;
 
         if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")){
             RealmMigration migration = new RealmMigration() {
