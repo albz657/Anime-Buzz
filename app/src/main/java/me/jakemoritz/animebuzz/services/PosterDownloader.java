@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,8 +18,11 @@ import me.jakemoritz.animebuzz.helpers.App;
 
 public class PosterDownloader extends IntentService {
 
+    private static final String TAG = PosterDownloader.class.getSimpleName();
+
     public PosterDownloader() {
         super(PosterDownloader.class.getSimpleName());
+        setIntentRedelivery(true);
     }
 
     @Override
@@ -34,7 +38,10 @@ public class PosterDownloader extends IntentService {
                 cachePoster(bitmap, MALID);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            if (URL != null){
+                Log.d(TAG, "Error getting bitmap from: '" + URL + "'");
+            }
         }
     }
 

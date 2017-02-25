@@ -5,4 +5,5 @@ New
 
 Fixes
 - Auto-refresh should now be more reliable
-- Changelog will no longer displaying after first installing app
+- Changelog will no longer display after first installing app
+- Added a fix for a crash when opening Season Browser

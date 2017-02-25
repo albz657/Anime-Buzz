@@ -232,9 +232,13 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(toolbar);
 
+        String versionName = App.getInstance().getVersionName();
+
         // Start relevant fragment
         int defaultTabId = 0;
         if (App.getInstance().isInitializing()) {
+            SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
+
             SeriesFragment seriesFragment;
 
             if (SharedPrefsHelper.getInstance().isLoggedIn()) {
@@ -273,8 +277,6 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         setBacklogBadge();
-
-        String versionName = App.getInstance().getVersionName();
 
         if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
             // mismatched app versions, check if changelog file exists
