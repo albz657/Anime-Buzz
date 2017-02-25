@@ -20,6 +20,7 @@ public class KitsuDataProcessor extends IntentService {
 
     public KitsuDataProcessor() {
         super(KitsuDataProcessor.class.getSimpleName());
+        setIntentRedelivery(true);
     }
 
     @Override

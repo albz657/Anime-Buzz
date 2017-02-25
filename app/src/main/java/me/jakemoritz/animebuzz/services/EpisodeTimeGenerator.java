@@ -12,6 +12,7 @@ public class EpisodeTimeGenerator extends IntentService {
 
     public EpisodeTimeGenerator() {
         super(EpisodeTimeGenerator.class.getSimpleName());
+        setIntentRedelivery(true);
     }
 
     @Override
