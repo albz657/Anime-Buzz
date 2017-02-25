@@ -124,7 +124,9 @@ public class SharedPrefsHelper {
             Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", getLatestSeasonKey()).findFirst();
 
             if (currentlyBrowsingSeason != null){
-                setLatestSeasonName(currentlyBrowsingSeason.getName());
+                String currentlyBrowingSeasonName = currentlyBrowsingSeason.getName();
+                setLatestSeasonName(currentlyBrowingSeasonName);
+                latestSeasonName = currentlyBrowingSeasonName;
             }
         }
 
