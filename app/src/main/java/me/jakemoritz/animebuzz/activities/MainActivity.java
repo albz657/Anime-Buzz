@@ -277,8 +277,13 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         setBacklogBadge();
+        removeSeriesMissingMALID();
 
         if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
+            if (versionName.matches("1.3.8")){
+                removeSeriesMissingMALID();
+            }
+
             // mismatched app versions, check if changelog file exists
 
             String changelogFilename = versionName.concat(".txt");
@@ -296,6 +301,21 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void removeSeriesMissingMALID(){
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Series> seriesList = realm.where(Series.class).findAll();
+
+                for (Series series : seriesList){
+                    if (series.getMALID().matches("false")){
+                        series.deleteFromRealm();
+                    }
+                }
+            }
+        });
     }
 
     @Override
