@@ -53,7 +53,14 @@ public class AlarmHelper {
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
 
-                for (int i = 0; i < 3; i++){
+                RealmResults<Alarm> alarms = realm.where(Alarm.class).findAll();
+                for (Alarm alarm : alarms){
+                    if (alarm.getSeries() == null){
+                        alarm.deleteFromRealm();
+                    }
+                }
+
+                for (int i = 0; i < 5; i++){
                     int random = (int) (Math.random() * userList.size() + 1);
                     Series series = userList.get(random);
 
@@ -68,6 +75,8 @@ public class AlarmHelper {
                     }
 
                 }
+
+                realm.where(Alarm.class).findAll().deleteAllFromRealm();
             }
         });
     }

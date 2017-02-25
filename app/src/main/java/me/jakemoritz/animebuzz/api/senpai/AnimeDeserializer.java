@@ -51,7 +51,7 @@ class AnimeDeserializer implements JsonDeserializer<SeasonHolder> {
 
             String MALID = null;
             try {
-                MALID = seriesObject.get("MALID").getAsString();
+                MALID = String.valueOf(seriesObject.get("MALID").getAsInt());
 
                 Series series = new Series();
                 series.setMALID(MALID);

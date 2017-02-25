@@ -9,7 +9,9 @@ import android.net.NetworkInfo;
 import android.os.Environment;
 import android.util.Log;
 
+import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
+import com.uphyca.stetho_realm.RealmInspectorModulesProvider;
 
 import java.util.Iterator;
 import java.util.List;
@@ -102,10 +104,10 @@ public class App extends Application {
             Log.d(TAG, "not normal process");
         }
 
-/*        Stetho.initialize(Stetho.newInitializerBuilder(this)
+        Stetho.initialize(Stetho.newInitializerBuilder(this)
                 .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
                 .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-                .build());*/
+                .build());
     }
 
     private String getAppName(int pID)
