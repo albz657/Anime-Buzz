@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
 
         String versionName = App.getInstance().getVersionName();
 
-        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName)){
+        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
             // mismatched app versions, check if changelog file exists
 
             String changelogFilename = versionName.concat(".txt");

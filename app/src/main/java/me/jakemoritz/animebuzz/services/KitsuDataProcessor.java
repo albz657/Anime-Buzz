@@ -86,7 +86,7 @@ public class KitsuDataProcessor extends IntentService {
                         airingStatus = "Finished airing";
                     } else {
                         airingStatus = "Airing";
-                        checkForSeasonSwitch(currSeries);
+//                        checkForSeasonSwitch(currSeries);
                     }
                 } else {
                     airingStatus = "Not yet aired";
@@ -99,7 +99,7 @@ public class KitsuDataProcessor extends IntentService {
                 } else {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         airingStatus = "Airing";
-                        checkForSeasonSwitch(currSeries);
+//                        checkForSeasonSwitch(currSeries);
                     } else {
                         airingStatus = "Not yet aired";
                     }

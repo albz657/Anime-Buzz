@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import me.jakemoritz.animebuzz.R;
+import me.jakemoritz.animebuzz.models.Season;
 
 public class SharedPrefsHelper {
 
@@ -117,7 +118,17 @@ public class SharedPrefsHelper {
     }
 
     public String getLatestSeasonName(){
-        return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_latest_season), "");
+        String latestSeasonName = sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_latest_season), "");
+
+        if (latestSeasonName.isEmpty() && !getLatestSeasonKey().isEmpty() && !App.getInstance().isInitializing()){
+            Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", getLatestSeasonKey()).findFirst();
+
+            if (currentlyBrowsingSeason != null){
+                setLatestSeasonName(currentlyBrowsingSeason.getName());
+            }
+        }
+
+        return latestSeasonName;
     }
 
     public void setLatestSeasonName(String latestSeasonName){

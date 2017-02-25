@@ -5,3 +5,4 @@ New
 
 Fixes
 - Auto-refresh should now be more reliable
+- Changelog will no longer displaying after first installing app
