@@ -6,5 +6,6 @@ New
 Fixes
 - Auto-refresh should now be more reliable
 - Changelog will no longer display after first installing app
+- Fixed anime entries without a MyAnimeList entry being synced
 - Added a fix for a crash when opening Season Browser
 - Added a fix for a crash when downloading missing images

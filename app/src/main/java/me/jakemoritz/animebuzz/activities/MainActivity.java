@@ -277,7 +277,6 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         setBacklogBadge();
-        removeSeriesMissingMALID();
 
         if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
             if (versionName.matches("1.3.8")){
