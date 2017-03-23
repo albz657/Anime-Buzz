@@ -140,7 +140,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             mainActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    previousRealmResults.removeChangeListeners();
+                    previousRealmResults.removeAllChangeListeners();
                 }
             });
         }

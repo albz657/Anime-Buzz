@@ -2,4 +2,4 @@ New
 -
 
 Fixes
--
+- Fixed multiple crashes when opening the season browser
