@@ -40,7 +40,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
     private boolean episodeCountSnackbarVisible = false;
 
     public BacklogRecyclerViewAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
-        super(parent.getContext(), backlogItems, true);
+        super(backlogItems, true);
         this.fragment = parent;
         ItemTouchHelper.Callback callback = new SwipeCallback(this, parent);
         this.touchHelper = new ItemTouchHelper(callback);
@@ -186,11 +186,11 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                 });
                 fragment.getMainActivity().setBacklogBadge();
 
-                Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
+                Intent wigetIntent = new Intent(fragment.getContext(), BacklogBadgeWidgetProvider.class);
                 wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, BacklogBadgeWidgetProvider.class));
+                int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
                 wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                context.sendBroadcast(wigetIntent);
+                fragment.getContext().sendBroadcast(wigetIntent);
             }
         }
     }
@@ -214,11 +214,11 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             });
             fragment.getMainActivity().setBacklogBadge();
 
-            Intent wigetIntent = new Intent(context, BacklogBadgeWidgetProvider.class);
+            Intent wigetIntent = new Intent(fragment.getContext(), BacklogBadgeWidgetProvider.class);
             wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            int[] ids = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, BacklogBadgeWidgetProvider.class));
+            int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
             wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-            context.sendBroadcast(wigetIntent);
+            fragment.getContext().sendBroadcast(wigetIntent);
         }
     }
 

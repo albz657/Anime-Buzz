@@ -35,7 +35,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
     private ModifyItemStatusListener modifyListener;
 
     public SeriesRecyclerViewAdapter(SeriesFragment seriesFragment, RealmResults<Series> allSeries) {
-        super(seriesFragment.getContext(), allSeries, true);
+        super(allSeries, true);
         this.seriesFragment = seriesFragment;
         this.modifyListener = seriesFragment;
         this.self = this;
