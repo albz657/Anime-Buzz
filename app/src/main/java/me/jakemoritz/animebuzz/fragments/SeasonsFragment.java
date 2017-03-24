@@ -197,7 +197,9 @@ public class SeasonsFragment extends SeriesFragment {
             int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", season.getKey()).count();
 
             if (seasonSeriesCount > 0){
-                seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
+                if (season.isValid()){
+                    seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
+                }
             }
         }
 
