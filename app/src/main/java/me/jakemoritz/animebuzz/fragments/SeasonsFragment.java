@@ -78,18 +78,12 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
-            getSenpaiExportHelper().getSeasonList();
-
             if (SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()){
                 if (!SharedPrefsHelper.getInstance().getLatestSeasonKey().isEmpty()){
                     Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
                     SharedPrefsHelper.getInstance().setLatestSeasonName(currentlyBrowsingSeason.getName());
-                } else {
-                    getSenpaiExportHelper().getSeasonList();
                 }
             }
-
-            loadSeason(SharedPrefsHelper.getInstance().getLatestSeasonName());
 
             // check if need to auto-refresh
             Calendar currentCal = Calendar.getInstance();
