@@ -43,13 +43,15 @@ public class SenpaiExportHelper {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, retrofit2.Response<String> response) {
-                if (response.isSuccessful()) {
+                seriesFragment.failedInitialization();
+
+/*                if (response.isSuccessful()) {
                     seriesFragment.senpaiSeasonListReceived();
                 } else {
                     if (App.getInstance().isInitializing()){
                         seriesFragment.failedInitialization();
                     }
-                }
+                }*/
             }
 
             @Override
