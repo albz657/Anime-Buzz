@@ -436,8 +436,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     public void failedInitialization() {
-        FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-        mainActivity.getFragmentManager().beginTransaction().add(failedInitializationFragment, failedInitializationFragment.getTag()).addToBackStack(null).commitAllowingStateLoss();
+        if (mainActivity.isAlive()){
+            FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
+            mainActivity.getFragmentManager().beginTransaction().add(failedInitializationFragment, failedInitializationFragment.getTag()).addToBackStack(null).commitAllowingStateLoss();
+        }
     }
 
 //    Item modification

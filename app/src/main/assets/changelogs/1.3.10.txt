@@ -3,3 +3,4 @@ New
 
 Fixes
 - Fixed multiple crashes when opening the season browser
+- Fixed multiple crashes when initial data failed to download

@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private OrientationEventListener orientationEventListener;
     private OrientationChangedListener orientationChangedListener;
     private int oldOrientation = -1;
+    private boolean alive = false;
 
     public interface OrientationChangedListener {
         void orientationChanged(boolean portrait);
@@ -321,6 +322,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        alive = true;
+
         Fragment fragment = getCurrentFragment();
 
         if (fragment instanceof SeriesFragment) {
@@ -357,6 +360,12 @@ public class MainActivity extends AppCompatActivity {
                 dialogFragment.show(getFragmentManager(), TAG);
             }
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        alive = false;
     }
 
     @Override
@@ -582,6 +591,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /* Getters/setters */
+
+    public boolean isAlive() {
+        return alive;
+    }
 
     public RelativeLayout getProgressViewHolder() {
         return progressViewHolder;
