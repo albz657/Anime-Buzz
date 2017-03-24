@@ -5,3 +5,4 @@ Fixes
 - Fixed multiple crashes when opening the season browser
 - Fixed multiple crashes when opening the app
 - Fixed multiple crashes when initial data failed to download
+- Fixed notification sound setting not displaying options after denying external storage permissions

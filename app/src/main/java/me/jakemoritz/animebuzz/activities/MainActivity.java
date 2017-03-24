@@ -393,13 +393,15 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
             if (grantResults.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Fragment fragment = getCurrentFragment();
-                    if (fragment instanceof SettingsFragment) {
-                        openRingtones = true;
-                    }
+
                 } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_read_external);
-                    dialogFragment.show(getFragmentManager(), TAG);
+/*                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_read_external);
+                    dialogFragment.show(getFragmentManager(), TAG);*/
+                }
+
+                Fragment fragment = getCurrentFragment();
+                if (fragment instanceof SettingsFragment) {
+                    openRingtones = true;
                 }
             }
         } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST) {

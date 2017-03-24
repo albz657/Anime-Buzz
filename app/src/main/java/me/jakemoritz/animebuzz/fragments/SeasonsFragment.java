@@ -45,7 +45,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         Season currentlyBrowsingSeason;
 
-        if (!SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()){
+        if (!SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
             currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
         } else {
             currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
@@ -78,8 +78,8 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
 
         if (!App.getInstance().isInitializing()) {
-            if (SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()){
-                if (!SharedPrefsHelper.getInstance().getLatestSeasonKey().isEmpty()){
+            if (SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
+                if (!SharedPrefsHelper.getInstance().getLatestSeasonKey().isEmpty()) {
                     Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
                     SharedPrefsHelper.getInstance().setLatestSeasonName(currentlyBrowsingSeason.getName());
                 }
@@ -91,12 +91,12 @@ public class SeasonsFragment extends SeriesFragment {
             Calendar lastUpdatedCal = Calendar.getInstance();
             lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
 
-            if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
-                if (getSwipeRefreshLayoutEmpty().isEnabled()){
+            if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6) {
+                if (getSwipeRefreshLayoutEmpty().isEnabled()) {
                     getSwipeRefreshLayoutEmpty().setRefreshing(true);
                 }
 
-                if (getSwipeRefreshLayoutRecycler().isEnabled()){
+                if (getSwipeRefreshLayoutRecycler().isEnabled()) {
                     getSwipeRefreshLayoutRecycler().setRefreshing(true);
                 }
 
@@ -117,7 +117,7 @@ public class SeasonsFragment extends SeriesFragment {
         if (App.getInstance().isInitializing()) {
             Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
 
-            if (currentlyBrowsingSeason == null){
+            if (currentlyBrowsingSeason == null) {
                 failedInitialization();
             } else {
                 setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
@@ -182,7 +182,7 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void refreshSpinnerItems() {
-        if (seasonsSpinnerAdapter == null){
+        if (seasonsSpinnerAdapter == null) {
             seasonsSpinnerAdapter = new SeasonsSpinnerAdapter(App.getInstance(), new ArrayList<String>(), this);
         }
 
@@ -196,14 +196,12 @@ public class SeasonsFragment extends SeriesFragment {
         for (Season season : allSeasons) {
             int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", season.getKey()).count();
 
-            if (seasonSeriesCount > 0){
-                if (season.isValid()){
-                    seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
-                }
+            if (seasonSeriesCount > 0) {
+                seasonsSpinnerAdapter.getSeasonNames().add(season.getName());
             }
         }
 
-        for (String seasonName : seasonsSpinnerAdapter.getSeasonNames()){
+        for (String seasonName : seasonsSpinnerAdapter.getSeasonNames()) {
             if (seasonName.equals(getCurrentlyBrowsingSeason().getName())) {
                 previousSpinnerIndex = seasonsSpinnerAdapter.getSeasonNames().indexOf(seasonName);
             }

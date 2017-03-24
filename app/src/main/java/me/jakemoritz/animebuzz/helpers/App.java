@@ -60,6 +60,7 @@ public class App extends Application {
 //        justLaunchedWatching = true;
 
         if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")){
+            // normal app process
             RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
@@ -99,6 +100,7 @@ public class App extends Application {
                 migratedTo1 = false;
             }
         } else {
+            // Firebase process
             Log.d(TAG, "not normal process");
         }
 
