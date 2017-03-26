@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.helpers.App;
@@ -71,12 +72,39 @@ public class ChangelogDialogFragment extends DialogFragment {
         return builder.create();
     }
 
+    private class ChangelogComparator implements Comparator<String>{
+        @Override
+        public int compare(String o1, String o2) {
+            String[] leftArray = o1.split("\\.");
+            String[] rightArray = o2.split("\\.");
+
+            Integer majorLeft = Integer.valueOf(leftArray[0]);
+            Integer majorRight = Integer.valueOf(rightArray[0]);
+            if (majorLeft.equals(majorRight)){
+                Integer minorLeft = Integer.valueOf(leftArray[1]);
+                Integer minorRight = Integer.valueOf(rightArray[1]);
+
+                if (minorLeft.equals(minorRight)){
+                    Integer patchLeft = Integer.valueOf(leftArray[2]);
+                    Integer patchRight = Integer.valueOf(rightArray[2]);
+
+                    return patchLeft.compareTo(patchRight);
+                } else {
+                    return minorLeft.compareTo(minorRight);
+                }
+            } else {
+                return majorLeft.compareTo(majorRight);
+            }
+        }
+    }
+
     private ArrayList<ChangelogItem> loadChangelog(){
         ArrayList<ChangelogItem> changelogItems = new ArrayList<>();
 
         try {
             String[] changelogs = App.getInstance().getResources().getAssets().list("changelogs");
             ArrayList<String> changelogList = new ArrayList<>(Arrays.asList(changelogs));
+            Collections.sort(changelogList, new ChangelogComparator());
             Collections.reverse(changelogList);
 
             for (String changelogFilename : changelogList){
