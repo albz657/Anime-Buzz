@@ -1,14 +1,17 @@
 package me.jakemoritz.animebuzz.fragments;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.XpPreferenceFragment;
@@ -252,10 +255,25 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         Uri ringtoneUri = Uri.parse(ringtoneKey);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+
         if (ringtone != null) {
+            if (ringtoneUri.getPath().contains("external") && !readExternalGranted()){
+                // rigntone from external storage selected but external read permissions not granted
+                // reset ringtone, then display
+
+                ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+                ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
+
+                SharedPrefsHelper.getInstance().resetRingtone();
+            }
             String name = ringtone.getTitle(App.getInstance());
             ringtonePreference.setSummary(name);
         }
+    }
+
+    private boolean readExternalGranted() {
+        int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
     }
 
     public void signOut(Preference preference) {

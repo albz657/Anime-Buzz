@@ -153,6 +153,12 @@ public class SharedPrefsHelper {
         return sharedPrefs.getString(App.getInstance().getString(R.string.pref_ringtone_key), "Silent");
     }
 
+    public void resetRingtone(){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putString(App.getInstance().getString(R.string.pref_ringtone_key), "content://settings/system/notification_sound");
+        editor.apply();
+    }
+
     public String getSortingPreference(){
         return sharedPrefs.getString(App.getInstance().getString(R.string.shared_prefs_sorting), "");
     }
