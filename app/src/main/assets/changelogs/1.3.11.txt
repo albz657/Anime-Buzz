@@ -2,4 +2,6 @@ New
 -
 
 Fixes
--
+- Fixed MyAnimeList connections not working
+- Fixed a crash during setup when device is in landscape
+- Fixed a crash when refreshing data

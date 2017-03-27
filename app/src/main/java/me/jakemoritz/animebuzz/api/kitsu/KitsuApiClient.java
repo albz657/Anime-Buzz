@@ -88,27 +88,36 @@ public class KitsuApiClient {
         call.enqueue(new Callback<KitsuAnimeHolder>() {
             @Override
             public void onResponse(Call<KitsuAnimeHolder> call, Response<KitsuAnimeHolder> response) {
-                if (response.isSuccessful()) {
-                    Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
-                    hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
-                    hbIntent.putExtra("MALID", MALID);
-                    hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
-                    hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
-                    hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
-                    hbIntent.putExtra("showType", response.body().getShowType());
-                    App.getInstance().startService(hbIntent);
+                // check if MALID is valid
+                if (MALID != null){
+                    int MALIDint = -1;
+                    try {
+                        MALIDint = Integer.valueOf(MALID);
 
-                    String imageURL = response.body().getImageURL();
-                    File cacheDirectory = App.getInstance().getCacheDir();
-                    File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
-                    if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
-                        Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
-                        imageIntent.putExtra("url", imageURL);
-                        imageIntent.putExtra("MALID", MALID);
-                        App.getInstance().startService(imageIntent);
+                        if (response.isSuccessful()) {
+                            Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
+                            hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
+                            hbIntent.putExtra("MALID", MALID);
+                            hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
+                            hbIntent.putExtra("finishedAiringDate", response.body().getFinishedAiringDate());
+                            hbIntent.putExtra("startedAiringDate", response.body().getStartedAiringDate());
+                            hbIntent.putExtra("showType", response.body().getShowType());
+                            App.getInstance().startService(hbIntent);
+
+                            String imageURL = response.body().getImageURL();
+                            File cacheDirectory = App.getInstance().getCacheDir();
+                            File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
+                            if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
+                                Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
+                                imageIntent.putExtra("url", imageURL);
+                                imageIntent.putExtra("MALID", MALID);
+                                App.getInstance().startService(imageIntent);
+                            }
+                        } else {
+                            setDefaultEnglishTitle(MALID);
+                        }
+                    } catch (NumberFormatException e) {
                     }
-                } else {
-                    setDefaultEnglishTitle(MALID);
                 }
             }
 

@@ -56,84 +56,84 @@ public class KitsuDataProcessor extends IntentService {
     private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType, final String kitsuId) {
         final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
-        String currentAiringStatus = currSeries.getAiringStatus();
+        if (currSeries != null){
+            String currentAiringStatus = currSeries.getAiringStatus();
 
-        final boolean single = episodeCount == 1;
-        String airingStatus = "";
-        String formattedStartAiringDate = "";
-        String formattedFinishedAiringDate = "";
+            final boolean single = episodeCount == 1;
+            String airingStatus = "";
+            String formattedStartAiringDate = "";
+            String formattedFinishedAiringDate = "";
 
-        if (showType.isEmpty()) {
-            showType = "TV";
-        }
-
-        showType = showType.substring(0, 1).toUpperCase() + showType.substring(1);
-
-        if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
-            Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
-            if (season.getRelativeTime().equals(Season.PRESENT)) {
-                airingStatus = "Finished airing";
-            } else {
-                airingStatus = "Not yet aired";
+            if (showType.isEmpty()) {
+                showType = "TV";
             }
-        } else {
-            Calendar currentCalendar = Calendar.getInstance();
-            Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(startedAiringDate);
 
-            formattedStartAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
-            if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
-                if (currentCalendar.compareTo(startedCalendar) > 0) {
-                    if (single) {
-                        airingStatus = "Finished airing";
-                    } else {
-                        airingStatus = "Airing";
-//                        checkForSeasonSwitch(currSeries);
-                    }
+            showType = showType.substring(0, 1).toUpperCase() + showType.substring(1);
+
+            if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
+                Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
+                if (season.getRelativeTime().equals(Season.PRESENT)) {
+                    airingStatus = "Finished airing";
                 } else {
                     airingStatus = "Not yet aired";
                 }
-            } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
-                Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(finishedAiringDate);
-                formattedFinishedAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
-                if (currentCalendar.compareTo(finishedCalendar) > 0) {
-                    airingStatus = "Finished airing";
-                } else {
+            } else {
+                Calendar currentCalendar = Calendar.getInstance();
+                Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(startedAiringDate);
+
+                formattedStartAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+                if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
-                        airingStatus = "Airing";
+                        if (single) {
+                            airingStatus = "Finished airing";
+                        } else {
+                            airingStatus = "Airing";
 //                        checkForSeasonSwitch(currSeries);
+                        }
                     } else {
                         airingStatus = "Not yet aired";
                     }
+                } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
+                    Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(finishedAiringDate);
+                    formattedFinishedAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+                    if (currentCalendar.compareTo(finishedCalendar) > 0) {
+                        airingStatus = "Finished airing";
+                    } else {
+                        if (currentCalendar.compareTo(startedCalendar) > 0) {
+                            airingStatus = "Airing";
+//                        checkForSeasonSwitch(currSeries);
+                        } else {
+                            airingStatus = "Not yet aired";
+                        }
+                    }
                 }
             }
-        }
 
-        if (currentAiringStatus.equals("Airing") && airingStatus.equals("Finished airing")){
-            AlarmHelper.getInstance().removeAlarm(currSeries);
-        }
-
-        final String finalAiringStatus = airingStatus;
-        final String finalShowType = showType;
-        final String finalStartAiringDate = formattedStartAiringDate;
-        final String finalfinishedAiringDate = formattedFinishedAiringDate;
-
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                currSeries.setShowType(finalShowType);
-                currSeries.setSingle(single);
-                if (!englishTitle.isEmpty()){
-                    currSeries.setEnglishTitle(englishTitle);
-                } else {
-                    currSeries.setEnglishTitle(currSeries.getName());
-                }
-                currSeries.setAiringStatus(finalAiringStatus);
-                currSeries.setStartedAiringDate(finalStartAiringDate);
-                currSeries.setFinishedAiringDate(finalfinishedAiringDate);
+            if (currentAiringStatus.equals("Airing") && airingStatus.equals("Finished airing")){
+                AlarmHelper.getInstance().removeAlarm(currSeries);
             }
-        });
 
+            final String finalAiringStatus = airingStatus;
+            final String finalShowType = showType;
+            final String finalStartAiringDate = formattedStartAiringDate;
+            final String finalfinishedAiringDate = formattedFinishedAiringDate;
 
+            realm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    currSeries.setShowType(finalShowType);
+                    currSeries.setSingle(single);
+                    if (!englishTitle.isEmpty()){
+                        currSeries.setEnglishTitle(englishTitle);
+                    } else {
+                        currSeries.setEnglishTitle(currSeries.getName());
+                    }
+                    currSeries.setAiringStatus(finalAiringStatus);
+                    currSeries.setStartedAiringDate(finalStartAiringDate);
+                    currSeries.setFinishedAiringDate(finalfinishedAiringDate);
+                }
+            });
+        }
     }
 
     private void checkForSeasonSwitch(final Series currSeries) {
