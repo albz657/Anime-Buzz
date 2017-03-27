@@ -9,8 +9,10 @@
 
 # Add any project specific keep options here:
 
+# Picasso
 -dontwarn com.squareup.okhttp.**
 
+# Retrofit
 # Platform calls Class.forName on types which do not exist on Android to determine platform.
 -dontnote retrofit2.Platform
 # Platform used when running on Java 8 VMs. Will not be used at runtime.
@@ -20,9 +22,18 @@
 # Retain declared checked exceptions for use by a Proxy instance.
 -keepattributes Exceptions
 
+# Okio
 -dontwarn okio.**
 
+# SimpleXML
 -dontwarn com.bea.xml.stream.**
+-keep public class org.simpleframework.**{ *; }
+-keep class org.simpleframework.xml.**{ *; }
+-keep class org.simpleframework.xml.core.**{ *; }
+-keep class org.simpleframework.xml.util.**{ *; }
+# (1)Annotations and signatures
+-keepattributes *Annotation*
+-keepattributes Signature
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface

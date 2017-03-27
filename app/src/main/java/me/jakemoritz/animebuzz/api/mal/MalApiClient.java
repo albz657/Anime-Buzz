@@ -207,6 +207,7 @@ public class MalApiClient {
                                 }
                             }
                         }
+
                         MalImportHelper helper = new MalImportHelper(malDataImportedListener);
                         helper.matchSeries(matchList);
                     } else {
@@ -303,9 +304,7 @@ public class MalApiClient {
         OkHttpClient client = httpClient.build();
         Retrofit retrofit = builder.client(client).build();
 
-        if (true){
-            builder.addConverterFactory(SimpleXmlConverterFactory.create());
-        }
+        builder.addConverterFactory(SimpleXmlConverterFactory.create());
 
         return retrofit.create(serviceClass);
     }

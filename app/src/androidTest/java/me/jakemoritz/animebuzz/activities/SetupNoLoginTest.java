@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 
 import me.jakemoritz.animebuzz.R;
 
-
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -29,6 +28,7 @@ public class SetupNoLoginTest {
 
     @Test
     public void setupNoLoginTest() {
+        ViewInteraction setupScreenOne = onView(withId(R.id.welcome_screen_one));
         ViewInteraction appCompatButton = onView(
                 allOf(withId(R.id.start_button), withText("Start"), isDisplayed()));
         appCompatButton.perform(click());
