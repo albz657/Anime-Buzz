@@ -191,9 +191,10 @@ public class SeasonsFragment extends SeriesFragment {
         RealmList<Season> allSeasons = new RealmList<>();
         allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAll());
 
-        Collections.sort(allSeasons, new SeasonComparator());
+        ArrayList<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(allSeasons));
+        Collections.sort(unmanagedSeasons, new SeasonComparator());
 
-        for (Season season : allSeasons) {
+        for (Season season : unmanagedSeasons) {
             int seasonSeriesCount = (int) App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", season.getKey()).count();
 
             if (seasonSeriesCount > 0) {
