@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
-import io.realm.RealmList;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonsSpinnerAdapter;
@@ -81,6 +80,7 @@ public class SeasonsFragment extends SeriesFragment {
             if (SharedPrefsHelper.getInstance().getLatestSeasonName().isEmpty()) {
                 if (!SharedPrefsHelper.getInstance().getLatestSeasonKey().isEmpty()) {
                     Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                    setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
                     SharedPrefsHelper.getInstance().setLatestSeasonName(currentlyBrowsingSeason.getName());
                 }
             }
@@ -188,10 +188,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         seasonsSpinnerAdapter.getSeasonNames().clear();
 
-        RealmList<Season> allSeasons = new RealmList<>();
-        allSeasons.addAll(App.getInstance().getRealm().where(Season.class).findAll());
-
-        ArrayList<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(allSeasons));
+        ArrayList<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(App.getInstance().getRealm().where(Season.class).findAll()));
         Collections.sort(unmanagedSeasons, new SeasonComparator());
 
         for (Season season : unmanagedSeasons) {
@@ -202,8 +199,12 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
+        if (getCurrentlyBrowsingSeasonName().isEmpty() && getCurrentlyBrowsingSeason() != null && getCurrentlyBrowsingSeason().isValid()){
+            setCurrentlyBrowsingSeasonName(getCurrentlyBrowsingSeason().getName());
+        }
+
         for (String seasonName : seasonsSpinnerAdapter.getSeasonNames()) {
-            if (seasonName.equals(getCurrentlyBrowsingSeason().getName())) {
+            if (seasonName.equals(getCurrentlyBrowsingSeasonName())) {
                 previousSpinnerIndex = seasonsSpinnerAdapter.getSeasonNames().indexOf(seasonName);
             }
         }

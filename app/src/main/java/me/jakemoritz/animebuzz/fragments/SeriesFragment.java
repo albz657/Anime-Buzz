@@ -59,30 +59,37 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
-    private SeriesRecyclerViewAdapter mAdapter;
-    private boolean updating = false;
-    private SenpaiExportHelper senpaiExportHelper;
-    private KitsuApiClient kitsuApiClient;
-    private RecyclerView recyclerView;
-    private LinearLayout emptyView;
-    private MalApiClient malApiClient;
-    private boolean adding = false;
     private MainActivity mainActivity;
-    private Season currentlyBrowsingSeason;
+
+    private SeriesRecyclerViewAdapter mAdapter;
     private BroadcastReceiver initialReceiver;
     private RealmResults<Series> previousRealmResults;
-    private FrameLayout seriesLayout;
+
+    // api clients
+    private SenpaiExportHelper senpaiExportHelper;
+    private KitsuApiClient kitsuApiClient;
+    private MalApiClient malApiClient;
+
+    // layouts
     private SwipeRefreshLayout swipeRefreshLayoutRecycler;
     private SwipeRefreshLayout swipeRefreshLayoutEmpty;
+
+    // current season info
+    private Season currentlyBrowsingSeason;
+    private String currentlyBrowsingSeasonName;
     private String currentlyBrowsingSeasonKey;
+
+    // boolean states
+    private boolean updating = false;
+    private boolean adding = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
-
         setHasOptionsMenu(true);
+
         malApiClient = new MalApiClient(this);
         senpaiExportHelper = new SenpaiExportHelper(this);
         kitsuApiClient = new KitsuApiClient(this);
@@ -94,16 +101,16 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         container.clearDisappearingChildren();
         container.removeAllViews();
 
-        seriesLayout = (FrameLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
+        FrameLayout seriesLayout = (FrameLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
 
         swipeRefreshLayoutRecycler = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_recycler);
         swipeRefreshLayoutRecycler.setOnRefreshListener(this);
         swipeRefreshLayoutEmpty = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_empty);
         swipeRefreshLayoutEmpty.setOnRefreshListener(this);
 
-        recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
+        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
-        emptyView = (LinearLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
+        LinearLayout emptyView = (LinearLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -180,6 +187,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
             currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
+            if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
+                currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
+                currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
+            }
         }
 
         if (updating){
@@ -214,8 +225,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                             public void onReceive(Context context, Intent intent) {
                                 App.getInstance().setInitializing(false);
                                 App.getInstance().setPostInitializing(true);
-
-//                                NotificationHelper.getInstance().createInitialNotification();
 
                                 RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
                                 Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
@@ -282,13 +291,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public void senpaiSeasonListReceived() {
         senpaiExportHelper.getSeasonData("raw");
-    }
-
-    @Override
-    public void malDataImported(boolean received) {
-/*        if (seriesLayout.isRefreshing()) {
-            stopRefreshing();
-        }*/
     }
 
     private void clearAppData() {
@@ -416,10 +418,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         } else {
             if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
+
             }
 
-            if (currentlyBrowsingSeason != null  && currentlyBrowsingSeason.isValid()){
+            if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
                 currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
+                currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
             }
         }
     }
@@ -573,7 +577,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
     }
 
-//    Getters/Setters
+    @Override
+    public void malDataImported(boolean received) {
+
+    }
+
+    //    Getters/Setters
 
     public SeriesRecyclerViewAdapter getmAdapter() {
         return mAdapter;
@@ -609,6 +618,18 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
         this.currentlyBrowsingSeason = currentlyBrowsingSeason;
+        if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
+            currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
+            currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
+        }
+    }
+
+    public String getCurrentlyBrowsingSeasonName() {
+        return currentlyBrowsingSeasonName;
+    }
+
+    public void setCurrentlyBrowsingSeasonName(String currentlyBrowsingSeasonName) {
+        this.currentlyBrowsingSeasonName = currentlyBrowsingSeasonName;
     }
 
     public SwipeRefreshLayout getSwipeRefreshLayoutRecycler() {

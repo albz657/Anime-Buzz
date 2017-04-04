@@ -1,0 +1,5 @@
+New
+-
+
+Fixes
+- Added a fix for a crash when opening the season browser
