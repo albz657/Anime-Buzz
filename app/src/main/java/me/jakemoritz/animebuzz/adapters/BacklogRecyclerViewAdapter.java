@@ -136,7 +136,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                 case "Hulu":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
                     break;
-                case "The MALAnimeXMLModel Network":
+                case "The Anime Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
                     holder.mSimulcast.setText(fragment.getMainActivity().getString(R.string.simulcast_anime_network));
                     break;

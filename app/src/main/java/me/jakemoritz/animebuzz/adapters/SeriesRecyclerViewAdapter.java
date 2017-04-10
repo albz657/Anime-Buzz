@@ -78,7 +78,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.series = getItem(position);
+        holder.series = getItem(holder.getAdapterPosition());
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.series.getEnglishTitle());
@@ -191,7 +191,7 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
                 case "Hulu":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
                     break;
-                case "The MALAnimeXMLModel Network":
+                case "The Anime Network":
                     colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
                     holder.mSimulcast.setText(seriesFragment.getString(R.string.simulcast_anime_network));
                     break;
