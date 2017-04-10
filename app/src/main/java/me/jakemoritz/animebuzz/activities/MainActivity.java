@@ -79,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt("orientation", oldOrientation);
+        Fragment fragment = getCurrentFragment();
+        getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
+
         orientationEventListener.disable();
         super.onSaveInstanceState(outState);
     }
@@ -88,8 +91,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Fragment savedFragment = null;
         if (savedInstanceState != null) {
             oldOrientation = savedInstanceState.getInt("orientation");
+
+            savedFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
         }
 
         orientationEventListener = new OrientationEventListener(this) {
@@ -237,41 +243,54 @@ public class MainActivity extends AppCompatActivity {
 
         // Start relevant fragment
         int defaultTabId = 0;
-        if (App.getInstance().isInitializing()) {
-            SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
+        if (savedFragment == null){
+            if (App.getInstance().isInitializing()) {
+                SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
 
-            SeriesFragment seriesFragment;
+                SeriesFragment seriesFragment;
 
-            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
-                seriesFragment = UserListFragment.newInstance();
-            } else {
-                seriesFragment = SeasonsFragment.newInstance();
-                defaultTabId = 2;
-            }
-
-            SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
-            senpaiExportHelper.getSeasonList();
-
-            startFragment(seriesFragment);
-        } else {
-            Fragment fragment = getCurrentFragment();
-            if (fragment == null) {
-                if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
-                    defaultTabId = 1;
-                    startFragment(BacklogFragment.newInstance());
+                if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                    seriesFragment = UserListFragment.newInstance();
                 } else {
-                    startFragment(UserListFragment.newInstance());
-                }
-            } else {
-                if (fragment instanceof UserListFragment) {
-                    defaultTabId = 0;
-                } else if (fragment instanceof SeriesFragment) {
+                    seriesFragment = SeasonsFragment.newInstance();
                     defaultTabId = 2;
-                } else if (fragment instanceof BacklogFragment) {
-                    defaultTabId = 1;
+                }
+
+                SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
+                senpaiExportHelper.getSeasonList();
+
+                startFragment(seriesFragment);
+            } else {
+                Fragment fragment = getCurrentFragment();
+                if (fragment == null) {
+                    if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
+                        defaultTabId = 1;
+                        startFragment(BacklogFragment.newInstance());
+                    } else {
+                        startFragment(UserListFragment.newInstance());
+                    }
+                } else {
+                    if (fragment instanceof UserListFragment) {
+                        defaultTabId = 0;
+                    } else if (fragment instanceof SeriesFragment) {
+                        defaultTabId = 2;
+                    } else if (fragment instanceof BacklogFragment) {
+                        defaultTabId = 1;
+                    }
                 }
             }
+        } else {
+            if (savedFragment instanceof UserListFragment) {
+                defaultTabId = 0;
+            } else if (savedFragment instanceof SeriesFragment) {
+                defaultTabId = 2;
+            } else if (savedFragment instanceof BacklogFragment) {
+                defaultTabId = 1;
+            }
+
+            startFragment(savedFragment);
         }
+
 
         App.getInstance().setSetDefaultTabId(true);
         bottomBar.setCurrentItem(defaultTabId);
@@ -389,6 +408,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
             if (grantResults.length > 0) {
@@ -419,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Fragment getCurrentFragment() {
+    public Fragment getCurrentFragment() {
         if (getSupportFragmentManager().getFragments() != null && !getSupportFragmentManager().getFragments().isEmpty()) {
             Iterator iterator = getSupportFragmentManager().getFragments().iterator();
             Fragment fragment = (Fragment) iterator.next();

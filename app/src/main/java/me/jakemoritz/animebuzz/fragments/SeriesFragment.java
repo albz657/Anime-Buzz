@@ -372,7 +372,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 mainActivity.startFragment(SettingsFragment.newInstance());
                 return true;
             case R.id.action_about:
-                mainActivity.startFragment(AboutFragment.newInstance());
+                mainActivity.getCurrentFragment();
+//                mainActivity.startFragment(AboutFragment.newInstance());
                 return true;
         }
 
