@@ -446,7 +446,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public Fragment getCurrentFragment() {
+    private Fragment getCurrentFragment() {
         if (getSupportFragmentManager().getFragments() != null && !getSupportFragmentManager().getFragments().isEmpty()) {
             Iterator iterator = getSupportFragmentManager().getFragments().iterator();
             Fragment fragment = (Fragment) iterator.next();

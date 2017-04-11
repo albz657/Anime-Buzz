@@ -121,16 +121,35 @@ public class KitsuDataProcessor extends IntentService {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-                    currSeries.setShowType(finalShowType);
-                    currSeries.setSingle(single);
-                    if (!englishTitle.isEmpty()){
-                        currSeries.setEnglishTitle(englishTitle);
-                    } else {
-                        currSeries.setEnglishTitle(currSeries.getName());
+                    if (!currSeries.getShowType().matches(finalShowType)){
+                        currSeries.setShowType(finalShowType);
                     }
-                    currSeries.setAiringStatus(finalAiringStatus);
-                    currSeries.setStartedAiringDate(finalStartAiringDate);
-                    currSeries.setFinishedAiringDate(finalfinishedAiringDate);
+
+                    if (currSeries.isSingle() != single){
+                        currSeries.setSingle(single);
+                    }
+
+                    if (!englishTitle.isEmpty()){
+                        if (!currSeries.getEnglishTitle().matches(englishTitle)){
+                            currSeries.setEnglishTitle(englishTitle);
+                        }
+                    } else {
+                        if (!currSeries.getEnglishTitle().matches(currSeries.getName())){
+                            currSeries.setEnglishTitle(currSeries.getName());
+                        }
+                    }
+
+                    if (!currSeries.getAiringStatus().matches(finalAiringStatus)){
+                        currSeries.setAiringStatus(finalAiringStatus);
+                    }
+
+                    if (!currSeries.getStartedAiringDate().matches(finalStartAiringDate)){
+                        currSeries.setStartedAiringDate(finalStartAiringDate);
+                    }
+
+                    if (!currSeries.getFinishedAiringDate().matches(finalfinishedAiringDate)){
+                        currSeries.setFinishedAiringDate(finalfinishedAiringDate);
+                    }
                 }
             });
         }
