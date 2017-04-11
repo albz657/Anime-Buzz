@@ -179,11 +179,11 @@ public class MainActivity extends AppCompatActivity {
                     Fragment newFragment = null;
 
                     Fragment currentFragment = getCurrentFragment();
-                    if (position == 0 && !(currentFragment instanceof UserListFragment)) {
+                    if (position == 0 && !wasSelected) {
                         newFragment = UserListFragment.newInstance();
-                    } else if (position == 2 && !(currentFragment instanceof SeasonsFragment)) {
+                    } else if (position == 2 && !wasSelected) {
                         newFragment = SeasonsFragment.newInstance();
-                    } else if (position == 1 && !(currentFragment instanceof BacklogFragment)) {
+                    } else if (position == 1 && !wasSelected) {
                         newFragment = BacklogFragment.newInstance();
                     }
 

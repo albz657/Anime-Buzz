@@ -30,6 +30,7 @@ public class UserListFragment extends SeriesFragment {
     public static UserListFragment newInstance() {
         UserListFragment fragment = new UserListFragment();
         fragment.setHasOptionsMenu(true);
+        fragment.setRetainInstance(true);
 
         Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
         fragment.setCurrentlyBrowsingSeason(currentSeason);
