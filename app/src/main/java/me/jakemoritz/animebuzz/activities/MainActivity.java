@@ -95,7 +95,11 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             oldOrientation = savedInstanceState.getInt("orientation");
 
-            savedFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
+            try {
+                savedFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
+            } catch (IllegalStateException e){
+                e.printStackTrace();;
+            }
         }
 
         orientationEventListener = new OrientationEventListener(this) {
@@ -178,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
                     Fragment newFragment = null;
 
-                    Fragment currentFragment = getCurrentFragment();
                     if (position == 0 && !wasSelected) {
                         newFragment = UserListFragment.newInstance();
                     } else if (position == 2 && !wasSelected) {
