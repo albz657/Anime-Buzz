@@ -2,4 +2,5 @@ New
 -
 
 Fixes
+- Added a fix for selecting tabs not working
 - Added a fix for a crash when opening the season browser
