@@ -17,6 +17,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import java.io.File;
+
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.models.Series;
@@ -160,11 +162,26 @@ public class NotificationHelper {
     private Bitmap createCircleBitmap(String MALID) {
         int posterId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz");
 
+        File bitmapFile = null;
         if (posterId == 0){
-            return null;
+            File cacheDirectory = App.getInstance().getCacheDir();
+
+            if (cacheDirectory.exists() && cacheDirectory.isDirectory()){
+                bitmapFile = new File(cacheDirectory, MALID + ".jspg");
+            }
+
+            if (bitmapFile == null || !bitmapFile.exists()){
+                return null;
+            }
         }
 
-        Bitmap bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), posterId);
+        Bitmap bitmap;
+
+        if (posterId == 0){
+            bitmap = BitmapFactory.decodeFile(bitmapFile.getPath());
+        } else {
+            bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), posterId);
+        }
 
         if (bitmap == null){
             return null;
