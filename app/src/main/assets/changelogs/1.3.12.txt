@@ -4,4 +4,5 @@ New
 Fixes
 - Added a fix for selecting tabs not working
 - Added a fix for refreshing causing incorrect anime images to be displayed
-- Added a fix for a crash when opening the season browser
+- Episode notifications will now check for downloaded images to display
+- Multiple crash fixes
