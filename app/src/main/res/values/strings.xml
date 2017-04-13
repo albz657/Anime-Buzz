@@ -157,7 +157,7 @@
     <string name="about_senpai_url">http://www.senpai.moe</string>
 
     <string name="about_mal"><b>MyAnimeList</b> allows users to sign in with their MAL accounts to access and update the anime they\'re currently watching.</string>
-    <string name="about_mal_url">http://MALXMLModel.net</string>
+    <string name="about_mal_url">http://myanimelist.net</string>
 
     <string name="about_hb"><b>Kitsu</b> provides the images and additional anime details.</string>
     <string name="about_hb_url">https://kitsu.io</string>
