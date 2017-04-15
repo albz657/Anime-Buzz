@@ -77,8 +77,11 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        holder.series = getItem(holder.getAdapterPosition());
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        final int adapterPosition = holder.getAdapterPosition();
+        holder.series = getItem(adapterPosition);
+
+        final String MALID = holder.series.getMALID();
 
         if (SharedPrefsHelper.getInstance().prefersEnglish() && !holder.series.getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.series.getEnglishTitle());
@@ -229,13 +232,13 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addSeriesHelper(holder.series.getMALID());
+                addSeriesHelper(MALID);
             }
         });
         holder.mMinusButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, holder.series.getMALID(), position);
+                RemoveSeriesDialogFragment dialogFragment = RemoveSeriesDialogFragment.newInstance(self, MALID, adapterPosition);
                 dialogFragment.show(seriesFragment.getMainActivity().getFragmentManager(), TAG);
             }
         });

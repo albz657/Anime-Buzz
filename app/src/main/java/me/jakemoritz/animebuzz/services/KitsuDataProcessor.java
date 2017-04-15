@@ -121,6 +121,17 @@ public class KitsuDataProcessor extends IntentService {
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
+/*                    currSeries.setShowType(finalShowType);
+                    currSeries.setSingle(single);
+                    if (!englishTitle.isEmpty()){
+                        currSeries.setEnglishTitle(englishTitle);
+                    } else {
+                        currSeries.setEnglishTitle(currSeries.getName());
+                    }
+                    currSeries.setAiringStatus(finalAiringStatus);
+                    currSeries.setStartedAiringDate(finalStartAiringDate);
+                    currSeries.setFinishedAiringDate(finalfinishedAiringDate);*/
+
                     if (!currSeries.getShowType().matches(finalShowType)){
                         currSeries.setShowType(finalShowType);
                     }
