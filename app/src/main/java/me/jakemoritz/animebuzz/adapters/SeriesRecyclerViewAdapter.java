@@ -13,7 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.io.File;
 
@@ -221,12 +221,12 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
         int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz");
         if (imageId != 0) {
-            Picasso.with(App.getInstance()).load(imageId).fit().centerCrop().into(holder.mPoster);
+            Glide.with(App.getInstance()).load(imageId).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         } else {
             File cacheDirectory = App.getInstance().getCacheDir();
             File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
 
-            Picasso.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).fit().centerCrop().into(holder.mPoster);
+            Glide.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {

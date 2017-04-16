@@ -1,8 +1,5 @@
-New
--
-
 Fixes
-- Added a fix for selecting tabs not working
+- Added a fix for selecting a tab not working
 - Added a fix for refreshing causing incorrect anime images to be displayed
 - Episode notifications will now check for downloaded images to display
 - Fixed incorrect MyAnimeList link in About section
