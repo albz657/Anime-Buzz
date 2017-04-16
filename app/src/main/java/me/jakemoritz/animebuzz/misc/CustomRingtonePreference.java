@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.misc;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -37,7 +38,7 @@ public class CustomRingtonePreference extends RingtonePreference {
 
     @Override
     protected void onClick() {
-        if (openList){
+        if (openList) {
             super.onClick();
             openList = false;
         } else {
@@ -45,12 +46,13 @@ public class CustomRingtonePreference extends RingtonePreference {
         }
     }
 
-    private void checkExternalPermissions(){
-        boolean apiOver15 = (Build.VERSION.SDK_INT > 15);
+    @TargetApi(19)
+    private void checkExternalPermissions() {
+        boolean apiGreaterThanOrEqual19 = (Build.VERSION.SDK_INT >= 19);
 
         int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
 
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED && apiOver15){
+        if (apiGreaterThanOrEqual19 && permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, constants.READ_EXTERNAL_STORAGE_REQUEST);
         } else {
             openList = true;

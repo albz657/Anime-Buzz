@@ -200,7 +200,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (getCurrentlyBrowsingSeasonName().isEmpty() && getCurrentlyBrowsingSeason() != null && getCurrentlyBrowsingSeason().isValid()){
+        if (getCurrentlyBrowsingSeason() != null && getCurrentlyBrowsingSeasonName().isEmpty() && getCurrentlyBrowsingSeason().isValid()){
             setCurrentlyBrowsingSeasonName(getCurrentlyBrowsingSeason().getName());
         }
 

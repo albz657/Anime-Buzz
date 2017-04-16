@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.crash.FirebaseCrash;
 
 import net.xpece.android.support.preference.ListPreference;
 import net.xpece.android.support.preference.PreferenceDividerDecoration;
@@ -266,14 +269,27 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
                 SharedPrefsHelper.getInstance().resetRingtone();
             }
-            String name = ringtone.getTitle(App.getInstance());
+
+            String name = "";
+            try {
+                name = ringtone.getTitle(App.getInstance());
+            } catch (SecurityException e){
+                FirebaseCrash.report(e);
+            }
             ringtonePreference.setSummary(name);
         }
     }
 
+    @TargetApi(19)
     private boolean readExternalGranted() {
-        int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
-        return (permissionCheck == PackageManager.PERMISSION_GRANTED);
+        boolean apiGreaterThanOrEqual19 = (Build.VERSION.SDK_INT >= 19);
+
+        if (apiGreaterThanOrEqual19){
+            int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
+            return (permissionCheck == PackageManager.PERMISSION_GRANTED);
+        } else {
+            return true;
+        }
     }
 
     public void signOut(Preference preference) {
