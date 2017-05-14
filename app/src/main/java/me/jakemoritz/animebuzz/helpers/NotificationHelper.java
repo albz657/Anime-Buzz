@@ -176,11 +176,14 @@ public class NotificationHelper {
         }
 
         Bitmap bitmap;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 2;
+//        options.inJustDecodeBounds = true;
 
         if (posterId == 0){
-            bitmap = BitmapFactory.decodeFile(bitmapFile.getPath());
+            bitmap = BitmapFactory.decodeFile(bitmapFile.getPath(), options);
         } else {
-            bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), posterId);
+            bitmap = BitmapFactory.decodeResource(App.getInstance().getResources(), posterId, options);
         }
 
         if (bitmap == null){
@@ -203,6 +206,7 @@ public class NotificationHelper {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
 
+        bitmap.recycle();
         return output;
     }
 

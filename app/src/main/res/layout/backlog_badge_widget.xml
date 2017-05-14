@@ -4,15 +4,16 @@
                 android:id="@+id/backlog_widget"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="top"
-                android:paddingTop="4dp">
+    android:gravity="top"
+    android:layout_marginTop="4dp">
 
     <ImageView
         android:id="@+id/backlog_widget_icon"
         android:layout_width="56dp"
         android:layout_height="56dp"
         android:adjustViewBounds="true"
-        android:src="@mipmap/ic_launcher"/>
+        android:src="@mipmap/ic_launcher"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/backlog_wiget_count"

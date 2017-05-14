@@ -53,8 +53,8 @@ public class AlarmHelper {
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
 
-                for (int i = 0; i < 5; i++){
-                    int random = (int) (Math.random() * userList.size() + 1);
+                for (int i = 0; i < 10; i++){
+                    int random = (int) (Math.random() * userList.size());
                     Series series = userList.get(random);
 
                     BacklogItem backlogItem = realm.createObject(BacklogItem.class);
