@@ -155,8 +155,7 @@ public class MainActivity extends AppCompatActivity {
         notificationReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                updateTeslaUnread();
-                setBacklogBadge();
+                updateBadges();
             }
         };
 
@@ -303,7 +302,7 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setCurrentItem(defaultTabId);
         App.getInstance().setSetDefaultTabId(false);
 
-        setBacklogBadge();
+        updateBadges();
 
         if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
             if (versionName.matches("1.3.8")){
@@ -519,7 +518,7 @@ public class MainActivity extends AppCompatActivity {
                     bottomBar.setCurrentItem(1);
                 }
             }
-            setBacklogBadge();
+            updateBadges();
         } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
             startFragment(BacklogFragment.newInstance());
             bottomBar.setCurrentItem(1);
