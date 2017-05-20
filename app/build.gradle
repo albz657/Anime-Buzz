@@ -91,6 +91,8 @@ dependencies {
         exclude module: 'design'
     }
     testCompile 'junit:junit:4.12'
+    compile files('src/main/jar/com.sonymobile.home.resourceprovider.jar')
+    compile "me.leolin:ShortcutBadger:1.1.16@aar"
 }
 
 apply plugin: 'com.google.gms.google-services'

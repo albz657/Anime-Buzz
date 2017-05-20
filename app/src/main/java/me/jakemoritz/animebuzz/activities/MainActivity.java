@@ -1,7 +1,6 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.content.BroadcastReceiver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -9,7 +8,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -17,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -26,6 +23,7 @@ import android.widget.Spinner;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -58,6 +56,7 @@ import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -406,13 +405,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setBacklogBadge() {
-        if (bottomBar != null) {
-            RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
-            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
-        }
-    }
-
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -446,29 +438,6 @@ public class MainActivity extends AppCompatActivity {
                     dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
-        }
-    }
-
-    public void updateBadges(){
-        setBacklogBadge();
-        updateTeslaUnread();
-    }
-
-    private void updateTeslaUnread() {
-        try {
-            RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
-
-            if (realmResults == null || realmResults.isValid()){
-                ContentValues cv = new ContentValues();
-                cv.put("tag", getPackageName() + "/" + getComponentName().getClassName());
-                cv.put("count", 5);
-                getContentResolver().insert(Uri.parse("content://com.teslacoilsw.notifier/unread_count"), cv);
-            }
-        } catch (IllegalArgumentException ex) {
-            /* Fine, TeslaUnread is not installed. */
-            Log.d(TAG, "s");
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 
@@ -522,6 +491,31 @@ public class MainActivity extends AppCompatActivity {
         } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
             startFragment(BacklogFragment.newInstance());
             bottomBar.setCurrentItem(1);
+        }
+    }
+
+    /* Badge methods */
+
+    public void updateBadges(){
+        RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+
+        if (realmResults == null || realmResults.isValid()){
+            try {
+                int badgeCount = realmResults.size();
+                ShortcutBadger.applyCount(this, badgeCount);
+            } catch (Exception e){
+                FirebaseCrash.log("Exception when setting app badge");
+                FirebaseCrash.report(e);
+            }
+        }
+
+        setBacklogBadge();
+    }
+
+    private void setBacklogBadge() {
+        if (bottomBar != null) {
+            RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
         }
     }
 
