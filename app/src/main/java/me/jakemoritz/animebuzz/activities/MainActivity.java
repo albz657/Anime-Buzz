@@ -407,7 +407,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setBacklogBadge() {
+    private void setBacklogBadge() {
         if (bottomBar != null) {
             RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
             bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
@@ -450,7 +450,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateTeslaUnread() {
+    public void updateBadges(){
+        setBacklogBadge();
+        updateTeslaUnread();
+    }
+
+    private void updateTeslaUnread() {
         try {
             RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
 

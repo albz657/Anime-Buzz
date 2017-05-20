@@ -189,15 +189,13 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
                     removedItem.deleteFromRealm();
                 }
             });
-            fragment.getMainActivity().setBacklogBadge();
+            fragment.getMainActivity().updateBadges();
 
             Intent wigetIntent = new Intent(fragment.getContext(), BacklogBadgeWidgetProvider.class);
             wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
             wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             fragment.getContext().sendBroadcast(wigetIntent);
-
-            fragment.getMainActivity().updateTeslaUnread();
         }
     }
 
