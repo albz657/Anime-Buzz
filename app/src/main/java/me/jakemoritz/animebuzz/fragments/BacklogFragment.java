@@ -71,10 +71,12 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
 
-        if (!updating){
-            updateData();
-        } else {
-            progressBar.setVisibility(View.VISIBLE);
+        if (SharedPrefsHelper.getInstance().isLoggedIn() && SharedPrefsHelper.getInstance().prefersIncrementDialog()){
+            if (!updating){
+                updateData();
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -121,7 +123,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public void updateData() {
         progressBar.setVisibility(View.VISIBLE);
 
-        if (!updating && SharedPrefsHelper.getInstance().isLoggedIn()) {
+        if (!updating) {
             if (App.getInstance().isNetworkAvailable()) {
                 if (malApiClient == null){
                     malApiClient = new MalApiClient(this);

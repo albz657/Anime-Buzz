@@ -57,7 +57,7 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
 
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (!backlogFragment.isCountsCurrent()){
+            if (SharedPrefsHelper.getInstance().isLoggedIn() && SharedPrefsHelper.getInstance().prefersIncrementDialog() && !backlogFragment.isCountsCurrent()){
                 if (!episodeCountSnackbarVisible){
                     episodeCountSnackbarVisible = true;
                     Snackbar snackbar = SnackbarHelper.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
@@ -175,34 +175,11 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
             dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
         } else {
-            final BacklogItem removedItem = getItem(position);
-
-            if (removedItem != null) {
-                App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(Realm realm) {
-                        removedItem.deleteFromRealm();
-                    }
-                });
-                fragment.getMainActivity().setBacklogBadge();
-
-                Intent wigetIntent = new Intent(fragment.getContext(), BacklogBadgeWidgetProvider.class);
-                wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
-                wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                fragment.getContext().sendBroadcast(wigetIntent);
-            }
+            backlogItemRemoved(position);
         }
     }
 
-    @Override
-    public void incrementDialogClosed(int response, Series series, int position) {
-        if (response == 1) {
-            fragment.getMalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
-        } else if (response == -1) {
-            SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
-        }
-
+    private void backlogItemRemoved(int position){
         final BacklogItem removedItem = getItem(position);
 
         if (removedItem != null) {
@@ -219,7 +196,20 @@ public class BacklogRecyclerViewAdapter extends RealmRecyclerViewAdapter<Backlog
             int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
             wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
             fragment.getContext().sendBroadcast(wigetIntent);
+
+            fragment.getMainActivity().updateTeslaUnread();
         }
+    }
+
+    @Override
+    public void incrementDialogClosed(int response, Series series, int position) {
+        if (response == 1) {
+            fragment.getMalApiClient().updateAnimeEpisodeCount(String.valueOf(series.getMALID()));
+        } else if (response == -1) {
+            SharedPrefsHelper.getInstance().setPrefersIncrementDialog(false);
+        }
+
+        backlogItemRemoved(position);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

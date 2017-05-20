@@ -59,14 +59,14 @@ public class App extends Application {
 //        justLaunchedBrowser = true;
 //        justLaunchedWatching = true;
 
-        if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")){
+        if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")) {
             // normal app process
             RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                     RealmSchema schema = realm.getSchema();
 
-                    if (oldVersion == 0){
+                    if (oldVersion == 0) {
                         schema.get("Series")
                                 .addField("kitsuID", String.class);
 
@@ -85,13 +85,13 @@ public class App extends Application {
             Realm.setDefaultConfiguration(realmConfiguration);
             realm.close();
 
-            if (migratedTo1){
+            if (migratedTo1) {
                 getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
                         RealmResults<Series> seriesRealmResults = realm.where(Series.class).findAll();
 
-                        for (Series series : seriesRealmResults){
+                        for (Series series : seriesRealmResults) {
                             series.setKitsuID("");
                         }
                     }
@@ -110,28 +110,22 @@ public class App extends Application {
                 .build());*/
     }
 
-    private String getAppName(int pID)
-    {
+    private String getAppName(int pID) {
         String processName = "";
-        ActivityManager am = (ActivityManager)this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
         List l = am.getRunningAppProcesses();
         Iterator i = l.iterator();
         PackageManager pm = this.getPackageManager();
-        while(i.hasNext())
-        {
-            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo)(i.next());
-            try
-            {
-                if(info.pid == pID)
-                {
+        while (i.hasNext()) {
+            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo) (i.next());
+            try {
+                if (info.pid == pID) {
                     CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
                     //Log.d("Process", "Id: "+ info.pid +" ProcessName: "+ info.processName +"  Label: "+c.toString());
                     //processName = c.toString();
                     processName = info.processName;
                 }
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 //Log.d("Process", "Error>> :"+ e.toString());
             }
         }
@@ -168,7 +162,7 @@ public class App extends Application {
 
         try {
             versionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-        } catch (PackageManager.NameNotFoundException e){
+        } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
 
@@ -210,7 +204,7 @@ public class App extends Application {
     }
 
     public Realm getRealm() {
-        if (realm == null || realm.isClosed()){
+        if (realm == null || realm.isClosed()) {
             realm = Realm.getDefaultInstance();
         }
         return realm;
@@ -232,15 +226,15 @@ public class App extends Application {
         return currentSyncingSeriesInitial;
     }
 
-    public void incrementTotalSyncingSeriesPost(int seriesCount){
+    public void incrementTotalSyncingSeriesPost(int seriesCount) {
         totalSyncingSeriesPost += seriesCount;
     }
 
-    public void incrementCurrentSyncingSeriesPost(){
+    public void incrementCurrentSyncingSeriesPost() {
         currentSyncingSeriesPost++;
     }
 
-    public void incrementCurrentSyncingSeriesInitial(){
+    public void incrementCurrentSyncingSeriesInitial() {
         currentSyncingSeriesInitial++;
     }
 
@@ -256,8 +250,8 @@ public class App extends Application {
         this.setDefaultTabId = setDefaultTabId;
     }
 
-    public OkHttpClient getOkHttpClient(){
-        if (okHttpClient == null){
+    public OkHttpClient getOkHttpClient() {
+        if (okHttpClient == null) {
             okHttpClient = new OkHttpClient();
         }
         return okHttpClient;

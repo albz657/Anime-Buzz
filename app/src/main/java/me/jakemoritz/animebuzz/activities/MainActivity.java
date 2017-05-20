@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.activities;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -8,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -15,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -152,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         notificationReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                updateTeslaUnread();
                 setBacklogBadge();
             }
         };
@@ -443,6 +447,24 @@ public class MainActivity extends AppCompatActivity {
                     dialogFragment.show(getFragmentManager(), TAG);
                 }
             }
+        }
+    }
+
+    public void updateTeslaUnread() {
+        try {
+            RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
+
+            if (realmResults == null || realmResults.isValid()){
+                ContentValues cv = new ContentValues();
+                cv.put("tag", getPackageName() + "/" + getComponentName().getClassName());
+                cv.put("count", 5);
+                getContentResolver().insert(Uri.parse("content://com.teslacoilsw.notifier/unread_count"), cv);
+            }
+        } catch (IllegalArgumentException ex) {
+            /* Fine, TeslaUnread is not installed. */
+            Log.d(TAG, "s");
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 
