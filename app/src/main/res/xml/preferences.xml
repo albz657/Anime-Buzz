@@ -47,6 +47,11 @@
             android:title="@string/pref_led_title"
             android:entries="@array/led_colors"
             android:entryValues="@array/led_colors_values" />
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="@string/pref_changed_time_notification_key"
+            android:title="@string/pref_changed_time_notification_title" />
     </PreferenceCategory>
 
     <PreferenceCategory

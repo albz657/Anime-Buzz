@@ -59,6 +59,16 @@ public class SharedPrefsHelper {
         editor.apply();
     }
 
+    public boolean changedNotificationEnabled(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_changed_time_notification_key), true);
+    }
+
+    public void setChangedNotificationState(boolean state){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.pref_changed_time_notification_key), state);
+        editor.apply();
+    }
+
     public boolean prefersSimulcast(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_simulcast_key), false);
     }

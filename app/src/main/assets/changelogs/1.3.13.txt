@@ -1,5 +1,6 @@
 New
 - Support for app icon badges on various launchers
+- Notification if a show's airing time has changed
 - Current LED setting is now shown in settings
 
 Fixes
