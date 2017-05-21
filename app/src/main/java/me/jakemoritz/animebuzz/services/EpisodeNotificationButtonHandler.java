@@ -50,6 +50,8 @@ public class EpisodeNotificationButtonHandler extends IntentService implements M
                                 backlogItem.deleteFromRealm();
                             }
                         });
+
+                        App.getInstance().sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
                     }
 
                     if (increment && SharedPrefsHelper.getInstance().isLoggedIn() && App.getInstance().isNetworkAvailable()){

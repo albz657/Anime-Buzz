@@ -1,6 +1,8 @@
 package me.jakemoritz.animebuzz.activities;
 
+import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -53,6 +55,7 @@ import me.jakemoritz.animebuzz.helpers.AlarmHelper;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -507,6 +510,12 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseCrash.report(e);
             }
         }
+
+        Intent wigetIntent = new Intent(this, BacklogBadgeWidgetProvider.class);
+        wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] ids = AppWidgetManager.getInstance(this).getAppWidgetIds(new ComponentName(this, BacklogBadgeWidgetProvider.class));
+        wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        this.sendBroadcast(wigetIntent);
 
         setBacklogBadge();
     }
