@@ -64,6 +64,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     private SwitchPreference incrementPreference;
     private CustomRingtonePreference ringtonePreference;
     private SwitchPreference firebasePreference;
+    private ListPreference ledColors;
 
     public SettingsFragment() {
 
@@ -103,10 +104,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     public void onCreatePreferences2(Bundle savedInstanceState, String rootKey) {
         addPreferencesFromResource(R.xml.preferences);
 
-        ListPreference ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
+        ledColors = (ListPreference) findPreference(getString(R.string.pref_led_key));
         if (ledColors.getValue() == null) {
             ledColors.setValueIndex(2);
+            ledColors.setSummary("None");
         }
+        ledColors.setSummary(ledColors.getEntry());
 
         ringtonePreference = (CustomRingtonePreference) findPreference(getString(R.string.pref_ringtone_key));
         ringtonePreference.setMainActivity(mainActivity);
@@ -250,6 +253,12 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             setRingtoneSummary();
         } else if (s.equals(getString(R.string.pref_firebase_key))) {
             FirebaseAnalytics.getInstance(App.getInstance()).setAnalyticsCollectionEnabled(firebasePreference.isChecked());
+        } else if (s.equals(getString(R.string.pref_led_key))){
+            if (ledColors.getValue() == null) {
+                ledColors.setValueIndex(2);
+                ledColors.setSummary("None");
+            }
+            ledColors.setSummary(ledColors.getEntry());
         }
     }
 

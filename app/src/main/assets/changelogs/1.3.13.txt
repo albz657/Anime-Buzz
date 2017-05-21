@@ -1,5 +1,6 @@
 New
 - Support for app icon badges on various launchers
+- Current LED setting is now shown in settings
 
 Fixes
 - Backlog widget alignment
