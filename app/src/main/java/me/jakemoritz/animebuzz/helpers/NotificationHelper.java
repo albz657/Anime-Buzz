@@ -14,6 +14,9 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 import br.com.goncalves.pugnotification.notification.Load;
 import br.com.goncalves.pugnotification.notification.PugNotification;
@@ -101,19 +104,43 @@ public class NotificationHelper {
         mNotificationManager.notify("image".hashCode(), mBuilder.build());
     }
 
-    public void createNewEpisodeNotification(Series series) {
-        // load ringtone
-        String ringtonePref = SharedPrefsHelper.getInstance().getRingtone();
-        Uri ringtoneUri = Uri.parse(ringtonePref);
+    public void createChangedTimeNotification(Series series, Calendar newEpisodeTime){
+        String name = series.getName();
 
-        // load series name
-        String seriesName = series.getName();
-        String MALID = series.getMALID();
-
-        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()) {
-            seriesName = series.getEnglishTitle();
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty() && !series.getEnglishTitle().matches(series.getName())){
+            name = series.getEnglishTitle();
         }
 
+        SimpleDateFormat weekdayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        String day = weekdayFormat.format(newEpisodeTime.getTime());
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
+        if (SharedPrefsHelper.getInstance().prefers24hour()){
+            timeFormat = new SimpleDateFormat("kk:mm", Locale.getDefault());
+        }
+
+        String time = timeFormat.format(newEpisodeTime.getTime());
+
+        Bitmap notificationIcon = getCircleBitmap(series.getMALID());
+
+        String title = "Changed airing time";
+        String message = "'" + name + "' will now air on " + day + "s at " + time;
+        PugNotification.with(App.getInstance())
+                .load()
+                .autoCancel(true)
+                .title(title)
+                .bigTextStyle(message)
+                .smallIcon(R.drawable.ic_update)
+                .largeIcon(notificationIcon)
+                .simple()
+                .build();
+
+        if (notificationIcon != null && !notificationIcon.isRecycled()){
+            notificationIcon.recycle();
+        }
+    }
+
+    private Bitmap getCircleBitmap(String MALID){
         // get image
         int posterId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz");
 
@@ -160,10 +187,28 @@ public class NotificationHelper {
 
         }
 
+        return notificationIcon;
+    }
+
+    public void createNewEpisodeNotification(Series series) {
+        // load ringtone
+        String ringtonePref = SharedPrefsHelper.getInstance().getRingtone();
+        Uri ringtoneUri = Uri.parse(ringtonePref);
+
+        // load series name
+        String seriesName = series.getName();
+        String MALID = series.getMALID();
+
+        if (SharedPrefsHelper.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty()) {
+            seriesName = series.getEnglishTitle();
+        }
+
         // create pendingintent ; onClick action
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         resultIntent.putExtra("notificationClicked", true);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
+
+        Bitmap notificationIcon = getCircleBitmap(MALID);
 
         Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
