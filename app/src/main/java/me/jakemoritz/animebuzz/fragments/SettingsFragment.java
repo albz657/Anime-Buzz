@@ -284,9 +284,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 name = ringtone.getTitle(App.getInstance());
             } catch (SecurityException e){
                 FirebaseCrash.report(e);
+                FirebaseCrash.log("Ringtone key: '" + ringtoneKey + "', path: '" + ringtoneUri.getPath() + "'");
             }
 
-            if (name.isEmpty() || name.matches("Unknown")){
+            if (name.matches("Unknown")){
                 name = "Silent";
             }
 
