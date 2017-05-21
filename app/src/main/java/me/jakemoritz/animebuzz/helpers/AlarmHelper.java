@@ -16,6 +16,7 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.models.Alarm;
+import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -51,8 +52,8 @@ public class AlarmHelper {
             @Override
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
-//                realm.where(Alarm.class).findAll().deleteAllFromRealm();
-//                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
+                realm.where(Alarm.class).findAll().deleteAllFromRealm();
+                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
 
                 final Calendar currentTime = Calendar.getInstance();
 

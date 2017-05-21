@@ -56,6 +56,7 @@ public class MalApiClient {
 
     public MalApiClient(BacklogFragment backlogFragment) {
         this.backlogFragment = backlogFragment;
+        this.malDataImportedListener = backlogFragment;
     }
 
     public MalApiClient(SeriesFragment seriesFragment) {
