@@ -2,7 +2,7 @@ New
 - Support for app icon badges on various launchers
 - Notification will be shown if a show's airing time has changed
 - "Watched" and "increment" action for episode notifications
-- Current LED setting is now shown in settings
+- Current LED color is now shown in settings
 
 Fixes
 - Backlog widget alignment

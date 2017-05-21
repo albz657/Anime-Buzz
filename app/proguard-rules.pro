@@ -47,6 +47,9 @@
     public *;
 }
 
+# Realm
+-keepnames public class * extends io.realm.RealmObject
+
 # Use ProGuard while debugging
 #-dontobfuscate
 
