@@ -55,7 +55,10 @@ public class PosterDownloader extends IntentService {
 
         InputStream input = connection.getInputStream();
 
-        bitmap = BitmapFactory.decodeStream(input);
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inSampleSize = 2;
+        bitmap = BitmapFactory.decodeStream(input, null, options);
 
         input.close();
         connection.disconnect();
