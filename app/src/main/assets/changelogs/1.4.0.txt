@@ -10,4 +10,4 @@ Fixes
 - Disabled updating episode counts if user has increment dialog disabled
 - Auto-refresh is now more reliable
 - Added a fix for a crash when notification is displayed
-- Added a fix for a crash when downloaded missing images
+- Added a fix for a crash when downloading missing images
