@@ -48,7 +48,7 @@
 }
 
 # Use ProGuard while debugging
--dontobfuscate
+#-dontobfuscate
 
 
 # If your project uses WebView with JS, uncomment the following
