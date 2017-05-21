@@ -6,3 +6,4 @@ Fixes
 - Backlog widget alignment
 - Can now swipe away backlog items when not signed in
 - Disabled updating episode counts if user has increment dialog disabled
+- Added a fix for a crash when notification is displayed
