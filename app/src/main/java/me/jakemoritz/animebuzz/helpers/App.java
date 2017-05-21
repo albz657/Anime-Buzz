@@ -59,6 +59,7 @@ public class App extends Application {
 //        justLaunchedBrowser = true;
 //        justLaunchedWatching = true;
 
+
         if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")) {
             // normal app process
             RealmMigration migration = new RealmMigration() {

@@ -221,12 +221,13 @@ public class SeriesRecyclerViewAdapter extends RealmRecyclerViewAdapter<Series, 
 
         int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.series.getMALID(), "drawable", "me.jakemoritz.animebuzz");
         if (imageId != 0) {
-            Glide.with(App.getInstance()).load(imageId).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
+
+            GlideApp.with(App.getInstance()).load(imageId).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         } else {
             File cacheDirectory = App.getInstance().getCacheDir();
             File bitmapFile = new File(cacheDirectory, holder.series.getMALID() + ".jpg");
 
-            Glide.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
+            GlideApp.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).into(holder.mPoster);
         }
 
         holder.mAddButton.setOnClickListener(new View.OnClickListener() {

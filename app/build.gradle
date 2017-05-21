@@ -54,7 +54,7 @@ repositories {
 dependencies {
     provided 'org.glassfish:javax.annotation:10.0-b28'
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile('com.squareup.retrofit2:converter-simplexml:2.2.0') {
+    compile('com.squareup.retrofit2:converter-simplexml:2.3.0') {
         exclude group: 'stax', module: 'stax-api'
         exclude group: 'xpp3', module: 'xpp3'
     }
@@ -64,22 +64,26 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.3.1'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'net.xpece.android:support-preference:1.2.7'
     ext.supportLibsVersion = "25.3.1"
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:preference-v7:25.3.1'
     compile 'net.xpece.android:support-preference-color:1.2.7'
-    compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.2.0'
-    compile 'com.google.firebase:firebase-core:10.2.1'
-    compile 'com.google.firebase:firebase-crash:10.2.1'
+    compile 'com.squareup.retrofit2:retrofit:2.3.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
+    compile 'com.google.firebase:firebase-core:10.2.6'
+    compile 'com.google.firebase:firebase-crash:10.2.6'
     compile 'io.realm:android-adapters:2.0.0'
     compile 'me.zhanghai.android.materialprogressbar:library:1.4.1'
     compile 'com.aurelhubert:ahbottomnavigation:2.0.6'
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.nightlynexus.viewstatepageradapter:viewstatepageradapter:1.0.4'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'jp.wasabeef:picasso-transformations:2.1.2'
+    compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
+    compile 'com.github.halysongoncalves:pugnotification:1.8.1'
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0-RC0'
     debugCompile 'com.android.support:appcompat-v7:25.3.1'
     debugCompile 'com.facebook.stetho:stetho:1.4.1'
     debugCompile 'com.uphyca:stetho_realm:2.0.0'
@@ -91,7 +95,6 @@ dependencies {
         exclude module: 'design'
     }
     testCompile 'junit:junit:4.12'
-    compile files('src/main/jar/com.sonymobile.home.resourceprovider.jar')
     compile "me.leolin:ShortcutBadger:1.1.16@aar"
 }
 
