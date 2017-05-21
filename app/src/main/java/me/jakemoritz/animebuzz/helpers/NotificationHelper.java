@@ -231,7 +231,7 @@ public class NotificationHelper {
                 .message(seriesName)
                 .smallIcon(R.drawable.bolt_copy)
                 .largeIcon(notificationIcon)
-                .button(R.drawable.ic_action_add, "INCREMENT", PendingIntent.getService(App.getInstance(), MALID.hashCode(), incrementIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+                .button(R.drawable.ic_action_ic_done_green, "WATCHED", PendingIntent.getService(App.getInstance(), MALID.hashCode(), watchedIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
         // set ringtone
         if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()){
@@ -250,7 +250,7 @@ public class NotificationHelper {
         }
 
         if (SharedPrefsHelper.getInstance().isLoggedIn()){
-//            notificationLoad = notificationLoad.button("s"s"s")
+            notificationLoad = notificationLoad.button(R.drawable.ic_action_add, "INCREMENT", PendingIntent.getService(App.getInstance(), MALID.hashCode(), incrementIntent, PendingIntent.FLAG_UPDATE_CURRENT));
         }
 
         notificationLoad.simple()

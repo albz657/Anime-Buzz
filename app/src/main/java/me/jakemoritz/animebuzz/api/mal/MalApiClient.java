@@ -72,6 +72,10 @@ public class MalApiClient {
         this.exportFragment = exportFragment;
     }
 
+    public MalApiClient(MalDataImportedListener malDataImportedListener){
+        this.malDataImportedListener = malDataImportedListener;
+    }
+
     public void addAnime(final String MALID) {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
@@ -102,12 +106,16 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    backlogFragment.episodeCountIncremented(response.isSuccessful());
+                    if (backlogFragment != null){
+                        backlogFragment.episodeCountIncremented(response.isSuccessful());
+                    }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    backlogFragment.episodeCountIncremented(false);
+                    if (backlogFragment != null){
+                        backlogFragment.episodeCountIncremented(false);
+                    }
                     Log.d(TAG, t.toString());
 
                 }
@@ -138,16 +146,18 @@ public class MalApiClient {
     }
 
     private void getUserAvatar() {
-        MainActivity mainActivity;
+        MainActivity mainActivity = null;
 
-        if (seriesFragment == null){
+        if (backlogFragment != null){
             mainActivity = backlogFragment.getMainActivity();
-        } else {
+        } else if (seriesFragment != null){
             mainActivity = seriesFragment.getMainActivity();
         }
 
-        GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(mainActivity);
-        getUserAvatarTask.execute();
+        if (mainActivity != null){
+            GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(mainActivity);
+            getUserAvatarTask.execute();
+        }
     }
 
     public void getUserXml(){
@@ -256,17 +266,17 @@ public class MalApiClient {
                                 }
                             }
                         }
-                        MalImportHelper helper = new MalImportHelper(backlogFragment);
+                        MalImportHelper helper = new MalImportHelper(malDataImportedListener);
                         helper.updateEpisodeCounts(matchList);
                     }
                 } else {
-                    backlogFragment.malDataImported(false);
+                    malDataImportedListener.malDataImported(false);
                 }
             }
 
             @Override
             public void onFailure(Call<UserListHolder> call, Throwable t) {
-                backlogFragment.malDataImported(false);
+                malDataImportedListener.malDataImported(false);
                 Log.d(TAG, "error: " + t.getMessage());
             }
         });

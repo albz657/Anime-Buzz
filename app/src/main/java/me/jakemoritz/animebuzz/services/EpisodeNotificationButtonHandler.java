@@ -12,12 +12,11 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.helpers.App;
 import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
 
-public class EpisodeNotificationButtonHandler extends IntentService implements VerifyCredentialsResponse, MalDataImportedListener{
+public class EpisodeNotificationButtonHandler extends IntentService implements MalDataImportedListener{
 
     private MalApiClient malApiClient;
     private String MALID = "-1";
@@ -77,15 +76,5 @@ public class EpisodeNotificationButtonHandler extends IntentService implements V
             malApiClient.updateAnimeEpisodeCount(MALID);
             MALID = "-1";
         }
-    }
-
-    @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
-
-    }
-
-    @Override
-    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
-
     }
 }
