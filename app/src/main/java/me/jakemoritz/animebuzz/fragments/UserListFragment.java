@@ -55,7 +55,7 @@ public class UserListFragment extends SeriesFragment {
             Calendar lastUpdatedCal = Calendar.getInstance();
             lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
 
-            if (currentCal.get(Calendar.DAY_OF_YEAR) == lastUpdatedCal.get(Calendar.DAY_OF_YEAR) && (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
+            if (currentCal.get(Calendar.DAY_OF_YEAR) != lastUpdatedCal.get(Calendar.DAY_OF_YEAR) || (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
                 if (getSwipeRefreshLayoutEmpty().isEnabled()){
                     getSwipeRefreshLayoutEmpty().setRefreshing(true);
                 }
