@@ -52,22 +52,32 @@ public class AlarmHelper {
             @Override
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
-                realm.where(Alarm.class).findAll().deleteAllFromRealm();
-                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
+//                realm.where(Alarm.class).findAll().deleteAllFromRealm();
+//                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
+
+                final Calendar currentTime = Calendar.getInstance();
 
                 for (int i = 0; i < 1; i++){
-                    int random = (int) (Math.random() * userList.size());
-                    Series series = userList.get(random);
+                    boolean blocked = true;
+                    while (blocked){
+                        int random = (int) (Math.random() * userList.size());
+                        Series series = userList.get(random);
 
-                    BacklogItem backlogItem = realm.createObject(BacklogItem.class);
-                    backlogItem.setSeries(series);
-                    backlogItem.setAlarmTime(System.currentTimeMillis());
+                        BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                        backlogItem.setSeries(series);
+                        backlogItem.setAlarmTime(System.currentTimeMillis());
 
-                    if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0){
-                        Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
-                        alarm.setAlarmTime(System.currentTimeMillis());
-                        alarm.setSeries(series);
+                        final Calendar lastNotificationTime = Calendar.getInstance();
+                        lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
+
+                        if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0 && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))){
+                            Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
+                            alarm.setAlarmTime(System.currentTimeMillis() + 000L);
+                            alarm.setSeries(series);
+                            blocked = false;
+                        }
                     }
+
                 }
             }
         });

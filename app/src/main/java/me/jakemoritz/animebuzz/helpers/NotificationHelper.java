@@ -1,11 +1,11 @@
 package me.jakemoritz.animebuzz.helpers;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
@@ -15,6 +15,7 @@ import com.squareup.picasso.Picasso;
 import java.io.File;
 import java.io.IOException;
 
+import br.com.goncalves.pugnotification.notification.Load;
 import br.com.goncalves.pugnotification.notification.PugNotification;
 import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import me.jakemoritz.animebuzz.R;
@@ -159,31 +160,12 @@ public class NotificationHelper {
 
         }
 
-
         // create pendingintent ; onClick action
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         resultIntent.putExtra("notificationClicked", true);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
 
-        // set vibrate pattern
-        Notification notification = new Notification();
-        long[] vibrate = new long[]{0L, 0L};
-        if (SharedPrefsHelper.getInstance().prefersVibrate()) {
-            vibrate[0] = 800L;
-            vibrate[1] = 800L;
-        }
-
-        // set LED
-        if (!SharedPrefsHelper.getInstance().getLed().equals("-1")) {
-            notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-            notification.ledOnMS = 1000;
-            notification.ledOffMS = 1000;
-            notification.ledARGB = Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16);
-        }
-
-//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-        PugNotification.with(App.getInstance())
+        Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
                 .identifier(Integer.valueOf(series.getMALID()))
                 .autoCancel(true)
@@ -191,11 +173,25 @@ public class NotificationHelper {
                 .title("New episode released")
                 .message(seriesName)
                 .smallIcon(R.drawable.bolt_copy)
-                .largeIcon(notificationIcon)
-                .vibrate(vibrate)
-                .sound(ringtoneUri)
-//                .lights(Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16), 1000, 1000)
-                .simple()
+                .largeIcon(notificationIcon);
+
+        // set ringtone
+        if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()){
+            notificationLoad = notificationLoad.sound(ringtoneUri);
+        }
+
+        // set LED
+        if (!SharedPrefsHelper.getInstance().getLed().equals("-1")){
+            notificationLoad = notificationLoad.lights(Color.parseColor("#" + SharedPrefsHelper.getInstance().getLed()), 1000, 1000);
+        }
+
+        // set vibrate pattern
+        if (SharedPrefsHelper.getInstance().prefersVibrate()) {
+            long[] vibrate = new long[]{800L, 800L};
+            notificationLoad = notificationLoad.vibrate(vibrate);
+        }
+
+        notificationLoad.simple()
                 .build();
 
         if (notificationIcon != null && !notificationIcon.isRecycled()){
