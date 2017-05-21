@@ -187,10 +187,8 @@ public class AlarmHelper {
         final String nextEpisodeTimeFormatted = formatAiringTime(nextEpisode, false);
         final String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
-        NotificationHelper.getInstance().createChangedTimeNotification(series, nextEpisode);
-
         if (simulcast) {
-            if (SharedPrefsHelper.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+            if (SharedPrefsHelper.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeSimulcastTime() > 0L){
                 Calendar previousTime = Calendar.getInstance();
                 previousTime.setTimeInMillis(series.getNextEpisodeSimulcastTime());
                 if (previousTime.get(Calendar.HOUR_OF_DAY) != nextEpisode.get(Calendar.HOUR_OF_DAY) || previousTime.get(Calendar.MINUTE) != nextEpisode.get(Calendar.MINUTE)){
@@ -202,7 +200,7 @@ public class AlarmHelper {
             series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
         } else {
-            if (!SharedPrefsHelper.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing()){
+            if (!SharedPrefsHelper.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeAirtime() > 0L){
                 Calendar previousTime = Calendar.getInstance();
                 previousTime.setTimeInMillis(series.getNextEpisodeAirtime());
                 if (previousTime.get(Calendar.HOUR_OF_DAY) != nextEpisode.get(Calendar.HOUR_OF_DAY) || previousTime.get(Calendar.MINUTE) != nextEpisode.get(Calendar.MINUTE)){
