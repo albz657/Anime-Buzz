@@ -24,6 +24,7 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.services.EpisodeNotificationButtonHandler;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
@@ -208,17 +209,29 @@ public class NotificationHelper {
         resultIntent.putExtra("notificationClicked", true);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
 
+        // get large circle icon
         Bitmap notificationIcon = getCircleBitmap(MALID);
+
+        // create intent for increment button
+        Intent incrementIntent = new Intent(App.getInstance(), EpisodeNotificationButtonHandler.class);
+        incrementIntent.putExtra("MALID", MALID);
+        incrementIntent.putExtra("increment", true);
+
+        // create intent for watched button
+        Intent watchedIntent = new Intent(App.getInstance(), EpisodeNotificationButtonHandler.class);
+        watchedIntent.putExtra("MALID", MALID);
+        watchedIntent.putExtra("increment", false);
 
         Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
-                .identifier(Integer.valueOf(series.getMALID()))
+                .identifier(MALID.hashCode())
                 .autoCancel(true)
                 .click(resultPendingIntent)
                 .title("New episode released")
                 .message(seriesName)
                 .smallIcon(R.drawable.bolt_copy)
-                .largeIcon(notificationIcon);
+                .largeIcon(notificationIcon)
+                .button(R.drawable.ic_action_add, "INCREMENT", PendingIntent.getService(App.getInstance(), MALID.hashCode(), incrementIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
         // set ringtone
         if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()){
@@ -234,6 +247,10 @@ public class NotificationHelper {
         if (SharedPrefsHelper.getInstance().prefersVibrate()) {
             long[] vibrate = new long[]{800L, 800L};
             notificationLoad = notificationLoad.vibrate(vibrate);
+        }
+
+        if (SharedPrefsHelper.getInstance().isLoggedIn()){
+//            notificationLoad = notificationLoad.button("s"s"s")
         }
 
         notificationLoad.simple()

@@ -47,11 +47,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                     boolean prefersNotification = sharedPreferences.getBoolean(context.getString(R.string.pref_notification_key), true);
 
-                    if (prefersNotification) {
-                        NotificationHelper helper = new NotificationHelper();
-                        helper.createNewEpisodeNotification(series);
-                    }
-
                     realm.executeTransaction(new Realm.Transaction() {
                         @Override
                         public void execute(Realm realm) {
@@ -64,6 +59,11 @@ public class AlarmReceiver extends BroadcastReceiver {
                             series.setLastNotificationTime(currentTime.getTimeInMillis());
                         }
                     });
+
+                    if (prefersNotification) {
+                        NotificationHelper helper = new NotificationHelper();
+                        helper.createNewEpisodeNotification(series);
+                    }
 
                     context.sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
 

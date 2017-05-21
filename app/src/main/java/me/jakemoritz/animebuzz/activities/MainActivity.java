@@ -481,8 +481,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (intent.hasExtra("notificationClicked")) {
             if (!getSupportFragmentManager().getFragments().isEmpty()) {
-                if (getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment) {
-                } else {
+                if (!(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment)) {
 //                    startFragment(BacklogFragment.newInstance());
                     bottomBar.setCurrentItem(1);
                 }

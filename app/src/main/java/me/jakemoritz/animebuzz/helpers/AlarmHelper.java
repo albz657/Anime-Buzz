@@ -16,7 +16,6 @@ import java.util.Locale;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.models.Alarm;
-import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
 
@@ -63,14 +62,14 @@ public class AlarmHelper {
                         int random = (int) (Math.random() * userList.size());
                         Series series = userList.get(random);
 
-                        BacklogItem backlogItem = realm.createObject(BacklogItem.class);
-                        backlogItem.setSeries(series);
-                        backlogItem.setAlarmTime(System.currentTimeMillis());
-
                         final Calendar lastNotificationTime = Calendar.getInstance();
                         lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                         if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0 && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))){
+/*                            BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                            backlogItem.setSeries(series);
+                            backlogItem.setAlarmTime(System.currentTimeMillis());*/
+
                             Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
                             alarm.setAlarmTime(System.currentTimeMillis() + 000L);
                             alarm.setSeries(series);
@@ -84,7 +83,7 @@ public class AlarmHelper {
     }
 
     public void setAlarmsOnBoot() {
-//        dummyAlarm();
+        dummyAlarm();
         DailyTimeGenerator.getInstance().setNextAlarm(true);
         Realm realm = Realm.getDefaultInstance();
         for (Alarm alarm : realm.where(Alarm.class).findAll()) {

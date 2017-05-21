@@ -60,6 +60,7 @@
         </receiver>
         <service android:name=".services.PosterDownloader"/>
         <service android:name=".services.KitsuDataProcessor"/>
+        <service android:name=".services.EpisodeNotificationButtonHandler"/>
         <service android:name=".services.EpisodeTimeGenerator"/>
     </application>
 </manifest>
