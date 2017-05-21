@@ -101,16 +101,11 @@ public class NotificationHelper {
     }
 
     public void createNewEpisodeNotification(Series series) {
+        // load ringtone
         String ringtonePref = SharedPrefsHelper.getInstance().getRingtone();
         Uri ringtoneUri = Uri.parse(ringtonePref);
-/*        Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
-        String ringtoneName = "Silent";
-        if (ringtone != null) {
-            if (ringtone.getTitle(App.getInstance()) != null) {
-                ringtoneName = ringtone.getTitle(App.getInstance());
-            }
-        }*/
 
+        // load series name
         String seriesName = series.getName();
         String MALID = series.getMALID();
 
@@ -118,7 +113,7 @@ public class NotificationHelper {
             seriesName = series.getEnglishTitle();
         }
 
-
+        // get image
         int posterId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz");
 
         File bitmapFile = null;
@@ -129,21 +124,6 @@ public class NotificationHelper {
                 bitmapFile = new File(cacheDirectory, MALID + ".jpg");
             }
         }
-
-/*        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(App.getInstance())
-                        .setSmallIcon(R.drawable.bolt_copy)
-                        .setAutoCancel(true)
-                        .setContentText(seriesName)
-                        .setContentTitle("New episode released");*/
-
-/*        if (notificationIcon != null) {
-            mBuilder.setLargeIcon(notificationIcon);
-        }*/
-
-        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
-        resultIntent.putExtra("notificationClicked", true);
-        PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
 
         Bitmap notificationIcon = null;
 
@@ -179,20 +159,21 @@ public class NotificationHelper {
 
         }
 
-        /*        if (!ringtoneName.equals("Silent")) {
-            mBuilder.setSound(ringtoneUri);
-        }*/
 
-//        Notification notification = mBuilder.build();
+        // create pendingintent ; onClick action
+        Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
+        resultIntent.putExtra("notificationClicked", true);
+        PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
 
+        // set vibrate pattern
         Notification notification = new Notification();
-        long[] vibrateLength = new long[]{0L};
+        long[] vibrate = new long[]{0L, 0L};
         if (SharedPrefsHelper.getInstance().prefersVibrate()) {
-            notification.defaults |= Notification.DEFAULT_VIBRATE;
-            vibrateLength[0] = 1000L;
+            vibrate[0] = 800L;
+            vibrate[1] = 800L;
         }
 
-
+        // set LED
         if (!SharedPrefsHelper.getInstance().getLed().equals("-1")) {
             notification.flags |= Notification.FLAG_SHOW_LIGHTS;
             notification.ledOnMS = 1000;
@@ -200,22 +181,20 @@ public class NotificationHelper {
             notification.ledARGB = Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16);
         }
 
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-//        mNotificationManager.notify(Integer.valueOf(series.getMALID()), notification);
+//        notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
         PugNotification.with(App.getInstance())
                 .load()
+                .identifier(Integer.valueOf(series.getMALID()))
+                .autoCancel(true)
+                .click(resultPendingIntent)
                 .title("New episode released")
                 .message(seriesName)
-                .identifier(Integer.valueOf(series.getMALID()))
                 .smallIcon(R.drawable.bolt_copy)
                 .largeIcon(notificationIcon)
-                .click(resultPendingIntent)
+                .vibrate(vibrate)
                 .sound(ringtoneUri)
-                .vibrate(vibrateLength)
-                .lights(Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16), 1000, 1000)
-                .autoCancel(true)
+//                .lights(Integer.parseInt(SharedPrefsHelper.getInstance().getLed(), 16), 1000, 1000)
                 .simple()
                 .build();
 

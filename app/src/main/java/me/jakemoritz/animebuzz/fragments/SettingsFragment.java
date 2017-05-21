@@ -277,8 +277,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 FirebaseCrash.report(e);
             }
 
-            if (name.isEmpty()){
-                name = "None";
+            if (name.isEmpty() || name.matches("Unknown")){
+                name = "Silent";
             }
 
             ringtonePreference.setSummary(name);

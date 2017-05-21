@@ -52,6 +52,8 @@ public class AlarmHelper {
             @Override
             public void execute(Realm realm) {
                 RealmResults<Series> userList = realm.where(Series.class).findAll();
+                realm.where(Alarm.class).findAll().deleteAllFromRealm();
+                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
 
                 for (int i = 0; i < 1; i++){
                     int random = (int) (Math.random() * userList.size());
