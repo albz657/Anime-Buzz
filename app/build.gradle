@@ -2,14 +2,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
 
 android {
-    signingConfigs {
-        config {
-            keyAlias 'myandroidkey'
-            keyPassword '***REMOVED***'
-            storeFile file('C:/Users/jakem/Documents/MALAnimeXMLModel Buzz/android.jks')
-            storePassword '***REMOVED***'
-        }
-    }
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
@@ -25,7 +17,6 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.config
         }
         debug {
 //            minifyEnabled false
