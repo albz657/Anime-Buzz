@@ -19,7 +19,7 @@ import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.receivers.AlarmReceiver;
+import me.jakemoritz.animebuzz.receivers.EpisodeNotificationReceiver;
 
 
 public class AlarmUtils {
@@ -313,7 +313,7 @@ public class AlarmUtils {
     }
 
     private PendingIntent createPendingIntent(int id) {
-        Intent notificationIntent = new Intent(App.getInstance(), AlarmReceiver.class);
+        Intent notificationIntent = new Intent(App.getInstance(), EpisodeNotificationReceiver.class);
         notificationIntent.putExtra("id", String.valueOf(id));
         return PendingIntent.getBroadcast(App.getInstance(), id, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
     }

@@ -12,23 +12,20 @@ import java.util.Calendar;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
-import me.jakemoritz.animebuzz.utils.NotificationUtils;
-import me.jakemoritz.animebuzz.utils.WakeLocker;
-import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.NotificationUtils;
+import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class EpisodeNotificationReceiver extends BroadcastReceiver {
 
-    private final static String TAG = AlarmReceiver.class.getSimpleName();
+    private final static String TAG = EpisodeNotificationReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        WakeLocker.acquire(context);
-
         String intentExtra = intent.getStringExtra("id");
 
         Realm realm = Realm.getDefaultInstance();
@@ -84,8 +81,6 @@ public class AlarmReceiver extends BroadcastReceiver {
             AlarmUtils.getInstance().setAlarmsOnBoot();
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
-
-        WakeLocker.release();
     }
 }
 
