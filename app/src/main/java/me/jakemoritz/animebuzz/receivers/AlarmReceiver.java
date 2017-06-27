@@ -12,11 +12,11 @@ import java.util.Calendar;
 
 import io.realm.Realm;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
-import me.jakemoritz.animebuzz.helpers.NotificationHelper;
-import me.jakemoritz.animebuzz.helpers.WakeLocker;
-import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.NotificationUtils;
+import me.jakemoritz.animebuzz.utils.WakeLocker;
+import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -61,7 +61,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     });
 
                     if (prefersNotification) {
-                        NotificationHelper helper = new NotificationHelper();
+                        NotificationUtils helper = new NotificationUtils();
                         helper.createNewEpisodeNotification(series);
                     }
 
@@ -73,7 +73,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                     wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                     context.sendBroadcast(wigetIntent);
 
-                    AlarmHelper.getInstance().makeAlarm(series);
+                    AlarmUtils.getInstance().makeAlarm(series);
                 }
             }
         }
@@ -81,7 +81,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         realm.close();
 
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            AlarmHelper.getInstance().setAlarmsOnBoot();
+            AlarmUtils.getInstance().setAlarmsOnBoot();
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
 

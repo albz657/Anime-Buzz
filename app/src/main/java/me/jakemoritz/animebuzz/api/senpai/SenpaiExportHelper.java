@@ -4,13 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import io.realm.Realm;
+import me.jakemoritz.animebuzz.api.senpai.deserializers.AnimeDeserializer;
+import me.jakemoritz.animebuzz.api.senpai.deserializers.SeasonDeserializer;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.UserListFragment;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.interfaces.retrofit.SenpaiEndpointInterface;
 import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.gson.SeasonHolder;
+import me.jakemoritz.animebuzz.api.senpai.models.SeasonHolder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -79,12 +81,12 @@ public class SenpaiExportHelper {
             public void onResponse(Call<SeasonHolder> call, final retrofit2.Response<SeasonHolder> response) {
                 if (response.isSuccessful()) {
                     if (seasonKey.equals("raw")){
-                        SharedPrefsHelper.getInstance().setLastUpdateTime(System.currentTimeMillis());
-                        SharedPrefsHelper.getInstance().setLatestSeasonKey(response.body().getSeasonKey());
-                        SharedPrefsHelper.getInstance().setLatestSeasonName(response.body().getSeasonName());
+                        SharedPrefsUtils.getInstance().setLastUpdateTime(System.currentTimeMillis());
+                        SharedPrefsUtils.getInstance().setLatestSeasonKey(response.body().getSeasonKey());
+                        SharedPrefsUtils.getInstance().setLatestSeasonName(response.body().getSeasonName());
 
                         if (seriesFragment instanceof UserListFragment && App.getInstance().isInitializing()){
-                            Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                            Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
                             seriesFragment.setCurrentlyBrowsingSeason(currentSeason);
                         }
                     }

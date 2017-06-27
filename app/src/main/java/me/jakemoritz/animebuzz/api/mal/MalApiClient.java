@@ -16,8 +16,8 @@ import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
@@ -78,7 +78,7 @@ public class MalApiClient {
     }
 
     public void addAnime(final String MALID) {
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.addAnimeURLEncoded("<entry><episode>0</episode><status>1</status><score></score><storage_type></storage_type><storage_value></storage_value><times_rewatched></times_rewatched><rewatch_value></rewatch_value><date_start></date_start><date_finish></date_finish><priority></priority><enable_discussion></enable_discussion><enable_rewatching></enable_rewatching><comments></comments><fansub_group></fansub_group><tags></tags></entry>", MALID);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -102,7 +102,7 @@ public class MalApiClient {
     public void updateAnimeEpisodeCount(String MALID) {
         Series series = App.getInstance().getRealm().where(Series.class).equalTo("MALID", MALID).findFirst();
         if (series != null) {
-            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+            MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
             Call<Void> call = malEndpointInterface.updateAnimeEpisodeCount("<entry><episode>" + (series.getEpisodesWatched() + 1) + "</episode></entry>", MALID);
             call.enqueue(new Callback<Void>() {
                 @Override
@@ -125,7 +125,7 @@ public class MalApiClient {
     }
 
     public void deleteAnime(final String MALID) {
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
         Call<Void> call = malEndpointInterface.deleteAnime(MALID);
         call.enqueue(new Callback<Void>() {
             @Override
@@ -162,8 +162,8 @@ public class MalApiClient {
     }
 
     public void getUserXml(){
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
-        Call<ResponseBody> call = malEndpointInterface.getUserXml(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
+        Call<ResponseBody> call = malEndpointInterface.getUserXml(SharedPrefsUtils.getInstance().getUsername(), "all", "anime");
 
         exporting = true;
         exportFragment.setProgressVisibility("inprogress");
@@ -200,8 +200,8 @@ public class MalApiClient {
     }
 
     public void getUserList() {
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
-        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
+        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsUtils.getInstance().getUsername(), "all", "anime");
 
         call.enqueue(new Callback<UserListHolder>() {
             @Override
@@ -249,8 +249,8 @@ public class MalApiClient {
     }
 
     public void syncEpisodeCounts() {
-        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsHelper.getInstance().getUsername(), SharedPrefsHelper.getInstance().getPassword());
-        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsHelper.getInstance().getUsername(), "all", "anime");
+        MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
+        Call<UserListHolder> call = malEndpointInterface.getUserList(SharedPrefsUtils.getInstance().getUsername(), "all", "anime");
 
         call.enqueue(new Callback<UserListHolder>() {
             @Override
@@ -330,10 +330,10 @@ public class MalApiClient {
                     verifyListener.verifyCredentialsResponseReceived(true);
 
                     if (response.body().getUsername() != null) {
-                        SharedPrefsHelper.getInstance().setMalUsernameFormatted(response.body().getUsername());
+                        SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
                     }
                     if (response.body().getUserID() != null) {
-                        SharedPrefsHelper.getInstance().setMalId(response.body().getUserID());
+                        SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
                     }
                 } else {
                     verifyListener.verifyCredentialsResponseReceived(false);
@@ -362,10 +362,10 @@ public class MalApiClient {
                     verifyListener.verifyCredentialsResponseReceived(true, MALID);
 
                     if (response.body().getUsername() != null) {
-                        SharedPrefsHelper.getInstance().setMalUsernameFormatted(response.body().getUsername());
+                        SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
                     }
                     if (response.body().getUserID() != null) {
-                        SharedPrefsHelper.getInstance().setMalId(response.body().getUserID());
+                        SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
                     }
                 } else {
                     verifyListener.verifyCredentialsResponseReceived(false, MALID);

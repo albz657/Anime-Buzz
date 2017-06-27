@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class HelperActivity extends AppCompatActivity {
 
@@ -15,7 +15,7 @@ public class HelperActivity extends AppCompatActivity {
 
         // Check sign-in state
 
-        if (SharedPrefsHelper.getInstance().hasCompletedSetup()){
+        if (SharedPrefsUtils.getInstance().hasCompletedSetup()){
             startActivity(new Intent(this, MainActivity.class));
             finish();
         } else {

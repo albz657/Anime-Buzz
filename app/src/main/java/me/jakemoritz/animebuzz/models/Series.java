@@ -8,7 +8,7 @@ import javax.annotation.Generated;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 @Generated("org.jsonschema2pojo")
 public class Series extends RealmObject{
@@ -224,14 +224,14 @@ public class Series extends RealmObject{
     }
 
     public String getNextEpisodeTimeFormatted(){
-        if (SharedPrefsHelper.getInstance().prefersSimulcast() && nextEpisodeSimulcastTime > 0) {
-            if (SharedPrefsHelper.getInstance().prefers24hour()){
+        if (SharedPrefsUtils.getInstance().prefersSimulcast() && nextEpisodeSimulcastTime > 0) {
+            if (SharedPrefsUtils.getInstance().prefers24hour()){
                 return nextEpisodeSimulcastTimeFormatted24;
             } else {
                 return nextEpisodeSimulcastTimeFormatted;
             }
         } else if (nextEpisodeAirtime > 0){
-            if (SharedPrefsHelper.getInstance().prefers24hour()){
+            if (SharedPrefsUtils.getInstance().prefers24hour()){
                 return nextEpisodeAirtimeFormatted24;
             } else {
                 return nextEpisodeAirtimeFormatted;

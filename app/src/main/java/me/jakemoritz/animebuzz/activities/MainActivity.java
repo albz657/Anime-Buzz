@@ -40,8 +40,8 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.constants;
-import me.jakemoritz.animebuzz.data.DatabaseHelper;
-import me.jakemoritz.animebuzz.data.SugarMigrator;
+import me.jakemoritz.animebuzz.data.migrations.DatabaseHelper;
+import me.jakemoritz.animebuzz.data.migrations.SugarMigrator;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
@@ -51,12 +51,12 @@ import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.fragments.UserListFragment;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.misc.BacklogBadgeWidgetProvider;
-import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
+import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -148,10 +148,10 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
         }
 
-        boolean justFailed = SharedPrefsHelper.getInstance().isJustFailed();
+        boolean justFailed = SharedPrefsUtils.getInstance().isJustFailed();
         if (justFailed) {
 //            Realm.init(App.getInstance());
-            SharedPrefsHelper.getInstance().setJustFailed(false);
+            SharedPrefsUtils.getInstance().setJustFailed(false);
         }
 
         notificationReceiver = new BroadcastReceiver() {
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
-                if (SharedPrefsHelper.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
+                if (SharedPrefsUtils.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
                     Fragment newFragment = null;
 
                     if (position == 0 && !wasSelected) {
@@ -205,10 +205,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Check if user has completed setup
-        if (!SharedPrefsHelper.getInstance().hasCompletedSetup() || justFailed) {
+        if (!SharedPrefsUtils.getInstance().hasCompletedSetup() || justFailed) {
             // Just finished setup
 
-            SharedPrefsHelper.getInstance().setCompletedSetup(true);
+            SharedPrefsUtils.getInstance().setCompletedSetup(true);
             App.getInstance().setInitializing(true);
 
             progressView = (CircularProgressView) findViewById(R.id.progress_view);
@@ -216,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
-            if (SharedPrefsHelper.getInstance().getLastUpdateTime() == 0L) {
+            if (SharedPrefsUtils.getInstance().getLastUpdateTime() == 0L) {
                 DailyTimeGenerator.getInstance().setNextAlarm(false);
             }
 
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                 deleteOldImages();
             }
 
-            AlarmHelper.getInstance().setAlarmsOnBoot();
+            AlarmUtils.getInstance().setAlarmsOnBoot();
         }
 
         if (App.getInstance().isInitializing()) {
@@ -253,11 +253,11 @@ public class MainActivity extends AppCompatActivity {
         int defaultTabId = 0;
         if (savedFragment == null){
             if (App.getInstance().isInitializing()) {
-                SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
+                SharedPrefsUtils.getInstance().setLastAppVersion(versionName);
 
                 SeriesFragment seriesFragment;
 
-                if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                if (SharedPrefsUtils.getInstance().isLoggedIn()) {
                     seriesFragment = UserListFragment.newInstance();
                 } else {
                     seriesFragment = SeasonsFragment.newInstance();
@@ -306,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
 
         updateBadges();
 
-        if (!SharedPrefsHelper.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
+        if (!SharedPrefsUtils.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
             if (versionName.matches("1.3.8")){
                 removeSeriesMissingMALID();
             }
@@ -319,7 +319,7 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> changelogArray = new ArrayList<>(Arrays.asList(changelogs));
 
                 if (changelogArray.contains(changelogFilename)){
-                    SharedPrefsHelper.getInstance().setLastAppVersion(versionName);
+                    SharedPrefsUtils.getInstance().setLastAppVersion(versionName);
 
                     ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance();
                     dialogFragment.show(getFragmentManager(), TAG);

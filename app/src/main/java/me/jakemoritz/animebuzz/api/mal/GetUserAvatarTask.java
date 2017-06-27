@@ -10,8 +10,8 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
@@ -27,7 +27,7 @@ class GetUserAvatarTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... voids) {
-        String userId = SharedPrefsHelper.getInstance().getMalId();
+        String userId = SharedPrefsUtils.getInstance().getMalId();
 
         if (!userId.isEmpty()){
             String URL  = BASE_URL + userId + ".jpg";

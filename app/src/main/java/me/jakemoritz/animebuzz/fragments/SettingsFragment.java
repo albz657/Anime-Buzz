@@ -37,19 +37,19 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.ImportFragment;
-import me.jakemoritz.animebuzz.dialogs.SignInFragment;
+import me.jakemoritz.animebuzz.dialogs.ImportDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.misc.AccountPreference;
-import me.jakemoritz.animebuzz.misc.CustomRingtonePreference;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.preferences.AccountPreference;
+import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
 
-public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInFragment.SignInFragmentListener {
+public class SettingsFragment extends XpPreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener, SignInDialogFragment.SignInFragmentListener {
 
     private static final String TAG = SettingsFragment.class.getSimpleName();
 
@@ -124,7 +124,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getString(R.string.pref_category_account_key));
         signOutPreference = (AccountPreference) preferenceCategory.getPreference(0);
-        String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
+        String username = SharedPrefsUtils.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
             signOutPreference.setSummary(summary);
@@ -143,8 +143,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 if (App.getInstance().isNetworkAvailable()) {
-                    SignInFragment signInFragment = SignInFragment.newInstance(self, mainActivity);
-                    signInFragment.show(mainActivity.getFragmentManager(), "");
+                    SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(self, mainActivity);
+                    signInDialogFragment.show(mainActivity.getFragmentManager(), "");
                 } else {
                     if (getView() != null)
                         Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
@@ -175,7 +175,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         });
 
-        if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+        if (SharedPrefsUtils.getInstance().isLoggedIn()) {
             signInPreference.setVisible(false);
             signOutPreference.setVisible(true);
             incrementPreference.setEnabled(true);
@@ -212,19 +212,19 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     private void setCorrectSummaries() {
-        if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
+        if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
             simulcastPreference.setSummary(getString(R.string.pref_simulcast_summary));
         } else {
             simulcastPreference.setSummary(getString(R.string.pref_simulcast_off_summary));
         }
 
-        if (SharedPrefsHelper.getInstance().prefers24hour()) {
+        if (SharedPrefsUtils.getInstance().prefers24hour()) {
             format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
         } else {
             format24hourPreference.setSummary(getString(R.string.pref_24hour_off_summary));
         }
 
-        if (SharedPrefsHelper.getInstance().prefersIncrementDialog()) {
+        if (SharedPrefsUtils.getInstance().prefersIncrementDialog()) {
             incrementPreference.setSummary(getString(R.string.pref_increment_summary));
         } else {
             incrementPreference.setSummary(getString(R.string.pref_increment_off_summary));
@@ -236,7 +236,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         if (s.equals(getString(R.string.pref_simulcast_key))) {
-            AlarmHelper.getInstance().switchAlarmTiming();
+            AlarmUtils.getInstance().switchAlarmTiming();
         } else if (s.equals(getString(R.string.pref_24hour_key))) {
             if (format24hourPreference.isChecked()) {
                 format24hourPreference.setSummary(getString(R.string.pref_24hour_summary));
@@ -263,7 +263,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     private void setRingtoneSummary() {
-        String ringtoneKey = SharedPrefsHelper.getInstance().getRingtone();
+        String ringtoneKey = SharedPrefsUtils.getInstance().getRingtone();
 
         Uri ringtoneUri = Uri.parse(ringtoneKey);
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
@@ -276,7 +276,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
                 ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
 
-                SharedPrefsHelper.getInstance().resetRingtone();
+                SharedPrefsUtils.getInstance().resetRingtone();
             }
 
             String name = "";
@@ -308,11 +308,11 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     public void signOut(Preference preference) {
-        SharedPrefsHelper.getInstance().setLoggedIn(false);
-        SharedPrefsHelper.getInstance().setUsername("");
-        SharedPrefsHelper.getInstance().setPassword("");
-        SharedPrefsHelper.getInstance().setMalUsernameFormatted("");
-        SharedPrefsHelper.getInstance().setMalId("");
+        SharedPrefsUtils.getInstance().setLoggedIn(false);
+        SharedPrefsUtils.getInstance().setUsername("");
+        SharedPrefsUtils.getInstance().setPassword("");
+        SharedPrefsUtils.getInstance().setMalUsernameFormatted("");
+        SharedPrefsUtils.getInstance().setMalId("");
 
         File avatarFile = new File(mainActivity.getFilesDir(), getString(R.string.file_avatar));
         if (avatarFile.exists()) {
@@ -329,8 +329,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
     }
 
     private void importExistingSeries() {
-        ImportFragment importFragment = ImportFragment.newInstance(this);
-        importFragment.show(mainActivity.getFragmentManager(), "");
+        ImportDialogFragment importDialogFragment = ImportDialogFragment.newInstance(this);
+        importDialogFragment.show(mainActivity.getFragmentManager(), "");
     }
 
     public void addToMAL(boolean add) {
@@ -339,7 +339,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         MalApiClient malApiClient = new MalApiClient(userListFragment);
 
         if (!add) {
-            AlarmHelper.getInstance().cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
+            AlarmUtils.getInstance().cancelAllAlarms(App.getInstance().getRealm().where(Alarm.class).findAll());
 
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
@@ -370,7 +370,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signInPreference.setVisible(false);
         signOutPreference.setVisible(true);
 
-        String username = SharedPrefsHelper.getInstance().getMalUsernameFormatted();
+        String username = SharedPrefsUtils.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
             String summary = getString(R.string.pref_account_summary_on) + username + "'.";
             signOutPreference.setSummary(summary);

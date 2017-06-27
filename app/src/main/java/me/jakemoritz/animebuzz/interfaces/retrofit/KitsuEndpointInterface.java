@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.interfaces.retrofit;
 
-import me.jakemoritz.animebuzz.api.kitsu.KitsuAnimeHolder;
+import me.jakemoritz.animebuzz.api.kitsu.models.KitsuAnimeHolder;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Headers;

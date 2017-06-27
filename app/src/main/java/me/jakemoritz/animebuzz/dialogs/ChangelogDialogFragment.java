@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.App;
 
 public class ChangelogDialogFragment extends DialogFragment {
 

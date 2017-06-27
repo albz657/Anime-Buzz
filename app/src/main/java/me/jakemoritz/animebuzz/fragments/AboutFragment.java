@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.App;
 
 public class AboutFragment extends Fragment {
 

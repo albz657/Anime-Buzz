@@ -6,10 +6,10 @@ import android.content.Intent;
 import java.util.Calendar;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.DateFormatHelper;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.DateFormatUtils;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -41,7 +41,7 @@ public class KitsuDataProcessor extends IntentService {
 
         if (App.getInstance().isInitializing()){
             App.getInstance().incrementCurrentSyncingSeriesInitial();
-//            NotificationHelper.getInstance().createInitialNotification();
+//            NotificationUtils.getInstance().createInitialNotification();
 
             if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
@@ -49,7 +49,7 @@ public class KitsuDataProcessor extends IntentService {
             }
         } else if (App.getInstance().isPostInitializing()){
             App.getInstance().incrementCurrentSyncingSeriesPost();
-//            NotificationHelper.getInstance().createSeasonDataNotification();
+//            NotificationUtils.getInstance().createSeasonDataNotification();
         }
     }
 
@@ -79,9 +79,9 @@ public class KitsuDataProcessor extends IntentService {
                 }
             } else {
                 Calendar currentCalendar = Calendar.getInstance();
-                Calendar startedCalendar = DateFormatHelper.getInstance().getCalFromHB(startedAiringDate);
+                Calendar startedCalendar = DateFormatUtils.getInstance().getCalFromHB(startedAiringDate);
 
-                formattedStartAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+                formattedStartAiringDate = DateFormatUtils.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                 if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         if (single) {
@@ -94,8 +94,8 @@ public class KitsuDataProcessor extends IntentService {
                         airingStatus = "Not yet aired";
                     }
                 } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
-                    Calendar finishedCalendar = DateFormatHelper.getInstance().getCalFromHB(finishedAiringDate);
-                    formattedFinishedAiringDate = DateFormatHelper.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
+                    Calendar finishedCalendar = DateFormatUtils.getInstance().getCalFromHB(finishedAiringDate);
+                    formattedFinishedAiringDate = DateFormatUtils.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                     if (currentCalendar.compareTo(finishedCalendar) > 0) {
                         airingStatus = "Finished airing";
                     } else {
@@ -110,7 +110,7 @@ public class KitsuDataProcessor extends IntentService {
             }
 
             if (currentAiringStatus.equals("Airing") && airingStatus.equals("Finished airing")){
-                AlarmHelper.getInstance().removeAlarm(currSeries);
+                AlarmUtils.getInstance().removeAlarm(currSeries);
             }
 
             final String finalAiringStatus = airingStatus;
@@ -167,20 +167,20 @@ public class KitsuDataProcessor extends IntentService {
     }
 
     private void checkForSeasonSwitch(final Series currSeries) {
-        String latestSeasonName = SharedPrefsHelper.getInstance().getLatestSeasonName();
+        String latestSeasonName = SharedPrefsUtils.getInstance().getLatestSeasonName();
         Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
         if (!season.getName().equals(latestSeasonName)) {
             // generate times for series airing but not in current season
             if (currSeries.getNextEpisodeAirtime() > 0) {
                 Calendar airdateCalendar = Calendar.getInstance();
                 airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
-                AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
+                AlarmUtils.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
             }
 
             if (currSeries.getNextEpisodeSimulcastTime() > 0) {
                 Calendar airdateCalendar = Calendar.getInstance();
                 airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
-                AlarmHelper.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
+                AlarmUtils.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
             }
         }
     }

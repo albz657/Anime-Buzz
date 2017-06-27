@@ -9,8 +9,12 @@ import java.io.File;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import me.jakemoritz.animebuzz.api.kitsu.deserializers.KitsuDeserializer;
+import me.jakemoritz.animebuzz.api.kitsu.deserializers.KitsuFilterDeserializer;
+import me.jakemoritz.animebuzz.api.kitsu.deserializers.KitsuMappingDeserializer;
+import me.jakemoritz.animebuzz.api.kitsu.models.KitsuAnimeHolder;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.KitsuEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.services.KitsuDataProcessor;

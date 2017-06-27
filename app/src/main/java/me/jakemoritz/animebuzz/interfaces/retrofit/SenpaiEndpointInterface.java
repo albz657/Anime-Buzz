@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.interfaces.retrofit;
 
-import me.jakemoritz.animebuzz.models.gson.SeasonHolder;
+import me.jakemoritz.animebuzz.api.senpai.models.SeasonHolder;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;

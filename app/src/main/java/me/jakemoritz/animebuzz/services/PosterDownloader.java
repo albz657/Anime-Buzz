@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import me.jakemoritz.animebuzz.helpers.App;
+import me.jakemoritz.animebuzz.misc.App;
 
 public class PosterDownloader extends IntentService {
 

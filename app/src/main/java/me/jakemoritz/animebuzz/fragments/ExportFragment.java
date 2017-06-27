@@ -33,9 +33,9 @@ import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.SnackbarHelper;
 
 public class ExportFragment extends Fragment implements MainActivity.OrientationChangedListener{
 
@@ -126,7 +126,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SharedPrefsHelper.getInstance().isLoggedIn()){
+                if (SharedPrefsUtils.getInstance().isLoggedIn()){
                     if (checkExternalPermissions()) {
                         if (App.getInstance().isExternalStorageWritable()) {
                             malApiClient.getUserXml();

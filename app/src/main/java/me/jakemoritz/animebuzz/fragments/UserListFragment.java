@@ -13,9 +13,9 @@ import java.util.Calendar;
 
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.DailyTimeGenerator;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
@@ -32,7 +32,7 @@ public class UserListFragment extends SeriesFragment {
         fragment.setHasOptionsMenu(true);
         fragment.setRetainInstance(true);
 
-        Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+        Season currentSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
         fragment.setCurrentlyBrowsingSeason(currentSeason);
 
         return fragment;
@@ -53,7 +53,7 @@ public class UserListFragment extends SeriesFragment {
             Calendar currentCal = Calendar.getInstance();
 
             Calendar lastUpdatedCal = Calendar.getInstance();
-            lastUpdatedCal.setTimeInMillis(SharedPrefsHelper.getInstance().getLastUpdateTime());
+            lastUpdatedCal.setTimeInMillis(SharedPrefsUtils.getInstance().getLastUpdateTime());
 
             if (currentCal.get(Calendar.DAY_OF_YEAR) != lastUpdatedCal.get(Calendar.DAY_OF_YEAR) || (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
                 if (getSwipeRefreshLayoutEmpty().isEnabled()){
@@ -83,7 +83,7 @@ public class UserListFragment extends SeriesFragment {
         }
 
         if (isUpdating()) {
-            if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+            if (SharedPrefsUtils.getInstance().isLoggedIn()) {
                 getMalApiClient().getUserList();
             } else {
                 stopRefreshing();
@@ -113,13 +113,13 @@ public class UserListFragment extends SeriesFragment {
             return;
         }
 
-        String sort = SharedPrefsHelper.getInstance().getSortingPreference();
+        String sort = SharedPrefsUtils.getInstance().getSortingPreference();
         if (sort.equals("name")) {
-            if (SharedPrefsHelper.getInstance().prefersEnglish()) {
+            if (SharedPrefsUtils.getInstance().prefersEnglish()) {
                 sort = "englishTitle";
             }
         } else {
-            if (SharedPrefsHelper.getInstance().prefersSimulcast()) {
+            if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
                 sort = "nextEpisodeSimulcastTime";
             } else if (sort.equals("date") || sort.isEmpty()) {
                 // supports upgrading users
@@ -156,7 +156,7 @@ public class UserListFragment extends SeriesFragment {
                     } else if (id == R.id.action_sort_name) {
                         sort = "name";
                     }
-                    SharedPrefsHelper.getInstance().setSortingPreference(sort);
+                    SharedPrefsUtils.getInstance().setSortingPreference(sort);
                     loadUserSortingPreference();
 
                     return false;

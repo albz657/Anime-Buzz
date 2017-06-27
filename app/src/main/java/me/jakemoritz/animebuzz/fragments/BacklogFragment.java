@@ -20,10 +20,10 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.adapters.BacklogRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.adapters.BacklogItemAdapter;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -33,7 +33,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
 
     private static final String TAG = BacklogFragment.class.getSimpleName();
 
-    private BacklogRecyclerViewAdapter mAdapter;
+    private BacklogItemAdapter mAdapter;
     private View backlogLayout;
     private MainActivity mainActivity;
     private RecyclerView recyclerView;
@@ -43,7 +43,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     private MalApiClient malApiClient;
     private boolean countsCurrent = false;
 
-    public BacklogRecyclerViewAdapter getmAdapter() {
+    public BacklogItemAdapter getmAdapter() {
         return mAdapter;
     }
 
@@ -71,7 +71,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
         mainActivity.fixToolbar(this.getClass().getSimpleName());
 
-        if (SharedPrefsHelper.getInstance().isLoggedIn() && SharedPrefsHelper.getInstance().prefersIncrementDialog()){
+        if (SharedPrefsUtils.getInstance().isLoggedIn() && SharedPrefsUtils.getInstance().prefersIncrementDialog()){
             if (!updating){
                 updateData();
             } else {
@@ -112,7 +112,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
                 setVisibility(element);
             }
         });
-        mAdapter = new BacklogRecyclerViewAdapter(this, backlogItems);
+        mAdapter = new BacklogItemAdapter(this, backlogItems);
         mAdapter.touchHelper.attachToRecyclerView(recyclerView);
 
         recyclerView.setAdapter(mAdapter);

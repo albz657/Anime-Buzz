@@ -7,8 +7,8 @@ import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.Index;
 import io.realm.annotations.PrimaryKey;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 
 public class Season extends RealmObject {
 
@@ -26,7 +26,7 @@ public class Season extends RealmObject {
 
     public static String calculateRelativeTime(String seasonName) {
         Realm realm = Realm.getDefaultInstance();
-        Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsHelper.getInstance().getLatestSeasonName()).findFirst();
+        Season latestSeason = realm.where(Season.class).equalTo("name", SharedPrefsUtils.getInstance().getLatestSeasonName()).findFirst();
         Season season = realm.where(Season.class).equalTo("name", seasonName).findFirst();
 
         RealmList<Season> allSeasons = new RealmList<>();

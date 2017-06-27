@@ -4,12 +4,12 @@
         android:key="@string/pref_category_account_key"
         android:title="@string/pref_category_account_title">
 
-        <me.jakemoritz.animebuzz.misc.AccountPreference
+        <me.jakemoritz.animebuzz.preferences.AccountPreference
             android:summary="You are currently signed in."
             android:title="Sign out from your MAL account"
             android:layout="@layout/account_preference"/>
 
-        <me.jakemoritz.animebuzz.misc.AccountPreference
+        <me.jakemoritz.animebuzz.preferences.AccountPreference
             android:summary="You are currently signed out."
             android:title="Sign in to your MAL account"
             android:layout="@layout/account_preference" />
@@ -29,7 +29,7 @@
             android:summary="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
 
-        <me.jakemoritz.animebuzz.misc.CustomRingtonePreference
+        <me.jakemoritz.animebuzz.preferences.CustomRingtonePreference
             android:key="@string/pref_ringtone_key"
             android:title="@string/pref_ringtone_title"
             android:showSilent="true"

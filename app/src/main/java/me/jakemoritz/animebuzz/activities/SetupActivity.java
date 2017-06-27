@@ -24,9 +24,9 @@ import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.SnackbarHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.SnackbarHelper;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.misc.SetupObject;
 
@@ -86,7 +86,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                         }
                     });
 
-                    if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+                    if (SharedPrefsUtils.getInstance().isLoggedIn()) {
                         hideLoginForm();
                     }
 
@@ -106,7 +106,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                     timeFormatSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefers24hour(b);
+                            SharedPrefsUtils.getInstance().setPrefers24hour(b);
                         }
                     });
 
@@ -114,7 +114,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                     simulcastPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefersSimulcast(b);
+                            SharedPrefsUtils.getInstance().setPrefersSimulcast(b);
                         }
                     });
 
@@ -122,7 +122,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                     englishPrefSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                            SharedPrefsHelper.getInstance().setPrefersEnglish(b);
+                            SharedPrefsUtils.getInstance().setPrefersEnglish(b);
                         }
                     });
 
@@ -193,9 +193,9 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
         if (verified) {
             hideLoginForm();
 
-            SharedPrefsHelper.getInstance().setUsername(usernameField.getText().toString().trim());
-            SharedPrefsHelper.getInstance().setPassword(passwordField.getText().toString());
-            SharedPrefsHelper.getInstance().setLoggedIn(true);
+            SharedPrefsUtils.getInstance().setUsername(usernameField.getText().toString().trim());
+            SharedPrefsUtils.getInstance().setPassword(passwordField.getText().toString());
+            SharedPrefsUtils.getInstance().setLoggedIn(true);
 
             SnackbarHelper.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.verification_successful);
         } else {

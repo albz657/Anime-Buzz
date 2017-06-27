@@ -34,17 +34,17 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.adapters.SeriesRecyclerViewAdapter;
+import me.jakemoritz.animebuzz.adapters.SeriesAdapter;
 import me.jakemoritz.animebuzz.api.kitsu.KitsuApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.dialogs.FailedInitializationFragment;
-import me.jakemoritz.animebuzz.dialogs.SignInFragment;
-import me.jakemoritz.animebuzz.dialogs.VerifyFailedFragment;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
-import me.jakemoritz.animebuzz.helpers.comparators.SeasonComparator;
+import me.jakemoritz.animebuzz.dialogs.FailedInitializationDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.VerifyFailedDialogFragment;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.kitsu.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
@@ -55,13 +55,13 @@ import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedFragment.SignInAgainListener, SeriesRecyclerViewAdapter.ModifyItemStatusListener, FailedInitializationFragment.FailedInitializationListener, ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
+public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInDialogFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedDialogFragment.SignInAgainListener, SeriesAdapter.ModifyItemStatusListener, FailedInitializationDialogFragment.FailedInitializationListener, ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
     private MainActivity mainActivity;
 
-    private SeriesRecyclerViewAdapter mAdapter;
+    private SeriesAdapter mAdapter;
     private BroadcastReceiver initialReceiver;
     private RealmResults<Series> previousRealmResults;
 
@@ -117,20 +117,20 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         RealmResults<Series> realmResults;
         String sort;
-        if (SharedPrefsHelper.getInstance().prefersEnglish()) {
+        if (SharedPrefsUtils.getInstance().prefersEnglish()) {
             sort = "englishTitle";
         } else {
             sort = "name";
         }
         if (this instanceof SeasonsFragment) {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findAllSorted(sort);
+            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
             realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
-        mAdapter = new SeriesRecyclerViewAdapter(this, realmResults);
+        mAdapter = new SeriesAdapter(this, realmResults);
         recyclerView.setAdapter(mAdapter);
         resetListener(realmResults);
 
@@ -227,7 +227,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                                 App.getInstance().setPostInitializing(true);
 
                                 RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
-                                Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsHelper.getInstance().getLatestSeasonKey()).findFirst();
+                                Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
                                 List<Season> seasons = new ArrayList<>(results);
 
                                 Collections.sort(seasons, new SeasonComparator());
@@ -325,7 +325,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void failedInitializationResponse(boolean retryNow) {
         clearAppData();
 
-        SharedPrefsHelper.getInstance().setJustFailed(true);
+        SharedPrefsUtils.getInstance().setJustFailed(true);
         if (retryNow) {
             getMainActivity().finish();
 
@@ -385,13 +385,13 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 String seasonKey = "";
 
                 if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid() && this instanceof UserListFragment) {
-                    seasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
+                    seasonKey = SharedPrefsUtils.getInstance().getLatestSeasonKey();
                 } else if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()) {
                     seasonKey = currentlyBrowsingSeason.getKey();
                 }
 
                 if (!seasonKey.isEmpty()) {
-                    if (seasonKey.equals(SharedPrefsHelper.getInstance().getLatestSeasonKey())) {
+                    if (seasonKey.equals(SharedPrefsUtils.getInstance().getLatestSeasonKey())) {
                         seasonKey = "raw";
                     }
 
@@ -414,7 +414,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public void orientationChanged(boolean portrait) {
         if (this instanceof UserListFragment){
-            currentlyBrowsingSeasonKey = SharedPrefsHelper.getInstance().getLatestSeasonKey();
+            currentlyBrowsingSeasonKey = SharedPrefsUtils.getInstance().getLatestSeasonKey();
         } else {
             if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
@@ -441,8 +441,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public void failedInitialization() {
         if (mainActivity.isAlive()){
-            FailedInitializationFragment failedInitializationFragment = FailedInitializationFragment.newInstance(this);
-            mainActivity.getFragmentManager().beginTransaction().add(failedInitializationFragment, failedInitializationFragment.getTag()).addToBackStack(null).commitAllowingStateLoss();
+            FailedInitializationDialogFragment failedInitializationDialogFragment = FailedInitializationDialogFragment.newInstance(this);
+            mainActivity.getFragmentManager().beginTransaction().add(failedInitializationDialogFragment, failedInitializationDialogFragment.getTag()).addToBackStack(null).commitAllowingStateLoss();
         }
     }
 
@@ -484,7 +484,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 Snackbar.make(getView(), "There was a problem adding or removing this show from your list.", Snackbar.LENGTH_LONG).show();
         }
 
-        AlarmHelper.getInstance().makeAlarm(series);
+        AlarmUtils.getInstance().makeAlarm(series);
 
         if (getView() != null)
             Snackbar.make(getView(), "Added '" + series.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
@@ -500,7 +500,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             }
         });
 
-        AlarmHelper.getInstance().removeAlarm(series);
+        AlarmUtils.getInstance().removeAlarm(series);
 
         if (getView() != null)
             Snackbar.make(getView(), "Removed '" + series.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
@@ -522,10 +522,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     private void itemStatusChangeHelper(String MALID) {
-        if (SharedPrefsHelper.getInstance().isLoggedIn()) {
+        if (SharedPrefsUtils.getInstance().isLoggedIn()) {
             if (App.getInstance().isNetworkAvailable()) {
-                String username = SharedPrefsHelper.getInstance().getUsername();
-                String password = SharedPrefsHelper.getInstance().getPassword();
+                String username = SharedPrefsUtils.getInstance().getUsername();
+                String password = SharedPrefsUtils.getInstance().getPassword();
 
                 malApiClient.verify(username, password);
             } else {
@@ -545,8 +545,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public void signInAgain(boolean wantsToSignIn) {
         if (wantsToSignIn) {
-            SignInFragment signInFragment = SignInFragment.newInstance(this, mainActivity);
-            signInFragment.show(mainActivity.getFragmentManager(), TAG);
+            SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(this, mainActivity);
+            signInDialogFragment.show(mainActivity.getFragmentManager(), TAG);
         }
     }
 
@@ -560,8 +560,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             }
         } else {
             adding = false;
-            VerifyFailedFragment dialogFragment = VerifyFailedFragment.newInstance(this, mainActivity);
-            dialogFragment.show(mainActivity.getFragmentManager(), "SeriesRecyclerViewAdapter");
+            VerifyFailedDialogFragment dialogFragment = VerifyFailedDialogFragment.newInstance(this, mainActivity);
+            dialogFragment.show(mainActivity.getFragmentManager(), "SeriesAdapter");
         }
     }
 
@@ -584,7 +584,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     //    Getters/Setters
 
-    public SeriesRecyclerViewAdapter getmAdapter() {
+    public SeriesAdapter getmAdapter() {
         return mAdapter;
     }
 

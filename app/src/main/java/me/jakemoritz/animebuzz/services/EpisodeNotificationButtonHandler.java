@@ -9,8 +9,8 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.helpers.App;
-import me.jakemoritz.animebuzz.helpers.SharedPrefsHelper;
+import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
@@ -54,7 +54,7 @@ public class EpisodeNotificationButtonHandler extends IntentService implements M
                         App.getInstance().sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
                     }
 
-                    if (increment && SharedPrefsHelper.getInstance().isLoggedIn() && App.getInstance().isNetworkAvailable()){
+                    if (increment && SharedPrefsUtils.getInstance().isLoggedIn() && App.getInstance().isNetworkAvailable()){
                         if (malApiClient == null){
                             malApiClient = new MalApiClient(this);
                             malApiClient.syncEpisodeCounts();

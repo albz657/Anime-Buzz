@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.helpers.AlarmHelper;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.models.Series;
 
 
@@ -23,7 +23,7 @@ public class EpisodeTimeGenerator extends IntentService {
         int airdate = intent.getIntExtra("airdate", -1);
         int simulcast_airdate = intent.getIntExtra("simulcast_airdate", -1);
 
-        AlarmHelper.getInstance().generateNextEpisodeTimes(realm.where(Series.class).equalTo("MALID", MALID).findFirst(), airdate, simulcast_airdate);
+        AlarmUtils.getInstance().generateNextEpisodeTimes(realm.where(Series.class).equalTo("MALID", MALID).findFirst(), airdate, simulcast_airdate);
 
         realm.close();
     }
