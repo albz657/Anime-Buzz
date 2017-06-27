@@ -196,7 +196,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         listView.addItemDecoration(new PreferenceDividerDecoration(getContext()).drawBottom(true));
         setDivider(null);
 
-        mainActivity.fixToolbar(this.getClass().getSimpleName());
+        mainActivity.resetToolbar(this);
     }
 
     @Override

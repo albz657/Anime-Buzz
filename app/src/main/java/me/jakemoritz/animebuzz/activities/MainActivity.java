@@ -6,30 +6,26 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
-import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,62 +47,61 @@ import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 import me.jakemoritz.animebuzz.fragments.UserListFragment;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.models.BacklogItem;
+import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
-import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
-import me.jakemoritz.animebuzz.models.BacklogItem;
-import me.jakemoritz.animebuzz.models.Series;
 import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = MainActivity.class.getSimpleName();
 
+    // Views
+    private Toolbar toolbar;
     private CircularProgressView progressView;
     private RelativeLayout progressViewHolder;
-    private Toolbar toolbar;
-    private boolean openRingtones = false;
-    private boolean startExport = false;
     private AHBottomNavigation bottomBar;
-    private BroadcastReceiver notificationReceiver;
+
+    // Handling orientation changes
     private OrientationEventListener orientationEventListener;
     private OrientationChangedListener orientationChangedListener;
     private int oldOrientation = -1;
+
+    // Bottom navigation tab ids
+    private ArrayList<Class> fragmentTabId = new ArrayList<Class>(Arrays.asList(UserListFragment.class, BacklogFragment.class, SeriesFragment.class));
+
+    private boolean openRingtones = false;
+    private boolean startExport = false;
     private boolean alive = false;
 
-    public interface OrientationChangedListener {
-        void orientationChanged(boolean portrait);
-    }
+    private BroadcastReceiver notificationReceiver;
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt("orientation", oldOrientation);
-        Fragment fragment = getCurrentFragment();
-        getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
-
-        orientationEventListener.disable();
-        super.onSaveInstanceState(outState);
-    }
-
+    // Activity lifecycle
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Fragment savedFragment = null;
+        Fragment initialFragment = null;
+
+        // Check for saved fragment & orientation
         if (savedInstanceState != null) {
             oldOrientation = savedInstanceState.getInt("orientation");
 
             try {
-                savedFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
-            } catch (IllegalStateException e){
-                e.printStackTrace();;
+                initialFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+                ;
             }
         }
 
+        // Set up orientation change listener
         orientationEventListener = new OrientationEventListener(this) {
             @Override
             public void onOrientationChanged(int i) {
@@ -127,42 +122,18 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
         orientationEventListener.enable();
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
-        boolean justUpdatedTo1_3_5 = sharedPreferences.getBoolean(getString(R.string.updated_to_1_3_5), true);
-        if (justUpdatedTo1_3_5) {
-            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    RealmResults<Series> allSeries = realm.where(Series.class).findAll();
-                    for (Series series : allSeries) {
-                        series.setKitsuID("");
-                    }
-                }
-            });
-
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean(getString(R.string.updated_to_1_3_5), false);
-            editor.apply();
-        }
-
-        boolean justFailed = SharedPrefsUtils.getInstance().isJustFailed();
-        if (justFailed) {
-//            Realm.init(App.getInstance());
-            SharedPrefsUtils.getInstance().setJustFailed(false);
-        }
-
+        // Set up notification receiver
         notificationReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 updateBadges();
             }
         };
-
         registerReceiver(notificationReceiver, new IntentFilter("NOTIFICATION_RECEIVED"));
 
+        // Initialize bottom navigation
         App.getInstance().setSetDefaultTabId(false);
 
         bottomBar = (AHBottomNavigation) findViewById(R.id.bottomBar);
@@ -175,9 +146,9 @@ public class MainActivity extends AppCompatActivity {
         bottomBar.addItem(backlogItem);
         bottomBar.addItem(browserItem);
 
-        bottomBar.setDefaultBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        bottomBar.setAccentColor(getResources().getColor(android.R.color.white));
-        bottomBar.setInactiveColor(Color.parseColor("#8CFFFFFF"));
+        bottomBar.setDefaultBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary));
+        bottomBar.setAccentColor(ContextCompat.getColor(this, android.R.color.white));
+        bottomBar.setInactiveColor(ContextCompat.getColor(this, R.color.bottom_nav_inactive));
 
         bottomBar.setTitleState(AHBottomNavigation.TitleState.SHOW_WHEN_ACTIVE);
 
@@ -187,15 +158,15 @@ public class MainActivity extends AppCompatActivity {
                 if (SharedPrefsUtils.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
                     Fragment newFragment = null;
 
-                    if (position == 0 && !wasSelected) {
+                    if (position == fragmentTabId.indexOf(UserListFragment.class) && !wasSelected) {
                         newFragment = UserListFragment.newInstance();
-                    } else if (position == 2 && !wasSelected) {
+                    } else if (position == fragmentTabId.indexOf(SeasonsFragment.class) && !wasSelected) {
                         newFragment = SeasonsFragment.newInstance();
-                    } else if (position == 1 && !wasSelected) {
+                    } else if (position == fragmentTabId.indexOf(BacklogFragment.class) && !wasSelected) {
                         newFragment = BacklogFragment.newInstance();
                     }
 
-                    if (newFragment != null) {
+                    if (newFragment != null){
                         startFragment(newFragment);
                     }
                 }
@@ -204,10 +175,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Check if user has completed setup
-        if (!SharedPrefsUtils.getInstance().hasCompletedSetup() || justFailed) {
-            // Just finished setup
+        fixNullKitsuIds();
 
+        // Check if user has completed setup
+        if (!SharedPrefsUtils.getInstance().hasCompletedSetup()) {
             SharedPrefsUtils.getInstance().setCompletedSetup(true);
             App.getInstance().setInitializing(true);
 
@@ -216,24 +187,13 @@ public class MainActivity extends AppCompatActivity {
             progressViewHolder.setVisibility(View.VISIBLE);
             progressView.startAnimation();
         } else {
+            // Check last update time
             if (SharedPrefsUtils.getInstance().getLastUpdateTime() == 0L) {
                 DailyTimeGenerator.getInstance().setNextAlarm(false);
             }
 
-            // fix old database
-            if (doesOldDatabaseExist()) {
-                DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
-                deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
-                deleteOldImages();
-                App.getInstance().setJustUpdated(true);
-            }
-
-            // fix sugar database
-            if (doesSugarDatabaseExist()) {
-                SugarMigrator.migrateToRealm();
-                deleteDatabase("buzz_sugar.db");
-                deleteOldImages();
-            }
+            // Check if database migration is needed
+            migrateOldDatabase();
 
             AlarmUtils.getInstance().setAlarmsOnBoot();
         }
@@ -242,16 +202,14 @@ public class MainActivity extends AppCompatActivity {
             bottomBar.setVisibility(View.GONE);
         }
 
-        // Initialize UI elements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-
         setSupportActionBar(toolbar);
 
         String versionName = App.getInstance().getVersionName();
 
-        // Start relevant fragment
-        int defaultTabId = 0;
-        if (savedFragment == null){
+        // Start relevant fragment, set selected bottom navigation tab
+        int defaultTabId = fragmentTabId.indexOf(UserListFragment.class);
+        if (initialFragment == null) {
             if (App.getInstance().isInitializing()) {
                 SharedPrefsUtils.getInstance().setLastAppVersion(versionName);
 
@@ -261,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                     seriesFragment = UserListFragment.newInstance();
                 } else {
                     seriesFragment = SeasonsFragment.newInstance();
-                    defaultTabId = 2;
+                    defaultTabId = fragmentTabId.indexOf(SeasonsFragment.class);
                 }
 
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
@@ -272,96 +230,60 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = getCurrentFragment();
                 if (fragment == null) {
                     if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
-                        defaultTabId = 1;
+                        defaultTabId = fragmentTabId.indexOf(BacklogFragment.class);
                         startFragment(BacklogFragment.newInstance());
                     } else {
                         startFragment(UserListFragment.newInstance());
                     }
                 } else {
-                    if (fragment instanceof UserListFragment) {
-                        defaultTabId = 0;
-                    } else if (fragment instanceof SeriesFragment) {
-                        defaultTabId = 2;
-                    } else if (fragment instanceof BacklogFragment) {
-                        defaultTabId = 1;
-                    }
+                    defaultTabId = fragmentTabId.indexOf(fragment.getClass());
                 }
             }
         } else {
-            if (savedFragment instanceof UserListFragment) {
-                defaultTabId = 0;
-            } else if (savedFragment instanceof SeriesFragment) {
-                defaultTabId = 2;
-            } else if (savedFragment instanceof BacklogFragment) {
-                defaultTabId = 1;
-            }
-
-            startFragment(savedFragment);
+            defaultTabId = fragmentTabId.indexOf(initialFragment.getClass());
+            startFragment(initialFragment);
         }
 
-
+        // Fixes double-select issue for bottom navigation
         App.getInstance().setSetDefaultTabId(true);
         bottomBar.setCurrentItem(defaultTabId);
         App.getInstance().setSetDefaultTabId(false);
 
-        updateBadges();
-
-        if (!SharedPrefsUtils.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()){
-            if (versionName.matches("1.3.8")){
+        // Check if changelog should be displayed
+        if (!SharedPrefsUtils.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()) {
+            // Fixes bug pre v1.3.8
+            if (versionName.matches("1.3.8")) {
                 removeSeriesMissingMALID();
             }
-
-            // mismatched app versions, check if changelog file exists
 
             String changelogFilename = versionName.concat(".txt");
             try {
                 String[] changelogs = getResources().getAssets().list("changelogs");
                 ArrayList<String> changelogArray = new ArrayList<>(Arrays.asList(changelogs));
 
-                if (changelogArray.contains(changelogFilename)){
+                if (changelogArray.contains(changelogFilename)) {
                     SharedPrefsUtils.getInstance().setLastAppVersion(versionName);
 
                     ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance();
-                    dialogFragment.show(getFragmentManager(), TAG);
+                    dialogFragment.show(getFragmentManager(), ChangelogDialogFragment.class.getSimpleName());
                 }
-            } catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void removeSeriesMissingMALID(){
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                RealmResults<Series> seriesList = realm.where(Series.class).findAll();
-
-                for (Series series : seriesList){
-                    if (series.getMALID().matches("false")){
-                        series.deleteFromRealm();
-                    }
-                }
-            }
-        });
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-
         alive = true;
 
+        updateBadges();
+
         Fragment fragment = getCurrentFragment();
-
-        if (fragment instanceof SeriesFragment) {
-            orientationChangedListener = (SeriesFragment) fragment;
-        } else if (fragment instanceof BacklogFragment) {
-            orientationChangedListener = (BacklogFragment) fragment;
+        if (fragment instanceof SeriesFragment || fragment instanceof BacklogFragment) {
+            orientationChangedListener = (OrientationChangedListener) fragment;
         }
-    }
-
-    public void setOrientationChangedListener(OrientationChangedListener orientationChangedListener){
-        this.orientationChangedListener = orientationChangedListener;
     }
 
     @Override
@@ -370,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
 
         final Fragment fragment = getCurrentFragment();
         if (openRingtones && fragment instanceof SettingsFragment) {
+            // Handles external permission check for ringtone
             SettingsFragment settingsFragment = (SettingsFragment) fragment;
             CustomRingtonePreference customRingtonePreference = settingsFragment.getRingtonePreference();
             customRingtonePreference.setOpenList(true);
@@ -377,6 +300,7 @@ public class MainActivity extends AppCompatActivity {
 
             openRingtones = false;
         } else if (startExport && fragment instanceof ExportFragment) {
+            // Handles external permission check for MAL export
             if (App.getInstance().isExternalStorageWritable()) {
                 ExportFragment exportFragment = (ExportFragment) fragment;
                 exportFragment.getMalApiClient().getUserXml();
@@ -408,27 +332,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Handle activity state
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("orientation", oldOrientation);
+        Fragment fragment = getCurrentFragment();
+        getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
+
+        orientationEventListener.disable();
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if (intent.hasExtra("notificationClicked")
+                && !getSupportFragmentManager().getFragments().isEmpty()
+                && !(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment)) {
+            bottomBar.setCurrentItem(fragmentTabId.indexOf(BacklogFragment.class));
+        } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
+            // Backlog widget clicked
+            startFragment(BacklogFragment.newInstance());
+            bottomBar.setCurrentItem(fragmentTabId.indexOf(BacklogFragment.class));
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST) {
-            if (grantResults.length > 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-/*                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_read_external);
-                    dialogFragment.show(getFragmentManager(), TAG);*/
-                }
-
-                Fragment fragment = getCurrentFragment();
-                if (fragment instanceof SettingsFragment) {
-                    openRingtones = true;
-                }
-            }
+        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST
+                && grantResults.length > 0
+                && getCurrentFragment() instanceof SettingsFragment) {
+            // User clicked ringtone preference
+            openRingtones = true;
         } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST) {
             if (grantResults.length > 0) {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -444,6 +380,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        getSupportFragmentManager().popBackStack();
+        return true;
+    }
+
+    // Handling fragments
     private Fragment getCurrentFragment() {
         if (getSupportFragmentManager().getFragments() != null && !getSupportFragmentManager().getFragments().isEmpty()) {
             Iterator iterator = getSupportFragmentManager().getFragments().iterator();
@@ -466,49 +409,74 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void cacheUserAvatar(Bitmap bitmap) {
-        try {
-            FileOutputStream fos = openFileOutput(getString(R.string.file_avatar), Context.MODE_PRIVATE);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void startFragment(Fragment fragment) {
+        String id = fragment.getClass().getSimpleName();
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.content_main, fragment, id)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .commit();
+
+        if (fragment instanceof SeriesFragment || fragment instanceof BacklogFragment) {
+            orientationChangedListener = (OrientationChangedListener) fragment;
+        }
+
+        if (!App.getInstance().isInitializing()) {
+            bottomBar.setVisibility(View.VISIBLE);
         }
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        if (intent.hasExtra("notificationClicked")) {
-            if (!getSupportFragmentManager().getFragments().isEmpty()) {
-                if (!(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment)) {
-//                    startFragment(BacklogFragment.newInstance());
-                    bottomBar.setCurrentItem(1);
+    public void resetToolbar(Fragment fragment) {
+        if (getSupportActionBar() != null) {
+            Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
+            if (!(fragment instanceof SeasonsFragment)) {
+                if (toolbarSpinner != null) {
+                    toolbarSpinner.setVisibility(View.GONE);
                 }
+
+                getSupportActionBar().setDisplayShowTitleEnabled(true);
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+                String toolbarTitle;
+                if (fragment instanceof SettingsFragment) {
+                    toolbarTitle = getString(R.string.fragment_settings);
+                } else if (fragment instanceof AboutFragment) {
+                    toolbarTitle = getString(R.string.fragment_about);
+                } else if (fragment instanceof ExportFragment) {
+                    toolbarTitle = getString(R.string.fragment_export);
+                } else {
+                    toolbarTitle = getString(R.string.app_name);
+                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                }
+
+                getSupportActionBar().setTitle(toolbarTitle);
+            } else {
+                if (toolbarSpinner != null) {
+                    toolbarSpinner.setVisibility(View.VISIBLE);
+                }
+
+                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
             }
-            updateBadges();
-        } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
-            startFragment(BacklogFragment.newInstance());
-            bottomBar.setCurrentItem(1);
         }
+    }
+
+    // Handle orientation changes
+    public void setOrientationChangedListener(OrientationChangedListener orientationChangedListener) {
+        this.orientationChangedListener = orientationChangedListener;
+    }
+
+    public interface OrientationChangedListener {
+        void orientationChanged(boolean portrait);
     }
 
     /* Badge methods */
-
-    public void updateBadges(){
+    public void updateBadges() {
         RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
 
-        if (realmResults == null || realmResults.isValid()){
-            try {
-                int badgeCount = realmResults.size();
-                ShortcutBadger.applyCount(this, badgeCount);
-            } catch (Exception e){
-                FirebaseCrash.log("Exception when setting app badge");
-                FirebaseCrash.report(e);
-            }
+        if (realmResults != null && realmResults.isValid()) {
+            int badgeCount = realmResults.size();
+            ShortcutBadger.applyCount(this, badgeCount);
         }
 
         Intent wigetIntent = new Intent(this, BacklogBadgeWidgetProvider.class);
@@ -523,132 +491,108 @@ public class MainActivity extends AppCompatActivity {
     private void setBacklogBadge() {
         if (bottomBar != null) {
             RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
-            bottomBar.setNotification(String.valueOf(backlogItems.size()), 1);
+            bottomBar.setNotification(String.valueOf(backlogItems.size()), fragmentTabId.indexOf(BacklogFragment.class));
         }
     }
 
-    /* Helpers  */
-
-    public void startFragment(Fragment fragment) {
-        String id = "";
-
-        if (fragment instanceof BacklogFragment) {
-            id = getString(R.string.fragment_watching_queue);
-        } else if (fragment instanceof UserListFragment) {
-            id = getString(R.string.fragment_myshows);
-        } else if (fragment instanceof SeasonsFragment) {
-            id = getString(R.string.fragment_seasons);
-        } else if (fragment instanceof SettingsFragment) {
-            id = getString(R.string.action_settings);
-        } else if (fragment instanceof AboutFragment) {
-            id = "About";
-        } else if (fragment instanceof ExportFragment) {
-            id = "Export MAL List";
-        }
-
-        if (fragment instanceof SettingsFragment || fragment instanceof AboutFragment || fragment instanceof ExportFragment) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, fragment, id)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .addToBackStack(id)
-                    .commit();
-        } else {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content_main, fragment, id)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                    .commit();
-
-            if (fragment instanceof SeriesFragment) {
-                orientationChangedListener = (SeriesFragment) fragment;
-            } else if (fragment instanceof BacklogFragment) {
-                orientationChangedListener = (BacklogFragment) fragment;
-            }
-
-            if (!App.getInstance().isInitializing()) {
-                bottomBar.setVisibility(View.VISIBLE);
-            }
-        }
-
-    }
-
-    public void fixToolbar(String fragment) {
-        if (getSupportActionBar() != null) {
-            Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
-            if (!fragment.equals(SeasonsFragment.class.getSimpleName())) {
-                if (toolbarSpinner != null) {
-                    toolbarSpinner.setVisibility(View.GONE);
-                }
-
-                getSupportActionBar().setDisplayShowTitleEnabled(true);
-
-                if (fragment.equals(SettingsFragment.class.getSimpleName())) {
-                    getSupportActionBar().setTitle(getString(R.string.action_settings));
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                } else if (fragment.equals(AboutFragment.class.getSimpleName())) {
-                    getSupportActionBar().setTitle(getString(R.string.fragment_about));
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                } else if (fragment.equals(ExportFragment.class.getSimpleName())) {
-                    getSupportActionBar().setTitle("Export MAL List");
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                } else {
-                    getSupportActionBar().setTitle("Anime Buzz");
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                }
-            } else {
-                if (toolbarSpinner != null) {
-                    toolbarSpinner.setVisibility(View.VISIBLE);
-                }
-                getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-            }
-        }
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        getSupportFragmentManager().popBackStack();
-        return true;
-    }
-
-    private boolean doesOldDatabaseExist() {
-        File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
-        return dbFile.exists();
-    }
-
-    private boolean doesSugarDatabaseExist() {
-        File dbFile = App.getInstance().getDatabasePath("buzz_sugar.db");
-        return dbFile.exists();
-    }
-
+    // Remove old cached images
     private void deleteOldImages() {
         File cache = getCacheDir();
-        File appDir = new File(cache.getParent());
 
+        String imageExtension;
         // deletes images from cache
         if (cache.exists()) {
             for (String file : cache.list()) {
-                if (file.contains(".jpg")) {
+                imageExtension = MimeTypeMap.getFileExtensionFromUrl(file);
+
+                if (imageExtension != null && imageExtension.matches("jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
                     imageFile.delete();
                 }
             }
         }
 
-        File files = new File(appDir.getPath() + "/app_cache/images");
+        File appDir = new File(cache.getParent());
+        Uri.Builder builder = new Uri.Builder();
+        builder.authority(appDir.getPath())
+                .appendPath("app_cache")
+                .appendPath("images");
+
+        File files = new File(builder.build().toString());
 
         // deletes images from old incorrect cache
         if (files.exists()) {
             for (String file : files.list()) {
-                if (file.contains(".jpg")) {
-                    File imageFile = new File(files.getPath() + "/" + file);
+                imageExtension = MimeTypeMap.getFileExtensionFromUrl(file);
+
+                if (imageExtension != null && imageExtension.matches("jpg")) {
+                    File imageFile = new File(cache.getPath() + "/" + file);
                     imageFile.delete();
                 }
             }
         }
     }
 
-    /* Getters/setters */
+    // Fixes for older versions
+    private void migrateOldDatabase() {
+        if (sqlDatabaseExists()) {
+            DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
+            deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
+            deleteOldImages();
+            App.getInstance().setJustUpdated(true);
+        }
 
+        if (sugarDatabaseExists()) {
+            SugarMigrator.migrateToRealm();
+            deleteDatabase("buzz_sugar.db");
+            deleteOldImages();
+        }
+    }
+
+    private boolean sqlDatabaseExists() {
+        File dbFile = getDatabasePath(DatabaseHelper.getInstance(this).getDatabaseName());
+        return dbFile.exists();
+    }
+
+    private boolean sugarDatabaseExists() {
+        File dbFile = App.getInstance().getDatabasePath("buzz_sugar.db");
+        return dbFile.exists();
+    }
+
+    private void removeSeriesMissingMALID() {
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                RealmResults<Series> seriesList = realm.where(Series.class).findAll();
+
+                for (Series series : seriesList) {
+                    if (series.getMALID().matches("false")) {
+                        series.deleteFromRealm();
+                    }
+                }
+            }
+        });
+    }
+
+    // Sets all series initial Kitsu IDs to an empty String instead of null
+    // Fixes crash for those updating to v1.3.5+
+    private void fixNullKitsuIds() {
+        if (SharedPrefsUtils.getInstance().justUpdatedTo_v1_3_5()) {
+            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(Realm realm) {
+                    RealmResults<Series> allSeries = realm.where(Series.class).findAll();
+                    for (Series series : allSeries) {
+                        series.setKitsuID("");
+                    }
+                }
+            });
+
+            SharedPrefsUtils.getInstance().setJustUpdatedTo_v1_3_5(false);
+        }
+    }
+
+    // Getters
     public boolean isAlive() {
         return alive;
     }

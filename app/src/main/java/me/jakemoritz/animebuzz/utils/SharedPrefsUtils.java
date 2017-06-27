@@ -100,6 +100,16 @@ public class SharedPrefsUtils {
         editor.apply();
     }
 
+    public boolean justUpdatedTo_v1_3_5(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.updated_to_v1_3_5), true);
+    }
+
+    public void setJustUpdatedTo_v1_3_5(boolean updatedTo_v1_3_5){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.updated_to_v1_3_5), updatedTo_v1_3_5);
+        editor.apply();
+    }
+
     boolean prefersVibrate(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_vibrate_key), false);
     }

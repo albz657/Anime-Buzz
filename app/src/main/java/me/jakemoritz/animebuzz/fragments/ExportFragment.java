@@ -61,7 +61,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mainActivity.fixToolbar(this.getClass().getSimpleName());
+        mainActivity.resetToolbar(this);
 
         if (status.isEmpty()){
             setProgressVisibility("start");

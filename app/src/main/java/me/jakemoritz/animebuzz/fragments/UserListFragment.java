@@ -42,7 +42,7 @@ public class UserListFragment extends SeriesFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        getMainActivity().fixToolbar(this.getClass().getSimpleName());
+        getMainActivity().resetToolbar(this);
         loadUserSortingPreference();
 
         // check if need to auto-refresh

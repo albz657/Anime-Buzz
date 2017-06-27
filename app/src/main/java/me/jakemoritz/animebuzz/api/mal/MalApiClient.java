@@ -1,27 +1,35 @@
 package me.jakemoritz.animebuzz.api.mal;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.activities.MainActivity;
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.mal.models.AnimeListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.MatchHolder;
 import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
-import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.misc.App;
-import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
+import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -41,7 +49,7 @@ public class MalApiClient {
     private SeriesFragment seriesFragment;
     private VerifyCredentialsResponse verifyListener;
     private MalDataImportedListener malDataImportedListener;
-    private BacklogFragment backlogFragment;
+    private IncrementEpisodeCountResponse incrementEpisodeCountResponse;
     private ExportFragment exportFragment;
     private boolean exporting = false;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -54,9 +62,9 @@ public class MalApiClient {
     public MalApiClient() {
     }
 
-    public MalApiClient(BacklogFragment backlogFragment) {
-        this.backlogFragment = backlogFragment;
-        this.malDataImportedListener = backlogFragment;
+    public MalApiClient(IncrementEpisodeCountResponse incrementEpisodeCountResponse, MalDataImportedListener malDataImportedListener) {
+        this.incrementEpisodeCountResponse = incrementEpisodeCountResponse;
+        this.malDataImportedListener = malDataImportedListener;
     }
 
     public MalApiClient(SeriesFragment seriesFragment) {
@@ -69,11 +77,11 @@ public class MalApiClient {
         this.verifyListener = verifyListener;
     }
 
-    public MalApiClient(ExportFragment exportFragment){
+    public MalApiClient(ExportFragment exportFragment) {
         this.exportFragment = exportFragment;
     }
 
-    public MalApiClient(MalDataImportedListener malDataImportedListener){
+    public MalApiClient(MalDataImportedListener malDataImportedListener) {
         this.malDataImportedListener = malDataImportedListener;
     }
 
@@ -107,15 +115,15 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (backlogFragment != null){
-                        backlogFragment.episodeCountIncremented(response.isSuccessful());
+                    if (incrementEpisodeCountResponse != null) {
+                        incrementEpisodeCountResponse.episodeCountIncremented(response.isSuccessful());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    if (backlogFragment != null){
-                        backlogFragment.episodeCountIncremented(false);
+                    if (incrementEpisodeCountResponse != null) {
+                        incrementEpisodeCountResponse.episodeCountIncremented(false);
                     }
                     Log.d(TAG, t.toString());
 
@@ -147,21 +155,46 @@ public class MalApiClient {
     }
 
     private void getUserAvatar() {
-        MainActivity mainActivity = null;
+        String userId = SharedPrefsUtils.getInstance().getMalId();
+        if (!userId.isEmpty()) {
+            final String BASE_URL = "myanimelist.cdn-dena.com";
+            final String[] URL_PATH = new String[]{"images", "userimages"};
 
-        if (backlogFragment != null){
-            mainActivity = backlogFragment.getMainActivity();
-        } else if (seriesFragment != null){
-            mainActivity = seriesFragment.getMainActivity();
-        }
+            Uri.Builder builder = new Uri.Builder();
+            builder.scheme("https")
+                    .authority(BASE_URL)
+                    .appendPath(URL_PATH[0])
+                    .appendPath(URL_PATH[1])
+                    .appendPath(userId + ".jpg");
 
-        if (mainActivity != null){
-            GetUserAvatarTask getUserAvatarTask = new GetUserAvatarTask(mainActivity);
-            getUserAvatarTask.execute();
+            String URL = builder.build().toString();
+
+            Picasso.with(App.getInstance()).load(URL).into(new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    try {
+                        FileOutputStream fos = App.getInstance().openFileOutput(App.getInstance().getString(R.string.file_avatar), Context.MODE_PRIVATE);
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onBitmapFailed(Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
         }
     }
 
-    public void getUserXml(){
+    public void getUserXml() {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, SharedPrefsUtils.getInstance().getUsername(), SharedPrefsUtils.getInstance().getPassword());
         Call<ResponseBody> call = malEndpointInterface.getUserXml(SharedPrefsUtils.getInstance().getUsername(), "all", "anime");
 
@@ -175,7 +208,7 @@ public class MalApiClient {
                     try {
                         userXml = response.body().string();
                         exportFragment.fixCompatibility(userXml);
-                    } catch (IOException e){
+                    } catch (IOException e) {
                         exportFragment.fixCompatibility(null);
                         exporting = false;
                         exportFragment.setProgressVisibility("error");

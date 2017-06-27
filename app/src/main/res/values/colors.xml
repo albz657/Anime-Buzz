@@ -18,4 +18,6 @@
     <color name="animenetwork">#9579fc</color>
     <color name="viewster">#f59719</color>
     <color name="viz">#d22048</color>
+
+    <color name="bottom_nav_inactive">#8CFFFFFF</color>
 </resources>

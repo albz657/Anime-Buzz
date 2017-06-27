@@ -69,7 +69,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
         super.onViewCreated(view, savedInstanceState);
 
         mainActivity.getBottomBar().setVisibility(View.VISIBLE);
-        mainActivity.fixToolbar(this.getClass().getSimpleName());
+        mainActivity.resetToolbar(this);
 
         if (SharedPrefsUtils.getInstance().isLoggedIn() && SharedPrefsUtils.getInstance().prefersIncrementDialog()){
             if (!updating){

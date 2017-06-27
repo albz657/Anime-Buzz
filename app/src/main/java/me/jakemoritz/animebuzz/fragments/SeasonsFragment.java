@@ -110,7 +110,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void stopInitialSpinner() {
         super.stopInitialSpinner();
 
-        getMainActivity().fixToolbar(this.getClass().getSimpleName());
+        getMainActivity().resetToolbar(this);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class SeasonsFragment extends SeriesFragment {
             refreshSpinnerItems();
 
             if (seasonSpinnerAdapter.isEmpty()) {
-                getMainActivity().fixToolbar(this.getClass().getSimpleName());
+                getMainActivity().resetToolbar(this);
             } else {
                 toolbarSpinner.setVisibility(View.VISIBLE);
                 getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
