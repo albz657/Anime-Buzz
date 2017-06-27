@@ -24,13 +24,14 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.IncrementFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.interfaces.BacklogItemSwiped;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.misc.GlideApp;
+import me.jakemoritz.animebuzz.models.BacklogItem;
+import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarHelper;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
-import me.jakemoritz.animebuzz.models.BacklogItem;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementFragment.IncrementDialogListener, BacklogItemSwiped {
 

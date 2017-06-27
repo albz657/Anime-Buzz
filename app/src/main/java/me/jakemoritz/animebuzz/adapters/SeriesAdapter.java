@@ -21,8 +21,9 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.RemoveSeriesDialogFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.misc.App;
-import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.misc.GlideApp;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class SeriesAdapter extends RealmRecyclerViewAdapter<Series, SeriesAdapter.ViewHolder> implements RemoveSeriesDialogFragment.RemoveSeriesDialogListener {
 
