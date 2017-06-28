@@ -2,14 +2,14 @@
 <tabs>
     <tab
         id="@+id/nav_my_shows"
-        icon="@drawable/ic_bookmark_trimmed"
+        icon="@drawable/ic_bookmark"
         title="@string/fragment_myshows" />
     <tab
         id="@+id/nav_watching_queue"
-        icon="@drawable/ic_assignment_late_trimmed"
+        icon="@drawable/ic_assignment_late"
         title="@string/fragment_watching_queue" />
     <tab
         id="@+id/nav_seasons"
-        icon="@drawable/ic_explore_trimmed"
+        icon="@drawable/ic_explore"
         title="@string/fragment_seasons" />
 </tabs>

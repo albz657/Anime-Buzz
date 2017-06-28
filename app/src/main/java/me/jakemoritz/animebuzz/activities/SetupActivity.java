@@ -8,6 +8,8 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -73,6 +75,36 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                             return false;
                         }
                     });
+
+                    final ImageView clearPasswordImage = (ImageView) layout.findViewById(R.id.clear_password);
+                    clearPasswordImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            passwordField.setText("");
+                        }
+                    });
+
+                    passwordField.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            if (s.length() == 0){
+                                clearPasswordImage.setVisibility(View.GONE);
+                            } else {
+                                clearPasswordImage.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+
+                        }
+                    });
+
 
                     Button signInButton = (Button) layout.findViewById(R.id.sign_in_button);
                     signInButton.setOnClickListener(new View.OnClickListener() {

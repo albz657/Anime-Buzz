@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/welcome_screen_two"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
-    android:id="@+id/welcome_screen_two">
+    android:background="@color/colorPrimary">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -28,10 +28,10 @@
             style="@style/Base.TextAppearance.AppCompat.Body2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/mal_sign_in"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="30dp"
             android:text="@string/mal_sign_in_optional_text"
-            android:layout_below="@id/mal_sign_in"
             android:textColor="#80FFFFFF" />
 
         <RelativeLayout
@@ -39,9 +39,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/mal_sign_in_optional"
+            android:layout_marginBottom="20dp"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:layout_marginBottom="20dp">
+            android:paddingRight="20dp">
 
             <RelativeLayout
                 android:id="@+id/username_container"
@@ -61,25 +61,25 @@
 
                 <EditText
                     android:id="@+id/edit_username"
-                    android:theme="@style/Theme.App.Base"
-
                     style="@style/Base.TextAppearance.AppCompat.Title"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginBottom="10dp"
                     android:layout_toRightOf="@id/label_username"
+                    android:singleLine="true"
                     android:textColor="#FFFFFF"
-                    android:singleLine="true" />
+                    android:theme="@style/Theme.App.Base" />
             </RelativeLayout>
 
             <RelativeLayout
                 android:id="@+id/password_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/username_container"
-                android:layout_alignParentRight="true">
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/username_container">
 
                 <TextView
                     android:id="@+id/label_password"
@@ -93,7 +93,6 @@
 
                 <EditText
                     android:id="@+id/edit_password"
-                    android:theme="@style/Theme.App.Base"
                     style="@style/Base.TextAppearance.AppCompat.Title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -101,8 +100,21 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@id/label_password"
                     android:inputType="textPassword"
+                    android:singleLine="true"
                     android:textColor="#FFFFFF"
-                    android:singleLine="true" />
+                    android:theme="@style/Theme.App.Base"
+                    android:paddingRight="45dp"/>
+
+                <ImageView
+                    android:id="@+id/clear_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignRight="@id/edit_password"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/ic_close"
+                    android:tint="@android:color/white"
+                    android:visibility="gone"/>
 
             </RelativeLayout>
 
@@ -110,25 +122,25 @@
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:layout_below="@id/password_container"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
                 android:text="@string/sign_in" />
 
 
         </RelativeLayout>
 
         <ImageView
+            android:id="@+id/sign_in_checkmark"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/sign_in_checkmark"
-            android:src="@drawable/ic_check_circle"
-            android:tint="@color/colorAccent"
+            android:layout_alignParentBottom="true"
             android:layout_below="@id/mal_sign_in_optional"
             android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
-
             android:layout_marginBottom="80dp"
+            android:src="@drawable/ic_check_circle"
+
+            android:tint="@color/colorAccent"
             android:visibility="gone" />
 
         <TextView
