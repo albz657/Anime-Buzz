@@ -14,7 +14,6 @@ public class HelperActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check sign-in state
-
         if (SharedPrefsUtils.getInstance().hasCompletedSetup()){
             startActivity(new Intent(this, MainActivity.class));
             finish();

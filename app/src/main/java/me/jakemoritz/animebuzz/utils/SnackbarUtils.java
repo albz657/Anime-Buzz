@@ -5,14 +5,14 @@ import android.view.View;
 
 import me.jakemoritz.animebuzz.misc.App;
 
-public class SnackbarHelper {
-    private static SnackbarHelper snackbarHelper;
+public class SnackbarUtils {
+    private static SnackbarUtils snackbarUtils;
 
-    public synchronized static SnackbarHelper getInstance(){
-        if (snackbarHelper == null){
-            snackbarHelper = new SnackbarHelper();
+    public synchronized static SnackbarUtils getInstance(){
+        if (snackbarUtils == null){
+            snackbarUtils = new SnackbarUtils();
         }
-        return snackbarHelper;
+        return snackbarUtils;
     }
 
     public Snackbar makeSnackbar(View rootView, int stringResId){

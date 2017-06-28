@@ -353,7 +353,7 @@ public class MalApiClient {
         return retrofit.create(serviceClass);
     }
 
-    public void verify(String username, String password) {
+    public void verifyCredentials(String username, String password) {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
         Call<VerifyHolder> call = malEndpointInterface.verifyCredentials();
         call.enqueue(new Callback<VerifyHolder>() {
@@ -385,7 +385,7 @@ public class MalApiClient {
         });
     }
 
-    public void verify(String username, String password, final String MALID) {
+    public void verifyCredentials(String username, String password, final String MALID) {
         MalEndpointInterface malEndpointInterface = createService(MalEndpointInterface.class, username, password);
         Call<VerifyHolder> call = malEndpointInterface.verifyCredentials();
         call.enqueue(new Callback<VerifyHolder>() {

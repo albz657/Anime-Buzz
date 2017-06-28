@@ -35,7 +35,7 @@ import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
-import me.jakemoritz.animebuzz.utils.SnackbarHelper;
+import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
 public class ExportFragment extends Fragment implements MainActivity.OrientationChangedListener{
 
@@ -257,7 +257,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
 
             saveXmlToStorage(modifiedUserXml);
         } else {
-            SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_fail);
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_export_fail);
         }
 
     }
@@ -321,7 +321,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
                 outputStreamWriter.close();
 
                 setProgressVisibility("success");
-                SnackbarHelper.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {

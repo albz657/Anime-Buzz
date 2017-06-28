@@ -30,7 +30,7 @@ import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
-import me.jakemoritz.animebuzz.utils.SnackbarHelper;
+import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 
 public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementFragment.IncrementDialogListener, BacklogItemSwiped {
@@ -216,7 +216,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             if (SharedPrefsUtils.getInstance().isLoggedIn() && SharedPrefsUtils.getInstance().prefersIncrementDialog() && !backlogFragment.isCountsCurrent()){
                 if (!episodeCountSnackbarVisible){
                     episodeCountSnackbarVisible = true;
-                    Snackbar snackbar = SnackbarHelper.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
+                    Snackbar snackbar = SnackbarUtils.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
                     snackbar.addCallback(new Snackbar.Callback(){
 
                         @Override

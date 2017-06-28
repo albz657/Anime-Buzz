@@ -61,8 +61,6 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final static String TAG = MainActivity.class.getSimpleName();
-
     // Views
     private Toolbar toolbar;
     private CircularProgressView progressView;
@@ -305,7 +303,7 @@ public class MainActivity extends AppCompatActivity {
                 startExport = false;
             } else {
                 SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-                dialogFragment.show(getFragmentManager(), TAG);
+                dialogFragment.show(getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
             }
         }
     }
@@ -332,6 +330,7 @@ public class MainActivity extends AppCompatActivity {
     // Handle activity state
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        // Save orientation and current fragment
         outState.putInt("orientation", oldOrientation);
         Fragment fragment = getCurrentFragment();
         getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
@@ -347,6 +346,7 @@ public class MainActivity extends AppCompatActivity {
         if (intent.hasExtra("notificationClicked")
                 && !getSupportFragmentManager().getFragments().isEmpty()
                 && !(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getFragments().size() - 1) instanceof BacklogFragment)) {
+            // New episode notification clicked
             bottomBar.setCurrentItem(fragmentTabId.indexOf(BacklogFragment.class));
         } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
             // Backlog widget clicked
@@ -362,17 +362,14 @@ public class MainActivity extends AppCompatActivity {
                 && getCurrentFragment() instanceof SettingsFragment) {
             // User clicked ringtone preference
             openRingtones = true;
-        } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST) {
-            if (grantResults.length > 0) {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Fragment fragment = getCurrentFragment();
-                    if (fragment instanceof ExportFragment) {
-                        startExport = true;
-                    }
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_write_external);
-                    dialogFragment.show(getFragmentManager(), TAG);
-                }
+        } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST && grantResults.length > 0) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && getCurrentFragment() instanceof ExportFragment) {
+                // Proceed with export
+                startExport = true;
+            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                // User denied permission during export
+                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_write_external);
+                dialogFragment.show(getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
             }
         }
     }
@@ -411,6 +408,7 @@ public class MainActivity extends AppCompatActivity {
 
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 
+        // Desired fragment doesn't exist, create new instance
         if (fragment == null) {
             if (fragmentTag.matches(UserListFragment.class.getSimpleName())) {
                 fragment = UserListFragment.newInstance();
@@ -431,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.content_main, fragment, fragmentTag)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 
+        // Add nested fragments to backstack
         if (fragment instanceof SettingsFragment || fragment instanceof ExportFragment
                 || fragment instanceof AboutFragment) {
             fragmentTransaction.addToBackStack(fragmentTag);
@@ -449,6 +448,7 @@ public class MainActivity extends AppCompatActivity {
         return fragment;
     }
 
+    // Handles setting Toolbar title, up navigation, and spinner visibility
     public void resetToolbar(Fragment fragment) {
         if (getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
@@ -503,15 +503,16 @@ public class MainActivity extends AppCompatActivity {
             ShortcutBadger.applyCount(this, badgeCount);
         }
 
-        Intent wigetIntent = new Intent(this, BacklogBadgeWidgetProvider.class);
-        wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-        int[] ids = AppWidgetManager.getInstance(this).getAppWidgetIds(new ComponentName(this, BacklogBadgeWidgetProvider.class));
-        wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-        this.sendBroadcast(wigetIntent);
+        Intent widgetIntent = new Intent(this, BacklogBadgeWidgetProvider.class);
+        widgetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        int[] widgetIds = AppWidgetManager.getInstance(this).getAppWidgetIds(new ComponentName(this, BacklogBadgeWidgetProvider.class));
+        widgetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
+        this.sendBroadcast(widgetIntent);
 
         setBacklogBadge();
     }
 
+    // Sets backlog count badge on bottom nav icon
     private void setBacklogBadge() {
         if (bottomBar != null) {
             RealmResults<BacklogItem> backlogItems = App.getInstance().getRealm().where(BacklogItem.class).findAll();
@@ -535,7 +536,7 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         imageFile.delete();
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         // Catches IOException added to File.delete() in Android O
                         FirebaseCrash.log("Error when deleting cached anime images");
                         FirebaseCrash.report(e);
@@ -562,7 +563,7 @@ public class MainActivity extends AppCompatActivity {
 
                     try {
                         imageFile.delete();
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         // Catches IOException added to File.delete() in Android O
                         FirebaseCrash.log("Error when deleting cached anime images");
                         FirebaseCrash.report(e);

@@ -27,7 +27,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
-import me.jakemoritz.animebuzz.utils.SnackbarHelper;
+import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
 public class SignInDialogFragment extends DialogFragment implements VerifyCredentialsResponse {
 
@@ -82,7 +82,6 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
                 return false;
             }
         });
-
 
         final ImageView clearPasswordImage = (ImageView) dialogView.findViewById(R.id.clear_password);
         clearPasswordImage.setOnClickListener(new View.OnClickListener() {
@@ -170,10 +169,10 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
 
     private void attemptVerification(String username, String password) {
         if (!App.getInstance().isTryingToVerify()) {
-            new MalApiClient(this).verify(username, password);
+            new MalApiClient(this).verifyCredentials(username, password);
             App.getInstance().setTryingToVerify(true);
         } else {
-            SnackbarHelper.getInstance().makeSnackbar(mainActivity.findViewById(R.id.drawer_layout), R.string.trying_to_verify);
+            SnackbarUtils.getInstance().makeSnackbar(mainActivity.findViewById(R.id.drawer_layout), R.string.trying_to_verify);
         }
     }
 
