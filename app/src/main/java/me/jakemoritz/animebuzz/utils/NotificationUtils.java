@@ -56,7 +56,7 @@ public class NotificationUtils {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(App.getInstance())
-                        .setSmallIcon(R.drawable.ic_get_app_black_24dp)
+                        .setSmallIcon(R.drawable.ic_get_app)
                         .setContentTitle(contentTitle)
                         .setAutoCancel(true)
                         .setProgress(App.getInstance().getTotalSyncingSeriesInitial(), App.getInstance().getCurrentSyncingSeriesInitial(), false);

@@ -51,7 +51,7 @@
 -keepnames public class * extends io.realm.RealmObject
 
 # Use ProGuard while debugging
-#-dontobfuscate
+-dontobfuscate
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface

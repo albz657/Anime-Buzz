@@ -139,9 +139,9 @@ public class MainActivity extends AppCompatActivity {
 
         bottomBar = (AHBottomNavigation) findViewById(R.id.bottomBar);
 
-        AHBottomNavigationItem watchingItem = new AHBottomNavigationItem(getString(R.string.fragment_myshows), R.drawable.ic_bookmark_trimmed);
-        AHBottomNavigationItem backlogItem = new AHBottomNavigationItem(getString(R.string.fragment_watching_queue), R.drawable.ic_assignment_late_trimmed);
-        AHBottomNavigationItem browserItem = new AHBottomNavigationItem(getString(R.string.fragment_seasons), R.drawable.ic_explore_trimmed);
+        AHBottomNavigationItem watchingItem = new AHBottomNavigationItem(getString(R.string.fragment_myshows), R.drawable.ic_bookmark);
+        AHBottomNavigationItem backlogItem = new AHBottomNavigationItem(getString(R.string.fragment_watching_queue), R.drawable.ic_assignment_late);
+        AHBottomNavigationItem browserItem = new AHBottomNavigationItem(getString(R.string.fragment_seasons), R.drawable.ic_explore);
 
         bottomBar.addItem(watchingItem);
         bottomBar.addItem(backlogItem);
