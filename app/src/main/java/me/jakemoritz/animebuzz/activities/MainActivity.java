@@ -25,6 +25,7 @@ import android.widget.Spinner;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                 initialFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
             } catch (IllegalStateException e) {
                 e.printStackTrace();
-                ;
             }
         }
 
@@ -520,6 +520,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Remove old cached images
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void deleteOldImages() {
         File cache = getCacheDir();
 
@@ -531,7 +532,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if (imageExtension != null && imageExtension.matches("jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
-                    imageFile.delete();
+
+                    try {
+                        imageFile.delete();
+                    } catch (Exception e){
+                        // Catches IOException added to File.delete() in Android O
+                        FirebaseCrash.log("Error when deleting cached anime images");
+                        FirebaseCrash.report(e);
+                    }
                 }
             }
         }
@@ -551,7 +559,14 @@ public class MainActivity extends AppCompatActivity {
 
                 if (imageExtension != null && imageExtension.matches("jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
-                    imageFile.delete();
+
+                    try {
+                        imageFile.delete();
+                    } catch (Exception e){
+                        // Catches IOException added to File.delete() in Android O
+                        FirebaseCrash.log("Error when deleting cached anime images");
+                        FirebaseCrash.report(e);
+                    }
                 }
             }
         }

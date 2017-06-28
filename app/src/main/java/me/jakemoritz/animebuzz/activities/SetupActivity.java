@@ -39,7 +39,6 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     private EditText usernameField;
     private EditText passwordField;
     private MalApiClient malApiClient;
-    private PagerAdapter pagerAdapter;
 
     private class SetupPagerAdapter extends ViewStatePagerAdapter {
 
@@ -192,7 +191,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.coordinator);
         viewPager.setOffscreenPageLimit(3);
-        pagerAdapter = new SetupPagerAdapter(this);
+        PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
     }
