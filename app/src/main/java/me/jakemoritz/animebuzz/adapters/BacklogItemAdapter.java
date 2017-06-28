@@ -16,6 +16,8 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
@@ -35,9 +37,22 @@ import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 
 public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementFragment.IncrementDialogListener, BacklogItemSwiped {
 
-    public ItemTouchHelper touchHelper;
+    private ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
     private boolean episodeCountSnackbarVisible = false;
+    private final static Map<String, Integer> simulcastColorMap;
+    static{
+        simulcastColorMap = new HashMap<>();
+        simulcastColorMap.put("Crunchyroll", App.getInstance().getResources().getIdentifier("crunchyroll_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Amazon Prime", App.getInstance().getResources().getIdentifier("amazon_prime_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Viewster", App.getInstance().getResources().getIdentifier("viewster_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Viz", App.getInstance().getResources().getIdentifier("viz_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Netflix", App.getInstance().getResources().getIdentifier("netflix_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("The Anime Network", App.getInstance().getResources().getIdentifier("anime_network_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Hulu", App.getInstance().getResources().getIdentifier("hulu_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Daisuki", App.getInstance().getResources().getIdentifier("daisuki_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Funimation", App.getInstance().getResources().getIdentifier("funimation_background", "drawable", App.getInstance().getPackageName()));
+    }
 
     public BacklogItemAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(backlogItems, true);
@@ -57,13 +72,15 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.backlogItem = getItem(position);
 
+        // Set anime title
         if (SharedPrefsUtils.getInstance().prefersEnglish() && !holder.backlogItem.getSeries().getEnglishTitle().isEmpty()) {
             holder.mTitle.setText(holder.backlogItem.getSeries().getEnglishTitle());
         } else {
             holder.mTitle.setText(holder.backlogItem.getSeries().getName());
         }
 
-        int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", "me.jakemoritz.animebuzz");
+        // Load anime image
+        int imageId = App.getInstance().getResources().getIdentifier("malid_" + holder.backlogItem.getSeries().getMALID(), "drawable", App.getInstance().getPackageName());
         if (imageId != 0) {
             GlideApp.with(App.getInstance()).load(imageId).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         } else {
@@ -73,7 +90,6 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             GlideApp.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         }
 
-
         if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
@@ -81,40 +97,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
                 holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcastProvider());
             }
 
-            GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
-
-            int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
-            switch (holder.backlogItem.getSeries().getSimulcastProvider()) {
-                case "Crunchyroll":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
-                    break;
-                case "Funimation":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
-                    break;
-                case "Amazon Prime":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
-                    break;
-                case "Daisuki":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
-                    break;
-                case "Netflix":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
-                    break;
-                case "Hulu":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
-                    break;
-                case "The Anime Network":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                    holder.mSimulcast.setText(fragment.getMainActivity().getString(R.string.simulcast_anime_network));
-                    break;
-                case "Viewster":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
-                    break;
-                case "Viz":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
-                    break;
-            }
-            background.setColor(colorId);
+            holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.backlogItem.getSeries().getSimulcastProvider()));
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);
 
@@ -244,5 +227,9 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
             return false;
         }
+    }
+
+    public ItemTouchHelper getTouchHelper() {
+        return touchHelper;
     }
 }

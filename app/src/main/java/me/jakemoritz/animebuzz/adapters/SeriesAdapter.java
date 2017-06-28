@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
@@ -32,6 +34,19 @@ public class SeriesAdapter extends RealmRecyclerViewAdapter<Series, SeriesAdapte
     private SeriesFragment seriesFragment = null;
     private SeriesAdapter self;
     private ModifyItemStatusListener modifyListener;
+    private final static Map<String, Integer> simulcastColorMap;
+    static{
+        simulcastColorMap = new HashMap<>();
+        simulcastColorMap.put("Crunchyroll", App.getInstance().getResources().getIdentifier("crunchyroll_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Amazon Prime", App.getInstance().getResources().getIdentifier("amazon_prime_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Viewster", App.getInstance().getResources().getIdentifier("viewster_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Viz", App.getInstance().getResources().getIdentifier("viz_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Netflix", App.getInstance().getResources().getIdentifier("netflix_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("The Anime Network", App.getInstance().getResources().getIdentifier("anime_network_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Hulu", App.getInstance().getResources().getIdentifier("hulu_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Daisuki", App.getInstance().getResources().getIdentifier("daisuki_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Funimation", App.getInstance().getResources().getIdentifier("funimation_background", "drawable", App.getInstance().getPackageName()));
+    }
 
     public SeriesAdapter(SeriesFragment seriesFragment, RealmResults<Series> allSeries) {
         super(allSeries, true);
@@ -171,40 +186,7 @@ public class SeriesAdapter extends RealmRecyclerViewAdapter<Series, SeriesAdapte
             holder.mSimulcast.setVisibility(View.VISIBLE);
             holder.mSimulcast.setText(holder.series.getSimulcastProvider());
 
-            GradientDrawable background = (GradientDrawable) holder.mSimulcast.getBackground();
-
-            int colorId = ContextCompat.getColor(App.getInstance(), android.R.color.transparent);
-            switch (holder.series.getSimulcastProvider()) {
-                case "Crunchyroll":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.crunchyroll);
-                    break;
-                case "Funimation":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.funimation);
-                    break;
-                case "Amazon Prime":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.amazon_prime);
-                    break;
-                case "Daisuki":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.daisuki);
-                    break;
-                case "Netflix":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.netflix);
-                    break;
-                case "Hulu":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.hulu);
-                    break;
-                case "The Anime Network":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.animenetwork);
-                    holder.mSimulcast.setText(seriesFragment.getString(R.string.simulcast_anime_network));
-                    break;
-                case "Viewster":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viewster);
-                    break;
-                case "Viz":
-                    colorId = ContextCompat.getColor(App.getInstance(), R.color.viz);
-                    break;
-            }
-            background.setColor(colorId);
+            holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.series.getSimulcastProvider()));
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);
         }

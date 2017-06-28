@@ -113,7 +113,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
             }
         });
         mAdapter = new BacklogItemAdapter(this, backlogItems);
-        mAdapter.touchHelper.attachToRecyclerView(recyclerView);
+        mAdapter.getTouchHelper().attachToRecyclerView(recyclerView);
 
         recyclerView.setAdapter(mAdapter);
 
