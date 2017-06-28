@@ -1,0 +1,3 @@
+Fixes
+- Anime with no airing times are now hidden
+- Anime that have finished airing are now hidden

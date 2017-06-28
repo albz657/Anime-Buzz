@@ -20,4 +20,6 @@
     <color name="viz">#d22048</color>
 
     <color name="bottom_nav_inactive">#8CFFFFFF</color>
+
+    <color name="season_spinner_active">#FFECEFF1</color>
 </resources>

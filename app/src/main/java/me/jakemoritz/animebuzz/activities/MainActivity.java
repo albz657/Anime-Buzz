@@ -480,7 +480,6 @@ public class MainActivity extends AppCompatActivity {
 
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
             }
         }
     }

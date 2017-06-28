@@ -41,10 +41,6 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.VerifyFailedDialogFragment;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
-import me.jakemoritz.animebuzz.misc.App;
-import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
-import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 import me.jakemoritz.animebuzz.interfaces.kitsu.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
@@ -52,8 +48,12 @@ import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
+import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 
 public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse,
         ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener,

@@ -1,6 +1,6 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,20 +12,15 @@ import java.util.List;
 
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
+import me.jakemoritz.animebuzz.misc.App;
 
 public class SeasonSpinnerAdapter extends BaseAdapter {
 
-    public List<String> getSeasonNames() {
-        return seasonNames;
-    }
-
     private List<String> seasonNames = new ArrayList<>();
-    private Context context;
     private SeasonsFragment fragment;
 
-    public SeasonSpinnerAdapter(Context context, List<String> seasonNames, SeasonsFragment fragment) {
-        this.seasonNames = seasonNames;
-        this.context = context;
+    public SeasonSpinnerAdapter(SeasonsFragment fragment) {
+        this.seasonNames = new ArrayList<>();
         this.fragment = fragment;
     }
 
@@ -47,7 +42,7 @@ public class SeasonSpinnerAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null || !convertView.getTag().toString().equals("NON_DROPDOWN")) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_seasons_item, parent, false);
+            convertView = LayoutInflater.from(App.getInstance()).inflate(R.layout.spinner_seasons_item, parent, false);
             convertView.setTag("NON_DROPDOWN");
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item);
@@ -58,20 +53,22 @@ public class SeasonSpinnerAdapter extends BaseAdapter {
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         if (convertView == null || !convertView.getTag().toString().equals("DROPDOWN")) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_seasons_item_dropdown, parent, false);
+            convertView = LayoutInflater.from(App.getInstance()).inflate(R.layout.spinner_seasons_item_dropdown, parent, false);
             convertView.setTag("DROPDOWN");
         }
         TextView textView = (TextView) convertView.findViewById(R.id.spinner_item_dropdown);
         textView.setText(seasonNames.get(position));
 
         if (seasonNames.get(position).equals(fragment.getCurrentlyBrowsingSeason().getName())){
-            textView.setBackgroundColor(0xFFECEFF1);
+            textView.setBackgroundColor(ContextCompat.getColor(App.getInstance(), R.color.season_spinner_active));
         } else {
             textView.setBackgroundResource(0);
-//            textView.setBackgroundColor(App.getInstance().getResources().getColor(android.R.color.white));
-
         }
 
         return convertView;
+    }
+
+    public List<String> getSeasonNames() {
+        return seasonNames;
     }
 }

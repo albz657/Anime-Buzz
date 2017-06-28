@@ -1,11 +1,6 @@
 package me.jakemoritz.animebuzz.adapters;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -33,13 +28,14 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
-import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 
 public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementFragment.IncrementDialogListener, BacklogItemSwiped {
 
     private ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
     private boolean episodeCountSnackbarVisible = false;
+
+    // Map of simulcast background resources
     private final static Map<String, Integer> simulcastColorMap;
     static{
         simulcastColorMap = new HashMap<>();
@@ -90,6 +86,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             GlideApp.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         }
 
+        // Set simulcsat display
         if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
@@ -103,32 +100,35 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
 
         }
 
+        // Set show type display
         holder.mShowType.setText(holder.backlogItem.getSeries().getShowType());
         if (!holder.backlogItem.getSeries().getShowType().isEmpty()) {
             holder.mShowType.setVisibility(View.VISIBLE);
-            GradientDrawable background = (GradientDrawable) holder.mShowType.getBackground();
-            background.setColor(ContextCompat.getColor(App.getInstance(), R.color.clock_gunmetal));
+            holder.mShowType.setBackgroundResource(R.drawable.show_type_background);
         } else {
             holder.mShowType.setVisibility(View.GONE);
         }
 
+        // Set date display
         Calendar backlogCalendar = Calendar.getInstance();
         backlogCalendar.setTimeInMillis(holder.backlogItem.getAlarmTime());
         holder.mDate.setText(AlarmUtils.getInstance().formatAiringTime(backlogCalendar, SharedPrefsUtils.getInstance().prefers24hour()));
     }
 
+    // Called when Backlog list item swiped
     @Override
     public void onItemDismiss(int position) {
         Series series = getItem(position).getSeries();
 
         if (SharedPrefsUtils.getInstance().prefersIncrementDialog() && SharedPrefsUtils.getInstance().isLoggedIn()) {
             IncrementFragment dialogFragment = IncrementFragment.newInstance(this, series, position);
-            dialogFragment.show(fragment.getMainActivity().getFragmentManager(), "BacklogRecycler");
+            dialogFragment.show(fragment.getMainActivity().getFragmentManager(), IncrementFragment.class.getSimpleName());
         } else {
             backlogItemRemoved(position);
         }
     }
 
+    // Called when Backlog list item swipe completed or IncrementFragment closed
     private void backlogItemRemoved(int position){
         final BacklogItem removedItem = getItem(position);
 
@@ -139,13 +139,8 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
                     removedItem.deleteFromRealm();
                 }
             });
-            fragment.getMainActivity().updateBadges();
 
-            Intent wigetIntent = new Intent(fragment.getContext(), BacklogBadgeWidgetProvider.class);
-            wigetIntent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            int[] ids = AppWidgetManager.getInstance(fragment.getContext()).getAppWidgetIds(new ComponentName(fragment.getContext(), BacklogBadgeWidgetProvider.class));
-            wigetIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-            fragment.getContext().sendBroadcast(wigetIntent);
+            fragment.getMainActivity().updateBadges();
         }
     }
 
@@ -184,10 +179,10 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         }
     }
 
+    // Handles Backlog list item swiping
     private class SwipeCallback extends ItemTouchHelper.Callback{
         private BacklogFragment backlogFragment;
         private BacklogItemSwiped mAdapter;
-
 
         SwipeCallback(BacklogItemSwiped mAdapter, BacklogFragment backlogFragment) {
             this.backlogFragment = backlogFragment;
@@ -197,6 +192,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
             if (SharedPrefsUtils.getInstance().isLoggedIn() && SharedPrefsUtils.getInstance().prefersIncrementDialog() && !backlogFragment.isCountsCurrent()){
+                // Disable swipe if episode count is still syncing
                 if (!episodeCountSnackbarVisible){
                     episodeCountSnackbarVisible = true;
                     Snackbar snackbar = SnackbarUtils.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
@@ -214,7 +210,8 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             } else {
                 int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
                 int swipeFlags = ItemTouchHelper.START | ItemTouchHelper.END;
-                return makeMovementFlags(dragFlags, swipeFlags);            }
+                return makeMovementFlags(dragFlags, swipeFlags);
+            }
         }
 
         @Override

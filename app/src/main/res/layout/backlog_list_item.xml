@@ -59,6 +59,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/series_title"
                     android:id="@+id/pill_holder">
+
                     <TextView
                         android:id="@+id/series_type"
                         android:layout_width="wrap_content"

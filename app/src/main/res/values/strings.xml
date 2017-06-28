@@ -186,4 +186,11 @@
 
     <string name="last_app_version">lastappversion</string>
 
+    <string name="update_episode_time">Updating episode release time</string>
+    <string name="no_airing_time">No airing times available</string>
+
+    <string name="airing_status_airing">Airing</string>
+    <string name="airing_status_aired">Finished airing</string>
+    <string name="airing_status_not_yet_aired">Not yet aired</string>
+
 </resources>

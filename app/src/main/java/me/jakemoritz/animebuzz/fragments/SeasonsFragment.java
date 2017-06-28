@@ -35,7 +35,7 @@ public class SeasonsFragment extends SeriesFragment {
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
         fragment.setRetainInstance(true);
-        fragment.seasonSpinnerAdapter = new SeasonSpinnerAdapter(App.getInstance(), new ArrayList<String>(), fragment);
+        fragment.seasonSpinnerAdapter = new SeasonSpinnerAdapter(fragment);
         return fragment;
     }
 
@@ -181,7 +181,7 @@ public class SeasonsFragment extends SeriesFragment {
 
     private void refreshSpinnerItems() {
         if (seasonSpinnerAdapter == null) {
-            seasonSpinnerAdapter = new SeasonSpinnerAdapter(App.getInstance(), new ArrayList<String>(), this);
+            seasonSpinnerAdapter = new SeasonSpinnerAdapter(this);
         }
 
         seasonSpinnerAdapter.getSeasonNames().clear();
