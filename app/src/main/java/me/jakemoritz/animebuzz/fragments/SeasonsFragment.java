@@ -109,7 +109,6 @@ public class SeasonsFragment extends SeriesFragment {
     @Override
     public void stopInitialSpinner() {
         super.stopInitialSpinner();
-
         getMainActivity().resetToolbar(this);
     }
 
@@ -169,14 +168,12 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     public void refreshToolbar() {
+        getMainActivity().resetToolbar(this);
+
         if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
             refreshSpinnerItems();
 
-            if (seasonSpinnerAdapter.isEmpty()) {
-                getMainActivity().resetToolbar(this);
-            } else {
-                toolbarSpinner.setVisibility(View.VISIBLE);
-                getMainActivity().getSupportActionBar().setDisplayShowTitleEnabled(false);
+            if (!seasonSpinnerAdapter.isEmpty()) {
                 toolbarSpinner.setSelection(previousSpinnerIndex);
             }
         }

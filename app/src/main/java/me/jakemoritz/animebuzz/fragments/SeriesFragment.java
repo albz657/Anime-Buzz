@@ -55,7 +55,13 @@ import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
-public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse, ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener, SignInDialogFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse, DeleteItemResponse, VerifyFailedDialogFragment.SignInAgainListener, SeriesAdapter.ModifyItemStatusListener, FailedInitializationDialogFragment.FailedInitializationListener, ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
+public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse,
+        ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener,
+        SignInDialogFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse,
+        DeleteItemResponse, VerifyFailedDialogFragment.SignInAgainListener,
+        SeriesAdapter.ModifyItemStatusListener,
+        FailedInitializationDialogFragment.FailedInitializationListener,
+        ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -366,13 +372,13 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_export:
-                mainActivity.startFragment(ExportFragment.newInstance());
+                mainActivity.startFragment(ExportFragment.class.getSimpleName());
                 return true;
             case R.id.action_settings:
-                mainActivity.startFragment(SettingsFragment.newInstance());
+                mainActivity.startFragment(SettingsFragment.class.getSimpleName());
                 return true;
             case R.id.action_about:
-                mainActivity.startFragment(AboutFragment.newInstance());
+                mainActivity.startFragment(AboutFragment.class.getSimpleName());
                 return true;
         }
 

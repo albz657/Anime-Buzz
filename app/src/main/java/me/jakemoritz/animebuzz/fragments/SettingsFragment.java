@@ -358,7 +358,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         }
 
-        mainActivity.startFragment(userListFragment);
+        mainActivity.startFragment(UserListFragment.class.getSimpleName());
 
         malApiClient.getUserList();
 
@@ -381,7 +381,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         } else {
             UserListFragment userListFragment = UserListFragment.newInstance();
 
-            mainActivity.startFragment(userListFragment);
+            mainActivity.startFragment(UserListFragment.class.getSimpleName());
             new MalApiClient(userListFragment).getUserList();
 
             if (mainActivity.findViewById(R.id.drawer_layout) != null)

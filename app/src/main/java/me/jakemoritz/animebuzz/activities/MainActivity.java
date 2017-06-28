@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     private int oldOrientation = -1;
 
     // Bottom navigation tab ids
-    private ArrayList<Class> fragmentTabId = new ArrayList<Class>(Arrays.asList(UserListFragment.class, BacklogFragment.class, SeriesFragment.class));
+    private ArrayList<Class> fragmentTabId = new ArrayList<Class>(Arrays.asList(UserListFragment.class, BacklogFragment.class, SeasonsFragment.class));
 
     private boolean openRingtones = false;
     private boolean startExport = false;
@@ -156,18 +157,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
                 if (SharedPrefsUtils.getInstance().hasCompletedSetup() && !App.getInstance().isSetDefaultTabId()) {
-                    Fragment newFragment = null;
+                    String fragmentTag = null;
 
                     if (position == fragmentTabId.indexOf(UserListFragment.class) && !wasSelected) {
-                        newFragment = UserListFragment.newInstance();
+                        fragmentTag = UserListFragment.class.getSimpleName();
                     } else if (position == fragmentTabId.indexOf(SeasonsFragment.class) && !wasSelected) {
-                        newFragment = SeasonsFragment.newInstance();
+                        fragmentTag = SeasonsFragment.class.getSimpleName();
                     } else if (position == fragmentTabId.indexOf(BacklogFragment.class) && !wasSelected) {
-                        newFragment = BacklogFragment.newInstance();
+                        fragmentTag = BacklogFragment.class.getSimpleName();
                     }
 
-                    if (newFragment != null){
-                        startFragment(newFragment);
+                    if (fragmentTag != null) {
+                        startFragment(fragmentTag);
                     }
                 }
 
@@ -208,40 +209,36 @@ public class MainActivity extends AppCompatActivity {
         String versionName = App.getInstance().getVersionName();
 
         // Start relevant fragment, set selected bottom navigation tab
+        String fragmentTag;
         int defaultTabId = fragmentTabId.indexOf(UserListFragment.class);
         if (initialFragment == null) {
             if (App.getInstance().isInitializing()) {
                 SharedPrefsUtils.getInstance().setLastAppVersion(versionName);
 
-                SeriesFragment seriesFragment;
-
                 if (SharedPrefsUtils.getInstance().isLoggedIn()) {
-                    seriesFragment = UserListFragment.newInstance();
+                    fragmentTag = UserListFragment.class.getSimpleName();
                 } else {
-                    seriesFragment = SeasonsFragment.newInstance();
+                    fragmentTag = SeasonsFragment.class.getSimpleName();
                     defaultTabId = fragmentTabId.indexOf(SeasonsFragment.class);
                 }
 
+                SeriesFragment seriesFragment = (SeriesFragment) startFragment(fragmentTag);
+
                 SenpaiExportHelper senpaiExportHelper = new SenpaiExportHelper(seriesFragment);
                 senpaiExportHelper.getSeasonList();
-
-                startFragment(seriesFragment);
             } else {
-                Fragment fragment = getCurrentFragment();
-                if (fragment == null) {
-                    if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
-                        defaultTabId = fragmentTabId.indexOf(BacklogFragment.class);
-                        startFragment(BacklogFragment.newInstance());
-                    } else {
-                        startFragment(UserListFragment.newInstance());
-                    }
+                if (getIntent() != null && getIntent().hasExtra("notificationClicked")) {
+                    defaultTabId = fragmentTabId.indexOf(BacklogFragment.class);
+                    fragmentTag = BacklogFragment.class.getSimpleName();
                 } else {
-                    defaultTabId = fragmentTabId.indexOf(fragment.getClass());
+                    fragmentTag = UserListFragment.class.getSimpleName();
                 }
+
+                startFragment(fragmentTag);
             }
         } else {
             defaultTabId = fragmentTabId.indexOf(initialFragment.getClass());
-            startFragment(initialFragment);
+            startFragment(initialFragment.getClass().getSimpleName());
         }
 
         // Fixes double-select issue for bottom navigation
@@ -353,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             bottomBar.setCurrentItem(fragmentTabId.indexOf(BacklogFragment.class));
         } else if (intent.hasExtra("backlog_widget") && intent.getBooleanExtra("backlog_widget", false)) {
             // Backlog widget clicked
-            startFragment(BacklogFragment.newInstance());
+            startFragment(BacklogFragment.class.getSimpleName());
             bottomBar.setCurrentItem(fragmentTabId.indexOf(BacklogFragment.class));
         }
     }
@@ -409,13 +406,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void startFragment(Fragment fragment) {
-        String id = fragment.getClass().getSimpleName();
+    public Fragment startFragment(String fragmentTag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.content_main, fragment, id)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .commit();
+        Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
+
+        if (fragment == null) {
+            if (fragmentTag.matches(UserListFragment.class.getSimpleName())) {
+                fragment = UserListFragment.newInstance();
+            } else if (fragmentTag.matches(BacklogFragment.class.getSimpleName())) {
+                fragment = BacklogFragment.newInstance();
+            } else if (fragmentTag.matches(SeasonsFragment.class.getSimpleName())) {
+                fragment = SeasonsFragment.newInstance();
+            } else if (fragmentTag.matches(SettingsFragment.class.getSimpleName())) {
+                fragment = SettingsFragment.newInstance();
+            } else if (fragmentTag.matches(AboutFragment.class.getSimpleName())) {
+                fragment = AboutFragment.newInstance();
+            } else if (fragmentTag.matches(ExportFragment.class.getSimpleName())) {
+                fragment = ExportFragment.newInstance();
+            }
+        }
+
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction()
+                .replace(R.id.content_main, fragment, fragmentTag)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+
+        if (fragment instanceof SettingsFragment || fragment instanceof ExportFragment
+                || fragment instanceof AboutFragment) {
+            fragmentTransaction.addToBackStack(fragmentTag);
+        }
+
+        fragmentTransaction.commit();
 
         if (fragment instanceof SeriesFragment || fragment instanceof BacklogFragment) {
             orientationChangedListener = (OrientationChangedListener) fragment;
@@ -424,6 +445,8 @@ public class MainActivity extends AppCompatActivity {
         if (!App.getInstance().isInitializing()) {
             bottomBar.setVisibility(View.VISIBLE);
         }
+
+        return fragment;
     }
 
     public void resetToolbar(Fragment fragment) {
@@ -455,6 +478,7 @@ public class MainActivity extends AppCompatActivity {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
 
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
             }

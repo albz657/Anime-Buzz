@@ -180,13 +180,13 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_export:
-                mainActivity.startFragment(ExportFragment.newInstance());
+                mainActivity.startFragment(ExportFragment.class.getSimpleName());
                 return true;
             case R.id.action_settings:
-                mainActivity.startFragment(SettingsFragment.newInstance());
+                mainActivity.startFragment(SettingsFragment.class.getSimpleName());
                 return true;
             case R.id.action_about:
-                mainActivity.startFragment(AboutFragment.newInstance());
+                mainActivity.startFragment(AboutFragment.class.getSimpleName());
                 return true;
         }
 
