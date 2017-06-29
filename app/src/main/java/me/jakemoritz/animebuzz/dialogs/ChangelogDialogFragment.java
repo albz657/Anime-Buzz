@@ -4,20 +4,19 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -48,9 +47,9 @@ public class ChangelogDialogFragment extends DialogFragment {
         View titleView = getActivity().getLayoutInflater().inflate(R.layout.dialog_changelog_title, null);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("What's new?")
+        builder.setTitle(R.string.changelog_dialog_title)
                 .setCustomTitle(titleView)
-                .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.dialog_close, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dismiss();
@@ -63,15 +62,13 @@ public class ChangelogDialogFragment extends DialogFragment {
 
         ChangelogAdapter changelogAdapter = new ChangelogAdapter(loadChangelog());
         recyclerView.setAdapter(changelogAdapter);
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         builder.setView(dialogView);
         return builder.create();
     }
 
+    // Sort changelog files by version
     private class ChangelogComparator implements Comparator<String>{
         @Override
         public int compare(String o1, String o2) {
@@ -113,7 +110,7 @@ public class ChangelogDialogFragment extends DialogFragment {
                 InputStream inputStream = App.getInstance().getResources().getAssets().open("changelogs".concat(File.separator).concat(changelogFilename));
 
                 String newChanges = "";
-                String fixes = "";
+                String fixes;
 
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 StringBuilder text = new StringBuilder();
@@ -138,7 +135,7 @@ public class ChangelogDialogFragment extends DialogFragment {
             }
 
         } catch (IOException e){
-            e.printStackTrace();
+            FirebaseCrash.report(e);
         }
 
         return changelogItems;
@@ -149,21 +146,21 @@ public class ChangelogDialogFragment extends DialogFragment {
         private String changelogNew;
         private String changelogFixes;
 
-        public ChangelogItem(String versionName, String changelogNew, String changelogFixes) {
+        ChangelogItem(String versionName, String changelogNew, String changelogFixes) {
             this.versionName = versionName;
             this.changelogNew = changelogNew;
             this.changelogFixes = changelogFixes;
         }
 
-        public String getChangelogFixes() {
+        String getChangelogFixes() {
             return changelogFixes;
         }
 
-        public String getChangelogNew() {
+        String getChangelogNew() {
             return changelogNew;
         }
 
-        public String getVersionName() {
+        String getVersionName() {
             return versionName;
         }
     }
@@ -172,7 +169,7 @@ public class ChangelogDialogFragment extends DialogFragment {
 
         private ArrayList<ChangelogItem> changelog;
 
-        public ChangelogAdapter(ArrayList<ChangelogItem> changelog) {
+        ChangelogAdapter(ArrayList<ChangelogItem> changelog) {
             this.changelog = changelog;
         }
 
@@ -189,62 +186,27 @@ public class ChangelogDialogFragment extends DialogFragment {
             holder.mTitle.setText(holder.changelogItem.getVersionName());
 
             if (!holder.changelogItem.getChangelogNew().isEmpty()){
-                TextView textView = new TextView(getActivity());
-
-                Resources r = getResources();
-                int px = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        10,
-                        r.getDisplayMetrics()
-                );
-
-                textView.setPadding(px, 0, 0, 0);
-
-                textView.setText(holder.changelogItem.getChangelogNew());
-
-                LinearLayout linearLayout = (LinearLayout) holder.mView.findViewById(R.id.changelog_content);
-                int indexOfNew = linearLayout.indexOfChild(holder.mNewChanges);
-                linearLayout.addView(textView, indexOfNew + 1);
+                holder.mNewChanges.setText(holder.changelogItem.getChangelogNew());
             } else {
+                holder.mNewChangesTitle.setVisibility(View.GONE);
                 holder.mNewChanges.setVisibility(View.GONE);
             }
 
             if (!holder.changelogItem.getChangelogFixes().isEmpty()){
-                TextView textView = new TextView(getActivity());
-
-                Resources r = getResources();
-                int px = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        10,
-                        r.getDisplayMetrics()
-                );
-
-                textView.setPadding(px, 0, 0, 0);
-
-                textView.setText(holder.changelogItem.getChangelogFixes());
-
-                LinearLayout linearLayout = (LinearLayout) holder.mView.findViewById(R.id.changelog_content);
-                int indexOfFixes = linearLayout.indexOfChild(holder.mFixes);
-                linearLayout.addView(textView, indexOfFixes + 1);
-
-                if (holder.mNewChanges.getVisibility() == View.VISIBLE){
-                    int topPx = (int) TypedValue.applyDimension(
-                            TypedValue.COMPLEX_UNIT_DIP,
-                            5,
-                            r.getDisplayMetrics()
-                    );
-
-                    holder.mFixes.setPadding(0, topPx, 0, 0);
-                }
+                holder.mFixes.setText(holder.changelogItem.getChangelogFixes());
             } else {
+                holder.mFixesTitle.setVisibility(View.GONE);
                 holder.mFixes.setVisibility(View.GONE);
             }
 
-            if (position == 0){
+            // Display an icon for the most recent changelog
+            if (changelog.indexOf(holder.changelogItem) == 0){
                 holder.mNewIcon.setVisibility(View.VISIBLE);
                 int color = ContextCompat.getColor(getActivity(), R.color.colorAccent);
                 ColorFilter colorFilter = new LightingColorFilter(color, color);
                 holder.mNewIcon.setColorFilter(colorFilter);
+            } else {
+                holder.mNewIcon.setVisibility(View.GONE);
             }
         }
 
@@ -257,6 +219,8 @@ public class ChangelogDialogFragment extends DialogFragment {
             final View mView;
 
             final TextView mTitle;
+            final TextView mNewChangesTitle;
+            final TextView mFixesTitle;
             final TextView mNewChanges;
             final TextView mFixes;
             final ImageView mNewIcon;
@@ -267,12 +231,12 @@ public class ChangelogDialogFragment extends DialogFragment {
                 super(view);
                 mView = view;
                 mTitle = (TextView) view.findViewById(R.id.changelog_version);
-                mNewChanges = (TextView) view.findViewById(R.id.changelog_text_new);
-                mFixes = (TextView) view.findViewById(R.id.changelog_text_fixes);
+                mNewChangesTitle = (TextView) view.findViewById(R.id.changelog_new_title);
+                mFixesTitle = (TextView) view.findViewById(R.id.changelog_fixes_title);
+                mNewChanges = (TextView) view.findViewById(R.id.changelog_new_text);
+                mFixes = (TextView) view.findViewById(R.id.changelog_fixes_text);
                 mNewIcon = (ImageView) view.findViewById(R.id.changelog_new_icon);
             }
         }
     }
-
-
 }

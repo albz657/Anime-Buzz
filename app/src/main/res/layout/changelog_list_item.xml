@@ -39,20 +39,38 @@
                 android:orientation="vertical"
                 android:id="@+id/changelog_content">
 
-
                 <TextView
-                    android:id="@+id/changelog_text_new"
+                    android:id="@+id/changelog_new_title"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="New" />
 
                 <TextView
-                    android:id="@+id/changelog_text_fixes"
+                    android:id="@+id/changelog_new_text"
+                    style="@style/Base.TextAppearance.AppCompat.Body1"
+                    android:paddingLeft="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="New"
+                    android:layout_marginRight="10dp"/>
+
+                <TextView
+                    android:id="@+id/changelog_fixes_title"
                     style="@style/Base.TextAppearance.AppCompat.Subhead"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Fixes" />
+
+
+                <TextView
+                    android:id="@+id/changelog_fixes_text"
+                    style="@style/Base.TextAppearance.AppCompat.Body1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:text="New" />
 
             </LinearLayout>
 
