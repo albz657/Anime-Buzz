@@ -58,9 +58,12 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         dialogView = inflater.inflate(R.layout.fragment_sign_in, container);
+
+        // MAL sign in screen
         usernameField = (EditText) dialogView.findViewById(R.id.edit_username);
         passwordField = (EditText) dialogView.findViewById(R.id.edit_password);
 
+        // Handles 'enter' button on keyboard
         passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -83,6 +86,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
             }
         });
 
+        // Clears password field
         final ImageView clearPasswordImage = (ImageView) dialogView.findViewById(R.id.clear_password);
         clearPasswordImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +95,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
             }
         });
 
+        // Toggles visibility of 'x' to clear password field
         passwordField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -112,7 +117,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
             }
         });
 
-
+        // Attempt to sign into MAL
         Button signInButton = (Button) dialogView.findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,19 +157,12 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
 
         Dialog dialog = getDialog();
 
+        // Programmatically set dialog dimensions (cannot set via XML)
         if (dialog != null){
             int width = (int) (400 * Resources.getSystem().getDisplayMetrics().density);
             int height = (int) (350 * Resources.getSystem().getDisplayMetrics().density);
             dialog.getWindow().setLayout(width, height);
-
         }
-    }
-
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-
     }
 
     private void attemptVerification(String username, String password) {
@@ -205,7 +203,6 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
 
                 failSnackbar.show();
             }
-
         }
     }
 
@@ -217,5 +214,4 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
     public interface SignInFragmentListener {
         void verified(boolean verified);
     }
-
 }

@@ -141,6 +141,17 @@ public class ChangelogDialogFragment extends DialogFragment {
         return changelogItems;
     }
 
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
+    }
+
     private class ChangelogItem {
         private String versionName;
         private String changelogNew;

@@ -10,19 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class IncrementFragment extends DialogFragment {
+public class IncrementDialogFragment extends DialogFragment {
 
     private IncrementDialogListener listener;
     private Series series;
     private int position;
 
-    public IncrementFragment() {
+    public IncrementDialogFragment() {
     }
 
-    public static IncrementFragment newInstance(IncrementDialogListener listener, Series series, int position) {
-        IncrementFragment fragment = new IncrementFragment();
+    public static IncrementDialogFragment newInstance(IncrementDialogListener listener, Series series, int position) {
+        IncrementDialogFragment fragment = new IncrementDialogFragment();
         fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.series = series;
@@ -44,7 +45,7 @@ public class IncrementFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Do you want to increment the episode count on MAL?")
+        builder.setMessage(R.string.increment_dialog_message)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 
 public class VerifyFailedDialogFragment extends DialogFragment {
@@ -31,8 +32,8 @@ public class VerifyFailedDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mainActivity);
-        builder.setMessage("We failed to verifyCredentials your MAL credentials. If your credentials were changed, you'll need to sign in again in order to access your MAL account.")
-                .setTitle("Verification failed")
+        builder.setMessage(R.string.verify_failed_dialog_message)
+                .setTitle(R.string.verify_failed_dialog_title)
                 .setPositiveButton("Sign in", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

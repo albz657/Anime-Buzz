@@ -6,10 +6,6 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
-/**
- * Created by jakem on 2/8/2017.
- */
-
 public class SimpleDialogFragment extends DialogFragment {
 
     private int messageResId;
@@ -22,6 +18,17 @@ public class SimpleDialogFragment extends DialogFragment {
         fragment.setRetainInstance(true);
         fragment.messageResId = stringResId;
         return fragment;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Dialog dialog = getDialog();
+
+        if (dialog != null && getRetainInstance()){
+            dialog.setDismissMessage(null);
+        }
+
+        super.onDestroyView();
     }
 
     @Override

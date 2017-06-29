@@ -10,18 +10,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import me.jakemoritz.animebuzz.fragments.SeriesFragment;
+import me.jakemoritz.animebuzz.R;
 
 public class FailedInitializationDialogFragment extends DialogFragment {
 
-    private SeriesFragment seriesFragment;
+    private FailedInitializationListener failedInitializationListener;
 
     public FailedInitializationDialogFragment() {
     }
 
-    public static FailedInitializationDialogFragment newInstance(SeriesFragment seriesFragment) {
+    public static FailedInitializationDialogFragment newInstance(FailedInitializationListener failedInitializationListener) {
         FailedInitializationDialogFragment fragment = new FailedInitializationDialogFragment();
-        fragment.seriesFragment = seriesFragment;
+        fragment.failedInitializationListener = failedInitializationListener;
         fragment.setRetainInstance(true);
         return fragment;
     }
@@ -40,18 +40,18 @@ public class FailedInitializationDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("There was a problem getting anime data and airing times. This data must be downloaded before continuing, would you like to retry now or later?")
-                .setTitle("Failed getting initial data")
+        builder.setMessage(R.string.failed_init_dialog_message)
+                .setTitle(R.string.failed_init_dialog_title)
                 .setPositiveButton("Now", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        seriesFragment.failedInitializationResponse(true);
+                        failedInitializationListener.failedInitializationResponse(true);
                     }
                 })
                 .setNegativeButton("Later", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        seriesFragment.failedInitializationResponse(false);
+                        failedInitializationListener.failedInitializationResponse(false);
                     }
                 })
                 .setCancelable(false);

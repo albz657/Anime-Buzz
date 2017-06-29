@@ -197,4 +197,18 @@
     <string name="airing_status_aired">Finished airing</string>
     <string name="airing_status_not_yet_aired">Not yet aired</string>
 
+    <string name="failed_init_dialog_message">There was a problem getting anime data and airing times. This data must be downloaded before continuing, would you like to retry now or later?</string>
+    <string name="failed_init_dialog_title">Failed getting initial data</string>
+
+    <string name="import_dialog_message">Signed in! Do you want to add the anime currently in your list to your MAL list?</string>
+
+    <string name="increment_dialog_message">Do you want to increment the episode count on MAL?</string>
+
+    <string name="remove_series_dialog_message_logged_in">Are you sure you want to remove this from your list? (including your MAL list)</string>
+    <string name="remove_series_dialog_message">Are you sure you want to remove this from your list?</string>
+
+    <string name="sign_out_dialog_message">Are you sure you want to sign out from your MAL account?</string>
+
+    <string name="verify_failed_dialog_message">We failed to verifyCredentials your MAL credentials. If your credentials were changed, you\'ll need to sign in again in order to access your MAL account.</string>
+    <string name="verify_failed_dialog_title">Verification failed</string>
 </resources>

@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 
 public class ImportDialogFragment extends DialogFragment {
@@ -36,7 +37,7 @@ public class ImportDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(callback.getMainActivity());
-        builder.setMessage("Signed in! Do you want to add the anime currently in your list to your MAL list?")
+        builder.setMessage(R.string.import_dialog_message)
                 .setPositiveButton("Add All", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

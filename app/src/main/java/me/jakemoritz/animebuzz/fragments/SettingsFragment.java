@@ -39,7 +39,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.ImportDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.SignOutFragment;
+import me.jakemoritz.animebuzz.dialogs.SignOutDialogFragment;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
@@ -132,8 +132,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         signOutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                SignOutFragment signOutFragment = SignOutFragment.newInstance(self, preference);
-                signOutFragment.show(mainActivity.getFragmentManager(), "");
+                SignOutDialogFragment signOutDialogFragment = SignOutDialogFragment.newInstance(self, preference);
+                signOutDialogFragment.show(mainActivity.getFragmentManager(), "");
                 return false;
             }
         });

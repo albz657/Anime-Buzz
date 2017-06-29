@@ -6,6 +6,7 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class RemoveSeriesDialogFragment extends DialogFragment {
@@ -54,10 +55,10 @@ public class RemoveSeriesDialogFragment extends DialogFragment {
                 });
 
         if (SharedPrefsUtils.getInstance().isLoggedIn()){
-            builder.setMessage("Are you sure you want to remove this from your list? (including your MAL list)");
+            builder.setMessage(R.string.remove_series_dialog_message_logged_in);
 
         } else {
-            builder.setMessage("Are you sure you want to remove this from your list?");
+            builder.setMessage(R.string.remove_series_dialog_message);
         }
 
         return builder.create();
