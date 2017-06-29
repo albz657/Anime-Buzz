@@ -1,5 +1,7 @@
 package me.jakemoritz.animebuzz.api.senpai;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -44,7 +46,7 @@ public class SenpaiExportHelper {
         Call<String> call = senpaiEndpointInterface.getSeasonList("json", "seasonlist");
         call.enqueue(new Callback<String>() {
             @Override
-            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+            public void onResponse(@NonNull Call<String> call, @NonNull retrofit2.Response<String> response) {
                 if (response.isSuccessful()) {
                     seriesFragment.senpaiSeasonListReceived();
                 } else {
@@ -55,7 +57,7 @@ public class SenpaiExportHelper {
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
                 if (App.getInstance().isInitializing()){
                     seriesFragment.failedInitialization();
                 }
@@ -78,9 +80,9 @@ public class SenpaiExportHelper {
         Call<SeasonHolder> call = senpaiEndpointInterface.getSeasonData("json", seasonKey);
         call.enqueue(new Callback<SeasonHolder>() {
             @Override
-            public void onResponse(Call<SeasonHolder> call, final retrofit2.Response<SeasonHolder> response) {
+            public void onResponse(@NonNull Call<SeasonHolder> call, @NonNull final retrofit2.Response<SeasonHolder> response) {
                 if (response.isSuccessful()) {
-                    if (seasonKey.equals("raw")){
+                    if (seasonKey.equals("raw") && response.body() != null){
                         SharedPrefsUtils.getInstance().setLastUpdateTime(System.currentTimeMillis());
                         SharedPrefsUtils.getInstance().setLatestSeasonKey(response.body().getSeasonKey());
                         SharedPrefsUtils.getInstance().setLatestSeasonName(response.body().getSeasonName());
@@ -109,7 +111,7 @@ public class SenpaiExportHelper {
             }
 
             @Override
-            public void onFailure(Call<SeasonHolder> call, Throwable t) {
+            public void onFailure(@NonNull Call<SeasonHolder> call, @NonNull Throwable t) {
                 seriesFragment.senpaiSeasonRetrieved(null);
             }
         });

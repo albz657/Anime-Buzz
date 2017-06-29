@@ -9,7 +9,7 @@ import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class AlarmsDataHelper {
+class AlarmsDataHelper {
 
     private static final String TAG = AlarmsDataHelper.class.getSimpleName();
 
@@ -29,7 +29,7 @@ public class AlarmsDataHelper {
         return mInstance;
     }
 
-    public void migrateAlarms(SQLiteDatabase sugarDb) {
+    void migrateAlarms(SQLiteDatabase sugarDb) {
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ALARMS, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {

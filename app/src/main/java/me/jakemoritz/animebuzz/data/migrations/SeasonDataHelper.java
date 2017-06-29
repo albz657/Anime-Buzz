@@ -8,7 +8,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Season;
 
-public class SeasonDataHelper {
+class SeasonDataHelper {
 
     private static String TABLE_SEASONS = "TABLE_SEASONS";
 
@@ -26,7 +26,7 @@ public class SeasonDataHelper {
         return mInstance;
     }
 
-    public void migrateSeason(SQLiteDatabase sugarDb) {
+    void migrateSeason(SQLiteDatabase sugarDb) {
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_SEASONS, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {

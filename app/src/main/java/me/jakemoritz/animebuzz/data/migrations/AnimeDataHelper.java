@@ -18,7 +18,7 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 
 
-public class AnimeDataHelper {
+class AnimeDataHelper {
 
     private static final String TAG = AnimeDataHelper.class.getSimpleName();
 
@@ -55,7 +55,7 @@ public class AnimeDataHelper {
         return mInstance;
     }
 
-    public void migrateSeries(SQLiteDatabase sugarDb) {
+    void migrateSeries(SQLiteDatabase sugarDb) {
         Cursor cursor = sugarDb.rawQuery("SELECT * FROM " + TABLE_ANIME, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
