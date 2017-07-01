@@ -2,10 +2,6 @@ package me.jakemoritz.animebuzz.misc;
 
 import me.jakemoritz.animebuzz.R;
 
-/**
- * Created by jakem on 2/3/2017.
- */
-
 public enum SetupObject {
 
     INTRO(R.layout.welcome_page_1),

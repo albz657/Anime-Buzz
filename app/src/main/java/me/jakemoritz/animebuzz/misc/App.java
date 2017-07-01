@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
-import android.util.Log;
 
 import com.squareup.picasso.Picasso;
 
@@ -37,9 +36,7 @@ public class App extends Application {
     private boolean tryingToVerify = false;
     private boolean justUpdated = false;
     private boolean setDefaultTabId = false;
-    private boolean migratedTo1 = false;
-    private boolean justLaunchedBrowser = false;
-    private boolean justLaunchedWatching = false;
+    private boolean realmDbMigratedTo_v1 = false;
 
     private int totalSyncingSeriesInitial;
     private int currentSyncingSeriesInitial = 0;
@@ -58,19 +55,18 @@ public class App extends Application {
         Picasso.with(this);
         Realm.init(this);
 
+        // Check if this process is the normal app process (not Firebase process)
         if (getAppName(android.os.Process.myPid()).equals(getPackageName())) {
-            // normal app process
             RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
                     RealmSchema schema = realm.getSchema();
 
                     if (oldVersion == 0) {
-                        schema.get("Series")
-                                .addField("kitsuID", String.class);
+                        schema.get("Series").addField("kitsuID", String.class);
 
                         oldVersion++;
-                        migratedTo1 = true;
+                        realmDbMigratedTo_v1 = true;
                     }
                 }
             };
@@ -84,7 +80,8 @@ public class App extends Application {
             Realm.setDefaultConfiguration(realmConfiguration);
             realm.close();
 
-            if (migratedTo1) {
+            // Fix null default Kitsu ID value in first Realm DB version
+            if (realmDbMigratedTo_v1) {
                 getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(Realm realm) {
@@ -96,11 +93,8 @@ public class App extends Application {
                     }
                 });
 
-                migratedTo1 = false;
+                realmDbMigratedTo_v1 = false;
             }
-        } else {
-            // Firebase process
-            Log.d(TAG, "not normal process");
         }
 
 /*        Stetho.initialize(Stetho.newInitializerBuilder(this)
@@ -137,7 +131,6 @@ public class App extends Application {
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
 
-    /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
@@ -241,21 +234,5 @@ public class App extends Application {
             okHttpClient = new OkHttpClient();
         }
         return okHttpClient;
-    }
-
-    public boolean isJustLaunchedBrowser() {
-        return justLaunchedBrowser;
-    }
-
-    public void setJustLaunchedBrowser(boolean justLaunchedBrowser) {
-        this.justLaunchedBrowser = justLaunchedBrowser;
-    }
-
-    public boolean isJustLaunchedWatching() {
-        return justLaunchedWatching;
-    }
-
-    public void setJustLaunchedWatching(boolean justLaunchedWatching) {
-        this.justLaunchedWatching = justLaunchedWatching;
     }
 }
