@@ -79,7 +79,7 @@ public class Series extends RealmObject{
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        return getMALID().matches(((Series) o).getMALID());
+        return getMALID().equals(((Series) o).getMALID());
     }
 
     @Override

@@ -117,10 +117,10 @@ public class ChangelogDialogFragment extends DialogFragment {
                 String line;
 
                 while ((line = bufferedReader.readLine()) != null){
-                    if (line.trim().matches("Fixes")){
+                    if (line.trim().equals("Fixes")){
                         newChanges = text.toString();
                         text = new StringBuilder();
-                    } else if (!line.trim().matches("New")){
+                    } else if (!line.trim().equals("New")){
                         text.append(line).append("\n");
                     }
                 }

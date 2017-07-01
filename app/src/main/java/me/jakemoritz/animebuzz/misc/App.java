@@ -29,20 +29,22 @@ public class App extends Application {
 
     private static App mInstance;
 
+    private Realm realm;
+    private OkHttpClient okHttpClient;
+
     private boolean initializing = false;
     private boolean postInitializing = false;
     private boolean tryingToVerify = false;
     private boolean justUpdated = false;
     private boolean setDefaultTabId = false;
-    private Realm realm;
+    private boolean migratedTo1 = false;
+    private boolean justLaunchedBrowser = false;
+    private boolean justLaunchedWatching = false;
+
     private int totalSyncingSeriesInitial;
     private int currentSyncingSeriesInitial = 0;
     private int totalSyncingSeriesPost;
     private int currentSyncingSeriesPost = 0;
-    private OkHttpClient okHttpClient;
-    private boolean migratedTo1 = false;
-    private boolean justLaunchedBrowser = false;
-    private boolean justLaunchedWatching = false;
 
     public static synchronized App getInstance() {
         return mInstance;
@@ -56,11 +58,7 @@ public class App extends Application {
         Picasso.with(this);
         Realm.init(this);
 
-//        justLaunchedBrowser = true;
-//        justLaunchedWatching = true;
-
-
-        if (getAppName(android.os.Process.myPid()).matches("me.jakemoritz.animebuzz")) {
+        if (getAppName(android.os.Process.myPid()).equals(getPackageName())) {
             // normal app process
             RealmMigration migration = new RealmMigration() {
                 @Override

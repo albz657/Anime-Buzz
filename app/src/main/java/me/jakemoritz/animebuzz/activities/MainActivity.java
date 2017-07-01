@@ -214,9 +214,9 @@ public class MainActivity extends AppCompatActivity {
         App.getInstance().setSetDefaultTabId(false);
 
         // Check if changelog should be displayed
-        if (!SharedPrefsUtils.getInstance().getLastAppVersion().matches(versionName) && !App.getInstance().isInitializing()) {
+        if (!SharedPrefsUtils.getInstance().getLastAppVersion().equals(versionName) && !App.getInstance().isInitializing()) {
             // Fixes bug pre v1.3.8
-            if (versionName.matches("1.3.8")) {
+            if (versionName.equals("1.3.8")) {
                 removeSeriesMissingMALID();
             }
 
@@ -372,17 +372,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Desired fragment doesn't exist, create new instance
         if (fragment == null) {
-            if (fragmentTag.matches(UserListFragment.class.getSimpleName())) {
+            if (fragmentTag.equals(UserListFragment.class.getSimpleName())) {
                 fragment = UserListFragment.newInstance();
-            } else if (fragmentTag.matches(BacklogFragment.class.getSimpleName())) {
+            } else if (fragmentTag.equals(BacklogFragment.class.getSimpleName())) {
                 fragment = BacklogFragment.newInstance();
-            } else if (fragmentTag.matches(SeasonsFragment.class.getSimpleName())) {
+            } else if (fragmentTag.equals(SeasonsFragment.class.getSimpleName())) {
                 fragment = SeasonsFragment.newInstance();
-            } else if (fragmentTag.matches(SettingsFragment.class.getSimpleName())) {
+            } else if (fragmentTag.equals(SettingsFragment.class.getSimpleName())) {
                 fragment = SettingsFragment.newInstance();
-            } else if (fragmentTag.matches(AboutFragment.class.getSimpleName())) {
+            } else if (fragmentTag.equals(AboutFragment.class.getSimpleName())) {
                 fragment = AboutFragment.newInstance();
-            } else if (fragmentTag.matches(ExportFragment.class.getSimpleName())) {
+            } else if (fragmentTag.equals(ExportFragment.class.getSimpleName())) {
                 fragment = ExportFragment.newInstance();
             }
         }
@@ -484,7 +484,7 @@ public class MainActivity extends AppCompatActivity {
             for (String file : cache.list()) {
                 imageExtension = MimeTypeMap.getFileExtensionFromUrl(file);
 
-                if (imageExtension != null && imageExtension.matches("jpg")) {
+                if (imageExtension != null && imageExtension.equals("jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
 
                     try {
@@ -511,7 +511,7 @@ public class MainActivity extends AppCompatActivity {
             for (String file : files.list()) {
                 imageExtension = MimeTypeMap.getFileExtensionFromUrl(file);
 
-                if (imageExtension != null && imageExtension.matches("jpg")) {
+                if (imageExtension != null && imageExtension.equals("jpg")) {
                     File imageFile = new File(cache.getPath() + "/" + file);
 
                     try {
@@ -559,7 +559,7 @@ public class MainActivity extends AppCompatActivity {
                 RealmResults<Series> seriesList = realm.where(Series.class).findAll();
 
                 for (Series series : seriesList) {
-                    if (series.getMALID().matches("false")) {
+                    if (series.getMALID().equals("false")) {
                         series.deleteFromRealm();
                     }
                 }

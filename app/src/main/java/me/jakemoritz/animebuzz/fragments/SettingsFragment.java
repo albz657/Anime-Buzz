@@ -208,7 +208,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                 FirebaseCrash.report(e);
             }
 
-            if (name.matches("Unknown")){
+            if (name.equals("Unknown")){
                 name = "Silent";
             }
 

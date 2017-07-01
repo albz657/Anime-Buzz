@@ -109,7 +109,7 @@ public class NotificationUtils {
     public void createChangedTimeNotification(Series series, Calendar newEpisodeTime){
         String name = series.getName();
 
-        if (SharedPrefsUtils.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty() && !series.getEnglishTitle().matches(series.getName())){
+        if (SharedPrefsUtils.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty() && !series.getEnglishTitle().equals(series.getName())){
             name = series.getEnglishTitle();
         }
 

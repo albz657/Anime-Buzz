@@ -104,7 +104,7 @@ public class SeriesAdapter extends RealmRecyclerViewAdapter<Series, SeriesAdapte
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.series = getItem(position);
 
-        if ((holder.series.getAiringStatus().matches(App.getInstance().getString(R.string.airing_status_aired)) || !holder.series.getShowType().equals("TV") && (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty()))))) {
+        if ((holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired)) || !holder.series.getShowType().equals("TV") && (!holder.series.isSingle() || (holder.series.isSingle() && (holder.series.getStartedAiringDate().isEmpty() && holder.series.getFinishedAiringDate().isEmpty()))))) {
             // Hides row if anime is either: Already aired, a non-TV series with multiple episodes, or an single-episode series with no start/end times
             holder.mView.setVisibility(View.GONE);
             holder.hideItem();
@@ -135,8 +135,8 @@ public class SeriesAdapter extends RealmRecyclerViewAdapter<Series, SeriesAdapte
             holder.mDateImage.setImageDrawable(dateImage);
 
             // Set airing status and date text
-            if (!holder.series.getAiringStatus().matches(App.getInstance().getString(R.string.airing_status_aired))) {
-                if (holder.series.getAiringStatus().matches(App.getInstance().getString(R.string.airing_status_airing))) {
+            if (!holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired))) {
+                if (holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_airing))) {
                     // Anime currently airing
                     holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
                 } else {

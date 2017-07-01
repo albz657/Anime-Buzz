@@ -132,7 +132,7 @@ public class KitsuDataProcessor extends IntentService {
                     currSeries.setStartedAiringDate(finalStartAiringDate);
                     currSeries.setFinishedAiringDate(finalfinishedAiringDate);*/
 
-                    if (!currSeries.getShowType().matches(finalShowType)){
+                    if (!currSeries.getShowType().equals(finalShowType)){
                         currSeries.setShowType(finalShowType);
                     }
 
@@ -141,24 +141,24 @@ public class KitsuDataProcessor extends IntentService {
                     }
 
                     if (!englishTitle.isEmpty()){
-                        if (!currSeries.getEnglishTitle().matches(englishTitle)){
+                        if (!currSeries.getEnglishTitle().equals(englishTitle)){
                             currSeries.setEnglishTitle(englishTitle);
                         }
                     } else {
-                        if (!currSeries.getEnglishTitle().matches(currSeries.getName())){
+                        if (!currSeries.getEnglishTitle().equals(currSeries.getName())){
                             currSeries.setEnglishTitle(currSeries.getName());
                         }
                     }
 
-                    if (!currSeries.getAiringStatus().matches(finalAiringStatus)){
+                    if (!currSeries.getAiringStatus().equals(finalAiringStatus)){
                         currSeries.setAiringStatus(finalAiringStatus);
                     }
 
-                    if (!currSeries.getStartedAiringDate().matches(finalStartAiringDate)){
+                    if (!currSeries.getStartedAiringDate().equals(finalStartAiringDate)){
                         currSeries.setStartedAiringDate(finalStartAiringDate);
                     }
 
-                    if (!currSeries.getFinishedAiringDate().matches(finalfinishedAiringDate)){
+                    if (!currSeries.getFinishedAiringDate().equals(finalfinishedAiringDate)){
                         currSeries.setFinishedAiringDate(finalfinishedAiringDate);
                     }
                 }
