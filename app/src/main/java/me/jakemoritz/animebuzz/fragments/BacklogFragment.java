@@ -19,9 +19,9 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.adapters.BacklogItemAdapter;
+import me.jakemoritz.animebuzz.adapters.BacklogItemAdapterListener;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.EpisodeCountIncrementedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -29,7 +29,7 @@ import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-public class BacklogFragment extends Fragment implements IncrementEpisodeCountResponse, MalDataImportedListener {
+public class BacklogFragment extends Fragment implements EpisodeCountIncrementedListener, MalDataImportedListener {
 
     private MainActivity mainActivity;
     private RecyclerView recyclerView;
@@ -74,7 +74,7 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
             }
         });
 
-        BacklogItemAdapter mAdapter = new BacklogItemAdapter(this, backlogItems);
+        BacklogItemAdapterListener mAdapter = new BacklogItemAdapterListener(this, backlogItems);
         mAdapter.getTouchHelper().attachToRecyclerView(recyclerView);
 
         recyclerView.setAdapter(mAdapter);
@@ -126,9 +126,9 @@ public class BacklogFragment extends Fragment implements IncrementEpisodeCountRe
     }
 
     @Override
-    public void malDataImported(boolean received) {
-        countsCurrent = received;
-        if (!received) {
+    public void malDataImported(boolean imported) {
+        countsCurrent = imported;
+        if (!imported) {
             SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_episode_count_syncing);
         }
 

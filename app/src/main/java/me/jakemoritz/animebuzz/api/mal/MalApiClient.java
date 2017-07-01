@@ -23,9 +23,9 @@ import me.jakemoritz.animebuzz.api.mal.models.UserListHolder;
 import me.jakemoritz.animebuzz.api.mal.models.VerifyHolder;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
 import me.jakemoritz.animebuzz.fragments.SeriesFragment;
-import me.jakemoritz.animebuzz.interfaces.mal.IncrementEpisodeCountResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.EpisodeCountIncrementedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
 import me.jakemoritz.animebuzz.interfaces.retrofit.MalEndpointInterface;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Series;
@@ -47,9 +47,9 @@ public class MalApiClient {
     private static final String BASE_URL = "https://myanimelist.net/";
 
     private SeriesFragment seriesFragment;
-    private VerifyCredentialsResponse verifyListener;
+    private MalCredentialsVerifiedListener verifyListener;
     private MalDataImportedListener malDataImportedListener;
-    private IncrementEpisodeCountResponse incrementEpisodeCountResponse;
+    private EpisodeCountIncrementedListener episodeCountIncrementedListener;
     private ExportFragment exportFragment;
     private boolean exporting = false;
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
@@ -62,8 +62,8 @@ public class MalApiClient {
     public MalApiClient() {
     }
 
-    public MalApiClient(IncrementEpisodeCountResponse incrementEpisodeCountResponse, MalDataImportedListener malDataImportedListener) {
-        this.incrementEpisodeCountResponse = incrementEpisodeCountResponse;
+    public MalApiClient(EpisodeCountIncrementedListener episodeCountIncrementedListener, MalDataImportedListener malDataImportedListener) {
+        this.episodeCountIncrementedListener = episodeCountIncrementedListener;
         this.malDataImportedListener = malDataImportedListener;
     }
 
@@ -73,7 +73,7 @@ public class MalApiClient {
         this.verifyListener = seriesFragment;
     }
 
-    public MalApiClient(VerifyCredentialsResponse verifyListener) {
+    public MalApiClient(MalCredentialsVerifiedListener verifyListener) {
         this.verifyListener = verifyListener;
     }
 
@@ -92,16 +92,16 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() && response.raw().message().equals("Created")) {
-                    seriesFragment.itemAdded(MALID);
+                    seriesFragment.malEntryAdded(MALID);
                     Log.d(TAG, response.toString());
                 } else {
-                    seriesFragment.itemAdded(null);
+                    seriesFragment.malEntryAdded(null);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                seriesFragment.itemAdded(null);
+                seriesFragment.malEntryAdded(null);
                 Log.d(TAG, t.toString());
             }
         });
@@ -115,15 +115,15 @@ public class MalApiClient {
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    if (incrementEpisodeCountResponse != null) {
-                        incrementEpisodeCountResponse.episodeCountIncremented(response.isSuccessful());
+                    if (episodeCountIncrementedListener != null) {
+                        episodeCountIncrementedListener.episodeCountIncremented(response.isSuccessful());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<Void> call, Throwable t) {
-                    if (incrementEpisodeCountResponse != null) {
-                        incrementEpisodeCountResponse.episodeCountIncremented(false);
+                    if (episodeCountIncrementedListener != null) {
+                        episodeCountIncrementedListener.episodeCountIncremented(false);
                     }
                     Log.d(TAG, t.toString());
 
@@ -139,16 +139,16 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful() && response.raw().message().equals("OK")) {
-                    seriesFragment.itemDeleted(MALID);
+                    seriesFragment.malEntryDeleted(MALID);
                     Log.d(TAG, response.toString());
                 } else {
-                    seriesFragment.itemDeleted(MALID);
+                    seriesFragment.malEntryDeleted(MALID);
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                seriesFragment.itemDeleted(MALID);
+                seriesFragment.malEntryDeleted(MALID);
                 Log.d(TAG, t.toString());
             }
         });
@@ -360,7 +360,7 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
                 if (response.isSuccessful()) {
-                    verifyListener.verifyCredentialsResponseReceived(true);
+                    verifyListener.malCredentialsVerified(true);
 
                     if (response.body().getUsername() != null) {
                         SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
@@ -369,7 +369,7 @@ public class MalApiClient {
                         SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
                     }
                 } else {
-                    verifyListener.verifyCredentialsResponseReceived(false);
+                    verifyListener.malCredentialsVerified(false);
                 }
                 App.getInstance().setTryingToVerify(false);
 
@@ -377,7 +377,7 @@ public class MalApiClient {
 
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
-                verifyListener.verifyCredentialsResponseReceived(false);
+                verifyListener.malCredentialsVerified(false);
 
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());
@@ -392,7 +392,7 @@ public class MalApiClient {
             @Override
             public void onResponse(Call<VerifyHolder> call, retrofit2.Response<VerifyHolder> response) {
                 if (response.isSuccessful()) {
-                    verifyListener.verifyCredentialsResponseReceived(true, MALID);
+                    verifyListener.malCredentialsVerified(true, MALID);
 
                     if (response.body().getUsername() != null) {
                         SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
@@ -401,7 +401,7 @@ public class MalApiClient {
                         SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
                     }
                 } else {
-                    verifyListener.verifyCredentialsResponseReceived(false, MALID);
+                    verifyListener.malCredentialsVerified(false, MALID);
                 }
                 App.getInstance().setTryingToVerify(false);
 
@@ -409,7 +409,7 @@ public class MalApiClient {
 
             @Override
             public void onFailure(Call<VerifyHolder> call, Throwable t) {
-                verifyListener.verifyCredentialsResponseReceived(false, MALID);
+                verifyListener.malCredentialsVerified(false, MALID);
 
                 App.getInstance().setTryingToVerify(false);
                 Log.d(TAG, "error: " + t.getMessage());

@@ -88,8 +88,8 @@ public class SeasonsFragment extends SeriesFragment {
 
     // API callbacks
     @Override
-    public void hummingbirdSeasonReceived() {
-        super.hummingbirdSeasonReceived();
+    public void kitsuDataReceived() {
+        super.kitsuDataReceived();
 
         if (App.getInstance().isPostInitializing() && isVisible()) {
             refreshToolbar();

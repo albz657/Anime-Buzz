@@ -29,10 +29,10 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
 import me.jakemoritz.animebuzz.misc.SetupObject;
 
-public class SetupActivity extends AppCompatActivity implements VerifyCredentialsResponse {
+public class SetupActivity extends AppCompatActivity implements MalCredentialsVerifiedListener {
 
     private EditText usernameField;
     private EditText passwordField;
@@ -227,7 +227,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
+    public void malCredentialsVerified(boolean verified) {
         if (verified) {
             hideLoginForm();
 
@@ -242,7 +242,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
+    public void malCredentialsVerified(boolean verified, String MALID) {
 
     }
 }

@@ -41,7 +41,7 @@ public class KitsuApiClient {
         RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
 
         if (seriesRealmResults.isEmpty()) {
-            callback.hummingbirdSeasonReceived();
+            callback.kitsuDataReceived();
         } else {
             if (App.getInstance().isInitializing()) {
                 App.getInstance().setTotalSyncingSeriesInitial(seriesRealmResults.size());
@@ -50,7 +50,7 @@ public class KitsuApiClient {
             for (Series series : seriesRealmResults) {
                 getSeriesData(series.getMALID());
             }
-            callback.hummingbirdSeasonReceived();
+            callback.kitsuDataReceived();
         }
     }
 

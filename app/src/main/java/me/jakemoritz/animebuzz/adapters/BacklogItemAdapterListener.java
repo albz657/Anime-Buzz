@@ -20,7 +20,7 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.dialogs.IncrementEpisodeCountDialogFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
-import me.jakemoritz.animebuzz.interfaces.BacklogItemSwiped;
+import me.jakemoritz.animebuzz.interfaces.BacklogItemSwipedListener;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.misc.GlideApp;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -29,7 +29,7 @@ import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
-public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementEpisodeCountDialogFragment.IncrementDialogListener, BacklogItemSwiped {
+public class BacklogItemAdapterListener extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapterListener.ViewHolder> implements IncrementEpisodeCountDialogFragment.IncrementDialogListener, BacklogItemSwipedListener {
 
     private ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
@@ -50,7 +50,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         simulcastColorMap.put("Funimation", App.getInstance().getResources().getIdentifier("funimation_background", "drawable", App.getInstance().getPackageName()));
     }
 
-    public BacklogItemAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
+    public BacklogItemAdapterListener(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(backlogItems, true);
         this.fragment = parent;
         ItemTouchHelper.Callback callback = new SwipeCallback(this, parent);
@@ -117,7 +117,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
 
     // Called when Backlog list item swiped
     @Override
-    public void onItemDismiss(int position) {
+    public void backlogItemSwiped(int position) {
         Series series = getItem(position).getSeries();
 
         if (SharedPrefsUtils.getInstance().prefersIncrementDialog() && SharedPrefsUtils.getInstance().isLoggedIn()) {
@@ -182,9 +182,9 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
     // Handles Backlog list item swiping
     private class SwipeCallback extends ItemTouchHelper.Callback{
         private BacklogFragment backlogFragment;
-        private BacklogItemSwiped mAdapter;
+        private BacklogItemSwipedListener mAdapter;
 
-        SwipeCallback(BacklogItemSwiped mAdapter, BacklogFragment backlogFragment) {
+        SwipeCallback(BacklogItemSwipedListener mAdapter, BacklogFragment backlogFragment) {
             this.backlogFragment = backlogFragment;
             this.mAdapter = mAdapter;
         }
@@ -216,7 +216,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
 
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
+            mAdapter.backlogItemSwiped(viewHolder.getAdapterPosition());
         }
 
         // Unused, only for drag & drop

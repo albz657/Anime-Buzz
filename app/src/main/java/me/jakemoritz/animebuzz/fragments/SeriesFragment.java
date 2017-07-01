@@ -42,11 +42,11 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.MalVerifyFailedDialogFragment;
-import me.jakemoritz.animebuzz.interfaces.kitsu.ReadHummingbirdDataResponse;
-import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
-import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
+import me.jakemoritz.animebuzz.interfaces.kitsu.KitsuDataReceiver;
+import me.jakemoritz.animebuzz.interfaces.mal.MalEntryAddedListener;
+import me.jakemoritz.animebuzz.interfaces.mal.MalEntryDeletedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.misc.App;
@@ -59,11 +59,11 @@ import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 
 public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse,
         ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener,
-        SignInDialogFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse,
-        DeleteItemResponse, MalVerifyFailedDialogFragment.SignInAgainListener,
+        SignInDialogFragment.SignInFragmentListener, MalCredentialsVerifiedListener, MalEntryAddedListener,
+        MalEntryDeletedListener, MalVerifyFailedDialogFragment.SignInAgainListener,
         SeriesAdapter.ModifyItemStatusListener,
         FailedInitializationDialogFragment.FailedInitializationListener,
-        ReadHummingbirdDataResponse {
+        KitsuDataReceiver {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -383,7 +383,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     // Item modification
 
     @Override
-    public void itemAdded(String MALID) {
+    public void malEntryAdded(String MALID) {
         if (MALID != null) {
             addSeries(MALID);
         } else {
@@ -441,7 +441,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void itemDeleted(String MALID) {
+    public void malEntryDeleted(String MALID) {
         if (MALID != null) {
             removeSeries(MALID);
         } else {
@@ -536,7 +536,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void hummingbirdSeasonReceived() {
+    public void kitsuDataReceived() {
         if (App.getInstance().isJustUpdated()) {
             App.getInstance().setJustUpdated(false);
             App.getInstance().setInitializing(false);
@@ -551,7 +551,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
+    public void malCredentialsVerified(boolean verified, String MALID) {
         if (verified) {
             if (adding) {
                 malApiClient.addAnime(String.valueOf(MALID));
@@ -566,7 +566,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
+    public void malCredentialsVerified(boolean verified) {
 
     }
 
@@ -578,7 +578,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
-    public void malDataImported(boolean received) {
+    public void malDataImported(boolean imported) {
 
     }
 

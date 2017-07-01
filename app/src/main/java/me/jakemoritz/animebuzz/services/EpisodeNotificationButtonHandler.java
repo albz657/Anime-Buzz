@@ -73,8 +73,8 @@ public class EpisodeNotificationButtonHandler extends IntentService implements M
     }
 
     @Override
-    public void malDataImported(boolean received) {
-        if (received && !MALID.matches("-1")){
+    public void malDataImported(boolean imported) {
+        if (imported && !MALID.matches("-1")){
             malApiClient.updateAnimeEpisodeCount(MALID);
             MALID = "-1";
         }

@@ -24,12 +24,12 @@ import android.widget.TextView;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.interfaces.mal.VerifyCredentialsResponse;
+import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
-public class SignInDialogFragment extends DialogFragment implements VerifyCredentialsResponse {
+public class SignInDialogFragment extends DialogFragment implements MalCredentialsVerifiedListener {
 
     private SignInFragmentListener listener;
     private View dialogView;
@@ -176,7 +176,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified) {
+    public void malCredentialsVerified(boolean verified) {
         if (verified) {
             SharedPrefsUtils.getInstance().setMalUsernameFormatted(usernameField.getText().toString());
             SharedPrefsUtils.getInstance().setUsername(usernameField.getText().toString().trim());
@@ -208,7 +208,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
     }
 
     @Override
-    public void verifyCredentialsResponseReceived(boolean verified, String MALID) {
+    public void malCredentialsVerified(boolean verified, String MALID) {
 
     }
 

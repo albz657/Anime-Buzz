@@ -43,8 +43,8 @@ public class UserListFragment extends SeriesFragment {
     }
 
     @Override
-    public void hummingbirdSeasonReceived() {
-        super.hummingbirdSeasonReceived();
+    public void kitsuDataReceived() {
+        super.kitsuDataReceived();
 
         if (App.getInstance().isInitializing()) {
             getMalApiClient().getUserList();
@@ -66,8 +66,8 @@ public class UserListFragment extends SeriesFragment {
     }
 
     @Override
-    public void malDataImported(boolean received) {
-        super.malDataImported(received);
+    public void malDataImported(boolean imported) {
+        super.malDataImported(imported);
 
         if (App.getInstance().isInitializing()) {
             stopInitialSpinner();
