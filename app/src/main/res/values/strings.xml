@@ -108,7 +108,7 @@
     <string name="pref_simulcast_key">airingorsimulcast</string>
     <string name="pref_simulcast_title">Prefer simulcast times</string>
     <string name="pref_simulcast_off_summary">You will be notified when an episode airs.</string>
-    <string name="pref_simulcast_summary">You will be notified when an episode is simulcastProvider.</string>
+    <string name="pref_simulcast_summary">You will be notified when an episode is simulcast.</string>
 
     <string name="pref_vibrate_key">vibratekey</string>
     <string name="pref_vibrate_title">Vibrate</string>
@@ -159,8 +159,8 @@
     <string name="pref_account_summary_on">You are signed in as \'</string>
     <string name="pref_account_summary_off">You are not signed in.</string>
     <string name="pref_account_cancel">Cancel</string>
-    <string name="pref_account_signin">Sign In</string>
-    <string name="pref_account_signout">Sign Out</string>
+    <string name="pref_account_signin_key">signinkey</string>
+    <string name="pref_account_signout_key">signoutkey</string>
 
     <!-- About -->
     <string name="about_senpai"><b>Senpai</b> provides data about anime airing times and other crucial information.</string>
@@ -211,4 +211,8 @@
 
     <string name="verify_failed_dialog_message">We failed to verifyCredentials your MAL credentials. If your credentials were changed, you\'ll need to sign in again in order to access your MAL account.</string>
     <string name="verify_failed_dialog_title">Verification failed</string>
+
+    <string name="snackbar_episode_count_syncing">There was a problem updating your episode counts. Please try syncing your info again later.</string>
+
+    <string name="snackbar_signed_out">You have signed out.</string>
 </resources>

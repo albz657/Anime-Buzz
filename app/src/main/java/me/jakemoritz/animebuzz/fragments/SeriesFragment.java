@@ -26,6 +26,7 @@ import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,7 +41,7 @@ import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.VerifyFailedDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.MalVerifyFailedDialogFragment;
 import me.jakemoritz.animebuzz.interfaces.kitsu.ReadHummingbirdDataResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.AddItemResponse;
 import me.jakemoritz.animebuzz.interfaces.mal.DeleteItemResponse;
@@ -53,15 +54,16 @@ import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
+import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 
 public abstract class SeriesFragment extends Fragment implements ReadSeasonDataResponse,
         ReadSeasonListResponse, MalDataImportedListener, SwipeRefreshLayout.OnRefreshListener,
         SignInDialogFragment.SignInFragmentListener, VerifyCredentialsResponse, AddItemResponse,
-        DeleteItemResponse, VerifyFailedDialogFragment.SignInAgainListener,
+        DeleteItemResponse, MalVerifyFailedDialogFragment.SignInAgainListener,
         SeriesAdapter.ModifyItemStatusListener,
         FailedInitializationDialogFragment.FailedInitializationListener,
-        ReadHummingbirdDataResponse, MainActivity.OrientationChangedListener {
+        ReadHummingbirdDataResponse {
 
     private static final String TAG = SeriesFragment.class.getSimpleName();
 
@@ -82,8 +84,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     // current season info
     private Season currentlyBrowsingSeason;
-    private String currentlyBrowsingSeasonName;
-    private String currentlyBrowsingSeasonKey;
 
     // boolean states
     private boolean updating = false;
@@ -104,23 +104,20 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container,
                              final Bundle savedInstanceState) {
-        container.clearDisappearingChildren();
-        container.removeAllViews();
-
         FrameLayout seriesLayout = (FrameLayout) inflater.inflate(R.layout.fragment_series_list, container, false);
-
         swipeRefreshLayoutRecycler = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_recycler);
         swipeRefreshLayoutRecycler.setOnRefreshListener(this);
         swipeRefreshLayoutEmpty = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_empty);
         swipeRefreshLayoutEmpty.setOnRefreshListener(this);
-
         RecyclerView recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
+        // Empty view
         LinearLayout emptyView = (LinearLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
         TextView emptyText = (TextView) emptyView.findViewById(R.id.empty_text);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
+        // Get anime list to display
         RealmResults<Series> realmResults;
         String sort;
         if (SharedPrefsUtils.getInstance().prefersEnglish()) {
@@ -128,6 +125,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         } else {
             sort = "name";
         }
+
         if (this instanceof SeasonsFragment) {
             realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
@@ -144,10 +142,83 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     }
 
     @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Handle 'refreshing' icon on rotation
+        if (updating) {
+            if (swipeRefreshLayoutEmpty.isEnabled() && !swipeRefreshLayoutEmpty.isRefreshing()) {
+                swipeRefreshLayoutEmpty.setRefreshing(true);
+            } else if (swipeRefreshLayoutRecycler.isEnabled() && !swipeRefreshLayoutRecycler.isRefreshing()) {
+                swipeRefreshLayoutRecycler.setRefreshing(true);
+            }
+        }
+
+        // Check if need to auto-refresh
+        if (!App.getInstance().isInitializing()) {
+            Calendar currentCal = Calendar.getInstance();
+
+            Calendar lastUpdatedCal = Calendar.getInstance();
+            lastUpdatedCal.setTimeInMillis(SharedPrefsUtils.getInstance().getLastUpdateTime());
+
+            if (currentCal.get(Calendar.DAY_OF_YEAR) != lastUpdatedCal.get(Calendar.DAY_OF_YEAR) || (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6) {
+                if (getSwipeRefreshLayoutEmpty().isEnabled()) {
+                    getSwipeRefreshLayoutEmpty().setRefreshing(true);
+                }
+
+                if (getSwipeRefreshLayoutRecycler().isEnabled()) {
+                    getSwipeRefreshLayoutRecycler().setRefreshing(true);
+                }
+
+                updateData();
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (initialReceiver != null) {
+            mainActivity.unregisterReceiver(initialReceiver);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
+    }
+
+    @Override
     public void onRefresh() {
         updateData();
     }
 
+    // Starts data sync from Senpai.moe
+    public void updateData() {
+        if (!isUpdating() && App.getInstance().isNetworkAvailable()) {
+            String seasonKey = SharedPrefsUtils.getInstance().getLatestSeasonKey();
+
+            if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid() && !(this instanceof UserListFragment)) {
+                seasonKey = currentlyBrowsingSeason.getKey();
+            }
+
+            if (!seasonKey.isEmpty()) {
+                if (seasonKey.equals(SharedPrefsUtils.getInstance().getLatestSeasonKey())) {
+                    seasonKey = "raw";
+                }
+
+                getSenpaiExportHelper().getSeasonData(seasonKey);
+                updating = true;
+            } else {
+                stopRefreshing();
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.no_network_available);
+            }
+        }
+    }
+
+    // Reset listener to new list
     public void resetListener(RealmResults<Series> realmResults) {
         if (previousRealmResults != null && previousRealmResults.isValid()) {
             mainActivity.runOnUiThread(new Runnable() {
@@ -168,6 +239,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         });
     }
 
+    // Handles empty view visibility
     private void setVisibility(RealmResults<Series> element) {
         if (element.isEmpty()) {
             swipeRefreshLayoutRecycler.setVisibility(View.GONE);
@@ -183,150 +255,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (!App.getInstance().isInitializing()) {
-            mainActivity.getBottomBar().setVisibility(View.VISIBLE);
-        }
-
-        if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
-            if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
-                currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
-                currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
-            }
-        }
-
-        if (updating){
-            if (swipeRefreshLayoutEmpty.isEnabled() && !swipeRefreshLayoutEmpty.isRefreshing()){
-                swipeRefreshLayoutEmpty.setRefreshing(true);
-            } else if (swipeRefreshLayoutRecycler.isEnabled() && !swipeRefreshLayoutRecycler.isRefreshing()){
-                swipeRefreshLayoutRecycler.setRefreshing(true);
-            }
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mainActivity = (MainActivity) context;
-    }
-
-    @Override
-    public void senpaiSeasonRetrieved(String seasonKey) {
-        if (seasonKey != null) {
-            RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
-
-            if (App.getInstance().isInitializing() && seriesRealmResults.isEmpty()) {
-                failedInitialization();
-            } else {
-                if (App.getInstance().isNetworkAvailable()) {
-                    if (App.getInstance().isInitializing()) {
-                        IntentFilter intentFilter = new IntentFilter();
-                        intentFilter.addAction("FINISHED_INITIALIZING");
-                        initialReceiver = new BroadcastReceiver() {
-                            @Override
-                            public void onReceive(Context context, Intent intent) {
-                                App.getInstance().setInitializing(false);
-                                App.getInstance().setPostInitializing(true);
-
-                                RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
-                                Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
-                                List<Season> seasons = new ArrayList<>(results);
-
-                                Collections.sort(seasons, new SeasonComparator());
-
-                                int indexOfLatestSeason = results.indexOf(latestSeason);
-
-                                seasons = seasons.subList(indexOfLatestSeason + 1, seasons.size());
-
-                                for (Season season : seasons) {
-                                    senpaiExportHelper.getSeasonData(season.getKey());
-                                }
-                            }
-                        };
-                        mainActivity.registerReceiver(initialReceiver, intentFilter);
-                    }
-                    kitsuApiClient.processSeriesList(seasonKey);
-                } else {
-                    if (getView() != null) {
-                        Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                    }
-                }
-            }
-        } else {
-            if (isUpdating()){
-                stopRefreshing();
-            }
-
-            if (!App.getInstance().isInitializing()) {
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
-                }
-            } else {
-                failedInitialization();
-            }
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (initialReceiver != null) {
-            try {
-                mainActivity.unregisterReceiver(initialReceiver);
-            } catch (IllegalArgumentException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public void hummingbirdSeasonReceived() {
-        if (App.getInstance().isJustUpdated()) {
-            App.getInstance().setJustUpdated(false);
-            App.getInstance().setInitializing(false);
-            App.getInstance().setPostInitializing(true);
-            senpaiExportHelper.getSeasonList();
-        }
-    }
-
-    @Override
-    public void senpaiSeasonListReceived() {
-        senpaiExportHelper.getSeasonData("raw");
-    }
-
-    private void clearAppData() {
-        File cache = App.getInstance().getCacheDir();
-        File appDir = new File(cache.getParent());
-        if (appDir.exists()) {
-            String[] children = appDir.list();
-            for (String s : children) {
-                if (!s.equals("lib")) {
-                    deleteDir(new File(appDir, s));
-                    Log.i(TAG, "File /data/data/me.jakemoritz.tasking/" + s + " DELETED");
-                }
-            }
-        }
-    }
-
-    private static boolean deleteDir(File dir) {
-        if (dir != null && dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-
-        return dir.delete();
-    }
-
+    // Initial data sync from Senpai.moe failed
     @Override
     public void failedInitializationResponse(boolean retryNow) {
         clearAppData();
@@ -346,6 +275,13 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             homeIntent.addCategory(Intent.CATEGORY_HOME);
             homeIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(homeIntent);
+        }
+    }
+
+    public void failedInitialization() {
+        if (mainActivity.isAlive()) {
+            FailedInitializationDialogFragment failedInitializationDialogFragment = FailedInitializationDialogFragment.newInstance(this);
+            mainActivity.getFragmentManager().beginTransaction().add(failedInitializationDialogFragment, FailedInitializationDialogFragment.class.getSimpleName()).addToBackStack(null).commitAllowingStateLoss();
         }
     }
 
@@ -385,51 +321,22 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateData() {
-        if (!isUpdating()) {
-            if (App.getInstance().isNetworkAvailable()) {
-                String seasonKey = "";
-
-                if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid() && this instanceof UserListFragment) {
-                    seasonKey = SharedPrefsUtils.getInstance().getLatestSeasonKey();
-                } else if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()) {
-                    seasonKey = currentlyBrowsingSeason.getKey();
-                }
-
-                if (!seasonKey.isEmpty()) {
-                    if (seasonKey.equals(SharedPrefsUtils.getInstance().getLatestSeasonKey())) {
-                        seasonKey = "raw";
-                    }
-
-                    getSenpaiExportHelper().getSeasonData(seasonKey);
-
-                    updating = true;
-                } else {
-                    stopRefreshing();
-                }
-            } else {
-                stopRefreshing();
-
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
-                }
-            }
-        }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("seasonKey", currentlyBrowsingSeason.getKey());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void orientationChanged(boolean portrait) {
-        if (this instanceof UserListFragment){
-            currentlyBrowsingSeasonKey = SharedPrefsUtils.getInstance().getLatestSeasonKey();
-        } else {
-            if (currentlyBrowsingSeasonKey != null && !currentlyBrowsingSeasonKey.isEmpty() && currentlyBrowsingSeason != null && !currentlyBrowsingSeason.isValid()){
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Restore Realm objects on rotate
+        if (savedInstanceState != null){
+            String currentlyBrowsingSeasonKey = savedInstanceState.getString("seasonKey");
+
+            if (currentlyBrowsingSeasonKey != null){
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
-
-            }
-
-            if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
-                currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
-                currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
             }
         }
     }
@@ -442,17 +349,38 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             mainActivity.getProgressView().stopAnimation();
         }
 
-        mainActivity.getBottomBar().setVisibility(View.VISIBLE);
+        mainActivity.resetToolbar(this);
     }
 
-    public void failedInitialization() {
-        if (mainActivity.isAlive()){
-            FailedInitializationDialogFragment failedInitializationDialogFragment = FailedInitializationDialogFragment.newInstance(this);
-            mainActivity.getFragmentManager().beginTransaction().add(failedInitializationDialogFragment, failedInitializationDialogFragment.getTag()).addToBackStack(null).commitAllowingStateLoss();
+    private void clearAppData() {
+        File cache = App.getInstance().getCacheDir();
+        File appDir = new File(cache.getParent());
+        if (appDir.exists()) {
+            String[] children = appDir.list();
+            for (String s : children) {
+                if (!s.equals("lib")) {
+                    deleteDir(new File(appDir, s));
+                    Log.i(TAG, "File /data/data/me.jakemoritz.tasking/" + s + " DELETED");
+                }
+            }
         }
     }
 
-//    Item modification
+    private static boolean deleteDir(File dir) {
+        if (dir != null && dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+
+        return dir.delete();
+    }
+
+    // Item modification
 
     @Override
     public void itemAdded(String MALID) {
@@ -548,12 +476,78 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
     }
 
+    // Data sync callback
+
     @Override
-    public void signInAgain(boolean wantsToSignIn) {
-        if (wantsToSignIn) {
-            SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(this, mainActivity);
-            signInDialogFragment.show(mainActivity.getFragmentManager(), TAG);
+    public void senpaiSeasonRetrieved(String seasonKey) {
+        if (seasonKey != null) {
+            RealmResults<Series> seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", seasonKey).findAll();
+
+            if (App.getInstance().isInitializing() && seriesRealmResults.isEmpty()) {
+                failedInitialization();
+            } else {
+                if (App.getInstance().isNetworkAvailable()) {
+                    if (App.getInstance().isInitializing()) {
+                        IntentFilter intentFilter = new IntentFilter();
+                        intentFilter.addAction("FINISHED_INITIALIZING");
+                        initialReceiver = new BroadcastReceiver() {
+                            @Override
+                            public void onReceive(Context context, Intent intent) {
+                                App.getInstance().setInitializing(false);
+                                App.getInstance().setPostInitializing(true);
+
+                                RealmResults<Season> results = App.getInstance().getRealm().where(Season.class).findAll();
+                                Season latestSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
+                                List<Season> seasons = new ArrayList<>(results);
+
+                                Collections.sort(seasons, new SeasonComparator());
+
+                                int indexOfLatestSeason = results.indexOf(latestSeason);
+
+                                seasons = seasons.subList(indexOfLatestSeason + 1, seasons.size());
+
+                                for (Season season : seasons) {
+                                    senpaiExportHelper.getSeasonData(season.getKey());
+                                }
+                            }
+                        };
+                        mainActivity.registerReceiver(initialReceiver, intentFilter);
+                    }
+                    kitsuApiClient.processSeriesList(seasonKey);
+                } else {
+                    if (getView() != null) {
+                        Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                    }
+                }
+            }
+        } else {
+            if (isUpdating()) {
+                stopRefreshing();
+            }
+
+            if (!App.getInstance().isInitializing()) {
+                if (getView() != null) {
+                    Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
+                }
+            } else {
+                failedInitialization();
+            }
         }
+    }
+
+    @Override
+    public void hummingbirdSeasonReceived() {
+        if (App.getInstance().isJustUpdated()) {
+            App.getInstance().setJustUpdated(false);
+            App.getInstance().setInitializing(false);
+            App.getInstance().setPostInitializing(true);
+            senpaiExportHelper.getSeasonList();
+        }
+    }
+
+    @Override
+    public void senpaiSeasonListReceived() {
+        senpaiExportHelper.getSeasonData("raw");
     }
 
     @Override
@@ -566,7 +560,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             }
         } else {
             adding = false;
-            VerifyFailedDialogFragment dialogFragment = VerifyFailedDialogFragment.newInstance(this, mainActivity);
+            MalVerifyFailedDialogFragment dialogFragment = MalVerifyFailedDialogFragment.newInstance(this, mainActivity);
             dialogFragment.show(mainActivity.getFragmentManager(), "SeriesAdapter");
         }
     }
@@ -588,6 +582,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     }
 
+    @Override
+    public void signInAgain(boolean wantsToSignIn) {
+        if (wantsToSignIn) {
+            SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(this, mainActivity);
+            signInDialogFragment.show(mainActivity.getFragmentManager(), TAG);
+        }
+    }
+
     //    Getters/Setters
 
     public SeriesAdapter getmAdapter() {
@@ -606,10 +608,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         return malApiClient;
     }
 
-    public void setUpdating(boolean updating) {
-        this.updating = updating;
-    }
-
     public void setAdding(boolean adding) {
         this.adding = adding;
     }
@@ -624,18 +622,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public void setCurrentlyBrowsingSeason(Season currentlyBrowsingSeason) {
         this.currentlyBrowsingSeason = currentlyBrowsingSeason;
-        if (currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
-            currentlyBrowsingSeasonKey = currentlyBrowsingSeason.getKey();
-            currentlyBrowsingSeasonName = currentlyBrowsingSeason.getName();
-        }
-    }
-
-    public String getCurrentlyBrowsingSeasonName() {
-        return currentlyBrowsingSeasonName;
-    }
-
-    public void setCurrentlyBrowsingSeasonName(String currentlyBrowsingSeasonName) {
-        this.currentlyBrowsingSeasonName = currentlyBrowsingSeasonName;
     }
 
     public SwipeRefreshLayout getSwipeRefreshLayoutRecycler() {

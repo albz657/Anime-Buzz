@@ -9,19 +9,15 @@ import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.misc.App;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
-import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class UserListFragment extends SeriesFragment {
-
-    private static final String TAG = UserListFragment.class.getSimpleName();
 
     public UserListFragment() {
 
@@ -44,29 +40,6 @@ public class UserListFragment extends SeriesFragment {
 
         getMainActivity().resetToolbar(this);
         loadUserSortingPreference();
-
-        // check if need to auto-refresh
-        if (!App.getInstance().isInitializing()){
-//            App.getInstance().setJustLaunchedWatching(false);
-//            App.getInstance().setJustLaunchedBrowser(false);
-
-            Calendar currentCal = Calendar.getInstance();
-
-            Calendar lastUpdatedCal = Calendar.getInstance();
-            lastUpdatedCal.setTimeInMillis(SharedPrefsUtils.getInstance().getLastUpdateTime());
-
-            if (currentCal.get(Calendar.DAY_OF_YEAR) != lastUpdatedCal.get(Calendar.DAY_OF_YEAR) || (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6){
-                if (getSwipeRefreshLayoutEmpty().isEnabled()){
-                    getSwipeRefreshLayoutEmpty().setRefreshing(true);
-                }
-
-                if (getSwipeRefreshLayoutRecycler().isEnabled()){
-                    getSwipeRefreshLayoutRecycler().setRefreshing(true);
-                }
-
-                updateData();
-            }
-        }
     }
 
     @Override
@@ -101,7 +74,7 @@ public class UserListFragment extends SeriesFragment {
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
 
-        if (isUpdating()){
+        if (isUpdating()) {
             stopRefreshing();
         }
 
@@ -114,10 +87,8 @@ public class UserListFragment extends SeriesFragment {
         }
 
         String sort = SharedPrefsUtils.getInstance().getSortingPreference();
-        if (sort.equals("name")) {
-            if (SharedPrefsUtils.getInstance().prefersEnglish()) {
-                sort = "englishTitle";
-            }
+        if (sort.equals("name") && SharedPrefsUtils.getInstance().prefersEnglish()) {
+            sort = "englishTitle";
         } else {
             if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
                 sort = "nextEpisodeSimulcastTime";
@@ -127,7 +98,7 @@ public class UserListFragment extends SeriesFragment {
             }
         }
 
-        RealmResults realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
+        RealmResults<Series> realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
         resetListener(realmResults);
         getmAdapter().updateData(realmResults);
     }
@@ -143,6 +114,7 @@ public class UserListFragment extends SeriesFragment {
         int id = item.getItemId();
 
         if (id == R.id.action_sort) {
+            // Load popup menu for sorting options
             PopupMenu popupMenu = new PopupMenu(getActivity(), getActivity().findViewById(R.id.action_sort));
             popupMenu.inflate(R.menu.sort_menu);
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -150,16 +122,14 @@ public class UserListFragment extends SeriesFragment {
                 public boolean onMenuItemClick(MenuItem item) {
                     int id = item.getItemId();
 
-                    String sort = "";
+                    String sort = "name";
                     if (id == R.id.action_sort_date) {
                         sort = "nextEpisodeAirtime";
-                    } else if (id == R.id.action_sort_name) {
-                        sort = "name";
                     }
                     SharedPrefsUtils.getInstance().setSortingPreference(sort);
                     loadUserSortingPreference();
 
-                    return false;
+                    return true;
                 }
             });
             popupMenu.show();

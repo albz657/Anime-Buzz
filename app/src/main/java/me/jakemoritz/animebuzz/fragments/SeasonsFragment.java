@@ -7,22 +7,20 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
+import java.util.List;
 
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.adapters.SeasonSpinnerAdapter;
 import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.models.Season;
+import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
-import me.jakemoritz.animebuzz.models.Season;
-import me.jakemoritz.animebuzz.models.Series;
 
 public class SeasonsFragment extends SeriesFragment {
-
-    private static final String TAG = SeriesFragment.class.getSimpleName();
 
     private Spinner toolbarSpinner;
     private SeasonSpinnerAdapter seasonSpinnerAdapter;
@@ -36,22 +34,11 @@ public class SeasonsFragment extends SeriesFragment {
         SeasonsFragment fragment = new SeasonsFragment();
         fragment.setRetainInstance(true);
         fragment.seasonSpinnerAdapter = new SeasonSpinnerAdapter(fragment);
+
+        Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
+        fragment.setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
+
         return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        Season currentlyBrowsingSeason;
-
-        if (!SharedPrefsUtils.getInstance().getLatestSeasonName().isEmpty()) {
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", SharedPrefsUtils.getInstance().getLatestSeasonName()).findFirst();
-        } else {
-            currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
-        }
-
-        setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
     }
 
     @Override
@@ -76,34 +63,6 @@ public class SeasonsFragment extends SeriesFragment {
         });
 
         refreshToolbar();
-
-        if (!App.getInstance().isInitializing()) {
-            if (SharedPrefsUtils.getInstance().getLatestSeasonName().isEmpty()) {
-                if (!SharedPrefsUtils.getInstance().getLatestSeasonKey().isEmpty()) {
-                    Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
-                    setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
-                    SharedPrefsUtils.getInstance().setLatestSeasonName(currentlyBrowsingSeason.getName());
-                }
-            }
-
-            // check if need to auto-refresh
-            Calendar currentCal = Calendar.getInstance();
-
-            Calendar lastUpdatedCal = Calendar.getInstance();
-            lastUpdatedCal.setTimeInMillis(SharedPrefsUtils.getInstance().getLastUpdateTime());
-
-            if (currentCal.get(Calendar.DAY_OF_YEAR) != lastUpdatedCal.get(Calendar.DAY_OF_YEAR) || (currentCal.get(Calendar.HOUR_OF_DAY) - lastUpdatedCal.get(Calendar.HOUR_OF_DAY)) > 6) {
-                if (getSwipeRefreshLayoutEmpty().isEnabled()) {
-                    getSwipeRefreshLayoutEmpty().setRefreshing(true);
-                }
-
-                if (getSwipeRefreshLayoutRecycler().isEnabled()) {
-                    getSwipeRefreshLayoutRecycler().setRefreshing(true);
-                }
-
-                updateData();
-            }
-        }
     }
 
     @Override
@@ -112,31 +71,13 @@ public class SeasonsFragment extends SeriesFragment {
         getMainActivity().resetToolbar(this);
     }
 
-    @Override
-    public void senpaiSeasonRetrieved(String seasonKey) {
-        if (App.getInstance().isInitializing()) {
-            Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
-
-            if (currentlyBrowsingSeason == null) {
-                failedInitialization();
-            } else {
-                setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
-                loadSeason(currentlyBrowsingSeason.getName());
-            }
-        }
-
-        super.senpaiSeasonRetrieved(seasonKey);
-    }
-
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
         setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
 
-        String sort;
+        String sort = "name";
         if (SharedPrefsUtils.getInstance().prefersEnglish()) {
             sort = "englishTitle";
-        } else {
-            sort = "name";
         }
 
         RealmResults<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
@@ -145,14 +86,13 @@ public class SeasonsFragment extends SeriesFragment {
         getmAdapter().updateData(seasonSeries);
     }
 
+    // API callbacks
     @Override
     public void hummingbirdSeasonReceived() {
         super.hummingbirdSeasonReceived();
 
-        if (App.getInstance().isPostInitializing()) {
-            if (isVisible()) {
-                refreshToolbar();
-            }
+        if (App.getInstance().isPostInitializing() && isVisible()) {
+            refreshToolbar();
         }
 
         stopRefreshing();
@@ -167,6 +107,27 @@ public class SeasonsFragment extends SeriesFragment {
         }
     }
 
+    @Override
+    public void senpaiSeasonRetrieved(String seasonKey) {
+        if (App.getInstance().isInitializing()) {
+            Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
+
+            if (currentlyBrowsingSeason == null
+                    || SharedPrefsUtils.getInstance().getLatestSeasonKey() == null
+                    || SharedPrefsUtils.getInstance().getLatestSeasonKey().isEmpty()
+                    || SharedPrefsUtils.getInstance().getLatestSeasonName() == null
+                    || SharedPrefsUtils.getInstance().getLatestSeasonName().isEmpty()) {
+                failedInitialization();
+            } else {
+                setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
+                loadSeason(currentlyBrowsingSeason.getName());
+            }
+        }
+
+        super.senpaiSeasonRetrieved(seasonKey);
+    }
+
+    // Toolbar spinner
     public void refreshToolbar() {
         getMainActivity().resetToolbar(this);
 
@@ -186,7 +147,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         seasonSpinnerAdapter.getSeasonNames().clear();
 
-        ArrayList<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(App.getInstance().getRealm().where(Season.class).findAll()));
+        List<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(App.getInstance().getRealm().where(Season.class).findAll()));
         Collections.sort(unmanagedSeasons, new SeasonComparator());
 
         for (Season season : unmanagedSeasons) {
@@ -197,16 +158,7 @@ public class SeasonsFragment extends SeriesFragment {
             }
         }
 
-        if (getCurrentlyBrowsingSeason() != null && getCurrentlyBrowsingSeasonName().isEmpty() && getCurrentlyBrowsingSeason().isValid()){
-            setCurrentlyBrowsingSeasonName(getCurrentlyBrowsingSeason().getName());
-        }
-
-        for (String seasonName : seasonSpinnerAdapter.getSeasonNames()) {
-            if (seasonName.equals(getCurrentlyBrowsingSeasonName())) {
-                previousSpinnerIndex = seasonSpinnerAdapter.getSeasonNames().indexOf(seasonName);
-            }
-        }
-
+        previousSpinnerIndex = seasonSpinnerAdapter.getSeasonNames().indexOf(getCurrentlyBrowsingSeason().getName());
         toolbarSpinner.setSelection(previousSpinnerIndex);
         seasonSpinnerAdapter.notifyDataSetChanged();
     }

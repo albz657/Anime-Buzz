@@ -18,7 +18,7 @@ import io.realm.Realm;
 import io.realm.RealmRecyclerViewAdapter;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
-import me.jakemoritz.animebuzz.dialogs.IncrementDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.IncrementEpisodeCountDialogFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.interfaces.BacklogItemSwiped;
 import me.jakemoritz.animebuzz.misc.App;
@@ -29,7 +29,7 @@ import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
-public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementDialogFragment.IncrementDialogListener, BacklogItemSwiped {
+public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementEpisodeCountDialogFragment.IncrementDialogListener, BacklogItemSwiped {
 
     private ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
@@ -121,14 +121,14 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         Series series = getItem(position).getSeries();
 
         if (SharedPrefsUtils.getInstance().prefersIncrementDialog() && SharedPrefsUtils.getInstance().isLoggedIn()) {
-            IncrementDialogFragment dialogFragment = IncrementDialogFragment.newInstance(this, series, position);
-            dialogFragment.show(fragment.getMainActivity().getFragmentManager(), IncrementDialogFragment.class.getSimpleName());
+            IncrementEpisodeCountDialogFragment dialogFragment = IncrementEpisodeCountDialogFragment.newInstance(this, series, position);
+            dialogFragment.show(fragment.getMainActivity().getFragmentManager(), IncrementEpisodeCountDialogFragment.class.getSimpleName());
         } else {
             backlogItemRemoved(position);
         }
     }
 
-    // Called when Backlog list item swipe completed or IncrementDialogFragment closed
+    // Called when Backlog list item swipe completed or IncrementEpisodeCountDialogFragment closed
     private void backlogItemRemoved(int position){
         final BacklogItem removedItem = getItem(position);
 

@@ -92,6 +92,7 @@ public class SignInDialogFragment extends DialogFragment implements VerifyCreden
             @Override
             public void onClick(View v) {
                 passwordField.setText("");
+                passwordField.requestFocus();
             }
         });
 

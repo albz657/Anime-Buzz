@@ -13,17 +13,17 @@ import android.view.ViewGroup;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class IncrementDialogFragment extends DialogFragment {
+public class IncrementEpisodeCountDialogFragment extends DialogFragment {
 
     private IncrementDialogListener listener;
     private Series series;
     private int position;
 
-    public IncrementDialogFragment() {
+    public IncrementEpisodeCountDialogFragment() {
     }
 
-    public static IncrementDialogFragment newInstance(IncrementDialogListener listener, Series series, int position) {
-        IncrementDialogFragment fragment = new IncrementDialogFragment();
+    public static IncrementEpisodeCountDialogFragment newInstance(IncrementDialogListener listener, Series series, int position) {
+        IncrementEpisodeCountDialogFragment fragment = new IncrementEpisodeCountDialogFragment();
         fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.series = series;

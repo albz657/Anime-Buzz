@@ -80,6 +80,7 @@ public class SetupActivity extends AppCompatActivity implements VerifyCredential
                         @Override
                         public void onClick(View v) {
                             passwordField.setText("");
+                            passwordField.requestFocus();
                         }
                     });
 

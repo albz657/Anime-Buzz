@@ -9,15 +9,15 @@ import android.os.Bundle;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.fragments.SettingsFragment;
 
-public class ImportDialogFragment extends DialogFragment {
+public class AddUserListToMalDialogFragment extends DialogFragment {
 
     SettingsFragment callback;
 
-    public ImportDialogFragment() {
+    public AddUserListToMalDialogFragment() {
     }
 
-    public static ImportDialogFragment newInstance(SettingsFragment callback) {
-        ImportDialogFragment fragment = new ImportDialogFragment();
+    public static AddUserListToMalDialogFragment newInstance(SettingsFragment callback) {
+        AddUserListToMalDialogFragment fragment = new AddUserListToMalDialogFragment();
         fragment.setRetainInstance(true);
         fragment.callback = callback;
         return fragment;
@@ -41,13 +41,13 @@ public class ImportDialogFragment extends DialogFragment {
                 .setPositiveButton("Add All", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        callback.addToMAL(true);
+                        callback.addLocalSeriesToMalList(true);
                     }
                 })
                 .setNegativeButton("No", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        callback.addToMAL(false);
+                        callback.addLocalSeriesToMalList(false);
                     }
                 });
 

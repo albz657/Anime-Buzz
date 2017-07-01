@@ -16,15 +16,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,17 +38,16 @@ import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
-public class ExportFragment extends Fragment implements MainActivity.OrientationChangedListener{
+public class ExportFragment extends Fragment {
 
     private final static String TAG = ExportFragment.class.getSimpleName();
 
     private MainActivity mainActivity;
     private MalApiClient malApiClient;
-    private ImageView checkmark;
+    private ImageView completedCheckmark;
     private ImageView errorImage;
     private Button exportButton;
     private CircularProgressView progressView;
-    private boolean exporting;
     private String status = "";
     private boolean errorDisplayed = false;
 
@@ -58,99 +58,114 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
         return exportFragment;
     }
 
-    @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mainActivity.resetToolbar(this);
-
-        if (status.isEmpty()){
-            setProgressVisibility("start");
-        } else {
-            setProgressVisibility(status);
-        }
-    }
-
-    public void setProgressVisibility(String status){
-        this.status = status;
-
-        switch (status){
-            case "start":
-                exportButton.setVisibility(View.VISIBLE);
-                checkmark.setVisibility(View.GONE);
-                errorImage.setVisibility(View.GONE);
-                progressView.setVisibility(View.GONE);
-                break;
-            case "success":
-                exportButton.setVisibility(View.GONE);
-                checkmark.setVisibility(View.VISIBLE);
-                errorImage.setVisibility(View.GONE);
-                progressView.setVisibility(View.GONE);
-
-                break;
-            case "error":
-                exportButton.setVisibility(View.GONE);
-                checkmark.setVisibility(View.GONE);
-                errorImage.setVisibility(View.VISIBLE);
-                progressView.setVisibility(View.GONE);
-
-                if (!errorDisplayed) {
-                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_error);
-                    dialogFragment.show(getActivity().getFragmentManager(), TAG);
-
-                    errorDisplayed = true;
-                }
-                break;
-            case "inprogress":
-                exportButton.setVisibility(View.GONE);
-                checkmark.setVisibility(View.GONE);
-                errorImage.setVisibility(View.GONE);
-                progressView.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
-
-    @Override
-    public void orientationChanged(boolean portrait) {
-        if (!status.isEmpty()){
-            setProgressVisibility(status);
-        }
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_export, container, false);
-        mainActivity.getBottomBar().setVisibility(View.GONE);
 
         exportButton = (Button) view.findViewById(R.id.export_button);
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SharedPrefsUtils.getInstance().isLoggedIn()){
-                    if (checkExternalPermissions()) {
-                        if (App.getInstance().isExternalStorageWritable()) {
-                            malApiClient.getUserXml();
-                        } else {
-                            SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-                            dialogFragment.show(getActivity().getFragmentManager(), TAG);
-                        }
+                if (SharedPrefsUtils.getInstance().isLoggedIn() && writeExternalStoragePermissionsGranted()) {
+                    if (App.getInstance().isExternalStorageWritable()) {
+                        malApiClient.getUserXml();
+                    } else {
+                        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
+                        dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
                     }
                 } else {
                     SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_not_logged_in);
-                    dialogFragment.show(getActivity().getFragmentManager(), TAG);
+                    dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
                 }
-
             }
         });
 
-        checkmark = (ImageView) view.findViewById(R.id.export_checkmark);
+        completedCheckmark = (ImageView) view.findViewById(R.id.export_checkmark);
         errorImage = (ImageView) view.findViewById(R.id.export_error);
         progressView = (CircularProgressView) view.findViewById(R.id.progress_view_export);
 
         return view;
     }
 
-    private boolean checkExternalPermissions() {
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mainActivity.resetToolbar(this);
+
+        if (status.isEmpty()) {
+            setProgressVisibility("start");
+        } else {
+            setProgressVisibility(status);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mainActivity = (MainActivity) context;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString("status", status);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (savedInstanceState != null){
+            String restoredStatus = savedInstanceState.getString("status");
+
+            if (restoredStatus != null && restoredStatus.isEmpty()){
+                setProgressVisibility(restoredStatus);
+            }
+        }
+    }
+
+    // Handles display of export progress
+    public void setProgressVisibility(String status) {
+        this.status = status;
+
+        switch (status) {
+            case "start":
+                exportButton.setVisibility(View.VISIBLE);
+                completedCheckmark.setVisibility(View.GONE);
+                errorImage.setVisibility(View.GONE);
+                progressView.setVisibility(View.GONE);
+                break;
+            case "success":
+                exportButton.setVisibility(View.GONE);
+                completedCheckmark.setVisibility(View.VISIBLE);
+                errorImage.setVisibility(View.GONE);
+                progressView.setVisibility(View.GONE);
+
+                break;
+            case "error":
+                exportButton.setVisibility(View.GONE);
+                completedCheckmark.setVisibility(View.GONE);
+                errorImage.setVisibility(View.VISIBLE);
+                progressView.setVisibility(View.GONE);
+
+                if (!errorDisplayed) {
+                    SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_error);
+                    dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
+
+                    errorDisplayed = true;
+                }
+                break;
+            case "inprogress":
+                exportButton.setVisibility(View.GONE);
+                completedCheckmark.setVisibility(View.GONE);
+                errorImage.setVisibility(View.GONE);
+                progressView.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    private boolean writeExternalStoragePermissionsGranted() {
         int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -161,6 +176,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
         }
     }
 
+    // Reworks API XML response to be compatible with MAL XML import
     public void fixCompatibility(String xml) {
         if (xml != null) {
             String modifiedUserXml = addTag(xml, "</user_name>", "<user_export_type>", 1);
@@ -262,6 +278,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
 
     }
 
+    // Creates directory to hold exported XML
     private File createExportDirectory() {
         File externalPublicDocuments = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 
@@ -269,20 +286,15 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
             String externalAppStoragePath = externalPublicDocuments.getPath().concat(File.separator).concat("Anime Buzz - MAL Exports");
 
             File exportDirectory = new File(externalAppStoragePath);
-            if (!exportDirectory.exists()) {
-                if (exportDirectory.mkdir()) {
-                    return exportDirectory;
-                }
-            } else {
+            if (!exportDirectory.exists() && exportDirectory.mkdir()) {
                 return exportDirectory;
             }
-        } else {
-            return null;
         }
 
         return null;
     }
 
+    // Generates a time-based filename and saved to storage
     private void saveXmlToStorage(String xml) {
         File backupDirectory = createExportDirectory();
 
@@ -293,7 +305,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
             String month = new DateFormatSymbols().getShortMonths()[calendar.get(Calendar.MONTH) - 1];
             month = month.toLowerCase();
 
-            SimpleDateFormat timeFormat = new SimpleDateFormat("k:m:s");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("k:m:s", Locale.getDefault());
             String dateString = timeFormat.format(calendar.getTime());
             backupFileName = backupFileName.concat(month).concat("-").concat(String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))).concat("_").concat(dateString);
 
@@ -302,7 +314,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
                 File backupFile = new File(backupFilePath);
 
                 if (backupFile.exists()) {
-                    SimpleDateFormat timeFormatMS = new SimpleDateFormat("S");
+                    SimpleDateFormat timeFormatMS = new SimpleDateFormat("S", Locale.getDefault());
 
                     String ms = timeFormatMS.format(calendar.getTime());
                     backupFileName = backupFileName.concat(":").concat(ms);
@@ -322,17 +334,21 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
 
                 setProgressVisibility("success");
                 SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_export_success);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                FirebaseCrash.report(e);
+
+                setProgressVisibility("error");
+
+                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
+                dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
             }
         } else {
             SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-            dialogFragment.show(getActivity().getFragmentManager(), TAG);
+            dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
         }
     }
 
+    // Methods to manipulate XML tags
     private int getIntFromTag(String xml, String openingTag) {
         int value = -1;
 
@@ -342,7 +358,7 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
                 Pattern pattern = Pattern.compile("\\d+");
                 Matcher matcher = pattern.matcher(s);
 
-                if (matcher.find()){
+                if (matcher.find()) {
                     value = Integer.parseInt(matcher.group());
                 }
             }
@@ -408,20 +424,5 @@ public class ExportFragment extends Fragment implements MainActivity.Orientation
             malApiClient = new MalApiClient(this);
         }
         return malApiClient;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        mainActivity = (MainActivity) context;
-        mainActivity.setOrientationChangedListener(this);
-    }
-
-    public boolean isExporting() {
-        return exporting;
-    }
-
-    public void setExporting(boolean exporting) {
-        this.exporting = exporting;
     }
 }

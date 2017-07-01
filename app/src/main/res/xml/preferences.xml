@@ -7,11 +7,13 @@
         <me.jakemoritz.animebuzz.preferences.AccountPreference
             android:summary="You are currently signed in."
             android:title="Sign out from your MAL account"
+            android:key="@string/pref_account_signout_key"
             android:layout="@layout/account_preference"/>
 
         <me.jakemoritz.animebuzz.preferences.AccountPreference
             android:summary="You are currently signed out."
             android:title="Sign in to your MAL account"
+            android:key="@string/pref_account_signin_key"
             android:layout="@layout/account_preference" />
     </PreferenceCategory>
     <PreferenceCategory
@@ -26,7 +28,8 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_simulcast_key"
-            android:summary="@string/pref_simulcast_off_summary"
+            android:summaryOn="@string/pref_simulcast_summary"
+            android:summaryOff="@string/pref_simulcast_off_summary"
             android:title="@string/pref_simulcast_title" />
 
         <me.jakemoritz.animebuzz.preferences.CustomRingtonePreference
@@ -61,7 +64,8 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="@string/pref_24hour_key"
-            android:summary="@string/pref_24hour_summary"
+            android:summaryOn="@string/pref_24hour_summary"
+            android:summaryOff="@string/pref_24hour_off_summary"
             android:title="@string/pref_24hour_title" />
 
         <SwitchPreference
@@ -72,7 +76,8 @@
         <SwitchPreference
             android:defaultValue="true"
             android:key="@string/pref_increment_key"
-            android:summary="@string/pref_increment_summary"
+            android:summaryOn="@string/pref_increment_summary"
+            android:summaryOff="@string/pref_increment_off_summary"
             android:title="@string/pref_increment_title"/>
 
         <SwitchPreference

@@ -13,16 +13,16 @@ import android.view.ViewGroup;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 
-public class VerifyFailedDialogFragment extends DialogFragment {
+public class MalVerifyFailedDialogFragment extends DialogFragment {
 
     private SignInAgainListener listener;
     private MainActivity mainActivity;
 
-    public VerifyFailedDialogFragment() {
+    public MalVerifyFailedDialogFragment() {
     }
 
-    public static VerifyFailedDialogFragment newInstance(SignInAgainListener listener, MainActivity mainActivity) {
-        VerifyFailedDialogFragment fragment = new VerifyFailedDialogFragment();
+    public static MalVerifyFailedDialogFragment newInstance(SignInAgainListener listener, MainActivity mainActivity) {
+        MalVerifyFailedDialogFragment fragment = new MalVerifyFailedDialogFragment();
         fragment.setRetainInstance(true);
         fragment.listener = listener;
         fragment.mainActivity = mainActivity;

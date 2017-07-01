@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.OrientationEventListener;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.RelativeLayout;
@@ -67,11 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private RelativeLayout progressViewHolder;
     private AHBottomNavigation bottomBar;
 
-    // Handling orientation changes
-    private OrientationEventListener orientationEventListener;
-    private OrientationChangedListener orientationChangedListener;
-    private int oldOrientation = -1;
-
     // Bottom navigation tab ids
     private ArrayList<Class> fragmentTabId = new ArrayList<Class>(Arrays.asList(UserListFragment.class, BacklogFragment.class, SeasonsFragment.class));
 
@@ -91,37 +85,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Check for saved fragment & orientation
         if (savedInstanceState != null) {
-            oldOrientation = savedInstanceState.getInt("orientation");
-
             try {
                 initialFragment = getSupportFragmentManager().getFragment(savedInstanceState, "current_fragment");
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
         }
-
-        // Set up orientation change listener
-        orientationEventListener = new OrientationEventListener(this) {
-            @Override
-            public void onOrientationChanged(int i) {
-                boolean portrait = true;
-
-                if (oldOrientation != -1 && oldOrientation != i) {
-                    oldOrientation = i;
-
-                    if (i == 90 || i == 270) {
-                        portrait = false;
-                    }
-
-                    if (orientationChangedListener != null) {
-                        orientationChangedListener.orientationChanged(portrait);
-                    }
-                } else {
-                    oldOrientation = i;
-                }
-            }
-        };
-        orientationEventListener.enable();
 
         // Set up notification receiver
         notificationReceiver = new BroadcastReceiver() {
@@ -274,11 +243,6 @@ public class MainActivity extends AppCompatActivity {
         alive = true;
 
         updateBadges();
-
-        Fragment fragment = getCurrentFragment();
-        if (fragment instanceof SeriesFragment || fragment instanceof BacklogFragment) {
-            orientationChangedListener = (OrientationChangedListener) fragment;
-        }
     }
 
     @Override
@@ -330,12 +294,10 @@ public class MainActivity extends AppCompatActivity {
     // Handle activity state
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // Save orientation and current fragment
-        outState.putInt("orientation", oldOrientation);
+        // Save current fragment
         Fragment fragment = getCurrentFragment();
         getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
 
-        orientationEventListener.disable();
         super.onSaveInstanceState(outState);
     }
 
@@ -437,10 +399,6 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
 
-        if (fragment instanceof SeriesFragment || fragment instanceof BacklogFragment) {
-            orientationChangedListener = (OrientationChangedListener) fragment;
-        }
-
         if (!App.getInstance().isInitializing()) {
             bottomBar.setVisibility(View.VISIBLE);
         }
@@ -460,6 +418,8 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+                bottomBar.setVisibility(View.GONE);
+
                 String toolbarTitle;
                 if (fragment instanceof SettingsFragment) {
                     toolbarTitle = getString(R.string.fragment_settings);
@@ -469,6 +429,7 @@ public class MainActivity extends AppCompatActivity {
                     toolbarTitle = getString(R.string.fragment_export);
                 } else {
                     toolbarTitle = getString(R.string.app_name);
+                    bottomBar.setVisibility(View.VISIBLE);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 }
 
@@ -478,19 +439,12 @@ public class MainActivity extends AppCompatActivity {
                     toolbarSpinner.setVisibility(View.VISIBLE);
                 }
 
+                bottomBar.setVisibility(View.VISIBLE);
+
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             }
         }
-    }
-
-    // Handle orientation changes
-    public void setOrientationChangedListener(OrientationChangedListener orientationChangedListener) {
-        this.orientationChangedListener = orientationChangedListener;
-    }
-
-    public interface OrientationChangedListener {
-        void orientationChanged(boolean portrait);
     }
 
     /* Badge methods */
@@ -646,9 +600,5 @@ public class MainActivity extends AppCompatActivity {
 
     public Toolbar getToolbar() {
         return toolbar;
-    }
-
-    public AHBottomNavigation getBottomBar() {
-        return bottomBar;
     }
 }
