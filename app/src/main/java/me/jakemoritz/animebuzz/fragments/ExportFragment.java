@@ -64,12 +64,11 @@ public class ExportFragment extends Fragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SharedPrefsUtils.getInstance().isLoggedIn() && PermissionUtils.getInstance().permissionGranted(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    if (App.getInstance().isExternalStorageWritable()) {
-                        malApiClient.getUserXml();
+                if (SharedPrefsUtils.getInstance().isLoggedIn()) {
+                    if (PermissionUtils.getInstance().permissionGranted(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)){
+                        beginExport();
                     } else {
-                        SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-                        dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
+                        PermissionUtils.getInstance().requestPermission(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
                     }
                 } else {
                     SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.export_not_logged_in);
@@ -83,6 +82,15 @@ public class ExportFragment extends Fragment {
         progressView = (CircularProgressView) view.findViewById(R.id.progress_view_export);
 
         return view;
+    }
+
+    public void beginExport(){
+        if (App.getInstance().isExternalStorageWritable()) {
+            malApiClient.getUserXml();
+        } else {
+            SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
+            dialogFragment.show(getActivity().getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
+        }
     }
 
     @Override

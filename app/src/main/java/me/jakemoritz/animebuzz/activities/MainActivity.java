@@ -39,7 +39,6 @@ import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.data.migrations.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.migrations.SugarMigrator;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
@@ -256,15 +255,7 @@ public class MainActivity extends AppCompatActivity {
             openRingtones = false;
         } else if (startExport && fragment instanceof ExportFragment) {
             // Handles external permission check for MAL export
-            if (App.getInstance().isExternalStorageWritable()) {
-                ExportFragment exportFragment = (ExportFragment) fragment;
-                exportFragment.getMalApiClient().getUserXml();
-
-                startExport = false;
-            } else {
-                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.dialog_no_external);
-                dialogFragment.show(getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
-            }
+            ((ExportFragment) fragment).beginExport();
         }
     }
 
@@ -320,15 +311,12 @@ public class MainActivity extends AppCompatActivity {
                 && getCurrentFragment() instanceof SettingsFragment) {
             // User clicked ringtone preference
             openRingtones = true;
-        } else if (requestCode == PermissionUtils.WRITE_EXTERNAL_STORAGE_REQUEST && grantResults.length > 0) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED && getCurrentFragment() instanceof ExportFragment) {
-                // Proceed with export
-                startExport = true;
-            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                // User denied permission during export
-                SimpleDialogFragment dialogFragment = SimpleDialogFragment.newInstance(R.string.permission_failed_write_external);
-                dialogFragment.show(getFragmentManager(), SimpleDialogFragment.class.getSimpleName());
-            }
+        } else if (requestCode == PermissionUtils.WRITE_EXTERNAL_STORAGE_REQUEST
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                && getCurrentFragment() instanceof ExportFragment) {
+            // Proceed with export
+            startExport = true;
         }
     }
 
