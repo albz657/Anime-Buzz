@@ -3,17 +3,13 @@ package me.jakemoritz.animebuzz.preferences;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 
 import net.xpece.android.support.preference.RingtonePreference;
 
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.constants;
-import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.PermissionUtils;
+import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class CustomRingtonePreference extends RingtonePreference {
 
@@ -36,29 +32,21 @@ public class CustomRingtonePreference extends RingtonePreference {
         super(context);
     }
 
+    @TargetApi(16)
     @Override
     protected void onClick() {
-        if (openList) {
+        boolean readExternalStoragePermissionsGranted = PermissionUtils.getInstance().permissionGranted(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        // If READ_EXTERNAL_STORAGE rationale already shown, always open list
+        if (readExternalStoragePermissionsGranted || openList || SharedPrefsUtils.getInstance().readExternalRationaleShown()) {
             super.onClick();
             openList = false;
         } else {
-            checkExternalPermissions();
+            PermissionUtils.getInstance().requestPermission(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE);
         }
     }
 
-    @TargetApi(19)
-    private void checkExternalPermissions() {
-        boolean apiGreaterThanOrEqual19 = (Build.VERSION.SDK_INT >= 19);
 
-        int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        if (apiGreaterThanOrEqual19 && permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, constants.READ_EXTERNAL_STORAGE_REQUEST);
-        } else {
-            openList = true;
-            onClick();
-        }
-    }
 
     public void setOpenList(boolean openList) {
         this.openList = openList;

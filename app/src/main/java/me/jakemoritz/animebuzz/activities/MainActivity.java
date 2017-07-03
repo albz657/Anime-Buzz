@@ -36,7 +36,6 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
-import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.data.migrations.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.migrations.SugarMigrator;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
@@ -54,6 +53,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
 import me.leolin.shortcutbadger.ShortcutBadger;
@@ -164,10 +164,6 @@ public class MainActivity extends AppCompatActivity {
             migrateOldDatabase();
 
             AlarmUtils.getInstance().setAlarmsOnBoot();
-        }
-
-        if (App.getInstance().isInitializing()) {
-            bottomBar.setVisibility(View.GONE);
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -319,12 +315,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == constants.READ_EXTERNAL_STORAGE_REQUEST
+        if (requestCode == PermissionUtils.READ_EXTERNAL_STORAGE_REQUEST
                 && grantResults.length > 0
                 && getCurrentFragment() instanceof SettingsFragment) {
             // User clicked ringtone preference
             openRingtones = true;
-        } else if (requestCode == constants.WRITE_EXTERNAL_STORAGE_REQUEST && grantResults.length > 0) {
+        } else if (requestCode == PermissionUtils.WRITE_EXTERNAL_STORAGE_REQUEST && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED && getCurrentFragment() instanceof ExportFragment) {
                 // Proceed with export
                 startExport = true;
@@ -399,10 +395,6 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentTransaction.commit();
 
-        if (!App.getInstance().isInitializing()) {
-            bottomBar.setVisibility(View.VISIBLE);
-        }
-
         return fragment;
     }
 
@@ -444,6 +436,10 @@ public class MainActivity extends AppCompatActivity {
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             }
+        }
+
+        if (App.getInstance().isInitializing()) {
+            bottomBar.setVisibility(View.GONE);
         }
     }
 

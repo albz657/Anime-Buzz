@@ -1,18 +1,14 @@
 package me.jakemoritz.animebuzz.fragments;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.XpPreferenceFragment;
 import android.view.View;
@@ -30,8 +26,8 @@ import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.AddUserListToMalDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.SignOutDialogFragment;
 import me.jakemoritz.animebuzz.misc.App;
@@ -40,6 +36,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.preferences.AccountPreference;
 import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
@@ -191,7 +188,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         Ringtone ringtone = RingtoneManager.getRingtone(App.getInstance(), ringtoneUri);
 
         if (ringtone != null) {
-            if (ringtoneUri.getPath().contains("external") && !readExternalPermissionsGranted()){
+            if (ringtoneUri.getPath().contains("external") && !PermissionUtils.getInstance().permissionGranted(mainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)){
                 // rigntone from external storage selected but external read permissions not granted
                 // reset ringtone, then display
                 ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -216,17 +213,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         }
     }
 
-    @TargetApi(19)
-    private boolean readExternalPermissionsGranted() {
-        boolean apiGreaterThanOrEqual19 = (Build.VERSION.SDK_INT >= 19);
 
-        if (apiGreaterThanOrEqual19){
-            int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.READ_EXTERNAL_STORAGE);
-            return (permissionCheck == PackageManager.PERMISSION_GRANTED);
-        } else {
-            return true;
-        }
-    }
 
     // Clear saved credentials and 'logged in' status
     public void signOut(Preference preference) {

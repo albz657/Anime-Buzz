@@ -2,13 +2,10 @@ package me.jakemoritz.animebuzz.fragments;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +29,9 @@ import java.util.regex.Pattern;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
-import me.jakemoritz.animebuzz.constants;
 import me.jakemoritz.animebuzz.dialogs.SimpleDialogFragment;
 import me.jakemoritz.animebuzz.misc.App;
+import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
@@ -67,7 +64,7 @@ public class ExportFragment extends Fragment {
         exportButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (SharedPrefsUtils.getInstance().isLoggedIn() && writeExternalStoragePermissionsGranted()) {
+                if (SharedPrefsUtils.getInstance().isLoggedIn() && PermissionUtils.getInstance().permissionGranted(mainActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                     if (App.getInstance().isExternalStorageWritable()) {
                         malApiClient.getUserXml();
                     } else {
@@ -162,17 +159,6 @@ public class ExportFragment extends Fragment {
                 errorImage.setVisibility(View.GONE);
                 progressView.setVisibility(View.VISIBLE);
                 break;
-        }
-    }
-
-    private boolean writeExternalStoragePermissionsGranted() {
-        int permissionCheck = ContextCompat.checkSelfPermission(App.getInstance(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(mainActivity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, constants.WRITE_EXTERNAL_STORAGE_REQUEST);
-            return false;
-        } else {
-            return true;
         }
     }
 

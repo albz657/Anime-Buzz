@@ -93,6 +93,7 @@
     <string name="shared_prefs_previous_season">previousseason</string>
     <string name="shared_prefs_latest_season_key">latestseasonkey</string>
     <string name="shared_prefs_failed">failedinit</string>
+    <string name="shared_prefs_read_external_rationale_shown">readexternalrationaleshown</string>
 
     <string name="credentials_username">credentialsusername</string>
     <string name="credentials_password">credentialspassword</string>
@@ -178,7 +179,7 @@
     <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
     <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
     <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your phone\'s storage in order to export your MAL list.</string>
-    <string name="permission_failed_read_external">You must grant Anime Buzz permission to read to your phone\'s storage in order to search for custom ringtones.</string>
+    <string name="permission_failed_read_external">You can grant Anime Buzz permission to read to your phone\'s storage to find custom ringtones.</string>
     <string name="snackbar_export_success">Export successful.</string>
     <string name="dialog_no_external">No external storage was detected. Please try again when external storage is available.</string>
     <string name="export_limitation">Due to limitations of the MAL API, the following fields will not be included in your export file: <b>storage type, comments, and rewatch value</b>.</string>

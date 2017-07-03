@@ -30,6 +30,16 @@ public class SharedPrefsUtils {
         editor.apply();
     }
 
+    public boolean readExternalRationaleShown(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.shared_prefs_read_external_rationale_shown), false);
+    }
+
+    public void setReadExternalRationaleShown(boolean readExternalRationaleShown){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.shared_prefs_read_external_rationale_shown), readExternalRationaleShown);
+        editor.apply();
+    }
+
     public boolean isJustFailed(){
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.shared_prefs_failed), false);
     }

@@ -509,6 +509,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                                 for (Season season : seasons) {
                                     senpaiExportHelper.getSeasonData(season.getKey());
                                 }
+
+                                stopInitialSpinner();
                             }
                         };
                         mainActivity.registerReceiver(initialReceiver, intentFilter);

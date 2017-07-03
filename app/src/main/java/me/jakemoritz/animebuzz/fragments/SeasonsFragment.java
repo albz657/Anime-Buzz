@@ -65,12 +65,6 @@ public class SeasonsFragment extends SeriesFragment {
         refreshToolbar();
     }
 
-    @Override
-    public void stopInitialSpinner() {
-        super.stopInitialSpinner();
-        getMainActivity().resetToolbar(this);
-    }
-
     private void loadSeason(String seasonName) {
         Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("name", seasonName).findFirst();
         setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
@@ -98,11 +92,6 @@ public class SeasonsFragment extends SeriesFragment {
         stopRefreshing();
 
         if (App.getInstance().isInitializing()) {
-            if (isVisible()) {
-                refreshToolbar();
-            }
-
-            stopInitialSpinner();
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
     }
@@ -131,7 +120,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void refreshToolbar() {
         getMainActivity().resetToolbar(this);
 
-        if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null) {
+        if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null && !App.getInstance().isInitializing()) {
             refreshSpinnerItems();
 
             if (!seasonSpinnerAdapter.isEmpty()) {

@@ -70,7 +70,6 @@ public class UserListFragment extends SeriesFragment {
         super.malDataImported(imported);
 
         if (App.getInstance().isInitializing()) {
-            stopInitialSpinner();
             DailyTimeGenerator.getInstance().setNextAlarm(false);
         }
 
