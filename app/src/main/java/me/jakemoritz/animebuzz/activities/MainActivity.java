@@ -234,8 +234,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
         alive = true;
+        super.onStart();
 
         updateBadges();
     }
@@ -351,7 +351,6 @@ public class MainActivity extends AppCompatActivity {
 
     public Fragment startFragment(String fragmentTag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         Fragment fragment = fragmentManager.findFragmentByTag(fragmentTag);
 
         // Desired fragment doesn't exist, create new instance

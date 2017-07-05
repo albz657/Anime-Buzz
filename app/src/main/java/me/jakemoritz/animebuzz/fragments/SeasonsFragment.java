@@ -25,6 +25,7 @@ public class SeasonsFragment extends SeriesFragment {
     private Spinner toolbarSpinner;
     private SeasonSpinnerAdapter seasonSpinnerAdapter;
     private int previousSpinnerIndex = 0;
+    private boolean activityRecreated = false;
 
     public SeasonsFragment() {
 
@@ -33,7 +34,6 @@ public class SeasonsFragment extends SeriesFragment {
     public static SeasonsFragment newInstance() {
         SeasonsFragment fragment = new SeasonsFragment();
         fragment.setRetainInstance(true);
-        fragment.seasonSpinnerAdapter = new SeasonSpinnerAdapter(fragment);
 
         Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findFirst();
         fragment.setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
@@ -47,6 +47,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         // initialize views
         toolbarSpinner = (Spinner) getMainActivity().getToolbar().findViewById(R.id.toolbar_spinner);
+        seasonSpinnerAdapter = new SeasonSpinnerAdapter(this);
         toolbarSpinner.setAdapter(seasonSpinnerAdapter);
         toolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -61,7 +62,11 @@ public class SeasonsFragment extends SeriesFragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+    }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         refreshToolbar();
     }
 
@@ -76,8 +81,7 @@ public class SeasonsFragment extends SeriesFragment {
 
         RealmResults<Series> seasonSeries = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", currentlyBrowsingSeason.getKey()).findAllSorted(sort);
 
-        resetListener(seasonSeries);
-        getmAdapter().updateData(seasonSeries);
+        updateAdapterData(seasonSeries);
     }
 
     // API callbacks
@@ -120,7 +124,7 @@ public class SeasonsFragment extends SeriesFragment {
     public void refreshToolbar() {
         getMainActivity().resetToolbar(this);
 
-        if (getMainActivity().getSupportActionBar() != null && toolbarSpinner != null && !App.getInstance().isInitializing()) {
+        if (getMainActivity().getSupportActionBar() != null && getMainActivity().isAlive() && toolbarSpinner != null && !App.getInstance().isInitializing()) {
             refreshSpinnerItems();
 
             if (!seasonSpinnerAdapter.isEmpty()) {
@@ -130,10 +134,6 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     private void refreshSpinnerItems() {
-        if (seasonSpinnerAdapter == null) {
-            seasonSpinnerAdapter = new SeasonSpinnerAdapter(this);
-        }
-
         seasonSpinnerAdapter.getSeasonNames().clear();
 
         List<Season> unmanagedSeasons = new ArrayList<>(App.getInstance().getRealm().copyFromRealm(App.getInstance().getRealm().where(Season.class).findAll()));

@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import io.realm.Realm;
@@ -40,13 +41,13 @@ import me.jakemoritz.animebuzz.api.kitsu.KitsuApiClient;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.api.senpai.SenpaiExportHelper;
 import me.jakemoritz.animebuzz.dialogs.FailedInitializationDialogFragment;
-import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.dialogs.MalVerifyFailedDialogFragment;
+import me.jakemoritz.animebuzz.dialogs.SignInDialogFragment;
 import me.jakemoritz.animebuzz.interfaces.kitsu.KitsuDataReceiver;
+import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
+import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalEntryAddedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalEntryDeletedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
-import me.jakemoritz.animebuzz.interfaces.mal.MalCredentialsVerifiedListener;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonDataResponse;
 import me.jakemoritz.animebuzz.interfaces.senpai.ReadSeasonListResponse;
 import me.jakemoritz.animebuzz.misc.App;
@@ -134,11 +135,40 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
-        mAdapter = new SeriesAdapter(this, realmResults);
+        realmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
+            @Override
+            public void onChange(RealmResults<Series> series) {
+                updateAdapterData(series);
+            }
+        });
+
+        List<Series> seriesList = trimSeriesList(realmResults);
+        setVisibility(seriesList);
+
+        mAdapter = new SeriesAdapter(this, seriesList);
         recyclerView.setAdapter(mAdapter);
-        resetListener(realmResults);
 
         return seriesLayout;
+    }
+
+    private List<Series> trimSeriesList(RealmResults<Series> realmResults){
+        List<Series> seriesList = new ArrayList<>(realmResults);
+        for (Iterator seriesIterator = seriesList.iterator(); seriesIterator.hasNext(); ) {
+            Series series = (Series) seriesIterator.next();
+            if ((series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired)) || !series.getShowType().equals("TV") && (!series.isSingle() || (series.isSingle() && (series.getStartedAiringDate().isEmpty() && series.getFinishedAiringDate().isEmpty()))))) {
+                seriesIterator.remove();
+            }
+        }
+
+        return seriesList;
+    }
+
+    public void updateAdapterData(RealmResults<Series> realmResults){
+        List<Series> seriesList = trimSeriesList(realmResults);
+
+        setVisibility(seriesList);
+        getmAdapter().setSeriesList(seriesList);
+        getmAdapter().notifyDataSetChanged();
     }
 
     @Override
@@ -218,30 +248,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
     }
 
-    // Reset listener to new list
-    public void resetListener(RealmResults<Series> realmResults) {
-        if (previousRealmResults != null && previousRealmResults.isValid()) {
-            mainActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    previousRealmResults.removeAllChangeListeners();
-                }
-            });
-        }
-
-        previousRealmResults = realmResults;
-        setVisibility(realmResults);
-        previousRealmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
-            @Override
-            public void onChange(RealmResults<Series> element) {
-                setVisibility(element);
-            }
-        });
-    }
-
     // Handles empty view visibility
-    private void setVisibility(RealmResults<Series> element) {
-        if (element.isEmpty()) {
+    private void setVisibility(List<Series> seriesList) {
+        if (seriesList.isEmpty()) {
             swipeRefreshLayoutRecycler.setVisibility(View.GONE);
             swipeRefreshLayoutRecycler.setEnabled(false);
             swipeRefreshLayoutEmpty.setVisibility(View.VISIBLE);
@@ -332,10 +341,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         super.onActivityCreated(savedInstanceState);
 
         // Restore Realm objects on rotate
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             String currentlyBrowsingSeasonKey = savedInstanceState.getString("seasonKey");
 
-            if (currentlyBrowsingSeasonKey != null){
+            if (currentlyBrowsingSeasonKey != null) {
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
             }
         }

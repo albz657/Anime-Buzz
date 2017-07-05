@@ -98,8 +98,8 @@ public class UserListFragment extends SeriesFragment {
         }
 
         RealmResults<Series> realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
-        resetListener(realmResults);
-        getmAdapter().updateData(realmResults);
+
+        updateAdapterData(realmResults);
     }
 
     @Override
