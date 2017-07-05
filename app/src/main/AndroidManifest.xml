@@ -57,9 +57,9 @@
             <meta-data android:name="android.appwidget.provider"
                        android:resource="@xml/backlog_badge_widget_info" />
         </receiver>
-        <service android:name=".services.PosterDownloader"/>
-        <service android:name=".services.KitsuDataProcessor"/>
-        <service android:name=".services.EpisodeNotificationButtonHandler"/>
-        <service android:name=".services.EpisodeTimeGenerator"/>
+        <service android:name=".services.AnimeImageDownloadIntentService"/>
+        <service android:name=".services.KitsuDataIntentService"/>
+        <service android:name=".services.EpisodeNotificationButtonIntentService"/>
+        <service android:name=".services.EpisodeTimeIntentService"/>
     </application>
 </manifest>

@@ -7,11 +7,11 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.models.Series;
 
+// Generates new episode times for Series
+public class EpisodeTimeIntentService extends IntentService {
 
-public class EpisodeTimeGenerator extends IntentService {
-
-    public EpisodeTimeGenerator() {
-        super(EpisodeTimeGenerator.class.getSimpleName());
+    public EpisodeTimeIntentService() {
+        super(EpisodeTimeIntentService.class.getSimpleName());
         setIntentRedelivery(true);
     }
 

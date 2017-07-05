@@ -17,8 +17,8 @@ import me.jakemoritz.animebuzz.fragments.SeriesFragment;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.interfaces.retrofit.KitsuEndpointInterface;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.services.KitsuDataProcessor;
-import me.jakemoritz.animebuzz.services.PosterDownloader;
+import me.jakemoritz.animebuzz.services.KitsuDataIntentService;
+import me.jakemoritz.animebuzz.services.AnimeImageDownloadIntentService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -99,7 +99,7 @@ public class KitsuApiClient {
                         MALIDint = Integer.valueOf(MALID);
 
                         if (response.isSuccessful()) {
-                            Intent hbIntent = new Intent(App.getInstance(), KitsuDataProcessor.class);
+                            Intent hbIntent = new Intent(App.getInstance(), KitsuDataIntentService.class);
                             hbIntent.putExtra("englishTitle", response.body().getEnglishTitle());
                             hbIntent.putExtra("MALID", MALID);
                             hbIntent.putExtra("episodeCount", response.body().getEpisodeCount());
@@ -112,7 +112,7 @@ public class KitsuApiClient {
                             File cacheDirectory = App.getInstance().getCacheDir();
                             File bitmapFile = new File(cacheDirectory, MALID + ".jpg");
                             if (!imageURL.isEmpty() && App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz") == 0 && !bitmapFile.exists()) {
-                                Intent imageIntent = new Intent(App.getInstance(), PosterDownloader.class);
+                                Intent imageIntent = new Intent(App.getInstance(), AnimeImageDownloadIntentService.class);
                                 imageIntent.putExtra("url", imageURL);
                                 imageIntent.putExtra("MALID", MALID);
                                 App.getInstance().startService(imageIntent);

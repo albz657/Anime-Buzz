@@ -6,20 +6,19 @@ import android.content.Intent;
 import java.util.Calendar;
 
 import io.realm.Realm;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.misc.App;
-import me.jakemoritz.animebuzz.utils.DateFormatUtils;
-import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
+import me.jakemoritz.animebuzz.utils.AlarmUtils;
+import me.jakemoritz.animebuzz.utils.DateFormatUtils;
 
-
-public class KitsuDataProcessor extends IntentService {
+// Processes data synced from Kitsu API
+public class KitsuDataIntentService extends IntentService {
 
     private Realm realm;
 
-    public KitsuDataProcessor() {
-        super(KitsuDataProcessor.class.getSimpleName());
+    public KitsuDataIntentService() {
+        super(KitsuDataIntentService.class.getSimpleName());
         setIntentRedelivery(true);
     }
 
@@ -40,19 +39,21 @@ public class KitsuDataProcessor extends IntentService {
         realm.close();
 
         if (App.getInstance().isInitializing()){
+            // During initialization, increment number of Series synced
             App.getInstance().incrementCurrentSyncingSeriesInitial();
-//            NotificationUtils.getInstance().createInitialNotification();
 
             if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
+                // All Series synced during initialization, notify SeriesFragment
+
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
                 sendBroadcast(finishedInitializingIntent);
             }
         } else if (App.getInstance().isPostInitializing()){
             App.getInstance().incrementCurrentSyncingSeriesPost();
-//            NotificationUtils.getInstance().createSeasonDataNotification();
         }
     }
 
+    // Processes data from Kitsu API into a Series object
     private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType, final String kitsuId) {
         final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
@@ -70,6 +71,7 @@ public class KitsuDataProcessor extends IntentService {
 
             showType = showType.substring(0, 1).toUpperCase() + showType.substring(1);
 
+            // Set airing status
             if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
                 Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
                 if (season.getRelativeTime().equals(Season.PRESENT)) {
@@ -88,7 +90,6 @@ public class KitsuDataProcessor extends IntentService {
                             airingStatus = "Finished airing";
                         } else {
                             airingStatus = "Airing";
-//                        checkForSeasonSwitch(currSeries);
                         }
                     } else {
                         airingStatus = "Not yet aired";
@@ -101,7 +102,6 @@ public class KitsuDataProcessor extends IntentService {
                     } else {
                         if (currentCalendar.compareTo(startedCalendar) > 0) {
                             airingStatus = "Airing";
-//                        checkForSeasonSwitch(currSeries);
                         } else {
                             airingStatus = "Not yet aired";
                         }
@@ -118,6 +118,7 @@ public class KitsuDataProcessor extends IntentService {
             final String finalStartAiringDate = formattedStartAiringDate;
             final String finalfinishedAiringDate = formattedFinishedAiringDate;
 
+            // Create/update Series object in Realm
             realm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
@@ -163,25 +164,6 @@ public class KitsuDataProcessor extends IntentService {
                     }
                 }
             });
-        }
-    }
-
-    private void checkForSeasonSwitch(final Series currSeries) {
-        String latestSeasonName = SharedPrefsUtils.getInstance().getLatestSeasonName();
-        Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
-        if (!season.getName().equals(latestSeasonName)) {
-            // generate times for series airing but not in current season
-            if (currSeries.getNextEpisodeAirtime() > 0) {
-                Calendar airdateCalendar = Calendar.getInstance();
-                airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeAirtime());
-                AlarmUtils.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, false);
-            }
-
-            if (currSeries.getNextEpisodeSimulcastTime() > 0) {
-                Calendar airdateCalendar = Calendar.getInstance();
-                airdateCalendar.setTimeInMillis(currSeries.getNextEpisodeSimulcastTime());
-                AlarmUtils.getInstance().calculateNextEpisodeTime(currSeries.getMALID(), airdateCalendar, true);
-            }
         }
     }
 }

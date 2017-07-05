@@ -16,12 +16,13 @@ import java.net.URL;
 
 import me.jakemoritz.animebuzz.misc.App;
 
-public class PosterDownloader extends IntentService {
+// Downloads missing anime images
+public class AnimeImageDownloadIntentService extends IntentService {
 
-    private static final String TAG = PosterDownloader.class.getSimpleName();
+    private static final String TAG = AnimeImageDownloadIntentService.class.getSimpleName();
 
-    public PosterDownloader() {
-        super(PosterDownloader.class.getSimpleName());
+    public AnimeImageDownloadIntentService() {
+        super(AnimeImageDownloadIntentService.class.getSimpleName());
         setIntentRedelivery(true);
     }
 
@@ -49,6 +50,7 @@ public class PosterDownloader extends IntentService {
         Bitmap bitmap;
 
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        // Set user-agent required to access Kitsu URL
         connection.setRequestProperty("User-Agent",
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.65 Safari/537.31");
         connection.connect();
@@ -65,6 +67,7 @@ public class PosterDownloader extends IntentService {
         return bitmap;
     }
 
+    // Save image as JPEG with 25% quality
     private void cachePoster(Bitmap bitmap, String MALID) {
         FileOutputStream fos = null;
         try {

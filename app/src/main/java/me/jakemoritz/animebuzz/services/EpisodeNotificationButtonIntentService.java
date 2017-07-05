@@ -15,14 +15,14 @@ import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 
-
-public class EpisodeNotificationButtonHandler extends IntentService implements MalDataImportedListener{
+// IntentService to handle button presses in episode notification
+public class EpisodeNotificationButtonIntentService extends IntentService implements MalDataImportedListener{
 
     private MalApiClient malApiClient;
     private String MALID = "-1";
 
-    public EpisodeNotificationButtonHandler() {
-        super(EpisodeNotificationButtonHandler.class.getSimpleName());
+    public EpisodeNotificationButtonIntentService() {
+        super(EpisodeNotificationButtonIntentService.class.getSimpleName());
 //        setIntentRedelivery(true);
     }
 
@@ -43,7 +43,8 @@ public class EpisodeNotificationButtonHandler extends IntentService implements M
 
             for (final BacklogItem backlogItem : backlogItems){
                 if (backlogItem.getSeries().equals(series)){
-                    if (backlogItem != null && backlogItem.isValid()){
+                    if (backlogItem.isValid()){
+                        // Delete BacklogItem created for this episode release
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(Realm realm) {
@@ -54,11 +55,13 @@ public class EpisodeNotificationButtonHandler extends IntentService implements M
                         App.getInstance().sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
                     }
 
+                    // 'Increment' button pressed
                     if (increment && SharedPrefsUtils.getInstance().isLoggedIn() && App.getInstance().isNetworkAvailable()){
                         if (malApiClient == null){
                             malApiClient = new MalApiClient(this);
-                            malApiClient.syncEpisodeCounts();
                         }
+
+                        malApiClient.syncEpisodeCounts();
                     } else {
                         MALID = "-1";
                     }

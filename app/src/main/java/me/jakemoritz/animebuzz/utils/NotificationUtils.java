@@ -25,7 +25,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.services.EpisodeNotificationButtonHandler;
+import me.jakemoritz.animebuzz.services.EpisodeNotificationButtonIntentService;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
@@ -214,12 +214,12 @@ public class NotificationUtils {
         Bitmap notificationIcon = getCircleBitmap(MALID);
 
         // create intent for increment button
-        Intent incrementIntent = new Intent(App.getInstance(), EpisodeNotificationButtonHandler.class);
+        Intent incrementIntent = new Intent(App.getInstance(), EpisodeNotificationButtonIntentService.class);
         incrementIntent.putExtra("MALID", MALID);
         incrementIntent.putExtra("increment", true);
 
         // create intent for watched button
-        Intent watchedIntent = new Intent(App.getInstance(), EpisodeNotificationButtonHandler.class);
+        Intent watchedIntent = new Intent(App.getInstance(), EpisodeNotificationButtonIntentService.class);
         watchedIntent.putExtra("MALID", MALID);
         watchedIntent.putExtra("increment", false);
 
