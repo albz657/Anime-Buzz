@@ -74,9 +74,19 @@ public class SharedPrefsUtils {
         return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_changed_time_notification_key), true);
     }
 
-    public void setChangedNotificationState(boolean state){
+    public void setChangedNotificationEnabled(boolean enabled){
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean(App.getInstance().getString(R.string.pref_changed_time_notification_key), state);
+        editor.putBoolean(App.getInstance().getString(R.string.pref_changed_time_notification_key), enabled);
+        editor.apply();
+    }
+
+    public boolean episodeNotificationsEnabled(){
+        return sharedPrefs.getBoolean(App.getInstance().getString(R.string.pref_notification_key), true);
+    }
+
+    public void setEpisodeNotificationEnabled(boolean enabled){
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean(App.getInstance().getString(R.string.pref_notification_key), enabled);
         editor.apply();
     }
 
