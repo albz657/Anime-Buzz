@@ -72,7 +72,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     private SeriesAdapter mAdapter;
     private BroadcastReceiver initialReceiver;
-    private RealmResults<Series> previousRealmResults;
 
     // api clients
     private SenpaiExportHelper senpaiExportHelper;
@@ -82,6 +81,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     // layouts
     private SwipeRefreshLayout swipeRefreshLayoutRecycler;
     private SwipeRefreshLayout swipeRefreshLayoutEmpty;
+    private RecyclerView recyclerView;
 
     // current season info
     private Season currentlyBrowsingSeason;
@@ -110,7 +110,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         swipeRefreshLayoutRecycler.setOnRefreshListener(this);
         swipeRefreshLayoutEmpty = (SwipeRefreshLayout) seriesLayout.findViewById(R.id.swipe_refresh_layout_empty);
         swipeRefreshLayoutEmpty.setOnRefreshListener(this);
-        RecyclerView recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
+        recyclerView = (RecyclerView) swipeRefreshLayoutRecycler.findViewById(R.id.list);
 
         // Empty view
         LinearLayout emptyView = (LinearLayout) swipeRefreshLayoutEmpty.findViewById(R.id.empty_view_included);
@@ -169,6 +169,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         setVisibility(seriesList);
         getmAdapter().setSeriesList(seriesList);
         getmAdapter().notifyDataSetChanged();
+
+        getRecyclerView().smoothScrollToPosition(0);
     }
 
     @Override
@@ -348,6 +350,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
             }
         }
+
+
     }
 
     public void stopInitialSpinner() {
@@ -625,6 +629,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     public MainActivity getMainActivity() {
         return mainActivity;
+    }
+
+    public RecyclerView getRecyclerView() {
+        return recyclerView;
     }
 
     public Season getCurrentlyBrowsingSeason() {
