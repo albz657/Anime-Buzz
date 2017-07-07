@@ -22,10 +22,13 @@ public class PermissionUtils {
         return permissionUtils;
     }
 
+    // Check if user has granted a specific permission
     public boolean permissionGranted(Activity activity, String permission){
         return ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
+    // Method used to request permission from external classes
+    // May show rationale
     public void requestPermission(Activity activity, String permission){
         if ((ActivityCompat.shouldShowRequestPermissionRationale(activity, permission) && !permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE))
                 || (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
@@ -40,6 +43,7 @@ public class PermissionUtils {
         }
     }
 
+    // Directly request permission
     public void requestPermissionDirect(Activity activity, String permission){
         int requestCode = -1;
 

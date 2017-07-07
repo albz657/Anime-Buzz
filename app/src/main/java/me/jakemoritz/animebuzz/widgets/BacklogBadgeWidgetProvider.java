@@ -19,9 +19,7 @@ public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         super.onUpdate(context, appWidgetManager, appWidgetIds);
 
-        for (int i = 0; i < appWidgetIds.length; i++){
-            int appWidgetId = appWidgetIds[i];
-
+        for (int widgetId : appWidgetIds){
             Intent intent = new Intent(context, MainActivity.class);
             intent.putExtra("backlog_widget", true);
 
@@ -33,7 +31,7 @@ public class BacklogBadgeWidgetProvider extends AppWidgetProvider {
             remoteViews.setTextViewText(R.id.backlog_wiget_count, String.valueOf(realmResults.size()));
             remoteViews.setOnClickPendingIntent(R.id.backlog_widget, pendingIntent);
 
-            appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+            appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
     }
 }
