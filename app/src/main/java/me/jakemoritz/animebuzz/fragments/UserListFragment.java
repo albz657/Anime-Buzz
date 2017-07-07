@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -35,14 +34,6 @@ public class UserListFragment extends SeriesFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        getMainActivity().resetToolbar(this);
-        loadUserSortingPreference();
-    }
-
-    @Override
     public void kitsuDataReceived() {
         super.kitsuDataReceived();
 
@@ -60,9 +51,16 @@ public class UserListFragment extends SeriesFragment {
                 getMalApiClient().getUserList();
             } else {
                 stopRefreshing();
-                loadUserSortingPreference();
+                loadCurrentSeason();
             }
         }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getMainActivity().resetToolbar(this);
+
     }
 
     @Override
@@ -76,11 +74,9 @@ public class UserListFragment extends SeriesFragment {
         if (isUpdating()) {
             stopRefreshing();
         }
-
-        loadUserSortingPreference();
     }
 
-    public void loadUserSortingPreference() {
+    public void loadCurrentSeason() {
         if (!isAdded()) {
             return;
         }
@@ -100,6 +96,12 @@ public class UserListFragment extends SeriesFragment {
         RealmResults<Series> realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
 
         updateAdapterData(realmResults);
+    }
+
+    @Override
+    public void stopInitialSpinner() {
+        super.stopInitialSpinner();
+        loadCurrentSeason();
     }
 
     @Override
@@ -126,7 +128,7 @@ public class UserListFragment extends SeriesFragment {
                         sort = "nextEpisodeAirtime";
                     }
                     SharedPrefsUtils.getInstance().setSortingPreference(sort);
-                    loadUserSortingPreference();
+                    loadCurrentSeason();
 
                     return true;
                 }

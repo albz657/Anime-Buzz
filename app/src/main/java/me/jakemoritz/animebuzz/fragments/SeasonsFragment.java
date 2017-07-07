@@ -25,7 +25,6 @@ public class SeasonsFragment extends SeriesFragment {
     private Spinner toolbarSpinner;
     private SeasonSpinnerAdapter seasonSpinnerAdapter;
     private int previousSpinnerIndex = 0;
-    private boolean activityRecreated = false;
 
     public SeasonsFragment() {
 
@@ -101,6 +100,12 @@ public class SeasonsFragment extends SeriesFragment {
     }
 
     @Override
+    public void stopInitialSpinner() {
+        super.stopInitialSpinner();
+        loadSeason(getCurrentlyBrowsingSeason().getName());
+    }
+
+    @Override
     public void senpaiSeasonRetrieved(String seasonKey) {
         if (App.getInstance().isInitializing()) {
             Season currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", seasonKey).findFirst();
@@ -113,7 +118,6 @@ public class SeasonsFragment extends SeriesFragment {
                 failedInitialization();
             } else {
                 setCurrentlyBrowsingSeason(currentlyBrowsingSeason);
-                loadSeason(currentlyBrowsingSeason.getName());
             }
         }
 

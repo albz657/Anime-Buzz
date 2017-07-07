@@ -1,11 +1,13 @@
 package me.jakemoritz.animebuzz.adapters;
 
 import android.graphics.drawable.Drawable;
+import android.os.FileObserver;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,6 +32,8 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
     private SeriesFragment seriesFragment = null;
     private ModifyItemStatusListener modifyListener;
     private List<Series> seriesList;
+    private List<Series> unmanagedSeriesList;
+    private FileObserver cachedImageObserver;
 
     // Map of simulcast background resources
     private final static Map<String, Integer> simulcastColorMap;
@@ -47,11 +51,42 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
         simulcastColorMap.put("Funimation", App.getInstance().getResources().getIdentifier("funimation_background", "drawable", App.getInstance().getPackageName()));
     }
 
-    public SeriesAdapter(SeriesFragment seriesFragment, List<Series> seriesList) {
+    public SeriesAdapter(final SeriesFragment seriesFragment, final List<Series> seriesList) {
         super();
         this.seriesFragment = seriesFragment;
         this.modifyListener = seriesFragment;
         this.seriesList = seriesList;
+        this.unmanagedSeriesList = App.getInstance().getRealm().copyFromRealm(this.seriesList);
+        this.cachedImageObserver = new FileObserver(seriesFragment.getMainActivity().getCacheDir().getPath()) {
+            @Override
+            public void onEvent(int event, String path) {
+                // Listens for missing images to be downloaded
+                // Redraws rows if missing images were downloaded
+                String imageExtension = MimeTypeMap.getFileExtensionFromUrl(path);
+
+                if (event == FileObserver.CREATE && imageExtension != null && imageExtension.equals("jpg")) {
+                    String MALID = path.replace(".jpg", "");
+
+                    for (int i = 0; i < unmanagedSeriesList.size(); i++) {
+                        if (unmanagedSeriesList.get(i).getMALID().equals(MALID)) {
+                            final ViewHolder seriesViewHolder = (ViewHolder) SeriesAdapter.this.seriesFragment.getRecyclerView().findViewHolderForAdapterPosition(i);
+
+                            final int indexOfItem = i;
+                            if (seriesViewHolder != null) {
+                                SeriesAdapter.this.seriesFragment.getMainActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        SeriesAdapter.this.notifyItemChanged(indexOfItem);
+                                    }
+                                });
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        };
+        this.cachedImageObserver.startWatching();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -91,6 +126,12 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
     }
 
     @Override
+    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        this.cachedImageObserver.stopWatching();
+    }
+
+    @Override
     public int getItemCount() {
         return seriesList.size();
     }
@@ -98,7 +139,6 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.series = seriesList.get(position);
-
         final String MALID = holder.series.getMALID();
 
         // Set anime title
@@ -215,6 +255,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
 
     public void setSeriesList(List<Series> seriesList) {
         this.seriesList = seriesList;
+        this.unmanagedSeriesList = App.getInstance().getRealm().copyFromRealm(this.seriesList);
     }
 
     private void addSeriesHelper(String MALID) {

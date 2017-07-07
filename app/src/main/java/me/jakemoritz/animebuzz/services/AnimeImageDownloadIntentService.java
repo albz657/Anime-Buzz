@@ -39,7 +39,7 @@ public class AnimeImageDownloadIntentService extends IntentService {
                 cachePoster(bitmap, MALID);
             }
         } catch (IOException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             if (URL != null){
                 Log.d(TAG, "Error getting bitmap from: '" + URL + "'");
             }

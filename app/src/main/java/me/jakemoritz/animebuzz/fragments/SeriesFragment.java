@@ -278,7 +278,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             Intent intent = new Intent(getActivity(), MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-
         } else {
             getMainActivity().finish();
 
@@ -350,8 +349,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 currentlyBrowsingSeason = App.getInstance().getRealm().where(Season.class).equalTo("key", currentlyBrowsingSeasonKey).findFirst();
             }
         }
-
-
     }
 
     public void stopInitialSpinner() {
