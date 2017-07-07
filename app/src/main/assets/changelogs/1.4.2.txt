@@ -1,3 +1,5 @@
 Fixes
-- Anime with no airing times are now hidden
-- Anime that have finished airing are now hidden
+- Anime with no airing times are no longer listed in the season browser
+- Anime that have finished airing are no longer listed in the season browser
+- New episode notifications now show anime title on multiple lines if needed
+- Multiple smaller fixes
