@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.utils;
 
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -33,8 +34,6 @@ public class NotificationUtils {
 
     private static NotificationUtils notificationUtils;
     private NotificationManager mNotificationManager = (NotificationManager) App.getInstance().getSystemService(Context.NOTIFICATION_SERVICE);
-    private int maxSeries = 0;
-    private int currSeries = 0;
 
     public synchronized static NotificationUtils getInstance() {
         if (notificationUtils == null) {
@@ -106,98 +105,43 @@ public class NotificationUtils {
         mNotificationManager.notify("image".hashCode(), mBuilder.build());
     }
 
-    public void createChangedTimeNotification(Series series, Calendar newEpisodeTime){
+    void createChangedTimeNotification(Series series, Calendar newEpisodeTime) {
         String name = series.getName();
 
-        if (SharedPrefsUtils.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty() && !series.getEnglishTitle().equals(series.getName())){
+        if (SharedPrefsUtils.getInstance().prefersEnglish() && !series.getEnglishTitle().isEmpty() && !series.getEnglishTitle().equals(series.getName())) {
             name = series.getEnglishTitle();
         }
 
+        // Format date and time strings
         SimpleDateFormat weekdayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
         String day = weekdayFormat.format(newEpisodeTime.getTime());
 
         SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.getDefault());
-        if (SharedPrefsUtils.getInstance().prefers24hour()){
+        if (SharedPrefsUtils.getInstance().prefers24hour()) {
             timeFormat = new SimpleDateFormat("kk:mm", Locale.getDefault());
         }
 
         String time = timeFormat.format(newEpisodeTime.getTime());
 
-        Bitmap notificationIcon = getCircleBitmap(series.getMALID());
-
         String title = "Changed airing time";
         String message = "'" + name + "' will now air on " + day + "s at " + time;
-        PugNotification.with(App.getInstance())
+        Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
                 .autoCancel(true)
                 .title(title)
                 .bigTextStyle(message)
-                .smallIcon(R.drawable.ic_update)
-                .largeIcon(notificationIcon)
-                .simple()
-                .build();
+                .smallIcon(R.drawable.ic_update);
 
-        if (notificationIcon != null && !notificationIcon.isRecycled()){
-            notificationIcon.recycle();
-        }
-    }
-
-    private Bitmap getCircleBitmap(String MALID){
-        // get image
-        int posterId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", "me.jakemoritz.animebuzz");
-
-        File bitmapFile = null;
-        if (posterId == 0) {
-            File cacheDirectory = App.getInstance().getCacheDir();
-
-            if (cacheDirectory.exists() && cacheDirectory.isDirectory()) {
-                bitmapFile = new File(cacheDirectory, MALID + ".jpg");
-            }
-        }
-
-        Bitmap notificationIcon = null;
-
-        AsyncTask getCirleCroppedImageTask = new AsyncTask<Object, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Object... params) {
-                Bitmap bitmap = null;
-                try {
-                    File bitmapFile = (File) params[0];
-                    if (bitmapFile != null && bitmapFile.exists()){
-                        bitmap = Picasso.with(App.getInstance()).load(bitmapFile).transform(new CropCircleTransformation()).get();
-                    } else {
-                        Integer imageResId = (Integer) params[1];
-                        if (imageResId != null && imageResId != 0){
-                            bitmap = Picasso.with(App.getInstance()).load(imageResId).transform(new CropCircleTransformation()).get();
-                        }
-                    }
-                } catch (IOException e) {
-
-                }
-
-                return bitmap;
-            }
-        };
-
-        try {
-            Object[] imageMetadata = new Object[2];
-            imageMetadata[0] = bitmapFile;
-            imageMetadata[1] = posterId;
-            getCirleCroppedImageTask.execute(imageMetadata);
-            notificationIcon = (Bitmap) getCirleCroppedImageTask.get();
-        } catch (Exception e) {
-
-        }
-
-        return notificationIcon;
+        LoadNotificationImageTask loadNotificationImageTask = new LoadNotificationImageTask(notificationLoad);
+        loadNotificationImageTask.execute(series.getMALID());
     }
 
     public void createNewEpisodeNotification(Series series) {
-        // load ringtone
+        // notificationLoad ringtone
         String ringtonePref = SharedPrefsUtils.getInstance().getRingtone();
         Uri ringtoneUri = Uri.parse(ringtonePref);
 
-        // load series name
+        // notificationLoad series name
         String seriesName = series.getName();
         String MALID = series.getMALID();
 
@@ -209,9 +153,6 @@ public class NotificationUtils {
         Intent resultIntent = new Intent(App.getInstance(), MainActivity.class);
         resultIntent.putExtra("notificationClicked", true);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(App.getInstance(), 0, resultIntent, FLAG_UPDATE_CURRENT);
-
-        // get large circle icon
-        Bitmap notificationIcon = getCircleBitmap(MALID);
 
         // create intent for increment button
         Intent incrementIntent = new Intent(App.getInstance(), EpisodeNotificationButtonIntentService.class);
@@ -225,56 +166,87 @@ public class NotificationUtils {
 
         Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
-                .identifier(MALID.hashCode())
+                .identifier(Integer.valueOf(MALID))
                 .autoCancel(true)
+                .onlyAlertOnce(true)
                 .click(resultPendingIntent)
                 .title("New episode released")
-                .message(seriesName)
+                .bigTextStyle(seriesName)
                 .smallIcon(R.drawable.bolt_copy)
-                .largeIcon(notificationIcon)
                 .button(R.drawable.ic_action_ic_done_green, "WATCHED", PendingIntent.getService(App.getInstance(), MALID.hashCode(), watchedIntent, PendingIntent.FLAG_UPDATE_CURRENT));
 
         // set ringtone
-        if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()){
-            notificationLoad = notificationLoad.sound(ringtoneUri);
+        if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()) {
+            notificationLoad.sound(ringtoneUri);
         }
 
         // set LED
-        if (!SharedPrefsUtils.getInstance().getLed().equals("-1")){
-            notificationLoad = notificationLoad.lights(Color.parseColor("#" + SharedPrefsUtils.getInstance().getLed()), 1000, 1000);
+        if (!SharedPrefsUtils.getInstance().getLed().equals("-1")) {
+            notificationLoad.lights(Color.parseColor("#" + SharedPrefsUtils.getInstance().getLed()), 1000, 1000);
         }
 
         // set vibrate pattern
         if (SharedPrefsUtils.getInstance().prefersVibrate()) {
-            long[] vibrate = new long[]{800L, 800L};
-            notificationLoad = notificationLoad.vibrate(vibrate);
+            notificationLoad.flags(Notification.DEFAULT_VIBRATE);
         }
 
-        if (SharedPrefsUtils.getInstance().isLoggedIn()){
-            notificationLoad = notificationLoad.button(R.drawable.ic_action_add, "INCREMENT", PendingIntent.getService(App.getInstance(), MALID.hashCode(), incrementIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+        // Add button intent if user is logged in
+        if (SharedPrefsUtils.getInstance().isLoggedIn()) {
+            notificationLoad.button(R.drawable.ic_action_add, "INCREMENT", PendingIntent.getService(App.getInstance(), MALID.hashCode(), incrementIntent, PendingIntent.FLAG_UPDATE_CURRENT));
         }
 
-        notificationLoad.simple()
-                .build();
+        LoadNotificationImageTask loadNotificationImageTask = new LoadNotificationImageTask(notificationLoad);
+        loadNotificationImageTask.execute(MALID);
+    }
 
-        if (notificationIcon != null && !notificationIcon.isRecycled()){
-            notificationIcon.recycle();
+    // AsyncTask to handle loading anime image for notifications
+    private class LoadNotificationImageTask extends AsyncTask<String, Void, Bitmap> {
+        private Load notificationLoad;
+
+        LoadNotificationImageTask(Load notificationLoad) {
+            this.notificationLoad = notificationLoad;
         }
-    }
 
-    public void incrementMaxSeries(int seriesCount) {
-        this.maxSeries += seriesCount;
-    }
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
 
-    public void incrementCurrSeries() {
-        this.currSeries++;
-    }
+            if (bitmap != null) {
+                notificationLoad.largeIcon(bitmap);
+            }
 
-    public int getMaxSeries() {
-        return maxSeries;
-    }
+            notificationLoad.simple().build();
+        }
 
-    public int getCurrSeries() {
-        return currSeries;
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            int imageResId = App.getInstance().getResources().getIdentifier("malid_" + params[0], "drawable", App.getInstance().getPackageName());
+
+            // if image isn't in drawable resources, check for cached image
+            if (imageResId == 0) {
+                File cacheDirectory = App.getInstance().getCacheDir();
+
+                if (cacheDirectory.exists() && cacheDirectory.isDirectory()) {
+                    File imageFile = new File(cacheDirectory, params[0] + ".jpg");
+
+                    if (imageFile.exists()) {
+                        try {
+                            return Picasso.with(App.getInstance()).load(imageFile).transform(new CropCircleTransformation()).get();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            } else {
+                // load image from drawable resource
+                try {
+                    return Picasso.with(App.getInstance()).load(imageResId).transform(new CropCircleTransformation()).get();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
     }
 }

@@ -11,7 +11,7 @@ import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.DailyUpdateUtils;
 import me.jakemoritz.animebuzz.utils.NotificationUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
@@ -69,8 +69,8 @@ public class EpisodeNotificationReceiver extends BroadcastReceiver {
 
         // Device just booted, set all Alarms again
         if ("android.intent.action.BOOT_COMPLETED".equals(intent.getAction())) {
-            AlarmUtils.getInstance().setAlarmsOnBoot();
-            DailyTimeGenerator.getInstance().setNextAlarm(false);
+            AlarmUtils.getInstance().setAllAlarms();
+            DailyUpdateUtils.getInstance().setNextAlarm(false);
         }
     }
 }

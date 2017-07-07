@@ -1,12 +1,10 @@
 package me.jakemoritz.animebuzz.utils;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
 
 public class DateFormatUtils {
 
@@ -19,6 +17,7 @@ public class DateFormatUtils {
         return dateFormatUtils;
     }
 
+    // Creates a Calendar object from Kitsu date string
     public Calendar getCalFromHB(String dateString) {
         SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         Date date;
@@ -34,6 +33,7 @@ public class DateFormatUtils {
         return null;
     }
 
+    // Formats Calendar date to string
     public String getAiringDateFormatted(Calendar calendar, boolean includeYear) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d", Locale.getDefault());
 
@@ -46,23 +46,7 @@ public class DateFormatUtils {
         return formattedDate;
     }
 
-    public String getLocalFormattedDateFromStringDate(String stringDate) {
-        try {
-            SimpleDateFormat originalFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-            Date date = originalFormat.parse(stringDate);
-
-            DateFormat localFormat = SimpleDateFormat.getDateInstance();
-
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(date);
-            return localFormat.format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String getDayOfMonthSuffix(final int n) {
+    String getDayOfMonthSuffix(final int n) {
         String[] suffixes =
                 //    0     1     2     3     4     5     6     7     8     9
                 {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th",
@@ -77,7 +61,7 @@ public class DateFormatUtils {
         return suffixes[n];
     }
 
-    public Calendar getCalFromSeconds(int seconds) {
+    Calendar getCalFromSeconds(int seconds) {
         Long ms = Long.valueOf(String.valueOf(seconds) + "000");
 
         Calendar cal = Calendar.getInstance();

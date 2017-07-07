@@ -14,7 +14,7 @@ import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.DailyUpdateUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 
 public class UserListFragment extends SeriesFragment {
@@ -70,7 +70,7 @@ public class UserListFragment extends SeriesFragment {
         super.malDataImported(imported);
 
         if (App.getInstance().isInitializing()) {
-            DailyTimeGenerator.getInstance().setNextAlarm(false);
+            DailyUpdateUtils.getInstance().setNextAlarm(false);
         }
 
         if (isUpdating()) {

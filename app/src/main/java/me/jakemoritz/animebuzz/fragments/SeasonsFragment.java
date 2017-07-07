@@ -16,7 +16,7 @@ import me.jakemoritz.animebuzz.adapters.SeasonSpinnerAdapter;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.DailyUpdateUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.comparators.SeasonComparator;
 
@@ -96,7 +96,7 @@ public class SeasonsFragment extends SeriesFragment {
         stopRefreshing();
 
         if (App.getInstance().isInitializing()) {
-            DailyTimeGenerator.getInstance().setNextAlarm(false);
+            DailyUpdateUtils.getInstance().setNextAlarm(false);
         }
     }
 

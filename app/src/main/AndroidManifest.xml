@@ -44,7 +44,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <receiver android:exported="false" android:name=".utils.DailyTimeGenerator$DailyReceiver">
+        <receiver android:exported="false" android:name=".utils.DailyUpdateUtils$DailyUpdateReceiver">
             <intent-filter>
                 <action android:name="GENERATE_TIME"/>
             </intent-filter>

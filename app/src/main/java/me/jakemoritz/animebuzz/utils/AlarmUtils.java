@@ -17,10 +17,8 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Alarm;
-import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.receivers.EpisodeNotificationReceiver;
-
 
 public class AlarmUtils {
     private static AlarmUtils alarmUtils;
@@ -34,59 +32,11 @@ public class AlarmUtils {
         return alarmUtils;
     }
 
-    private void dummyAlarm() {
-/*        final RealmResults<Alarm> alarms = App.getInstance().getRealm().where(Alarm.class).findAll();
-        if (!alarms.isEmpty()) {
-            final long time = System.currentTimeMillis() + 5000L;
+    // Set all Alarms again, useful to reset Alarms on device boot
+    public void setAllAlarms() {
+//        DummyDataUtils.getInstance().createDummyAlarms(1);
 
-
-            App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    alarms.get(0).setAlarmTime(time);
-
-                }
-            });
-        }*/
-
-        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(Realm realm) {
-                RealmResults<Series> userList = realm.where(Series.class).findAll();
-                realm.where(Alarm.class).findAll().deleteAllFromRealm();
-                realm.where(BacklogItem.class).findAll().deleteAllFromRealm();
-
-                final Calendar currentTime = Calendar.getInstance();
-
-                for (int i = 0; i < 1; i++){
-                    boolean blocked = true;
-                    while (blocked){
-                        int random = (int) (Math.random() * userList.size());
-                        Series series = userList.get(random);
-
-                        final Calendar lastNotificationTime = Calendar.getInstance();
-                        lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
-
-                        if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0 && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))){
-/*                            BacklogItem backlogItem = realm.createObject(BacklogItem.class);
-                            backlogItem.setSeries(series);
-                            backlogItem.setAlarmTime(System.currentTimeMillis());*/
-
-                            Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
-                            alarm.setAlarmTime(System.currentTimeMillis() + 000L);
-                            alarm.setSeries(series);
-                            blocked = false;
-                        }
-                    }
-
-                }
-            }
-        });
-    }
-
-    public void setAlarmsOnBoot() {
-//        dummyAlarm();
-        DailyTimeGenerator.getInstance().setNextAlarm(true);
+        DailyUpdateUtils.getInstance().setNextAlarm(true);
         Realm realm = Realm.getDefaultInstance();
         for (Alarm alarm : realm.where(Alarm.class).findAll()) {
             setAlarm(alarm);
@@ -98,6 +48,7 @@ public class AlarmUtils {
         alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getAlarmTime(), createPendingIntent(Integer.valueOf(alarm.getMALID())));
     }
 
+    // Overloaded method to generate episode times during database migration
     public void generateNextEpisodeTimes(String MALID, int airdate, int simulcastAirdate) {
         DateFormatUtils dateFormatUtils = new DateFormatUtils();
 
@@ -126,7 +77,7 @@ public class AlarmUtils {
         }
     }
 
-    public void calculateNextEpisodeTime(String MALID, Calendar calendar, boolean simulcast) {
+    void calculateNextEpisodeTime(String MALID, Calendar calendar, boolean simulcast) {
         Realm realm = Realm.getDefaultInstance();
         final Series series = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
@@ -170,7 +121,7 @@ public class AlarmUtils {
         realm.close();
     }
 
-    public void calculateNextEpisodeTime(Series series, Calendar calendar, boolean simulcast) {
+    void calculateNextEpisodeTime(Series series, Calendar calendar, boolean simulcast) {
         final Calendar nextEpisode = Calendar.getInstance();
         nextEpisode.set(Calendar.HOUR_OF_DAY, calendar.get(Calendar.HOUR_OF_DAY));
         nextEpisode.set(Calendar.MINUTE, calendar.get(Calendar.MINUTE));
@@ -215,6 +166,7 @@ public class AlarmUtils {
         }
     }
 
+    // Formats airing time and saves them to Series
     public String formatAiringTime(Calendar calendar, boolean prefers24hour) {
         SimpleDateFormat format = new SimpleDateFormat("MMMM d", Locale.getDefault());
         SimpleDateFormat hourFormat;
@@ -256,6 +208,7 @@ public class AlarmUtils {
         return formattedTime;
     }
 
+    // Create Alarm object for Series
     public void makeAlarm(final Series series) {
         if (series.getAiringStatus().equals("Airing")) {
             if (series.getNextEpisodeAirtime() > 0) {
@@ -298,6 +251,7 @@ public class AlarmUtils {
 
     }
 
+    // Handles switching preference for simulcast and regular airing times
     public void switchAlarmTiming() {
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override

@@ -51,7 +51,7 @@ import me.jakemoritz.animebuzz.models.BacklogItem;
 import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
-import me.jakemoritz.animebuzz.utils.DailyTimeGenerator;
+import me.jakemoritz.animebuzz.utils.DailyUpdateUtils;
 import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
@@ -156,13 +156,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Check last update time
             if (SharedPrefsUtils.getInstance().getLastUpdateTime() == 0L) {
-                DailyTimeGenerator.getInstance().setNextAlarm(false);
+                DailyUpdateUtils.getInstance().setNextAlarm(false);
             }
 
             // Check if database migration is needed
             migrateOldDatabase();
 
-            AlarmUtils.getInstance().setAlarmsOnBoot();
+            AlarmUtils.getInstance().setAllAlarms();
         }
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);

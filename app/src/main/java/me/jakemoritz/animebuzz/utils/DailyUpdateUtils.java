@@ -12,17 +12,18 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Series;
 
-public class DailyTimeGenerator {
+// Handles daily update of formatted episode times
+public class DailyUpdateUtils {
 
-    private static DailyTimeGenerator dailyTimeGenerator;
+    private static DailyUpdateUtils dailyUpdateUtils;
     private AlarmManager alarmManager;
 
-    public synchronized static DailyTimeGenerator getInstance() {
-        if (dailyTimeGenerator == null) {
-            dailyTimeGenerator = new DailyTimeGenerator();
-            dailyTimeGenerator.alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
+    public synchronized static DailyUpdateUtils getInstance() {
+        if (dailyUpdateUtils == null) {
+            dailyUpdateUtils = new DailyUpdateUtils();
+            dailyUpdateUtils.alarmManager = (AlarmManager) App.getInstance().getSystemService(Context.ALARM_SERVICE);
         }
-        return dailyTimeGenerator;
+        return dailyUpdateUtils;
     }
 
     public void setNextAlarm(boolean booted){
@@ -40,7 +41,7 @@ public class DailyTimeGenerator {
             nextAlarmCalendar.set(Calendar.SECOND, 0);
             nextAlarmCalendar.set(Calendar.MILLISECOND, 0);
 
-            Intent timeGeneratorIntent = new Intent(App.getInstance(), DailyReceiver.class);
+            Intent timeGeneratorIntent = new Intent(App.getInstance(), DailyUpdateReceiver.class);
             timeGeneratorIntent.setAction("GENERATE_TIME");
             PendingIntent pendingIntent = PendingIntent.getBroadcast(App.getInstance(), 0, timeGeneratorIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -49,7 +50,7 @@ public class DailyTimeGenerator {
     }
 
 
-    public static class DailyReceiver extends BroadcastReceiver{
+    public static class DailyUpdateReceiver extends BroadcastReceiver{
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals("GENERATE_TIME")){
