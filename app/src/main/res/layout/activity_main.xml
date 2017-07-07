@@ -1,54 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/drawer_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#FFFFFF"
-                android:fitsSystemWindows="true">
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="true">
 
     <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottomBar"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true" />
 
     <include
         layout="@layout/app_bar_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomBar"/>
+        android:layout_above="@id/bottomBar" />
 
-    <RelativeLayout
-        android:id="@+id/progress_view_holder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottomBar"
-        android:background="#FFFFFF"
-        android:visibility="gone">
-
-        <com.github.rahatarmanahmed.cpv.CircularProgressView
-            android:id="@+id/progress_view"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            app:cpv_animAutostart="false"
-            app:cpv_indeterminate="true"/>
-
-        <TextView
-            android:id="@+id/loading_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@id/progress_view"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="18dp"
-            android:maxWidth="200dp"
-            android:singleLine="false"
-            android:text="@string/initial_loading_season"
-            android:textAlignment="center"
-            android:textColor="#D9000000"
-            android:textSize="16sp"/>
-    </RelativeLayout>
-
+    <include layout="@layout/setup_progress_screen"/>
 </RelativeLayout>
