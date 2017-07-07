@@ -89,8 +89,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         // Display MAL username if logged in
         signOutPreference = (AccountPreference) findPreference(getString(R.string.pref_account_signout_key));
         if (SharedPrefsUtils.getInstance().isLoggedIn()) {
-            String summary = getString(R.string.pref_account_summary_on) + SharedPrefsUtils.getInstance().getMalUsernameFormatted() + "'.";
-            signOutPreference.setSummary(summary);
+            String signedinTitle = getString(R.string.pref_account_summary_on) + SharedPrefsUtils.getInstance().getMalUsernameFormatted() + "'.";
+            signOutPreference.setTitle(signedinTitle);
         }
 
         signOutPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -212,8 +212,6 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             ringtonePreference.setSummary(name);
         }
     }
-
-
 
     // Clear saved credentials and 'logged in' status
     public void signOut(Preference preference) {

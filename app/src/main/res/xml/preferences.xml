@@ -5,14 +5,13 @@
         android:title="@string/pref_category_account_title">
 
         <me.jakemoritz.animebuzz.preferences.AccountPreference
-            android:summary="You are currently signed in."
-            android:title="Sign out from your MAL account"
+            android:summary="@string/pref_account_signed_in_summary"
             android:key="@string/pref_account_signout_key"
             android:layout="@layout/account_preference"/>
 
         <me.jakemoritz.animebuzz.preferences.AccountPreference
-            android:summary="You are currently signed out."
-            android:title="Sign in to your MAL account"
+            android:summary="@string/pref_account_signed_out_summary"
+            android:title="@string/pref_account_signed_out_title"
             android:key="@string/pref_account_signin_key"
             android:layout="@layout/account_preference" />
     </PreferenceCategory>
