@@ -19,7 +19,7 @@ import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
-import me.jakemoritz.animebuzz.adapters.BacklogItemAdapterListener;
+import me.jakemoritz.animebuzz.adapters.BacklogItemAdapter;
 import me.jakemoritz.animebuzz.api.mal.MalApiClient;
 import me.jakemoritz.animebuzz.interfaces.mal.EpisodeCountIncrementedListener;
 import me.jakemoritz.animebuzz.interfaces.mal.MalDataImportedListener;
@@ -74,7 +74,7 @@ public class BacklogFragment extends Fragment implements EpisodeCountIncremented
             }
         });
 
-        BacklogItemAdapterListener mAdapter = new BacklogItemAdapterListener(this, backlogItems);
+        BacklogItemAdapter mAdapter = new BacklogItemAdapter(this, backlogItems);
         mAdapter.getTouchHelper().attachToRecyclerView(recyclerView);
 
         recyclerView.setAdapter(mAdapter);

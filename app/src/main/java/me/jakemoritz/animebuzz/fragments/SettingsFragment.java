@@ -89,7 +89,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         // Display MAL username if logged in
         signOutPreference = (AccountPreference) findPreference(getString(R.string.pref_account_signout_key));
         if (SharedPrefsUtils.getInstance().isLoggedIn()) {
-            String signedinTitle = getString(R.string.pref_account_summary_on) + SharedPrefsUtils.getInstance().getMalUsernameFormatted() + "'.";
+            String signedinTitle = getString(R.string.pref_account_signed_in_title) + SharedPrefsUtils.getInstance().getMalUsernameFormatted() + "'.";
             signOutPreference.setTitle(signedinTitle);
         }
 
@@ -272,7 +272,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         String username = SharedPrefsUtils.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
-            String signedinTitle = getString(R.string.pref_account_summary_on) + username + "'.";
+            String signedinTitle = getString(R.string.pref_account_signed_in_title) + username + "'.";
             signOutPreference.setTitle(signedinTitle);
         }
 

@@ -29,7 +29,7 @@ import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
 
-public class BacklogItemAdapterListener extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapterListener.ViewHolder> implements IncrementEpisodeCountDialogFragment.IncrementDialogListener, BacklogItemSwipedListener {
+public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, BacklogItemAdapter.ViewHolder> implements IncrementEpisodeCountDialogFragment.IncrementDialogListener, BacklogItemSwipedListener {
 
     private ItemTouchHelper touchHelper;
     private BacklogFragment fragment;
@@ -39,18 +39,19 @@ public class BacklogItemAdapterListener extends RealmRecyclerViewAdapter<Backlog
     private final static Map<String, Integer> simulcastColorMap;
     static{
         simulcastColorMap = new HashMap<>();
-        simulcastColorMap.put("Crunchyroll", App.getInstance().getResources().getIdentifier("crunchyroll_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Amazon Prime", App.getInstance().getResources().getIdentifier("amazon_prime_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Viewster", App.getInstance().getResources().getIdentifier("viewster_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Viz", App.getInstance().getResources().getIdentifier("viz_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Netflix", App.getInstance().getResources().getIdentifier("netflix_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("The Anime Network", App.getInstance().getResources().getIdentifier("anime_network_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Hulu", App.getInstance().getResources().getIdentifier("hulu_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Daisuki", App.getInstance().getResources().getIdentifier("daisuki_background", "drawable", App.getInstance().getPackageName()));
-        simulcastColorMap.put("Funimation", App.getInstance().getResources().getIdentifier("funimation_background", "drawable", App.getInstance().getPackageName()));
+        simulcastColorMap.put("Crunchyroll", R.drawable.crunchyroll_background);
+        simulcastColorMap.put("Amazon Prime", R.drawable.amazon_prime_background);
+        simulcastColorMap.put("Viewster", R.drawable.viewster_background);
+        simulcastColorMap.put("Viz", R.drawable.viz_background);
+        simulcastColorMap.put("Netflix", R.drawable.netflix_background);
+        simulcastColorMap.put("The Anime Network", R.drawable.anime_network_background);
+        simulcastColorMap.put("Hulu", R.drawable.hulu_background);
+        simulcastColorMap.put("Daisuki", R.drawable.daisuki_background);
+        simulcastColorMap.put("Funimation", R.drawable.funimation_background);
+        simulcastColorMap.put("HIDIVE", R.drawable.hidive_background);
     }
 
-    public BacklogItemAdapterListener(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
+    public BacklogItemAdapter(BacklogFragment parent, RealmResults<BacklogItem> backlogItems) {
         super(backlogItems, true);
         this.fragment = parent;
         ItemTouchHelper.Callback callback = new SwipeCallback(this, parent);

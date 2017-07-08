@@ -13,11 +13,12 @@
     <color name="funimation">#410099</color>
     <color name="netflix">#e50914</color>
     <color name="daisuki">#000000</color>
-    <color name="amazon_prime">#38b8e7</color>
+    <color name="amazon_prime">#00aeef</color>
     <color name="hulu">#66aa33</color>
     <color name="animenetwork">#9579fc</color>
     <color name="viewster">#f59719</color>
     <color name="viz">#d22048</color>
+    <color name="hidive">#00adef</color>
 
     <color name="bottom_nav_inactive">#8CFFFFFF</color>
 

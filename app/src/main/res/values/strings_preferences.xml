@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_account_signed_in_summary">Click to sign out of your MAL account.</string>
+    <string name="pref_account_signed_out_title">You are not signed in.</string>
+    <string name="pref_account_signed_out_summary">Click to sign in to your MAL account.</string>
+    <string name="pref_account_signed_in_title">You are signed in as \'</string>
+    <string name="pref_account_signin_key">signinkey</string>
+    <string name="pref_account_signout_key">signoutkey</string>
+
+    <string name="pref_category_notifications_title">Notifications</string>
+    <string name="pref_category_notifications_key">categorynotificationskey</string>
+
+    <string name="pref_category_other_title">Other</string>
+    <string name="pref_category_other_key">categoryotherkey</string>
+
+    <string name="pref_simulcast_key">airingorsimulcast</string>
+    <string name="pref_simulcast_title">Prefer simulcast times</string>
+    <string name="pref_simulcast_off_summary">You will be notified when an episode airs.</string>
+    <string name="pref_simulcast_summary">You will be notified when an episode is simulcast.</string>
+
+    <string name="pref_vibrate_key">vibratekey</string>
+    <string name="pref_vibrate_title">Vibrate</string>
+
+    <string name="pref_led_key">ledkey</string>
+    <string name="pref_led_title">LED color</string>
+
+    <string name="pref_ringtone_key">ringtonekey</string>
+    <string name="pref_ringtone_title">Sound</string>
+
+    <string name="pref_privacy_policy_title">Privacy Policy</string>
+    <string name="pref_privacy_policy_key">privacypolicykey</string>
+
+    <string name="pref_changelog_title">Changelog</string>
+    <string name="pref_changelog_key">changelogkey</string>
+
+    <string name="pref_category_misc_title">Miscellaneous</string>
+    <string name="pref_category_misc_key">categorymisckey</string>
+
+    <string name="pref_english_key">englishkey</string>
+    <string name="pref_english_title">Display English titles</string>
+
+    <string name="pref_24hour_key">24hour</string>
+    <string name="pref_24hour_title">Display time in 24-hour format</string>
+    <string name="pref_24hour_off_summary">Time will be displayed in 12-hour format (AM/PM).</string>
+    <string name="pref_24hour_summary">Time will be displayed in 24-hour format.</string>
+
+    <string name="pref_increment_key">incrementkey</string>
+    <string name="pref_increment_title">Prompt to increment episode count</string>
+    <string name="pref_increment_summary">Prompt will be displayed after swiping item in watching queue. (for MAL)</string>
+    <string name="pref_increment_off_summary">Prompt will not be displayed after swiping item in watching queue. (for MAL)</string>
+
+    <string name="pref_firebase_key">firebasekey</string>
+    <string name="pref_firebase_title">Report anonymous usage data</string>
+    <string name="pref_firebase_summary">Help improve Anime Buzz by automatically reporting anonymous usage data.</string>
+
+    <string name="pref_notification_key">notificationkey</string>
+    <string name="pref_notification_title">Enable episode notifications</string>
+
+    <string name="pref_changed_time_notification_key">changednotificationkey</string>
+    <string name="pref_changed_time_notification_title">Enable changed airing time notifications</string>
+
+    <string name="pref_category_account_title">Account</string>
+    <string name="pref_category_account_key">categoryaccountkey</string>
+</resources>
