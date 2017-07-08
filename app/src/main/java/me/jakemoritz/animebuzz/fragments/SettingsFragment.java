@@ -272,8 +272,8 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         String username = SharedPrefsUtils.getInstance().getMalUsernameFormatted();
         if (!username.isEmpty()) {
-            String summary = getString(R.string.pref_account_summary_on) + username + "'.";
-            signOutPreference.setSummary(summary);
+            String signedinTitle = getString(R.string.pref_account_summary_on) + username + "'.";
+            signOutPreference.setTitle(signedinTitle);
         }
 
         if (!App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAll().isEmpty()) {

@@ -60,7 +60,6 @@ public class UserListFragment extends SeriesFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getMainActivity().resetToolbar(this);
-
     }
 
     @Override

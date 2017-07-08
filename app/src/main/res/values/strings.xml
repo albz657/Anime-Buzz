@@ -77,8 +77,6 @@
 
     <string name="action_settings">Settings</string>
 
-    <string name="changelog_dialog_title">What\'s new?</string>
-
     <string name="action_sync">Sync</string>
     <!--File names-->
     <string name="file_avatar">malavatar.jpg</string>
@@ -182,13 +180,13 @@
 
     <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
     <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
-    <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your phone\'s storage in order to export your MAL list.</string>
-    <string name="permission_failed_read_external">You can grant Anime Buzz permission to read to your phone\'s storage to find custom ringtones.</string>
+    <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your device\'s storage in order to export your MAL list.</string>
+    <string name="permission_failed_read_external">You can grant Anime Buzz permission to read to your device\'s storage to find custom ringtones.</string>
     <string name="snackbar_export_success">Export successful.</string>
     <string name="dialog_no_external">No external storage was detected. Please try again when external storage is available.</string>
     <string name="export_limitation">Due to limitations of the MAL API, the following fields will not be included in your export file: <b>storage type, comments, and rewatch value</b>.</string>
     <string name="export_permission">External storage permissions are required to save your export file.</string>
-    <string name="export_path">Your export files will be located in <b>\'Downloads/Anime Buzz - MAL Exports\'</b> on your phone\'s external storage.</string>
+    <string name="export_path">Your export files will be located in <b>\'Downloads/Anime Buzz - MAL Exports\'</b> on your device\'s storage.</string>
     <string name="export_details">A few things to note about your MAL list export file:</string>
     <string name="export_error">There was an error backing up your MAL list.</string>
     <string name="export_not_logged_in">You are not logged in to your MyAnimeList account.</string>
@@ -220,4 +218,9 @@
     <string name="snackbar_episode_count_syncing">There was a problem updating your episode counts. Please try syncing your info again later.</string>
 
     <string name="snackbar_signed_out">You have signed out.</string>
+    <string name="series_list_item_image_content_desc">Anime image</string>
+    <string name="changelog_dialog_title">What\'s New?</string>
+    <string name="export_button_text">Export</string>
+    <string name="login_username_hint">Username</string>
+    <string name="login_password_hint">Password</string>
 </resources>

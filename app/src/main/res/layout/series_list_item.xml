@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:paddingEnd="4dp"
-             android:paddingStart="4dp">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingEnd="4dp"
+    android:paddingStart="4dp">
 
     <android.support.v7.widget.CardView xmlns:android.support.v7.cardview="http://schemas.android.com/apk/res-auto"
-                                        android:id="@+id/card"
-                                        android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginBottom="0dp"
-                                        android:layout_marginTop="0dp"
-                                        android.support.v7.cardview:cardBackgroundColor="@android:color/white"
-                                        android.support.v7.cardview:cardElevation="3dp"
-                                        android.support.v7.cardview:cardUseCompatPadding="true"
-                                        android.support.v7.cardview:contentPadding="0dp">
+        android:id="@+id/card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="0dp"
+        android:layout_marginTop="0dp"
+        android.support.v7.cardview:cardBackgroundColor="@android:color/white"
+        android.support.v7.cardview:cardElevation="3dp"
+        android.support.v7.cardview:cardUseCompatPadding="true"
+        android.support.v7.cardview:contentPadding="0dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -28,27 +28,31 @@
                 android:layout_width="64dp"
                 android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="4dp"/>
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp" />
 
             <FrameLayout
                 android:id="@+id/button_holder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
-
-                android:layout_marginLeft="6dp">
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp">
 
                 <ImageButton
                     android:id="@+id/add_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@color/colorAccent"
-                    android:src="@drawable/ic_action_add"/>
+                    android:src="@drawable/ic_action_add" />
 
                 <ImageButton
                     android:id="@+id/minus_button"
@@ -56,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:background="@color/colorAccent"
                     android:src="@drawable/ic_action_minus"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
 
             </FrameLayout>
 
@@ -64,8 +68,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
                 android:layout_marginTop="0dp"
+                android:layout_toEndOf="@id/series_poster"
                 android:layout_toLeftOf="@id/button_holder"
                 android:layout_toRightOf="@id/series_poster"
+                android:layout_toStartOf="@id/button_holder"
                 android:paddingBottom="4dp"
                 android:paddingTop="4dp">
 
@@ -77,26 +83,28 @@
                     android:maxLines="2"
                     android:text="Test title"
                     android:textColor="#D9000000"
-                    android:textSize="18dp"
-                    android:textStyle="bold"/>
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <RelativeLayout
+                    android:id="@+id/pill_holder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/series_title"
-                    android:id="@+id/pill_holder">
+                    android:layout_below="@id/series_title">
+
                     <TextView
                         android:id="@+id/series_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/simulcast_shape"
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:text="OVA"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/series_simulcast"
@@ -104,12 +112,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="5dp"
-                        android:background="@drawable/simulcast_shape"
+                        android:layout_toEndOf="@id/series_type"
                         android:layout_toRightOf="@id/series_type"
+                        android:background="@drawable/simulcast_shape"
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:text="Crunchyroll"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF" />
                 </RelativeLayout>
 
                 <LinearLayout
@@ -123,7 +132,8 @@
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_gravity="center"
-                        android:layout_marginRight="4dp"/>
+                        android:layout_marginEnd="4dp"
+                        android:layout_marginRight="4dp" />
 
                     <TextView
                         android:id="@+id/series_date"
@@ -131,7 +141,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textColor="#D9000000"/>
+                        android:textColor="#D9000000" />
                 </LinearLayout>
             </RelativeLayout>
         </RelativeLayout>

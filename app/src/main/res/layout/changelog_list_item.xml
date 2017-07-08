@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:orientation="horizontal">
 
             <TextView
@@ -31,13 +32,14 @@
                 android:textStyle="bold" />
 
             <LinearLayout
+                android:id="@+id/changelog_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/changelog_version"
                 android:layout_marginBottom="8dp"
                 android:layout_marginLeft="7dp"
-                android:orientation="vertical"
-                android:id="@+id/changelog_content">
+                android:layout_marginStart="7dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/changelog_new_title"
@@ -49,11 +51,15 @@
                 <TextView
                     android:id="@+id/changelog_new_text"
                     style="@style/Base.TextAppearance.AppCompat.Body1"
-                    android:paddingLeft="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="New"
-                    android:layout_marginRight="10dp"/>
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginRight="10dp"
+                    android:paddingEnd="0dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="0dp"
+                    android:paddingStart="10dp"
+                    android:text="New" />
 
                 <TextView
                     android:id="@+id/changelog_fixes_title"
@@ -68,8 +74,12 @@
                     style="@style/Base.TextAppearance.AppCompat.Body1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
+                    android:layout_marginEnd="10dp"
                     android:layout_marginRight="10dp"
+                    android:paddingEnd="0dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="0dp"
+                    android:paddingStart="10dp"
                     android:text="New" />
 
             </LinearLayout>
@@ -81,6 +91,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
                 android:layout_marginTop="3dp"
                 android:layout_toEndOf="@+id/changelog_version"
                 android:layout_toRightOf="@+id/changelog_version"

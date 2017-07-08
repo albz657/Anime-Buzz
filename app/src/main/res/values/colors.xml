@@ -22,4 +22,6 @@
     <color name="bottom_nav_inactive">#8CFFFFFF</color>
 
     <color name="season_spinner_active">#FFECEFF1</color>
+
+    <color name="hint_text_color">#80FFFFFF</color>
 </resources>

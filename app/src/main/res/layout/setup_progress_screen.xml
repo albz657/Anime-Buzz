@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:layout_above="@id/bottomBar"
     android:background="#FFFFFF"
-    android:visibility="gone"
+    android:visibility="visible"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 

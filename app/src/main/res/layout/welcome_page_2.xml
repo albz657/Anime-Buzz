@@ -1,158 +1,127 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/welcome_screen_two"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
 
+    <TextView
+        android:id="@+id/mal_sign_in"
+        style="@style/Base.TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="120dp"
+        android:gravity="center"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="@string/mal_sign_in_text"
+        android:textColor="#FFFFFF" />
+
+    <TextView
+        android:id="@+id/mal_sign_in_optional"
+        style="@style/Base.TextAppearance.AppCompat.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mal_sign_in"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="50dp"
+        android:text="@string/mal_sign_in_optional_text"
+        android:textColor="#80FFFFFF" />
+
     <RelativeLayout
+        android:id="@+id/mal_sign_in_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_below="@id/mal_sign_in_optional"
+        android:layout_marginBottom="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
 
-        <TextView
-            android:id="@+id/mal_sign_in"
-            style="@style/Base.TextAppearance.AppCompat.Headline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="120dp"
-            android:gravity="center"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/mal_sign_in_text"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/mal_sign_in_optional"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/mal_sign_in"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="30dp"
-            android:text="@string/mal_sign_in_optional_text"
-            android:textColor="#80FFFFFF" />
-
-        <RelativeLayout
-            android:id="@+id/mal_sign_in_container"
+        <EditText
+            android:id="@+id/edit_username"
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/mal_sign_in_optional"
-            android:layout_marginBottom="20dp"
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp">
+            android:layout_marginBottom="10dp"
+            android:hint="@string/login_username_hint"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="#FFFFFF"
+            android:textColorHint="@color/hint_text_color"
+            android:textSize="18sp"
+            android:theme="@style/Theme.App.Base" />
 
-            <RelativeLayout
-                android:id="@+id/username_container"
+        <RelativeLayout
+            android:id="@+id/password_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/edit_username">
+
+            <EditText
+                android:id="@+id/edit_password"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_password_hint"
+                android:inputType="textPassword"
+                android:maxLines="1"
+                android:paddingEnd="45dp"
+                android:paddingRight="45dp"
+                android:textColor="#FFFFFF"
+                android:textColorHint="@color/hint_text_color"
+                android:textSize="18sp"
+                android:theme="@style/Theme.App.Base" />
+
+            <ImageView
+                android:id="@+id/clear_password"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true">
-
-                <TextView
-                    android:id="@+id/label_username"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:text="@string/label_username_text"
-                    android:textColor="#FFFFFF" />
-
-                <EditText
-                    android:id="@+id/edit_username"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginBottom="10dp"
-                    android:layout_toRightOf="@id/label_username"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:theme="@style/Theme.App.Base" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:id="@+id/password_container"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/username_container">
-
-                <TextView
-                    android:id="@+id/label_password"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:text="@string/label_password_text"
-                    android:textColor="#FFFFFF" />
-
-                <EditText
-                    android:id="@+id/edit_password"
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@id/label_password"
-                    android:inputType="textPassword"
-                    android:singleLine="true"
-                    android:textColor="#FFFFFF"
-                    android:theme="@style/Theme.App.Base"
-                    android:paddingRight="45dp"/>
-
-                <ImageView
-                    android:id="@+id/clear_password"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/edit_password"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="10dp"
-                    android:src="@drawable/ic_close"
-                    android:tint="@android:color/white"
-                    android:visibility="gone"/>
-
-            </RelativeLayout>
-
-            <Button
-                android:id="@+id/sign_in_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/password_container"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
-                android:text="@string/sign_in" />
-
+                android:layout_alignEnd="@id/edit_password"
+                android:layout_alignRight="@id/edit_password"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:src="@drawable/ic_close"
+                android:tint="@android:color/white"
+                android:visibility="gone" />
 
         </RelativeLayout>
 
-        <ImageView
-            android:id="@+id/sign_in_checkmark"
+        <Button
+            android:id="@+id/sign_in_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/mal_sign_in_optional"
+            android:layout_below="@id/password_container"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="80dp"
-            android:src="@drawable/ic_check_circle"
+            android:layout_marginTop="20dp"
+            android:text="@string/sign_in" />
 
-            android:tint="@color/colorAccent"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/mal_or_no_later"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="60dp"
-            android:text="@string/sign_in_later"
-            android:textColor="#80FFFFFF" />
 
     </RelativeLayout>
-</FrameLayout>
+
+    <ImageView
+        android:id="@+id/sign_in_checkmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/mal_sign_in_optional"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/ic_check_circle"
+
+        android:tint="@color/colorAccent"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/mal_or_no_later"
+        style="@style/Base.TextAppearance.AppCompat.Body2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:text="@string/sign_in_later"
+        android:textColor="#80FFFFFF" />
+
+</RelativeLayout>

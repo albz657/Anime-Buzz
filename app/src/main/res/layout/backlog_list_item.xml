@@ -28,20 +28,26 @@
                 android:layout_width="64dp"
                 android:layout_height="80dp"
                 android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
                 android:layout_marginBottom="4dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="8dp"
-                android:layout_marginTop="4dp" />
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:contentDescription="@string/series_list_item_image_content_desc" />
 
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent"
+                android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
                 android:layout_marginTop="0dp"
+                android:layout_toEndOf="@id/series_poster"
                 android:layout_toRightOf="@id/series_poster"
                 android:paddingBottom="4dp"
-                android:paddingTop="4dp"
-                android:layout_marginRight="4dp">
+                android:paddingTop="4dp">
 
                 <TextView
                     android:id="@+id/series_title"
@@ -51,27 +57,28 @@
                     android:maxLines="2"
                     android:text="Test title"
                     android:textColor="#D9000000"
-                    android:textSize="18dp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <RelativeLayout
+                    android:id="@+id/pill_holder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/series_title"
-                    android:id="@+id/pill_holder">
+                    android:layout_below="@id/series_title">
 
                     <TextView
                         android:id="@+id/series_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="5dp"
                         android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
                         android:background="@drawable/simulcast_shape"
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:text="OVA"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF" />
 
                     <TextView
                         android:id="@+id/series_simulcast"
@@ -79,12 +86,13 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="5dp"
-                        android:background="@drawable/simulcast_shape"
+                        android:layout_toEndOf="@id/series_type"
                         android:layout_toRightOf="@id/series_type"
+                        android:background="@drawable/simulcast_shape"
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:text="Crunchyroll"
-                        android:textColor="#FFFFFF"/>
+                        android:textColor="#FFFFFF" />
                 </RelativeLayout>
 
                 <LinearLayout
@@ -99,6 +107,7 @@
                         android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:layout_marginRight="4dp"
+                        android:layout_marginEnd="4dp"
                         android:src="@drawable/ic_watch_later" />
 
                     <TextView

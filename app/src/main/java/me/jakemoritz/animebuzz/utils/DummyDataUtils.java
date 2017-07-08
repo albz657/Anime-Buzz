@@ -41,7 +41,7 @@ public class DummyDataUtils {
     }
 
     void createDummyAlarms(final int alarms) {
-        clearAlarms();
+//        clearAlarms();
 
         App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
@@ -70,15 +70,14 @@ public class DummyDataUtils {
                         lastNotificationTime.setTimeInMillis(series.getLastNotificationTime());
 
                         if (realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll().size() == 0
-                                && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))
-                                && series.getName().length() > 40) {
-/*                            BacklogItem backlogItem = realm.createObject(BacklogItem.class);
+                                && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))) {
+                            BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                             backlogItem.setSeries(series);
-                            backlogItem.setAlarmTime(System.currentTimeMillis());*/
+                            backlogItem.setAlarmTime(System.currentTimeMillis());
 
-                            Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
+/*                            Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
                             alarm.setAlarmTime(System.currentTimeMillis() + 000L);
-                            alarm.setSeries(series);
+                            alarm.setSeries(series);*/
                             blocked = false;
                         }
                     }

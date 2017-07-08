@@ -34,7 +34,7 @@ public class AlarmUtils {
 
     // Set all Alarms again, useful to reset Alarms on device boot
     public void setAllAlarms() {
-//        DummyDataUtils.getInstance().createDummyAlarms(1);
+//        DummyDataUtils.getInstance().createDummyAlarms(15);
 
         DailyUpdateUtils.getInstance().setNextAlarm(true);
         Realm realm = Realm.getDefaultInstance();
