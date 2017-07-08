@@ -72,7 +72,7 @@ public class SignInDialogFragment extends DialogFragment implements MalCredentia
                         attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                     } else {
                         if (dialogView != null) {
-                            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
+                            Snackbar failSnackbar = Snackbar.make(dialogView, getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG);
                             View view = failSnackbar.getView();
                             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
                             params.gravity = Gravity.TOP;
@@ -127,7 +127,7 @@ public class SignInDialogFragment extends DialogFragment implements MalCredentia
                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                 } else {
                     if (view != null){
-                        Snackbar failSnackbar = Snackbar.make(view, getString(R.string.no_network_available), Snackbar.LENGTH_LONG);
+                        Snackbar failSnackbar = Snackbar.make(view, getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG);
                         View view1 = failSnackbar.getView();
                         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view1.getLayoutParams();
                         params.gravity = Gravity.TOP;

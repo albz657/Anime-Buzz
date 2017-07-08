@@ -245,7 +245,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 updating = true;
             } else {
                 stopRefreshing();
-                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.no_network_available);
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
             }
         }
     }
@@ -399,7 +399,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         } else {
             adding = false;
             if (getView() != null)
-                Snackbar.make(getView(), App.getInstance().getString(R.string.add_failed), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_add_series_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -456,7 +456,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             removeSeries(MALID);
         } else {
             if (getView() != null)
-                Snackbar.make(getView(), App.getInstance().getString(R.string.remove_failed), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_remove_series_failed), Snackbar.LENGTH_LONG).show();
         }
     }
 
@@ -475,7 +475,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             } else {
                 adding = false;
                 if (getView() != null)
-                    Snackbar.make(getView(), App.getInstance().getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG).show();
             }
         } else {
             if (adding) {
@@ -528,7 +528,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                     kitsuApiClient.processSeriesList(seasonKey);
                 } else {
                     if (getView() != null) {
-                        Snackbar.make(getView(), getString(R.string.no_network_available), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(getView(), getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG).show();
                     }
                 }
             }
@@ -539,7 +539,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
             if (!App.getInstance().isInitializing()) {
                 if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.senpai_failed), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(getView(), getString(R.string.snackbar_senpai_failed), Snackbar.LENGTH_LONG).show();
                 }
             } else {
                 failedInitialization();

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="shared_prefs_logged_in">isuserloggedin</string>
+    <string name="shared_prefs_completed_setup">hasusercompletedsetup</string>
+    <string name="shared_prefs_latest_season">latestseason</string>
+    <string name="shared_prefs_latest_season_key">latestseasonkey</string>
+    <string name="shared_prefs_failed">failedinit</string>
+    <string name="shared_prefs_read_external_rationale_shown">readexternalrationaleshown</string>
+    <string name="shared_prefs_sorting">usersortingpref</string>
+    <string name="shared_prefs_last_update_time">lastupdatetime</string>
+    <string name="shared_prefs_credentials_username">credentialsusername</string>
+    <string name="shared_prefs_credentials_password">credentialspassword</string>
+    <string name="shared_presfs_mal_username_formatted">malusernameformatted</string>
+    <string name="shared_prefs_mal_user_id">maluserid</string>
+</resources>

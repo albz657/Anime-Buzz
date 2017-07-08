@@ -110,7 +110,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
                     SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(SettingsFragment.this, mainActivity);
                     signInDialogFragment.show(mainActivity.getFragmentManager(), SignOutDialogFragment.class.getSimpleName());
                 } else {
-                    SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.no_network_available);
+                    SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
                 }
 
                 return true;
@@ -219,7 +219,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         SharedPrefsUtils.getInstance().setUsername("");
         SharedPrefsUtils.getInstance().setPassword("");
         SharedPrefsUtils.getInstance().setMalUsernameFormatted("");
-        SharedPrefsUtils.getInstance().setMalId("");
+        SharedPrefsUtils.getInstance().setMalUserId("");
 
         File avatarFile = new File(mainActivity.getFilesDir(), getString(R.string.file_avatar));
         if (avatarFile.exists()) {

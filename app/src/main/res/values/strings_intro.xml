@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="swipe_left_setup">Swipe left to begin setup</string>
+
+    <!--Welcome Page 1 -->
+    <string name="welcome_text">Welcome to Anime Buzz</string>
+    <string name="explanation_text">Stay on top of the anime you\'re watching with:</string>
+    <string name="benefit_notification_text">Notifications when new episodes air</string>
+    <string name="benefit_backlog_text">A backlog of episodes you haven\'t watched yet</string>
+    <string name="benefit_browse_text">A season browser to discover and follow new series</string>
+
+    <!--Welcome Page 2-->
+    <string name="mal_sign_in_text">Would you like to sign in to your MyAnimeList account?</string>
+    <string name="mal_sign_in_optional_text">(optional)</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_later">(You can sign in later)</string>
+    <string name="trying_to_verify">Verifying your credentials, please wait before trying again.</string>
+    <string name="verification_failed">Your username or password is incorrect. Please try again.</string>
+    <string name="verification_successful">Sign in successful!</string>
+
+    <!--Welcome Page 3-->
+    <string name="setup_settings_text">A couple of settings&#8230;</string>
+    <string name="start_button_text">Start</string>
+    <string name="change_later_text">(You can change these later)</string>
+</resources>

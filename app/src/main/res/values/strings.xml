@@ -1,73 +1,38 @@
 <resources>
-    <!-- ===================== General ===================== -->
-
+    <!-- General -->
     <string name="app_name">Anime Buzz</string>
-    <string name="label_activity_setup">SetupActivity</string>
+    <string name="bullet">&#8226;</string>
+    <string name="simulcast_anime_network">Anime Network</string>
+    <string name="updated_to_v1.3.5">upgradedto135</string>
+    <string name="last_app_version">lastappversion</string>
+    <string name="airing_status_airing">Airing</string>
+    <string name="airing_status_aired">Finished airing</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!-- Snackbar strings -->
+    <string name="snackbar_no_network_available">No network available.</string>
+    <string name="snackbar_remove_series_failed">There was a problem removing this anime from your MAL list. Please try again later.</string>
+    <string name="snackbar_add_series_failed">There was a problem adding this anime to your MAL list. Please try again later.</string>
+    <string name="snackbar_sync_mal_user_list_failed">There was a problem getting your MAL list. Please try again later.</string>
+    <string name="snackbar_mal_increment_failed">There was a problem incrementing the episode count.</string>
+    <string name="snackbar_senpai_failed">There was a problem updating anime data.</string>
+    <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
+    <string name="snackbar_export_success">Export successful.</string>
+    <string name="snackbar_episode_count_syncing">There was a problem updating your episode counts. Please try syncing your info again later.</string>
+    <string name="snackbar_signed_out">You have signed out.</string>
+    <string name="snackbar_getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
 
-    <string name="dialog_close">Close</string>
-
-    <string name="last_update_time">lastupdatetime</string>
-
-    <string name="initial_loading_myshows">Getting your currently watching shows from MAL&#8230;</string>
-    <string name="initial_loading_season">Downloading the current season info&#8230;</string>
-
-    <string name="mal_username_formatted">malusernameformatted</string>
-    <string name="mal_userid">maluserid</string>
-
-    <string name="no_network_available">No network available.</string>
-
-    <string name="remove_failed">There was a problem removing this anime from your MAL list. Please try again later.</string>
-    <string name="add_failed">There was a problem adding this anime to your MAL list. Please try again later.</string>
-    <string name="user_list_failed">There was a problem getting your MAL list. Please try again later.</string>
-    <string name="increment_failed">There was a problem incrementing the episode count.</string>
-    <string name="senpai_failed">There was a problem updating anime data.</string>
-
+    <!-- General view strings -->
     <string name="empty_text_myshows">You aren\'t following any shows. Why not check the season browser?</string>
     <string name="empty_text_backlog">You\'re all caught up!</string>
     <string name="empty_text_season">No anime was found.</string>
 
-    <string name="simulcast_anime_network">Anime Network</string>
-    <string name="season_not_found">Sorry, that season hasn\'t been loaded yet!</string>
-    <string name="activity_running">activityrunning</string>
+    <string name="initial_loading_myshows">Getting your currently watching shows from MAL&#8230;</string>
+    <string name="initial_loading_season">Downloading the current season info&#8230;</string>
 
-    <string name="upgraded_to_realm">upgradedtorealm</string>
+    <string name="login_username_hint">Username</string>
+    <string name="login_password_hint">Password</string>
 
-    <string name="updated_to_v1.3.5">upgradedto135</string>
-
-    <!-- ===================== Welcome strings ===================== -->
-
-    <!--Welcome Page 1 -->
-    <string name="welcome_text">Welcome to Anime Buzz</string>
-    <string name="explanation_text">Stay on top of the anime you\'re watching with:</string>
-    <string name="bullet">&#8226;</string>
-    <string name="benefit_notification_text">Notifications when new episodes air</string>
-    <string name="benefit_backlog_text">A backlog of episodes you haven\'t watched yet</string>
-    <string name="benefit_browse_text">A season browser to discover and follow new series</string>
-
-    <string name="swipe_left_setup">Swipe left to begin setup</string>
-
-    <!--Welcome Page 2-->
-    <string name="mal_sign_in_text">Would you like to sign in to your MyAnimeList account?</string>
-    <string name="mal_sign_in_optional_text">(optional)</string>
-    <string name="label_username_text">Username:</string>
-    <string name="label_password_text">Password:</string>
-    <string name="sign_in">Sign in</string>
-    <string name="sign_in_later">(You can sign in later)</string>
-    <string name="trying_to_verify">Verifying your credentials, please wait before trying again.</string>
-    <string name="already_sign_in">You\'ve already signed in.</string>
-    <string name="verification_failed">Your username or password is incorrect. Please try again.</string>
-    <string name="verification_successful">Sign in successful!</string>
-
-    <!--Welcome Page 3-->
-    <string name="setup_settings_text">A couple of settings&#8230;</string>
-    <string name="start_button_text">Start</string>
-    <string name="change_later_text">(You can change these later)</string>
-
-    <!-- ===================== Fragment names ===================== -->
-
+    <!--Fragment names -->
     <string name="fragment_myshows">Watching</string>
     <string name="fragment_seasons">Browser</string>
     <string name="fragment_watching_queue">Backlog</string>
@@ -75,92 +40,26 @@
     <string name="fragment_about">About</string>
     <string name="fragment_export">Export MAL List</string>
 
-    <string name="action_settings">Settings</string>
-
-    <string name="action_sync">Sync</string>
     <!--File names-->
     <string name="file_avatar">malavatar.jpg</string>
 
-    <!--Notifications-->
-    <string name="notification_list_update">Downloading off-season anime details&#8230;</string>
-
-    <!--SharedPreferences-->
-    <string name="shared_prefs_logged_in">isuserloggedin</string>
-    <string name="shared_prefs_completed_setup">hasusercompletedsetup</string>
-    <string name="shared_prefs_latest_season">latestseason</string>
-    <string name="shared_prefs_previous_season">previousseason</string>
-    <string name="shared_prefs_latest_season_key">latestseasonkey</string>
-    <string name="shared_prefs_failed">failedinit</string>
-    <string name="shared_prefs_read_external_rationale_shown">readexternalrationaleshown</string>
-
-    <string name="credentials_username">credentialsusername</string>
-    <string name="credentials_password">credentialspassword</string>
-    <string name="shared_prefs_sorting">usersortingpref</string>
-
-    <!--Preferences-->
-
-
-    <!-- About -->
-    <string name="about_senpai"><b>Senpai</b> provides data about anime airing times and other crucial information.</string>
-    <string name="about_senpai_url">http://www.senpai.moe</string>
-
-    <string name="about_mal"><b>MyAnimeList</b> allows users to sign in with their MAL accounts to access and update the anime they\'re currently watching.</string>
-    <string name="about_mal_url">http://myanimelist.net</string>
-
-    <string name="about_hb"><b>Kitsu</b> provides the images and additional anime details.</string>
-    <string name="about_hb_url">https://kitsu.io</string>
-
-    <string name="about_ann"><b>Anime News Network</b> provides the anime images and English titles used in this app.</string>
-    <string name="about_ann_url">http://www.animenewsnetwork.com</string>
-
-    <string name="snackbar_export_fail">There was a problem downloading your MAL list. Please try again later.</string>
-    <string name="getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
-    <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your device\'s storage in order to export your MAL list.</string>
-    <string name="permission_failed_read_external">You can grant Anime Buzz permission to read to your device\'s storage to find custom ringtones.</string>
-    <string name="snackbar_export_success">Export successful.</string>
-    <string name="dialog_no_external">No external storage was detected. Please try again when external storage is available.</string>
+    <!-- ExportFragment -->
     <string name="export_limitation">Due to limitations of the MAL API, the following fields will not be included in your export file: <b>storage type, comments, and rewatch value</b>.</string>
-    <string name="export_permission">External storage permissions are required to save your export file.</string>
     <string name="export_path">Your export files will be located in <b>\'Downloads/Anime Buzz - MAL Exports\'</b> on your device\'s storage.</string>
     <string name="export_details">A few things to note about your MAL list export file:</string>
     <string name="export_error">There was an error backing up your MAL list.</string>
     <string name="export_not_logged_in">You are not logged in to your MyAnimeList account.</string>
-
-    <string name="last_app_version">lastappversion</string>
-
-    <string name="update_episode_time">Updating episode release time</string>
-    <string name="no_airing_time">No airing times available</string>
-
-    <string name="airing_status_airing">Airing</string>
-    <string name="airing_status_aired">Finished airing</string>
-    <string name="airing_status_not_yet_aired">Not yet aired</string>
-
-    <string name="failed_init_dialog_message">There was a problem getting anime data and airing times. This data must be downloaded before continuing, would you like to retry now or later?</string>
-    <string name="failed_init_dialog_title">Failed getting initial data</string>
-
-    <string name="import_dialog_message">Signed in! Do you want to add the anime currently in your list to your MAL list?</string>
-
-    <string name="increment_dialog_message">Do you want to increment the episode count on MAL?</string>
-
-    <string name="remove_series_dialog_message_logged_in">Are you sure you want to remove this from your list? (including your MAL list)</string>
-    <string name="remove_series_dialog_message">Are you sure you want to remove this from your list?</string>
-
-    <string name="sign_out_dialog_message">Are you sure you want to sign out from your MAL account?</string>
-
-    <string name="verify_failed_dialog_message">We failed to verifyCredentials your MAL credentials. If your credentials were changed, you\'ll need to sign in again in order to access your MAL account.</string>
-    <string name="verify_failed_dialog_title">Verification failed</string>
-
-    <string name="snackbar_episode_count_syncing">There was a problem updating your episode counts. Please try syncing your info again later.</string>
-
-    <string name="snackbar_signed_out">You have signed out.</string>
-    <string name="series_list_item_image_content_desc">Anime image</string>
-    <string name="changelog_dialog_title">What\'s New?</string>
     <string name="export_button_text">Export</string>
-    <string name="login_username_hint">Username</string>
-    <string name="login_password_hint">Password</string>
+
+    <!-- Permissions -->
+    <string name="permission_failed_write_external">You must grant Anime Buzz permission to write to your device\'s storage in order to export your MAL list.</string>
+    <string name="permission_failed_read_external">You can grant Anime Buzz permission to read to your device\'s storage to find custom ringtones.</string>
+    <string name="export_permission">External storage permissions are required to save your export file.</string>
+
+    <!-- Menu actions -->
     <string name="action_sort">Sort</string>
     <string name="action_sort_name">Sort by Name</string>
     <string name="action_sort_date">Sort by Date</string>
-
     <string name="action_export">MAL Export</string>
+    <string name="action_settings">Settings</string>
 </resources>

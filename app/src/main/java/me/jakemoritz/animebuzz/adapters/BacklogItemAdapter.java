@@ -87,13 +87,15 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             GlideApp.with(App.getInstance()).load(bitmapFile).placeholder(R.drawable.placeholder).centerCrop().into(holder.mPoster);
         }
 
-        // Set simulcsat display
+        // Set simulcast display
         if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
-            if (!holder.backlogItem.getSeries().getSimulcastProvider().equals("false")) {
-                holder.mSimulcast.setText(holder.backlogItem.getSeries().getSimulcastProvider());
+            String simulcastProvider = holder.backlogItem.getSeries().getSimulcastProvider();
+            if (simulcastProvider.equals("The Anime Network")){
+                simulcastProvider = App.getInstance().getString(R.string.simulcast_anime_network);
             }
+            holder.mSimulcast.setText(simulcastProvider);
 
             holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.backlogItem.getSeries().getSimulcastProvider()));
         } else {
@@ -196,7 +198,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
                 // Disable swipe if episode count is still syncing
                 if (!episodeCountSnackbarVisible){
                     episodeCountSnackbarVisible = true;
-                    Snackbar snackbar = SnackbarUtils.getInstance().makeSnackbar(backlogFragment.getView(), R.string.getting_episode_count);
+                    Snackbar snackbar = SnackbarUtils.getInstance().makeSnackbar(backlogFragment.getView(), R.string.snackbar_getting_episode_count);
                     snackbar.addCallback(new Snackbar.Callback(){
 
                         @Override

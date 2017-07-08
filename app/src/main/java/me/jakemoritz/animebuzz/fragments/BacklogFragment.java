@@ -118,7 +118,7 @@ public class BacklogFragment extends Fragment implements EpisodeCountIncremented
                 countsCurrent = false;
             } else {
                 stopUpdating();
-                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.no_network_available);
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
             }
         } else {
             stopUpdating();
@@ -175,7 +175,7 @@ public class BacklogFragment extends Fragment implements EpisodeCountIncremented
     @Override
     public void episodeCountIncremented(boolean incremented) {
         if (!incremented) {
-            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.increment_failed);
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_mal_increment_failed);
         }
     }
 

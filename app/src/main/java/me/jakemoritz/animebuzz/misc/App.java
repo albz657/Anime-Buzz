@@ -10,7 +10,6 @@ import android.os.Environment;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.Iterator;
 import java.util.List;
 
 import io.realm.DynamicRealm;
@@ -56,7 +55,7 @@ public class App extends Application {
         Realm.init(this);
 
         // Check if this process is the normal app process (not Firebase process)
-        if (getAppName(android.os.Process.myPid()).equals(getPackageName())) {
+        if (getPackageFromProcess(android.os.Process.myPid()).equals(getPackageName())) {
             RealmMigration migration = new RealmMigration() {
                 @Override
                 public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
@@ -103,25 +102,17 @@ public class App extends Application {
                 .build());*/
     }
 
-    private String getAppName(int pID) {
+    private String getPackageFromProcess(int pID) {
         String processName = "";
-        ActivityManager am = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
-        List l = am.getRunningAppProcesses();
-        Iterator i = l.iterator();
-        PackageManager pm = this.getPackageManager();
-        while (i.hasNext()) {
-            ActivityManager.RunningAppProcessInfo info = (ActivityManager.RunningAppProcessInfo) (i.next());
-            try {
-                if (info.pid == pID) {
-                    CharSequence c = pm.getApplicationLabel(pm.getApplicationInfo(info.processName, PackageManager.GET_META_DATA));
-                    //Log.d("Process", "Id: "+ info.pid +" ProcessName: "+ info.processName +"  Label: "+c.toString());
-                    //processName = c.toString();
-                    processName = info.processName;
-                }
-            } catch (Exception e) {
-                //Log.d("Process", "Error>> :"+ e.toString());
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> runningAppProcesses = activityManager.getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo processInfo : runningAppProcesses){
+            if (processInfo.pid == pID) {
+                processName = processInfo.processName;
+                break;
             }
         }
+
         return processName;
     }
 

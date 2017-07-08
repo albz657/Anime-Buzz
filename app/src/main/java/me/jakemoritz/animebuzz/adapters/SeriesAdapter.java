@@ -165,47 +165,51 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
         holder.mDateImage.setImageDrawable(dateImage);
 
         // Set airing status and date text
-        if (!holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired))) {
-            if (holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_airing))) {
-                // Anime currently airing
-                holder.mDate.setText(holder.series.getNextEpisodeTimeFormatted());
-            } else {
-                // Anime not yet aired
-                String dateText = holder.series.getAiringStatus();
-                if (holder.series.isSingle() && !holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
-                    dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
-                } else if (!holder.series.getStartedAiringDate().isEmpty()) {
-                    dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
-                }
-
-                holder.mDate.setText(dateText);
+        String dateText;
+        if (holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_airing))) {
+            // Anime currently airing
+            dateText = holder.series.getNextEpisodeTimeFormatted();
+        } else {
+            // Anime not yet aired
+            dateText = holder.series.getAiringStatus();
+            if (holder.series.isSingle() && !holder.series.getNextEpisodeTimeFormatted().isEmpty()) {
+                dateText = "Will air on " + holder.series.getNextEpisodeTimeFormatted();
+            } else if (!holder.series.getStartedAiringDate().isEmpty()) {
+                dateText = "Will begin airing on " + holder.series.getStartedAiringDate();
             }
+        }
+        holder.mDate.setText(dateText);
 
-            // Handle add/remove button visibility
-            if (holder.series.isSingle()) {
-                holder.mAddButton.setVisibility(View.GONE);
-                holder.mMinusButton.setVisibility(View.GONE);
-            } else if (holder.series.isInUserList()) {
-                // Anime is in user list, show remove button
-                holder.mAddButton.setVisibility(View.GONE);
-                holder.mMinusButton.setVisibility(View.VISIBLE);
+        // Handle add/remove button visibility
+        if (holder.series.isSingle()) {
+            holder.mAddButton.setVisibility(View.GONE);
+            holder.mMinusButton.setVisibility(View.GONE);
+        } else if (holder.series.isInUserList()) {
+            // Anime is in user list, show remove button
+            holder.mAddButton.setVisibility(View.GONE);
+            holder.mMinusButton.setVisibility(View.VISIBLE);
 
-                holder.mAddButton.setClickable(false);
-                holder.mMinusButton.setClickable(true);
-            } else {
-                // Anime is not in user list, show add button
-                holder.mAddButton.setVisibility(View.VISIBLE);
-                holder.mMinusButton.setVisibility(View.GONE);
+            holder.mAddButton.setClickable(false);
+            holder.mMinusButton.setClickable(true);
+        } else {
+            // Anime is not in user list, show add button
+            holder.mAddButton.setVisibility(View.VISIBLE);
+            holder.mMinusButton.setVisibility(View.GONE);
 
-                holder.mAddButton.setClickable(true);
-                holder.mMinusButton.setClickable(false);
-            }
+            holder.mAddButton.setClickable(true);
+            holder.mMinusButton.setClickable(false);
         }
 
         // Set simulcast display
         if (SharedPrefsUtils.getInstance().prefersSimulcast() && !holder.series.getSimulcastProvider().equals("false")) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
-            holder.mSimulcast.setText(holder.series.getSimulcastProvider());
+
+            String simulcastProvider = holder.series.getSimulcastProvider();
+            if (simulcastProvider.equals("The Anime Network")) {
+                simulcastProvider = App.getInstance().getString(R.string.simulcast_anime_network);
+            }
+            holder.mSimulcast.setText(simulcastProvider);
+
             holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.series.getSimulcastProvider()));
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);

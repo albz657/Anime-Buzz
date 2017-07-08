@@ -18,5 +18,7 @@
         android:layout_height="match_parent"
         android:layout_above="@id/bottomBar" />
 
-    <include layout="@layout/setup_progress_screen"/>
+    <include
+        layout="@layout/setup_progress_screen"
+        android:visibility="gone" />
 </RelativeLayout>

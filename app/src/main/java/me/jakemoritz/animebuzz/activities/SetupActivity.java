@@ -67,7 +67,7 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
                                 if (App.getInstance().isNetworkAvailable()) {
                                     attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                                 } else {
-                                    SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.no_network_available);
+                                    SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.snackbar_no_network_available);
                                 }
                             }
                             return false;
@@ -114,7 +114,7 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
                             if (App.getInstance().isNetworkAvailable()) {
                                 attemptVerification(usernameField.getText().toString().trim(), passwordField.getText().toString());
                             } else {
-                                SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.no_network_available);
+                                SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.snackbar_no_network_available);
                             }
                         }
                     });
@@ -136,7 +136,7 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
                                 startActivity(intent);
                                 finish();
                             } else {
-                                SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.no_network_available);
+                                SnackbarUtils.getInstance().makeSnackbar(findViewById(R.id.coordinator), R.string.snackbar_no_network_available);
                             }
                         }
                     });

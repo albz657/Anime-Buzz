@@ -155,7 +155,7 @@ public class MalApiClient {
     }
 
     private void getUserAvatar() {
-        String userId = SharedPrefsUtils.getInstance().getMalId();
+        String userId = SharedPrefsUtils.getInstance().getMalUserId();
         if (!userId.isEmpty()) {
             final String BASE_URL = "myanimelist.cdn-dena.com";
             final String[] URL_PATH = new String[]{"images", "userimages"};
@@ -366,7 +366,7 @@ public class MalApiClient {
                         SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
                     }
                     if (response.body().getUserID() != null) {
-                        SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
+                        SharedPrefsUtils.getInstance().setMalUserId(response.body().getUserID());
                     }
                 } else {
                     verifyListener.malCredentialsVerified(false);
@@ -398,7 +398,7 @@ public class MalApiClient {
                         SharedPrefsUtils.getInstance().setMalUsernameFormatted(response.body().getUsername());
                     }
                     if (response.body().getUserID() != null) {
-                        SharedPrefsUtils.getInstance().setMalId(response.body().getUserID());
+                        SharedPrefsUtils.getInstance().setMalUserId(response.body().getUserID());
                     }
                 } else {
                     verifyListener.malCredentialsVerified(false, MALID);

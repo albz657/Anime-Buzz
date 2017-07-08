@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="me.jakemoritz.animebuzz">
+    package="me.jakemoritz.animebuzz">
 
     <!-- Normal permissions -->
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!-- Dangerous permissions -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:name=".misc.App"
@@ -22,44 +22,51 @@
 
         <activity
             android:name=".activities.MainActivity"
-            android:label="@string/app_name"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop" />
+
         <activity
             android:name=".activities.SetupActivity"
-            android:label="@string/label_activity_setup"
-            android:launchMode="singleTop">
-        </activity>
+            android:launchMode="singleTop" />
+
         <activity
             android:name=".activities.HelperActivity"
-            android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:exported="true" android:name=".receivers.EpisodeNotificationReceiver">
+
+        <receiver
+            android:name=".receivers.EpisodeNotificationReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:exported="false" android:name=".utils.DailyUpdateUtils$DailyUpdateReceiver">
+
+        <receiver
+            android:name=".utils.DailyUpdateUtils$DailyUpdateReceiver"
+            android:exported="false">
             <intent-filter>
-                <action android:name="GENERATE_TIME"/>
+                <action android:name="GENERATE_TIME" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".widgets.BacklogBadgeWidgetProvider"
+
+        <receiver
+            android:name=".widgets.BacklogBadgeWidgetProvider"
             android:label="Backlog count">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
-                       android:resource="@xml/backlog_badge_widget_info" />
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/backlog_badge_widget_info" />
         </receiver>
-        <service android:name=".services.AnimeImageDownloadIntentService"/>
-        <service android:name=".services.KitsuDataIntentService"/>
-        <service android:name=".services.EpisodeNotificationButtonIntentService"/>
-        <service android:name=".services.EpisodeTimeIntentService"/>
+
+        <service android:name=".services.AnimeImageDownloadIntentService" />
+        <service android:name=".services.KitsuDataIntentService" />
+        <service android:name=".services.EpisodeNotificationButtonIntentService" />
+        <service android:name=".services.EpisodeTimeIntentService" />
     </application>
 </manifest>
