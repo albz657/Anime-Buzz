@@ -20,6 +20,7 @@
     <string name="snackbar_episode_count_syncing">There was a problem updating your episode counts. Please try syncing your info again later.</string>
     <string name="snackbar_signed_out">You have signed out.</string>
     <string name="snackbar_getting_episode_count">Getting your episode counts, please try again in a few seconds.</string>
+    <string name="snackbar_mal_credentials_verified">Your MAL credentials have been verified.</string>
 
     <!-- General view strings -->
     <string name="empty_text_myshows">You aren\'t following any shows. Why not check the season browser?</string>

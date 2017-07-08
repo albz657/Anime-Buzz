@@ -398,8 +398,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             addSeries(MALID);
         } else {
             adding = false;
-            if (getView() != null)
-                Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_add_series_failed), Snackbar.LENGTH_LONG).show();
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_add_series_failed);
         }
     }
 
@@ -424,15 +423,14 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             FirebaseCrash.report(e);
 
             adding = false;
-            if (getView() != null)
-                Snackbar.make(getView(), "There was a problem adding or removing this show from your list.", Snackbar.LENGTH_LONG).show();
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_add_series_failed);
         }
 
         AlarmUtils.getInstance().makeAlarm(series);
 
-        if (getView() != null)
+        if (getView() != null) {
             Snackbar.make(getView(), "Added '" + series.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
-
+        }
     }
 
     private void removeSeries(String MALID) {
@@ -446,8 +444,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         AlarmUtils.getInstance().removeAlarm(series);
 
-        if (getView() != null)
+        if (getView() != null){
             Snackbar.make(getView(), "Removed '" + series.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     @Override
@@ -455,8 +454,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         if (MALID != null) {
             removeSeries(MALID);
         } else {
-            if (getView() != null)
-                Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_remove_series_failed), Snackbar.LENGTH_LONG).show();
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_remove_series_failed);
         }
     }
 
@@ -474,8 +472,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 malApiClient.verifyCredentials(username, password);
             } else {
                 adding = false;
-                if (getView() != null)
-                    Snackbar.make(getView(), App.getInstance().getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG).show();
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
             }
         } else {
             if (adding) {
@@ -527,9 +524,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                     }
                     kitsuApiClient.processSeriesList(seasonKey);
                 } else {
-                    if (getView() != null) {
-                        Snackbar.make(getView(), getString(R.string.snackbar_no_network_available), Snackbar.LENGTH_LONG).show();
-                    }
+                    SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
                 }
             }
         } else {
@@ -538,9 +533,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
             }
 
             if (!App.getInstance().isInitializing()) {
-                if (getView() != null) {
-                    Snackbar.make(getView(), getString(R.string.snackbar_senpai_failed), Snackbar.LENGTH_LONG).show();
-                }
+                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_senpai_failed);
             } else {
                 failedInitialization();
             }
@@ -584,8 +577,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void verified(boolean verified) {
-        if (verified && getView() != null) {
-            Snackbar.make(getView(), "Your MAL credentials have been verified.", Snackbar.LENGTH_LONG).show();
+        if (verified) {
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_mal_credentials_verified);
         }
     }
 
