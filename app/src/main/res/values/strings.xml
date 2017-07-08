@@ -223,4 +223,9 @@
     <string name="export_button_text">Export</string>
     <string name="login_username_hint">Username</string>
     <string name="login_password_hint">Password</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_sort_name">Sort by Name</string>
+    <string name="action_sort_date">Sort by Date</string>
+
+    <string name="action_export">MAL Export</string>
 </resources>

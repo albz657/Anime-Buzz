@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_export"
-        android:title="MAL Export"
+        android:title="@string/action_export"
         android:orderInCategory="98"
         app:showAsAction="never"/>
     <item
