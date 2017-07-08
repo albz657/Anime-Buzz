@@ -4,7 +4,6 @@
     android:minHeight="40dp"
     android:initialLayout="@layout/backlog_badge_widget"
     android:resizeMode="none"
-    android:widgetCategory="home_screen"
     android:previewImage="@drawable/anime_buzz_ori_portrait">
 
 </appwidget-provider>
