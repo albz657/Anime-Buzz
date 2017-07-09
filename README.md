@@ -40,7 +40,7 @@ An Android app for anime fans that like to stay on top of currently airing shows
 - [Android Studio](https://developer.android.com/studio/index.html) - IDE
 
 ### APIs
-- [Senpai](http://www.senpai.moe) - Anime episode release times and base series metadata
+- [Senpai](http://www.senpai.moe/export.php) - Anime episode release times and base series metadata
 - [Kitsu](http://docs.kitsu.apiary.io/#) - Anime airing dates and images
 - [MyAnimeList](https://myanimelist.net/modules.php?go=api) - MyAnimeList account integration
 
