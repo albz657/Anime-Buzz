@@ -406,7 +406,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (fragment instanceof ExportFragment) {
                     toolbarTitle = getString(R.string.fragment_export);
                 } else if (fragment instanceof AttributionFragment) {
-                    toolbarTitle = getString(R.string.app_name);
+                    toolbarTitle = getString(R.string.fragment_attribution);
                 } else {
                     toolbarTitle = getString(R.string.app_name);
                     bottomBar.setVisibility(View.VISIBLE);

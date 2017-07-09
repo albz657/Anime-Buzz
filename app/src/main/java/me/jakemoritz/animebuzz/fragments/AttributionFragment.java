@@ -43,10 +43,7 @@ public class AttributionFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-/*        mainActivity.enableUpNavigation(true);
-        if (mainActivity.getSupportActionBar() != null){
-            mainActivity.getSupportActionBar().setTitle(getString(R.string.about_fragment_title));
-        }*/
+        mainActivity.resetToolbar(this);
     }
 
     @Override
