@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="attribution_fragment_heading">This app was built with the help of:</string>
+
+    <string name="apache_2.0">Apache 2.0</string>
+    <string name="license_local">LICENSE (LOCAL)</string>
+    <string name="license_web">LICENSE (WEB)</string>
+    <string name="website">WEBSITE</string>
+
     <string name="about_senpai"><b>Senpai</b> provides data about anime airing times and other crucial information.</string>
     <string name="about_senpai_url">http://www.senpai.moe</string>
 
@@ -8,4 +15,10 @@
 
     <string name="about_hb"><b>Kitsu</b> provides the images and additional anime details.</string>
     <string name="about_hb_url">https://kitsu.io</string>
+
+    <string-array name="civ_attrib">
+        <item>CircleImageView</item>
+        <item>https://github.com/hdodenhof/CircleImageView</item>
+        <item>Apache 2.0</item>
+    </string-array>
 </resources>

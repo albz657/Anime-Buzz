@@ -61,4 +61,7 @@
 
     <string name="pref_category_account_title">Account</string>
     <string name="pref_category_account_key">categoryaccountkey</string>
+
+    <string name="pref_attribution_title">Attribution</string>
+    <string name="pref_attribution_key">categoryattributionkey</string>
 </resources>

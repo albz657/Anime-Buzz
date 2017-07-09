@@ -138,6 +138,15 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             }
         });
 
+        Preference attributionPreference = findPreference(getString(R.string.pref_attribution_key));
+        attributionPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                mainActivity.startFragment(AttributionFragment.class.getSimpleName());
+                return true;
+            }
+        });
+
         // Set visibility of 'sign in' / 'sign out' preferences based on login status
         if (SharedPrefsUtils.getInstance().isLoggedIn()) {
             signInPreference.setVisible(false);

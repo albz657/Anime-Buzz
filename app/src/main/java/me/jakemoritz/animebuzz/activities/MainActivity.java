@@ -39,6 +39,7 @@ import me.jakemoritz.animebuzz.data.migrations.DatabaseHelper;
 import me.jakemoritz.animebuzz.data.migrations.SugarMigrator;
 import me.jakemoritz.animebuzz.dialogs.ChangelogDialogFragment;
 import me.jakemoritz.animebuzz.fragments.AboutFragment;
+import me.jakemoritz.animebuzz.fragments.AttributionFragment;
 import me.jakemoritz.animebuzz.fragments.BacklogFragment;
 import me.jakemoritz.animebuzz.fragments.ExportFragment;
 import me.jakemoritz.animebuzz.fragments.SeasonsFragment;
@@ -363,6 +364,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = AboutFragment.newInstance();
             } else if (fragmentTag.equals(ExportFragment.class.getSimpleName())) {
                 fragment = ExportFragment.newInstance();
+            } else if (fragmentTag.equals(AttributionFragment.class.getSimpleName())) {
+                fragment = AttributionFragment.newInstance();
             }
         }
 
@@ -372,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Add nested fragments to backstack
         if (fragment instanceof SettingsFragment || fragment instanceof ExportFragment
-                || fragment instanceof AboutFragment) {
+                || fragment instanceof AboutFragment || fragment instanceof AttributionFragment) {
             fragmentTransaction.addToBackStack(fragmentTag);
         }
 
@@ -402,6 +405,8 @@ public class MainActivity extends AppCompatActivity {
                     toolbarTitle = getString(R.string.fragment_about);
                 } else if (fragment instanceof ExportFragment) {
                     toolbarTitle = getString(R.string.fragment_export);
+                } else if (fragment instanceof AttributionFragment) {
+                    toolbarTitle = getString(R.string.app_name);
                 } else {
                     toolbarTitle = getString(R.string.app_name);
                     bottomBar.setVisibility(View.VISIBLE);

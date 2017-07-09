@@ -24,5 +24,7 @@
 
     <color name="season_spinner_active">#FFECEFF1</color>
 
+    <color name="primaryOnLight">#D9000000</color>
+
     <color name="hint_text_color">#80FFFFFF</color>
 </resources>
