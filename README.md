@@ -1,5 +1,5 @@
 # Anime-Buzz
-[![license](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
+[![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](LICENSE)
 [![API](https://img.shields.io/badge/API-15%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=15)
 
 An Android app for anime fans that like to stay on top of currently airing shows.
@@ -14,6 +14,8 @@ An Android app for anime fans that like to stay on top of currently airing shows
 - MyAnimeList integration - syncs anime in your "Currently Watching" list, add/remove series to your list, increment episode counts
 
 ## Built With
+
+### Libraries
 - [Picasso](https://square.github.io/picasso/) - Image downloading
 - [Picasso Transformations](https://github.com/wasabeef/picasso-transformations) - Circle image transformations for Picasso
 - [Glide](https://github.com/bumptech/glide) - Smooth image loading in scrolling lists
@@ -31,6 +33,11 @@ An Android app for anime fans that like to stay on top of currently airing shows
 - [Stetho-Realm](https://github.com/uPhyca/stetho-realm) - Access Realm databases with Stetho
 - [Firebase](https://firebase.google.com/) - Analytics and crash reporting
 - [Android Studio](https://developer.android.com/studio/index.html) - IDE
+
+### APIs
+- [Senpai](http://www.senpai.moe) - Anime episode release times and base series metadata
+- [Kitsu](http://docs.kitsu.apiary.io/#) - Anime airing dates and images
+- [MyAnimeList](https://myanimelist.net/modules.php?go=api) - MyAnimeList account integration
 
 ## License
 This project is released under the Apache-2.0 - [License](/LICENSE)
@@ -54,7 +61,7 @@ This project is released under the Apache-2.0 - [License](/LICENSE)
 - Picasso - Apache-2.0
 - Picasso Transformations - Apache-2.0
 - Glide - BSD-2-Clause (MIT/Apache-2.0)
-- [Gson - Apache-2.0
+- Gson - Apache-2.0
 - Retrofit - Apache-2.0
 - MaterialProgressBar - Apache-2.0
 - AHBottomNavigation - Apache-2.0
