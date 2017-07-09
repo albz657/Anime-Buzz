@@ -75,7 +75,6 @@ dependencies {
     compile 'me.zhanghai.android.materialprogressbar:library:1.4.1'
     compile 'com.aurelhubert:ahbottomnavigation:2.0.6'
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    compile 'com.github.rahatarmanahmed:circularprogressview:2.5.0'
 
     compile 'com.nightlynexus.viewstatepageradapter:viewstatepageradapter:1.0.4'
 

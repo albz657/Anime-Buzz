@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
@@ -34,6 +33,7 @@ import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.utils.SnackbarUtils;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
 public class ExportFragment extends Fragment {
 
@@ -44,7 +44,7 @@ public class ExportFragment extends Fragment {
     private ImageView completedCheckmark;
     private ImageView errorImage;
     private Button exportButton;
-    private CircularProgressView progressView;
+    private MaterialProgressBar progressView;
     private String status = "";
     private boolean errorDisplayed = false;
 
@@ -79,7 +79,7 @@ public class ExportFragment extends Fragment {
 
         completedCheckmark = (ImageView) view.findViewById(R.id.export_checkmark);
         errorImage = (ImageView) view.findViewById(R.id.export_error);
-        progressView = (CircularProgressView) view.findViewById(R.id.progress_view_export);
+        progressView = (MaterialProgressBar) view.findViewById(R.id.progress_view_export);
 
         return view;
     }

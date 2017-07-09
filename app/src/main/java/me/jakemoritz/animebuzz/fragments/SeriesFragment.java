@@ -355,9 +355,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         if (mainActivity.getProgressViewHolder() != null) {
             mainActivity.getProgressViewHolder().setVisibility(View.GONE);
         }
-        if (mainActivity.getProgressView() != null) {
-            mainActivity.getProgressView().stopAnimation();
-        }
 
         mainActivity.resetToolbar(this);
     }

@@ -128,13 +128,14 @@
             android:layout_centerHorizontal="true"
             android:visibility="gone"/>
 
-        <com.github.rahatarmanahmed.cpv.CircularProgressView
+        <me.zhanghai.android.materialprogressbar.MaterialProgressBar
             android:id="@+id/progress_view_export"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_centerHorizontal="true"
-            app:cpv_animAutostart="true"
-            app:cpv_indeterminate="true"
+            app:mpb_progressStyle="circular"
+            android:indeterminate="true"
+            style="@style/Widget.MaterialProgressBar.ProgressBar"
             android:visibility="gone"/>
     </RelativeLayout>
 

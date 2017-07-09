@@ -23,7 +23,6 @@ import android.widget.Spinner;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.firebase.crash.FirebaseCrash;
 
 import java.io.File;
@@ -61,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     // Views
     private Toolbar toolbar;
-    private CircularProgressView progressView;
     private RelativeLayout progressViewHolder;
     private AHBottomNavigation bottomBar;
 
@@ -149,10 +147,8 @@ public class MainActivity extends AppCompatActivity {
             SharedPrefsUtils.getInstance().setCompletedSetup(true);
             App.getInstance().setInitializing(true);
 
-            progressView = (CircularProgressView) findViewById(R.id.progress_view);
             progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
             progressViewHolder.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
         } else {
             // Check last update time
             if (SharedPrefsUtils.getInstance().getLastUpdateTime() == 0L) {
@@ -575,10 +571,6 @@ public class MainActivity extends AppCompatActivity {
 
     public RelativeLayout getProgressViewHolder() {
         return progressViewHolder;
-    }
-
-    public CircularProgressView getProgressView() {
-        return progressView;
     }
 
     public Toolbar getToolbar() {

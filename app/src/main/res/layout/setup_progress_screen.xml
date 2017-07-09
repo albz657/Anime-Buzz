@@ -8,14 +8,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.github.rahatarmanahmed.cpv.CircularProgressView
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
         android:id="@+id/progress_view"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        app:cpv_animAutostart="false"
-        app:cpv_indeterminate="true" />
+        app:mpb_progressStyle="circular"
+        android:indeterminate="true"
+        style="@style/Widget.MaterialProgressBar.ProgressBar"/>
 
     <TextView
         android:id="@+id/loading_text"
