@@ -2,7 +2,7 @@
 [![Hex.pm](https://img.shields.io/hexpm/l/plug.svg)](LICENSE)
 [![API](https://img.shields.io/badge/API-15%2B-green.svg?style=flat)](https://android-arsenal.com/api?level=15)
 
-An Android app for anime fans that like to stay on top of currently airing shows.
+Anime Buzz is an Android app for anime fans that like to stay on top of currently airing shows.
 
 ![icon](/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
 <a href='https://play.google.com/store/apps/details?id=me.jakemoritz.animebuzz&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="25%" height="auto" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
@@ -78,4 +78,3 @@ This project is released under the Apache-2.0 - [License](/LICENSE)
 - Realm - Apache-2.0
 - Realm Android Adapters - Apache-2.0
 - Stetho-Realm - BSD-3-Clause
-- Firebase - Apache-2.0
