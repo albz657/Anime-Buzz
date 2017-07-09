@@ -4,14 +4,19 @@
 
 An Android app for anime fans that like to stay on top of currently airing shows.
 
+![icon](/app/src/main/res/mipmap-xhdpi/ic_launcher.png)
 <a href='https://play.google.com/store/apps/details?id=me.jakemoritz.animebuzz&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="25%" height="auto" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
-## What does it do?
+## Features
 - Notifies you when new episodes are released
 - Maintains a list of anime you're following 
 - Builds a backlog as episodes are released
 - Browse through anime in current and future seasons
 - MyAnimeList integration - syncs anime in your "Currently Watching" list, add/remove series to your list, increment episode counts
+
+## Links
+- [Google+ community](https://plus.google.com/communities/105073979572187779412)
+- [MyAnimeList thread](https://myanimelist.net/forum/?topicid=1540434)
 
 ## Built With
 
