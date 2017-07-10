@@ -140,7 +140,7 @@ public class AlarmUtils {
         final String nextEpisodeTimeFormatted24 = formatAiringTime(nextEpisode, true);
 
         if (simulcast) {
-            if (SharedPrefsUtils.getInstance().changedNotificationEnabled() && SharedPrefsUtils.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeSimulcastTime() > 0L){
+            if (series.isInUserList() && SharedPrefsUtils.getInstance().changedNotificationEnabled() && SharedPrefsUtils.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeSimulcastTime() > 0L){
                 Calendar previousTime = Calendar.getInstance();
                 previousTime.setTimeInMillis(series.getNextEpisodeSimulcastTime());
                 if (previousTime.get(Calendar.HOUR_OF_DAY) != nextEpisode.get(Calendar.HOUR_OF_DAY) || previousTime.get(Calendar.MINUTE) != nextEpisode.get(Calendar.MINUTE)){
@@ -152,7 +152,7 @@ public class AlarmUtils {
             series.setNextEpisodeSimulcastTimeFormatted24(nextEpisodeTimeFormatted24);
             series.setNextEpisodeSimulcastTime(nextEpisode.getTimeInMillis());
         } else {
-            if (SharedPrefsUtils.getInstance().changedNotificationEnabled() && !SharedPrefsUtils.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeAirtime() > 0L){
+            if (series.isInUserList() && SharedPrefsUtils.getInstance().changedNotificationEnabled() && !SharedPrefsUtils.getInstance().prefersSimulcast() && !App.getInstance().isInitializing() && !App.getInstance().isPostInitializing() && series.getNextEpisodeAirtime() > 0L){
                 Calendar previousTime = Calendar.getInstance();
                 previousTime.setTimeInMillis(series.getNextEpisodeAirtime());
                 if (previousTime.get(Calendar.HOUR_OF_DAY) != nextEpisode.get(Calendar.HOUR_OF_DAY) || previousTime.get(Calendar.MINUTE) != nextEpisode.get(Calendar.MINUTE)){
