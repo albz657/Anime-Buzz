@@ -135,6 +135,7 @@ public class NotificationUtils {
                 .autoCancel(true)
                 .onlyAlertOnce(true)
                 .title(title)
+                .message(message)
                 .bigTextStyle(message)
                 .smallIcon(R.drawable.ic_update);
 
@@ -182,6 +183,7 @@ public class NotificationUtils {
                 .onlyAlertOnce(true)
                 .click(resultPendingIntent)
                 .title("New episode released")
+                .message(seriesName)
                 .bigTextStyle(seriesName)
                 .smallIcon(R.drawable.bolt_copy)
                 .button(R.drawable.ic_action_ic_done_green, "WATCHED", PendingIntent.getService(App.getInstance(), MALID.hashCode(), watchedIntent, PendingIntent.FLAG_UPDATE_CURRENT));
