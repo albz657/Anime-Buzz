@@ -243,10 +243,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
                 getSenpaiExportHelper().getSeasonData(seasonKey);
                 updating = true;
-            } else {
-                stopRefreshing();
-                SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
             }
+        } else {
+            stopRefreshing();
+            SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);
         }
     }
 

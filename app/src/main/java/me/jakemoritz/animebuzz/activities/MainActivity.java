@@ -411,6 +411,10 @@ public class MainActivity extends AppCompatActivity {
                     toolbarTitle = getString(R.string.app_name);
                     bottomBar.setVisibility(View.VISIBLE);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+
+                    if (bottomBar.getCurrentItem() != fragmentTabId.indexOf(fragment.getClass())) {
+                        bottomBar.setCurrentItem(fragmentTabId.indexOf(fragment.getClass()));
+                    }
                 }
 
                 getSupportActionBar().setTitle(toolbarTitle);
