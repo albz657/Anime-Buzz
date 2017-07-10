@@ -24,6 +24,8 @@ import me.jakemoritz.animebuzz.misc.App;
 public class AttributionAdapter extends RecyclerView.Adapter<AttributionAdapter.ViewHolder> {
 
     private final static String APACHE_LICENSE_URL = "https://www.apache.org/licenses/LICENSE-2.0";
+    private final static String BSD_2_CLAUSE_LICENSE_URL = "https://opensource.org/licenses/BSD-2-Clause";
+    private final static String BSD_3_CLAUSE_LICENSE_URL = "https://opensource.org/licenses/BSD-3-Clause";
 
     private AttributionFragment attributionFragment;
     private List<String[]> data;
@@ -98,7 +100,15 @@ public class AttributionAdapter extends RecyclerView.Adapter<AttributionAdapter.
             holder.attributionLicenseWeb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Uri licenseUri = Uri.parse(APACHE_LICENSE_URL);
+                    Uri licenseUri = null;
+
+                    if (attributionData[2].equals(App.getInstance().getString(R.string.apache_2_0))){
+                        licenseUri = Uri.parse(APACHE_LICENSE_URL);
+                    } else if (attributionData[2].equals(App.getInstance().getString(R.string.bsd_2_clause))){
+                        licenseUri = Uri.parse(BSD_2_CLAUSE_LICENSE_URL);
+                    } else if (attributionData[2].equals(App.getInstance().getString(R.string.bsd_3_clause))){
+                        licenseUri = Uri.parse(BSD_3_CLAUSE_LICENSE_URL);
+                    }
                     Intent licenseIntent = new Intent(Intent.ACTION_VIEW, licenseUri);
                     if (licenseIntent.resolveActivity(attributionFragment.getActivity().getPackageManager()) != null) {
                         attributionFragment.getActivity().startActivity(licenseIntent);

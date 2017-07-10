@@ -60,8 +60,8 @@
         <item>@string/apache_2.0</item>
     </string-array>
 
-    <string-array name="attrib_pugnotifcation">
-        <item>PugNotifcation</item>
+    <string-array name="attrib_pugnotification">
+        <item>PugNotification</item>
         <item>https://github.com/halysongoncalves/Pugnotification</item>
         <item>@string/apache_2.0</item>
     </string-array>
