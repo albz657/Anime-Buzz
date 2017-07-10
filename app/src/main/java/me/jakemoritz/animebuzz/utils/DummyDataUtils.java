@@ -1,6 +1,7 @@
 package me.jakemoritz.animebuzz.utils;
 
 import java.util.Calendar;
+import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
@@ -38,6 +39,20 @@ public class DummyDataUtils {
                 }
             }
         });
+    }
+
+    public void createNewEpisodeNotification(){
+        RealmResults<Series> seriesList = App.getInstance().getRealm().where(Series.class).findAll();
+        Random random = new Random();
+        int randomIndex = random.nextInt(seriesList.size() - 1);
+        NotificationUtils.getInstance().createNewEpisodeNotification(seriesList.get(randomIndex));
+    }
+
+    public void createChangedTimeNotification(){
+        RealmResults<Series> seriesList = App.getInstance().getRealm().where(Series.class).findAll();
+        Random random = new Random();
+        int randomIndex = random.nextInt(seriesList.size() - 1);
+        NotificationUtils.getInstance().createChangedTimeNotification(seriesList.get(randomIndex), Calendar.getInstance());
     }
 
     void createDummyAlarms(final int alarms) {

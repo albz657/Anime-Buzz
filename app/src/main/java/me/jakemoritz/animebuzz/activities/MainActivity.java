@@ -433,6 +433,8 @@ public class MainActivity extends AppCompatActivity {
         if (App.getInstance().isInitializing()) {
             bottomBar.setVisibility(View.GONE);
         }
+
+//        DummyDataUtils.getInstance().createChangedTimeNotification();
     }
 
     /* Badge methods */

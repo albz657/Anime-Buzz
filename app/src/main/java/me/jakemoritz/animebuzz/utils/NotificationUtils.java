@@ -112,6 +112,10 @@ public class NotificationUtils {
             name = series.getEnglishTitle();
         }
 
+        // notificationLoad ringtone
+        String ringtonePref = SharedPrefsUtils.getInstance().getRingtone();
+        Uri ringtoneUri = Uri.parse(ringtonePref);
+        
         // Format date and time strings
         SimpleDateFormat weekdayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
         String day = weekdayFormat.format(newEpisodeTime.getTime());
@@ -127,10 +131,17 @@ public class NotificationUtils {
         String message = "'" + name + "' will now air on " + day + "s at " + time;
         Load notificationLoad = PugNotification.with(App.getInstance())
                 .load()
+                .identifier(Integer.valueOf(series.getMALID()))
                 .autoCancel(true)
+                .onlyAlertOnce(true)
                 .title(title)
                 .bigTextStyle(message)
                 .smallIcon(R.drawable.ic_update);
+
+        // set ringtone
+        if (ringtoneUri != null && !ringtoneUri.getPath().isEmpty()) {
+            notificationLoad.sound(ringtoneUri);
+        }
 
         LoadNotificationImageTask loadNotificationImageTask = new LoadNotificationImageTask(notificationLoad);
         loadNotificationImageTask.execute(series.getMALID());
