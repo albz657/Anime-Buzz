@@ -41,18 +41,24 @@ public class DummyDataUtils {
         });
     }
 
-    public void createNewEpisodeNotification(){
+    public void createNewEpisodeNotification(int notifications){
         RealmResults<Series> seriesList = App.getInstance().getRealm().where(Series.class).findAll();
         Random random = new Random();
-        int randomIndex = random.nextInt(seriesList.size() - 1);
-        NotificationUtils.getInstance().createNewEpisodeNotification(seriesList.get(randomIndex));
+
+        for (int i = 0; i < notifications; i++){
+            int randomIndex = random.nextInt(seriesList.size() - 1);
+            NotificationUtils.getInstance().createNewEpisodeNotification(seriesList.get(randomIndex));
+        }
     }
 
-    public void createChangedTimeNotification(){
+    public void createChangedTimeNotification(int notifications){
         RealmResults<Series> seriesList = App.getInstance().getRealm().where(Series.class).findAll();
         Random random = new Random();
-        int randomIndex = random.nextInt(seriesList.size() - 1);
-        NotificationUtils.getInstance().createChangedTimeNotification(seriesList.get(randomIndex), Calendar.getInstance());
+
+        for (int i = 0; i < notifications; i++){
+            int randomIndex = random.nextInt(seriesList.size() - 1);
+            NotificationUtils.getInstance().createChangedTimeNotification(seriesList.get(randomIndex), Calendar.getInstance());
+        }
     }
 
     void createDummyAlarms(final int alarms) {

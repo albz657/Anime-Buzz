@@ -115,7 +115,7 @@ public class NotificationUtils {
         // notificationLoad ringtone
         String ringtonePref = SharedPrefsUtils.getInstance().getRingtone();
         Uri ringtoneUri = Uri.parse(ringtonePref);
-        
+
         // Format date and time strings
         SimpleDateFormat weekdayFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
         String day = weekdayFormat.format(newEpisodeTime.getTime());

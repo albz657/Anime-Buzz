@@ -52,6 +52,7 @@ import me.jakemoritz.animebuzz.models.Series;
 import me.jakemoritz.animebuzz.preferences.CustomRingtonePreference;
 import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.DailyUpdateUtils;
+import me.jakemoritz.animebuzz.utils.DummyDataUtils;
 import me.jakemoritz.animebuzz.utils.PermissionUtils;
 import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 import me.jakemoritz.animebuzz.widgets.BacklogBadgeWidgetProvider;
@@ -434,7 +435,7 @@ public class MainActivity extends AppCompatActivity {
             bottomBar.setVisibility(View.GONE);
         }
 
-//        DummyDataUtils.getInstance().createChangedTimeNotification();
+        DummyDataUtils.getInstance().createChangedTimeNotification(5);
     }
 
     /* Badge methods */
