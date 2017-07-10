@@ -209,7 +209,6 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
                 simulcastProvider = App.getInstance().getString(R.string.simulcast_anime_network);
             }
             holder.mSimulcast.setText(simulcastProvider);
-
             holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.series.getSimulcastProvider()));
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);

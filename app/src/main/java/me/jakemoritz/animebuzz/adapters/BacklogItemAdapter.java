@@ -88,7 +88,7 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
         }
 
         // Set simulcast display
-        if (SharedPrefsUtils.getInstance().prefersSimulcast()) {
+        if (SharedPrefsUtils.getInstance().prefersSimulcast() && !holder.backlogItem.getSeries().getSimulcastProvider().equals("false")) {
             holder.mSimulcast.setVisibility(View.VISIBLE);
 
             String simulcastProvider = holder.backlogItem.getSeries().getSimulcastProvider();
@@ -96,7 +96,6 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
                 simulcastProvider = App.getInstance().getString(R.string.simulcast_anime_network);
             }
             holder.mSimulcast.setText(simulcastProvider);
-
             holder.mSimulcast.setBackgroundResource(simulcastColorMap.get(holder.backlogItem.getSeries().getSimulcastProvider()));
         } else {
             holder.mSimulcast.setVisibility(View.INVISIBLE);
