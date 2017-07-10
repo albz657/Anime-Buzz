@@ -45,7 +45,7 @@ Anime Buzz is an Android app for anime fans that like to stay on top of currentl
 - [MyAnimeList](https://myanimelist.net/modules.php?go=api) - MyAnimeList account integration
 
 ## License
-This project is released under the Apache-2.0 - [License](/LICENSE)
+This project is released under the Apache-2.0 License - [License](/LICENSE)
 
    ```
    Copyright 2017 Jake Moritz
