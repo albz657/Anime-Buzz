@@ -440,8 +440,13 @@ public class MainActivity extends AppCompatActivity {
         RealmResults<BacklogItem> realmResults = App.getInstance().getRealm().where(BacklogItem.class).findAll();
 
         if (realmResults != null && realmResults.isValid()) {
-            int badgeCount = realmResults.size();
-            ShortcutBadger.applyCount(this, badgeCount);
+            try {
+                int badgeCount = realmResults.size();
+                ShortcutBadger.applyCount(this, badgeCount);
+            } catch (Exception e) {
+                FirebaseCrash.log("Exception when setting app badge with ShortcutBadger");
+                FirebaseCrash.report(e);
+            }
         }
 
         Intent widgetIntent = new Intent(this, BacklogBadgeWidgetProvider.class);
