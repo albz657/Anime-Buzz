@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="attrib_picasso">
+        <item>Picasso</item>
+        <item>https://github.com/square/picasso</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_picasso_transformations">
+        <item>Picasso Transformations</item>
+        <item>https://github.com/wasabeef/picasso-transformations</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_glide">
+        <item>Glide</item>
+        <item>https://github.com/bumptech/glide</item>
+        <item>@string/bsd_2_clause</item>
+    </string-array>
+
+    <string-array name="attrib_gson">
+        <item>Gson</item>
+        <item>https://github.com/google/gson</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_retrofit">
+        <item>Retrofit</item>
+        <item>https://github.com/square/retrofit</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_materialprogressbar">
+        <item>MaterialProgressBar</item>
+        <item>https://github.com/DreaminginCodeZH/MaterialProgressBar</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_ahbottomnavigation">
+        <item>AHBottomNavigation</item>
+        <item>https://github.com/aurelhubert/ahbottomnavigation</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_material_preference">
+        <item>Material Preference</item>
+        <item>https://github.com/consp1racy/android-support-preference</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_circleimageview">
+        <item>CircleImageView</item>
+        <item>https://github.com/hdodenhof/CircleImageView</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_viewstatepageradapter">
+        <item>ViewStatePagerAdapter</item>
+        <item>https://github.com/NightlyNexus/ViewStatePagerAdapter</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_pugnotifcation">
+        <item>PugNotifcation</item>
+        <item>https://github.com/halysongoncalves/Pugnotification</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_shortcutbadger">
+        <item>ShortcutBadger</item>
+        <item>https://github.com/leolin310148/ShortcutBadger</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_realm">
+        <item>Realm</item>
+        <item>https://realm.io/docs/get-started/overview/</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_realm_android_adapters">
+        <item>Realm Android Adapters</item>
+        <item>https://github.com/realm/realm-android-adapters</item>
+        <item>@string/apache_2.0</item>
+    </string-array>
+
+    <string-array name="attrib_stetho_realm">
+        <item>Stetho-Realm</item>
+        <item>https://github.com/uPhyca/stetho-realm</item>
+        <item>@string/bsd_3_clause</item>
+    </string-array>
+
+    <string-array name="attrib_firebase">
+        <item>Firebase</item>
+        <item>https://firebase.google.com/</item>
+        <item>none</item>
+    </string-array>
+
+    <string-array name="attrib_senpai">
+        <item>Senpai</item>
+        <item>http://www.senpai.moe</item>
+        <item>API</item>
+    </string-array>
+
+    <string-array name="attrib_myanimelist">
+        <item>MyAnimeList</item>
+        <item>http://myanimelist.net</item>
+        <item>API</item>
+    </string-array>
+
+    <string-array name="attrib_Kitsu">
+        <item>Kitsu</item>
+        <item>https://kitsu.io</item>
+        <item>API</item>
+    </string-array>
+</resources>

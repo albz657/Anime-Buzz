@@ -53,6 +53,7 @@ public class TextFileDialogFragment extends DialogFragment {
     }
 
     private String readTextFile() {
+        filename = filename.replace("attrib_", "");
         StringBuilder text = new StringBuilder();
         BufferedReader reader = null;
 

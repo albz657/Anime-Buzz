@@ -34,7 +34,8 @@ public class AttributionFragment extends Fragment {
         View attributionFragmentLayout = inflater.inflate(R.layout.fragment_attribution, container, false);
 
         RecyclerView recyclerView = (RecyclerView) attributionFragmentLayout.findViewById(R.id.attribution_list);
-        recyclerView.setAdapter(new AttributionAdapter(mainActivity));
+        recyclerView.setAdapter(new AttributionAdapter(this));
+        recyclerView.setNestedScrollingEnabled(false);
 
         return attributionFragmentLayout;
     }
