@@ -61,6 +61,17 @@ public class DummyDataUtils {
         }
     }
 
+    public void createLongNameNewEpisodeNotification(){
+        RealmResults<Series> seriesList = App.getInstance().getRealm().where(Series.class).findAll();
+
+        for (Series series : seriesList){
+            if (series.getName().length() > 40){
+                NotificationUtils.getInstance().createChangedTimeNotification(series, Calendar.getInstance());
+                break;
+            }
+        }
+    }
+
     void createDummyAlarms(final int alarms) {
 //        clearAlarms();
 
