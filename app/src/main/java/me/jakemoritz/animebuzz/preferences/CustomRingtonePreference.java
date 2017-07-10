@@ -46,8 +46,6 @@ public class CustomRingtonePreference extends RingtonePreference {
         }
     }
 
-
-
     public void setOpenList(boolean openList) {
         this.openList = openList;
     }

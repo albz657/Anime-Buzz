@@ -76,6 +76,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
 
         // LED preference
         ledColorPreference = (ListPreference) findPreference(getString(R.string.pref_led_key));
+        if (ledColorPreference.getEntry() == null){
+            // Sets default LED value
+            ledColorPreference.setValueIndex(0);
+        }
         ledColorPreference.setSummary(ledColorPreference.getEntry());
 
         // Ringtone preference
@@ -189,6 +193,10 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
         } else if (s.equals(getString(R.string.pref_led_key))){
             ledColorPreference.setSummary(ledColorPreference.getEntry());
         }
+    }
+
+    private void setLedSummary(){
+
     }
 
     private void setRingtoneSummary() {
