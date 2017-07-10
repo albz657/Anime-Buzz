@@ -36,6 +36,8 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
 
     private EditText usernameField;
     private EditText passwordField;
+    private boolean usernameFieldFocused = false;
+    private boolean passworldFieldFocused = false;
     private MalApiClient malApiClient;
 
     private class SetupPagerAdapter extends ViewStatePagerAdapter {
@@ -58,6 +60,17 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
                     // MAL sign in screen
                     usernameField = (EditText) layout.findViewById(R.id.edit_username);
                     passwordField = (EditText) layout.findViewById(R.id.edit_password);
+
+                    if (passworldFieldFocused){
+                        passwordField.requestFocus();
+                    }
+
+                    if (usernameFieldFocused){
+                        usernameField.requestFocus();
+                    }
+
+                    passworldFieldFocused = false;
+                    usernameFieldFocused = false;
 
                     // Handles 'enter' button on keyboard
                     passwordField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -198,6 +211,11 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
             getSupportActionBar().hide();
         }
 
+        if (savedInstanceState != null){
+            usernameFieldFocused = savedInstanceState.getBoolean("usernameFieldFocused", false);
+            passworldFieldFocused = savedInstanceState.getBoolean("passwordFieldFocused", false);
+        }
+
         malApiClient = new MalApiClient(this);
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.coordinator);
@@ -205,6 +223,16 @@ public class SetupActivity extends AppCompatActivity implements MalCredentialsVe
         PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (usernameField.isFocused()){
+            outState.putBoolean("usernameFieldFocused", true);
+        } else if (passwordField.isFocused()){
+            outState.putBoolean("passwordFieldFocused", true);
+        }
+        super.onSaveInstanceState(outState);
     }
 
     private void attemptVerification(String username, String password) {
