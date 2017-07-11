@@ -51,7 +51,10 @@ public class SignInDialogFragment extends DialogFragment implements MalCredentia
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
-        listener.verified(false);
+
+        if (listener != null){
+            listener.verified(false);
+        }
     }
 
     @Nullable
