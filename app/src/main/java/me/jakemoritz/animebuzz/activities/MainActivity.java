@@ -227,6 +227,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+        deleteRedundantCachedImages();
     }
 
     @Override
@@ -466,9 +468,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteRedundantCachedImages(){
+        File cache = getCacheDir();
+
+        String imageExtension;
+        // deletes images from cache
+        if (cache.exists()) {
+            for (String file : cache.list()) {
+                imageExtension = MimeTypeMap.getFileExtensionFromUrl(file);
+
+                if (imageExtension != null && imageExtension.equals("jpg")) {
+                    String MALID = file.replace(".jpg", "");
+                    int imageId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", App.getInstance().getPackageName());
+
+                    if (imageId != 0){
+                        File imageFile = new File(cache.getPath() + "/" + file);
+
+                        try {
+                            imageFile.delete();
+                        } catch (Exception e) {
+                            // Catches IOException added to File.delete() in Android O
+                            FirebaseCrash.log("Error when deleting cached anime images");
+                            FirebaseCrash.report(e);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // Remove old cached images
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteOldImages() {
+    private void deleteImagesInWrongLocation() {
         File cache = getCacheDir();
 
         String imageExtension;
@@ -524,14 +556,14 @@ public class MainActivity extends AppCompatActivity {
         if (sqlDatabaseExists()) {
             DatabaseHelper.getInstance(App.getInstance()).migrateToRealm();
             deleteDatabase(DatabaseHelper.getInstance(App.getInstance()).getDatabaseName());
-            deleteOldImages();
+            deleteImagesInWrongLocation();
             App.getInstance().setJustUpdated(true);
         }
 
         if (sugarDatabaseExists()) {
             SugarMigrator.migrateToRealm();
             deleteDatabase("buzz_sugar.db");
-            deleteOldImages();
+            deleteImagesInWrongLocation();
         }
     }
 
