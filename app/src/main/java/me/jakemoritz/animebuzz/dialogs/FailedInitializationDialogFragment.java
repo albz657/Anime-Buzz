@@ -45,13 +45,17 @@ public class FailedInitializationDialogFragment extends DialogFragment {
                 .setPositiveButton("Now", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        failedInitializationListener.failedInitializationResponse(true);
+                        if (failedInitializationListener != null){
+                            failedInitializationListener.failedInitializationResponse(true);
+                        }
                     }
                 })
                 .setNegativeButton("Later", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        failedInitializationListener.failedInitializationResponse(false);
+                        if (failedInitializationListener != null){
+                            failedInitializationListener.failedInitializationResponse(false);
+                        }
                     }
                 })
                 .setCancelable(false);
