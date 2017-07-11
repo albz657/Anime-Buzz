@@ -31,8 +31,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.activities.MainActivity;
@@ -71,6 +72,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     private MainActivity mainActivity;
 
     private SeriesAdapter mAdapter;
+    private OrderedRealmCollectionChangeListener<RealmResults<Series>> realmCollectionChangeListener;
+    private RealmResults<Series> seriesRealmResults;
     private BroadcastReceiver initialReceiver;
 
     // api clients
@@ -119,7 +122,6 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // Get anime list to display
-        RealmResults<Series> realmResults;
         String sort;
         if (SharedPrefsUtils.getInstance().prefersEnglish()) {
             sort = "englishTitle";
@@ -128,21 +130,24 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         }
 
         if (this instanceof SeasonsFragment) {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findAllSorted(sort);
+            seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("seasonKey", SharedPrefsUtils.getInstance().getLatestSeasonKey()).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_season));
         } else {
-            realmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
+            seriesRealmResults = App.getInstance().getRealm().where(Series.class).equalTo("isInUserList", true).findAllSorted(sort);
             emptyText.setText(getString(R.string.empty_text_myshows));
         }
 
-        realmResults.addChangeListener(new RealmChangeListener<RealmResults<Series>>() {
+        realmCollectionChangeListener = new OrderedRealmCollectionChangeListener<RealmResults<Series>>() {
             @Override
-            public void onChange(RealmResults<Series> series) {
-                updateAdapterData(series);
+            public void onChange(RealmResults<Series> realmResults, OrderedCollectionChangeSet changeSet) {
+                if (changeSet == null || changeSet.getChanges().length > 1 || SeriesFragment.this instanceof UserListFragment){
+                    updateAdapterData(realmResults);
+                }
             }
-        });
+        };
+        seriesRealmResults.addChangeListener(realmCollectionChangeListener);
 
-        List<Series> seriesList = trimSeriesList(realmResults);
+        List<Series> seriesList = trimSeriesList(seriesRealmResults);
         setVisibility(seriesList);
 
         mAdapter = new SeriesAdapter(this, seriesList);
@@ -213,6 +218,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         if (initialReceiver != null) {
             mainActivity.unregisterReceiver(initialReceiver);
+        }
+
+        if (realmCollectionChangeListener != null){
+            seriesRealmResults.removeChangeListener(realmCollectionChangeListener);
         }
     }
 
@@ -422,6 +431,8 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         AlarmUtils.getInstance().makeAlarm(series);
 
+        mAdapter.seriesItemChanged(MALID);
+
         if (getView() != null) {
             Snackbar.make(getView(), "Added '" + series.getName() + "' to your list.", Snackbar.LENGTH_LONG).show();
         }
@@ -437,6 +448,10 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         });
 
         AlarmUtils.getInstance().removeAlarm(series);
+
+        if (this instanceof SeasonsFragment){
+            mAdapter.seriesItemChanged(MALID);
+        }
 
         if (getView() != null){
             Snackbar.make(getView(), "Removed '" + series.getName() + "' from your list.", Snackbar.LENGTH_LONG).show();

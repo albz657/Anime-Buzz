@@ -67,23 +67,7 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
 
                 if (event == FileObserver.CREATE && imageExtension != null && imageExtension.equals("jpg")) {
                     String MALID = path.replace(".jpg", "");
-
-                    for (int i = 0; i < unmanagedSeriesList.size(); i++) {
-                        if (unmanagedSeriesList.get(i).getMALID().equals(MALID)) {
-                            final ViewHolder seriesViewHolder = (ViewHolder) SeriesAdapter.this.seriesFragment.getRecyclerView().findViewHolderForAdapterPosition(i);
-
-                            final int indexOfItem = i;
-                            if (seriesViewHolder != null) {
-                                SeriesAdapter.this.seriesFragment.getMainActivity().runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        SeriesAdapter.this.notifyItemChanged(indexOfItem);
-                                    }
-                                });
-                            }
-                            break;
-                        }
-                    }
+                    seriesItemChanged(MALID);
                 }
             }
         };
@@ -254,6 +238,25 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
     public void removeSeriesDialogClosed(boolean accepted, String MALID, int position) {
         if (accepted) {
             modifyListener.modifyItem(MALID);
+        }
+    }
+
+    public void seriesItemChanged(String MALID){
+        for (int i = 0; i < unmanagedSeriesList.size(); i++) {
+            if (unmanagedSeriesList.get(i).getMALID().equals(MALID)) {
+                final ViewHolder seriesViewHolder = (ViewHolder) seriesFragment.getRecyclerView().findViewHolderForAdapterPosition(i);
+
+                final int indexOfItem = i;
+                if (seriesViewHolder != null) {
+                    seriesFragment.getMainActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            notifyItemChanged(indexOfItem);
+                        }
+                    });
+                }
+                break;
+            }
         }
     }
 
