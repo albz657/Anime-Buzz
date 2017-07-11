@@ -9,7 +9,6 @@ import io.realm.Realm;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Season;
 import me.jakemoritz.animebuzz.models.Series;
-import me.jakemoritz.animebuzz.utils.AlarmUtils;
 import me.jakemoritz.animebuzz.utils.DateFormatUtils;
 
 // Processes data synced from Kitsu API
@@ -107,10 +106,6 @@ public class KitsuDataIntentService extends IntentService {
                         }
                     }
                 }
-            }
-
-            if (currentAiringStatus.equals("Airing") && airingStatus.equals("Finished airing")){
-                AlarmUtils.getInstance().removeAlarm(currSeries);
             }
 
             final String finalAiringStatus = airingStatus;

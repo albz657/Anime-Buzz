@@ -36,6 +36,7 @@ public class App extends Application {
     private boolean justUpdated = false;
     private boolean setDefaultTabId = false;
     private boolean realmDbMigratedTo_v1 = false;
+    private boolean realmDbMigratedTo_v2 = false;
 
     private int totalSyncingSeriesInitial;
     private int currentSyncingSeriesInitial = 0;
@@ -67,11 +68,18 @@ public class App extends Application {
                         oldVersion++;
                         realmDbMigratedTo_v1 = true;
                     }
+
+                    if (oldVersion == 1) {
+                        schema.get("Series").addField("lastEpisodeNotificationDisplayed", boolean.class);
+
+                        oldVersion++;
+                        realmDbMigratedTo_v2 = true;
+                    }
                 }
             };
 
             RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-                    .schemaVersion(1)
+                    .schemaVersion(2)
                     .migration(migration)
                     .build();
 
@@ -93,6 +101,19 @@ public class App extends Application {
                 });
 
                 realmDbMigratedTo_v1 = false;
+            } else if (realmDbMigratedTo_v2){
+                getRealm().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(Realm realm) {
+                        RealmResults<Series> seriesRealmResults = realm.where(Series.class).findAll();
+
+                        for (Series series : seriesRealmResults) {
+                            series.setLastEpisodeNotificationDisplayed(false);
+                        }
+                    }
+                });
+
+                realmDbMigratedTo_v2 = false;
             }
         }
 

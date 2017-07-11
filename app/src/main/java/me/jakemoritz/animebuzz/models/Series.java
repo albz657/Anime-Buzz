@@ -39,6 +39,7 @@ public class Series extends RealmObject{
     private String nextEpisodeAirtimeFormatted24 = "";
     private String nextEpisodeSimulcastTimeFormatted24 = "";
     private long lastNotificationTime = 0L;
+    private boolean lastEpisodeNotificationDisplayed = false;
     private String englishTitle = "";
     @Index
     private String airingStatus = "";
@@ -72,6 +73,7 @@ public class Series extends RealmObject{
         this.isInUserList = realmSeries.isInUserList();
         this.episodesWatched = realmSeries.getEpisodesWatched();
         this.kitsuID = realmSeries.getKitsuID();
+        this.lastEpisodeNotificationDisplayed = realmSeries.isLastEpisodeNotificationDisplayed();
     }
 
     @Override
@@ -279,5 +281,13 @@ public class Series extends RealmObject{
 
     public void setKitsuID(String kitsuID) {
         this.kitsuID = kitsuID;
+    }
+
+    public boolean isLastEpisodeNotificationDisplayed() {
+        return lastEpisodeNotificationDisplayed;
+    }
+
+    public void setLastEpisodeNotificationDisplayed(boolean lastEpisodeNotificationDisplayed) {
+        this.lastEpisodeNotificationDisplayed = lastEpisodeNotificationDisplayed;
     }
 }
