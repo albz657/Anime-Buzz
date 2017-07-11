@@ -74,9 +74,9 @@ public class KitsuDataIntentService extends IntentService {
             if (finishedAiringDate.isEmpty() && startedAiringDate.isEmpty()) {
                 Season season = realm.where(Season.class).equalTo("key", currSeries.getSeasonKey()).findFirst();
                 if (season.getRelativeTime().equals(Season.PRESENT)) {
-                    airingStatus = "Finished airing";
+                    airingStatus = Series.AIRING_STATUS_FINISHED_AIRING;
                 } else {
-                    airingStatus = "Not yet aired";
+                    airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                 }
             } else {
                 Calendar currentCalendar = Calendar.getInstance();
@@ -86,23 +86,23 @@ public class KitsuDataIntentService extends IntentService {
                 if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         if (single) {
-                            airingStatus = "Finished airing";
+                            airingStatus = Series.AIRING_STATUS_FINISHED_AIRING;
                         } else {
-                            airingStatus = "Airing";
+                            airingStatus = Series.AIRING_STATUS_AIRING;
                         }
                     } else {
-                        airingStatus = "Not yet aired";
+                        airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                     }
                 } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
                     Calendar finishedCalendar = DateFormatUtils.getInstance().getCalFromHB(finishedAiringDate);
                     formattedFinishedAiringDate = DateFormatUtils.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                     if (currentCalendar.compareTo(finishedCalendar) > 0) {
-                        airingStatus = "Finished airing";
+                        airingStatus = Series.AIRING_STATUS_FINISHED_AIRING;
                     } else {
                         if (currentCalendar.compareTo(startedCalendar) > 0) {
-                            airingStatus = "Airing";
+                            airingStatus = Series.AIRING_STATUS_AIRING;
                         } else {
-                            airingStatus = "Not yet aired";
+                            airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                         }
                     }
                 }

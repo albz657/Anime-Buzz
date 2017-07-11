@@ -136,10 +136,10 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
         // Set anime airing status image
         Drawable dateImage;
         switch (holder.series.getAiringStatus()) {
-            case "Finished airing":
+            case Series.AIRING_STATUS_FINISHED_AIRING:
                 dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_done_green, null);
                 break;
-            case "Not yet aired":
+            case Series.AIRING_STATUS_NOT_YET_AIRED:
                 dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_event_blue, null);
                 break;
             default:

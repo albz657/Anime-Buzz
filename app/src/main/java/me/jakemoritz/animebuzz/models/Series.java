@@ -13,6 +13,10 @@ import me.jakemoritz.animebuzz.utils.SharedPrefsUtils;
 @Generated("org.jsonschema2pojo")
 public class Series extends RealmObject{
 
+    public static final String AIRING_STATUS_AIRING = "Airing";
+    public static final String AIRING_STATUS_FINISHED_AIRING = "Finished airing";
+    public static final String AIRING_STATUS_NOT_YET_AIRED = "Not yet aired";
+
     @Expose
     @PrimaryKey
     private String MALID = "";

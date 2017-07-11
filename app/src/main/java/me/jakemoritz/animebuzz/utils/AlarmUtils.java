@@ -210,7 +210,7 @@ public class AlarmUtils {
 
     // Create Alarm object for Series
     public void makeAlarm(final Series series) {
-        if (series.getAiringStatus().equals("Airing")) {
+        if (series.getAiringStatus().equals(Series.AIRING_STATUS_AIRING)) {
             if (series.getNextEpisodeAirtime() > 0) {
                 Calendar airdateCalendar = Calendar.getInstance();
                 airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());

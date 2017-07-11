@@ -58,7 +58,7 @@ public class DailyUpdateUtils {
 
                 Realm realm = Realm.getDefaultInstance();
 
-                for (Series series : realm.where(Series.class).equalTo("airingStatus", "Airing").findAll()) {
+                for (Series series : realm.where(Series.class).equalTo("airingStatus", Series.AIRING_STATUS_AIRING).findAll()) {
                     if (series.getNextEpisodeAirtime() > 0) {
                         Calendar airdateCalendar = Calendar.getInstance();
                         airdateCalendar.setTimeInMillis(series.getNextEpisodeAirtime());

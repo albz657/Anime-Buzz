@@ -178,7 +178,7 @@ public class SugarMigrator {
                 }
             });
 
-            if (airingStatus.equals("Airing")) {
+            if (airingStatus.equals(Series.AIRING_STATUS_AIRING)) {
                 AlarmUtils.getInstance().generateNextEpisodeTimes(MALID, airdate, simulcastAirdate);
             }
 

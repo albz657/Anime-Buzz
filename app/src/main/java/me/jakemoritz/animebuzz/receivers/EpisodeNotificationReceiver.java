@@ -57,6 +57,10 @@ public class EpisodeNotificationReceiver extends BroadcastReceiver {
                     helper.createNewEpisodeNotification(series);
                 }
 
+                if (series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING)){
+                    series.setLastEpisodeNotificationDisplayed(true);
+                }
+
                 // Notify MainActivity that episode notification received, must update Backlog count badges
                 context.sendBroadcast(new Intent("NOTIFICATION_RECEIVED"));
 
