@@ -160,7 +160,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         List<Series> seriesList = new ArrayList<>(realmResults);
         for (Iterator seriesIterator = seriesList.iterator(); seriesIterator.hasNext(); ) {
             Series series = (Series) seriesIterator.next();
-            if ((series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired)) || !series.getShowType().equals("TV") && (!series.isSingle() || (series.isSingle() && (series.getStartedAiringDate().isEmpty() && series.getFinishedAiringDate().isEmpty()))))) {
+            if ((series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING) && !(series.isInUserList() && !series.isLastEpisodeNotificationDisplayed()))
+                    || !series.getShowType().equals("TV")
+                    && (!series.isSingle() || (series.isSingle() && (series.getStartedAiringDate().isEmpty() && series.getFinishedAiringDate().isEmpty())))) {
                 seriesIterator.remove();
             }
         }
@@ -451,6 +453,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
         if (this instanceof SeasonsFragment){
             mAdapter.seriesItemChanged(MALID);
+
         }
 
         if (getView() != null){

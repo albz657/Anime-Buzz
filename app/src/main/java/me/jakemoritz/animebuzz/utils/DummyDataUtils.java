@@ -7,7 +7,6 @@ import java.util.Random;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
-import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.misc.App;
 import me.jakemoritz.animebuzz.models.Alarm;
 import me.jakemoritz.animebuzz.models.BacklogItem;
@@ -124,7 +123,7 @@ public class DummyDataUtils {
 
                         RealmResults<Alarm> alarmsForSeries = realm.where(Alarm.class).equalTo("MALID", series.getMALID()).findAll();
                         if (simulcastCount < 2 && !series.getSimulcastProvider().equals("false") && alarmsForSeries.size() == 0 && (series.getLastNotificationTime() == 0 || currentTime.get(Calendar.DAY_OF_YEAR) != lastNotificationTime.get(Calendar.DAY_OF_YEAR))
-                                && !(series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_aired)) || !series.getShowType().equals("TV") && (!series.isSingle() || (series.isSingle() && (series.getStartedAiringDate().isEmpty() && series.getFinishedAiringDate().isEmpty()))))) {
+                                && !(series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING) || !series.getShowType().equals("TV") && (!series.isSingle() || (series.isSingle() && (series.getStartedAiringDate().isEmpty() && series.getFinishedAiringDate().isEmpty()))))) {
                             long time = timeArray[curr++];
                             BacklogItem backlogItem = realm.createObject(BacklogItem.class);
                             backlogItem.setSeries(series);

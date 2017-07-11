@@ -5,8 +5,6 @@
     <string name="simulcast_anime_network">Anime Network</string>
     <string name="updated_to_v1.3.5">upgradedto135</string>
     <string name="last_app_version">lastappversion</string>
-    <string name="airing_status_airing">Airing</string>
-    <string name="airing_status_aired">Finished airing</string>
 
     <!-- Snackbar strings -->
     <string name="snackbar_no_network_available">No network available.</string>

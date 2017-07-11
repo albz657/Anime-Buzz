@@ -136,12 +136,14 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
         // Set anime airing status image
         Drawable dateImage;
         switch (holder.series.getAiringStatus()) {
-            case Series.AIRING_STATUS_FINISHED_AIRING:
-                dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_done_green, null);
-                break;
             case Series.AIRING_STATUS_NOT_YET_AIRED:
                 dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_event_blue, null);
                 break;
+            case Series.AIRING_STATUS_FINISHED_AIRING:
+                if (!holder.series.isLastEpisodeNotificationDisplayed()){
+                    dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_done_green, null);
+                    break;
+                }
             default:
                 dateImage = ResourcesCompat.getDrawable(App.getInstance().getResources(), R.drawable.ic_action_ic_watch_later_gunmetal, null);
         }
@@ -150,7 +152,8 @@ public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder
 
         // Set airing status and date text
         String dateText;
-        if (holder.series.getAiringStatus().equals(App.getInstance().getString(R.string.airing_status_airing))) {
+        if (holder.series.getAiringStatus().equals(Series.AIRING_STATUS_AIRING)
+                || (!holder.series.isLastEpisodeNotificationDisplayed() && holder.series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING))) {
             // Anime currently airing
             dateText = holder.series.getNextEpisodeTimeFormatted();
         } else {
