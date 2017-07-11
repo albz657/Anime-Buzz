@@ -578,7 +578,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         } else {
             adding = false;
             MalVerifyFailedDialogFragment dialogFragment = MalVerifyFailedDialogFragment.newInstance(this, mainActivity);
-            dialogFragment.show(mainActivity.getFragmentManager(), "SeriesAdapter");
+            dialogFragment.show(mainActivity.getFragmentManager(), MalVerifyFailedDialogFragment.class.getSimpleName());
         }
     }
 
@@ -603,7 +603,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
     public void signInAgain(boolean wantsToSignIn) {
         if (wantsToSignIn) {
             SignInDialogFragment signInDialogFragment = SignInDialogFragment.newInstance(this, mainActivity);
-            signInDialogFragment.show(mainActivity.getFragmentManager(), TAG);
+            signInDialogFragment.show(mainActivity.getFragmentManager(), SignInDialogFragment.class.getSimpleName());
         }
     }
 

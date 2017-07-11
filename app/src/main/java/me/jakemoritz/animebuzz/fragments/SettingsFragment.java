@@ -137,7 +137,7 @@ public class SettingsFragment extends XpPreferenceFragment implements SharedPref
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 ChangelogDialogFragment dialogFragment = ChangelogDialogFragment.newInstance();
-                dialogFragment.show(getActivity().getFragmentManager(), TAG);
+                dialogFragment.show(getActivity().getFragmentManager(), ChangelogDialogFragment.class.getSimpleName());
                 return true;
             }
         });
