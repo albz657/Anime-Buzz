@@ -48,6 +48,9 @@ public class EpisodeNotificationReceiver extends BroadcastReceiver {
                         backlogItem.setAlarmTime(alarmTime);
 
                         series.setLastNotificationTime(currentTime.getTimeInMillis());
+                        if (series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING)){
+                            series.setLastEpisodeNotificationDisplayed(true);
+                        }
                     }
                 });
 
@@ -58,7 +61,7 @@ public class EpisodeNotificationReceiver extends BroadcastReceiver {
                 }
 
                 if (series.getAiringStatus().equals(Series.AIRING_STATUS_FINISHED_AIRING)){
-                    series.setLastEpisodeNotificationDisplayed(true);
+                    AlarmUtils.getInstance().removeAlarm(series);
                 }
 
                 // Notify MainActivity that episode notification received, must update Backlog count badges
