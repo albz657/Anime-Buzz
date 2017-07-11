@@ -83,6 +83,35 @@ public class DummyDataUtils {
         }
     }
 
+    public void createFinalEpisodeSeries(){
+        App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                Series oldTest = realm.where(Series.class).equalTo("MALID", "1").findFirst();
+                if (oldTest != null){
+                    oldTest.deleteFromRealm();
+                }
+
+                Series series = realm.createObject(Series.class, "1");
+
+                series.setName("Test name");
+                series.setLastEpisodeNotificationDisplayed(false);
+                series.setAiringStatus(Series.AIRING_STATUS_FINISHED_AIRING);
+
+                Alarm oldAlarm = realm.where(Alarm.class).equalTo("MALID", "1").findFirst();
+                if (oldAlarm != null){
+                    oldAlarm.deleteFromRealm();
+                }
+
+                Alarm alarm = realm.createObject(Alarm.class, series.getMALID());
+                alarm.setSeries(series);
+                alarm.setAlarmTime(System.currentTimeMillis());
+
+                AlarmUtils.getInstance().setAllAlarms();
+            }
+        });
+    }
+
     public void createDummyAlarms(final int alarms) {
         clearAlarms();
 
