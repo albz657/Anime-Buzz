@@ -37,17 +37,17 @@ public class KitsuDataIntentService extends IntentService {
 
         realm.close();
 
-        if (App.getInstance().isInitializing()){
+        if (App.getInstance().isInitializing()) {
             // During initialization, increment number of Series synced
             App.getInstance().incrementCurrentSyncingSeriesInitial();
 
-            if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()){
+            if (App.getInstance().getCurrentSyncingSeriesInitial() == App.getInstance().getTotalSyncingSeriesInitial()) {
                 // All Series synced during initialization, notify SeriesFragment
 
                 Intent finishedInitializingIntent = new Intent("FINISHED_INITIALIZING");
                 sendBroadcast(finishedInitializingIntent);
             }
-        } else if (App.getInstance().isPostInitializing()){
+        } else if (App.getInstance().isPostInitializing()) {
             App.getInstance().incrementCurrentSyncingSeriesPost();
         }
     }
@@ -56,7 +56,7 @@ public class KitsuDataIntentService extends IntentService {
     private void processSeries(final String MALID, final String englishTitle, int episodeCount, String finishedAiringDate, String startedAiringDate, String showType, final String kitsuId) {
         final Series currSeries = realm.where(Series.class).equalTo("MALID", MALID).findFirst();
 
-        if (currSeries != null){
+        if (currSeries != null) {
             String currentAiringStatus = currSeries.getAiringStatus();
 
             final boolean single = episodeCount == 1;
@@ -78,12 +78,12 @@ public class KitsuDataIntentService extends IntentService {
                 } else {
                     airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                 }
-            } else {
+            } else if (!startedAiringDate.isEmpty()) {
                 Calendar currentCalendar = Calendar.getInstance();
                 Calendar startedCalendar = DateFormatUtils.getInstance().getCalFromHB(startedAiringDate);
 
                 formattedStartAiringDate = DateFormatUtils.getInstance().getAiringDateFormatted(startedCalendar, startedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
-                if (finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
+                if (finishedAiringDate.isEmpty()) {
                     if (currentCalendar.compareTo(startedCalendar) > 0) {
                         if (single) {
                             airingStatus = Series.AIRING_STATUS_FINISHED_AIRING;
@@ -93,17 +93,15 @@ public class KitsuDataIntentService extends IntentService {
                     } else {
                         airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                     }
-                } else if (!finishedAiringDate.isEmpty() && !startedAiringDate.isEmpty()) {
+                } else {
                     Calendar finishedCalendar = DateFormatUtils.getInstance().getCalFromHB(finishedAiringDate);
                     formattedFinishedAiringDate = DateFormatUtils.getInstance().getAiringDateFormatted(finishedCalendar, finishedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR));
                     if (currentCalendar.compareTo(finishedCalendar) > 0) {
                         airingStatus = Series.AIRING_STATUS_FINISHED_AIRING;
+                    } else if (currentCalendar.compareTo(startedCalendar) > 0) {
+                        airingStatus = Series.AIRING_STATUS_AIRING;
                     } else {
-                        if (currentCalendar.compareTo(startedCalendar) > 0) {
-                            airingStatus = Series.AIRING_STATUS_AIRING;
-                        } else {
-                            airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
-                        }
+                        airingStatus = Series.AIRING_STATUS_NOT_YET_AIRED;
                     }
                 }
             }
@@ -128,33 +126,33 @@ public class KitsuDataIntentService extends IntentService {
                     currSeries.setStartedAiringDate(finalStartAiringDate);
                     currSeries.setFinishedAiringDate(finalfinishedAiringDate);*/
 
-                    if (!currSeries.getShowType().equals(finalShowType)){
+                    if (!currSeries.getShowType().equals(finalShowType)) {
                         currSeries.setShowType(finalShowType);
                     }
 
-                    if (currSeries.isSingle() != single){
+                    if (currSeries.isSingle() != single) {
                         currSeries.setSingle(single);
                     }
 
-                    if (!englishTitle.isEmpty()){
-                        if (!currSeries.getEnglishTitle().equals(englishTitle)){
+                    if (!englishTitle.isEmpty()) {
+                        if (!currSeries.getEnglishTitle().equals(englishTitle)) {
                             currSeries.setEnglishTitle(englishTitle);
                         }
                     } else {
-                        if (!currSeries.getEnglishTitle().equals(currSeries.getName())){
+                        if (!currSeries.getEnglishTitle().equals(currSeries.getName())) {
                             currSeries.setEnglishTitle(currSeries.getName());
                         }
                     }
 
-                    if (!currSeries.getAiringStatus().equals(finalAiringStatus)){
+                    if (!currSeries.getAiringStatus().equals(finalAiringStatus)) {
                         currSeries.setAiringStatus(finalAiringStatus);
                     }
 
-                    if (!currSeries.getStartedAiringDate().equals(finalStartAiringDate)){
+                    if (!currSeries.getStartedAiringDate().equals(finalStartAiringDate)) {
                         currSeries.setStartedAiringDate(finalStartAiringDate);
                     }
 
-                    if (!currSeries.getFinishedAiringDate().equals(finalfinishedAiringDate)){
+                    if (!currSeries.getFinishedAiringDate().equals(finalfinishedAiringDate)) {
                         currSeries.setFinishedAiringDate(finalfinishedAiringDate);
                     }
                 }
