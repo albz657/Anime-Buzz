@@ -488,7 +488,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
                 String username = SharedPrefsUtils.getInstance().getUsername();
                 String password = SharedPrefsUtils.getInstance().getPassword();
 
-                malApiClient.verifyCredentials(username, password);
+                malApiClient.verifyCredentials(username, password, MALID);
             } else {
                 adding = false;
                 SnackbarUtils.getInstance().makeSnackbar(getView(), R.string.snackbar_no_network_available);

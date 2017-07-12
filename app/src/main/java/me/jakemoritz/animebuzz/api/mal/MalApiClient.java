@@ -91,7 +91,7 @@ public class MalApiClient {
         call.enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                if (response.isSuccessful() && response.raw().message().equals("Created")) {
+                if (response.isSuccessful() && response.code() == 201) {
                     seriesFragment.malEntryAdded(MALID);
                     Log.d(TAG, response.toString());
                 } else {
