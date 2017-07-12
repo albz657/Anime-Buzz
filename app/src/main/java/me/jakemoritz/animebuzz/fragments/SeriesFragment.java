@@ -346,7 +346,7 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (!App.getInstance().isInitializing()){
+        if (!App.getInstance().isInitializing() && currentlyBrowsingSeason != null && currentlyBrowsingSeason.isValid()){
             outState.putString("seasonKey", currentlyBrowsingSeason.getKey());
         }
         super.onSaveInstanceState(outState);

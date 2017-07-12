@@ -144,10 +144,10 @@ public class MainActivity extends AppCompatActivity {
         fixNullKitsuIds();
 
         progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             int progressViewHolderVisibility = savedInstanceState.getInt("progressViewVisible", View.GONE);
 
-            switch (progressViewHolderVisibility){
+            switch (progressViewHolderVisibility) {
                 case View.GONE:
                     progressViewHolder.setVisibility(View.GONE);
                     break;
@@ -300,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment fragment = getCurrentFragment();
         getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
 
-        if (progressViewHolder != null){
+        if (progressViewHolder != null) {
             outState.putInt("progressViewVisible", progressViewHolder.getVisibility());
         }
 
@@ -398,7 +398,9 @@ public class MainActivity extends AppCompatActivity {
         // Add nested fragments to backstack
         if (fragment instanceof SettingsFragment || fragment instanceof ExportFragment
                 || fragment instanceof AboutFragment || fragment instanceof AttributionFragment) {
-            fragmentTransaction.addToBackStack(fragmentTag);
+            if (getCurrentFragment() != null && !getCurrentFragment().getClass().getSimpleName().equals(fragmentTag)) {
+                fragmentTransaction.addToBackStack(fragmentTag);
+            }
         }
 
         fragmentTransaction.commit();
@@ -407,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Handles setting Toolbar title, up navigation, and spinner visibility
+
     public void resetToolbar(Fragment fragment) {
         if (getSupportActionBar() != null) {
             Spinner toolbarSpinner = (Spinner) findViewById(R.id.toolbar_spinner);
@@ -489,7 +492,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private void deleteRedundantCachedImages(){
+    private void deleteRedundantCachedImages() {
         File cache = getCacheDir();
 
         String imageExtension;
@@ -502,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
                     String MALID = file.replace(".jpg", "");
                     int imageId = App.getInstance().getResources().getIdentifier("malid_" + MALID, "drawable", App.getInstance().getPackageName());
 
-                    if (imageId != 0){
+                    if (imageId != 0) {
                         File imageFile = new File(cache.getPath() + "/" + file);
 
                         try {
