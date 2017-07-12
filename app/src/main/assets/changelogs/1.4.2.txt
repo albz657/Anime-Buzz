@@ -2,4 +2,9 @@ Fixes
 - Anime with no airing times are no longer listed in the season browser
 - Anime that have finished airing are no longer listed in the season browser
 - New episode notifications now show anime title on multiple lines if needed
-- Multiple smaller fixes
+- Fixed notifications not showing text
+- Fixed notification for last episode not being displayed
+- Cached images are now removed if included in app update
+- Fixed backlog badge count not updating
+- Fixed 'changed airing time' notifications being shown for anime you aren't following
+- Many bug fixes
