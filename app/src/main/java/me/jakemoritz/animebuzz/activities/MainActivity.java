@@ -143,12 +143,28 @@ public class MainActivity extends AppCompatActivity {
 
         fixNullKitsuIds();
 
+        progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
+        if (savedInstanceState != null){
+            int progressViewHolderVisibility = savedInstanceState.getInt("progressViewVisible", View.GONE);
+
+            switch (progressViewHolderVisibility){
+                case View.GONE:
+                    progressViewHolder.setVisibility(View.GONE);
+                    break;
+                case View.VISIBLE:
+                    progressViewHolder.setVisibility(View.VISIBLE);
+                    break;
+                case View.INVISIBLE:
+                    progressViewHolder.setVisibility(View.INVISIBLE);
+                    break;
+            }
+        }
+
         // Check if user has completed setup
         if (!SharedPrefsUtils.getInstance().hasCompletedSetup()) {
             SharedPrefsUtils.getInstance().setCompletedSetup(true);
             App.getInstance().setInitializing(true);
 
-            progressViewHolder = (RelativeLayout) findViewById(R.id.progress_view_holder);
             progressViewHolder.setVisibility(View.VISIBLE);
         } else {
             // Check last update time
@@ -283,6 +299,10 @@ public class MainActivity extends AppCompatActivity {
         // Save current fragment
         Fragment fragment = getCurrentFragment();
         getSupportFragmentManager().putFragment(outState, "current_fragment", fragment);
+
+        if (progressViewHolder != null){
+            outState.putInt("progressViewVisible", progressViewHolder.getVisibility());
+        }
 
         super.onSaveInstanceState(outState);
     }

@@ -219,7 +219,12 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
         super.onDestroy();
 
         if (initialReceiver != null) {
-            mainActivity.unregisterReceiver(initialReceiver);
+            // Catch IllegalArgumentException thrown if receiver not registered
+            try {
+                mainActivity.unregisterReceiver(initialReceiver);
+            } catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }
         }
 
         if (realmCollectionChangeListener != null){
@@ -341,7 +346,9 @@ public abstract class SeriesFragment extends Fragment implements ReadSeasonDataR
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString("seasonKey", currentlyBrowsingSeason.getKey());
+        if (!App.getInstance().isInitializing()){
+            outState.putString("seasonKey", currentlyBrowsingSeason.getKey());
+        }
         super.onSaveInstanceState(outState);
     }
 
