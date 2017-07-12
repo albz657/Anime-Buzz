@@ -138,6 +138,9 @@ public class BacklogItemAdapter extends RealmRecyclerViewAdapter<BacklogItem, Ba
             App.getInstance().getRealm().executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
+                    Series backlogItemSeries = realm.where(Series.class).equalTo("MALID", removedItem.getSeries().getMALID()).findFirst();
+                    backlogItemSeries.setEpisodesWatched(backlogItemSeries.getEpisodesWatched() + 1);
+
                     removedItem.deleteFromRealm();
                 }
             });
