@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Anime Buzz</string>
+    <string name="bullet">&#8226;</string>
+
+    <!-- Login flow -->
+    <string name="login_intro_header">Welcome to</string>
+    <string name="login_intro_subheader">Stay on top of the anime you\'re watching with:</string>
+    <string name="login_intro_benefit_notification">Notifications when new episodes are released</string>
+    <string name="login_intro_benefit_backlog">A backlog of episodes you haven\'t watched yet</string>
+    <string name="login_intro_benefit_browser">A season browser to discover and follow new anime</string>
+    <string name="login_intro_swipe_left">Swipe left to begin setup</string>
+
 </resources>

@@ -33,6 +33,8 @@ android {
 
 dependencies {
     compile "com.android.support:appcompat-v7:$rootProject.ext.androidSupportLibrary"
+    compile "com.nightlynexus.viewstatepageradapter:viewstatepageradapter:$rootProject.ext.viewStatePagerAdapter"
+    compile "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayout"
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'
