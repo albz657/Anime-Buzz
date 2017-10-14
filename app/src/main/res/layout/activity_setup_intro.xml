@@ -9,13 +9,13 @@
         android:background="@color/colorPrimary">
 
         <TextView
-            android:id="@+id/login_intro_header"
+            android:id="@+id/setup_intro_header"
             style="@style/TextAppearance.AppCompat.Display1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="60dp"
             android:fontFamily="sans-serif-thin"
-            android:text="@string/login_intro_header"
+            android:text="@string/setup_intro_header"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -23,7 +23,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/login_intro_header_app_name"
+            android:id="@+id/setup_intro_header_app_name"
             style="@style/TextAppearance.AppCompat.Display1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,10 +32,10 @@
             android:textColor="@android:color/white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/login_intro_header" />
+            app:layout_constraintTop_toBottomOf="@+id/setup_intro_header" />
 
         <TextView
-            android:id="@+id/login_intro_subheader"
+            android:id="@+id/setup_intro_subheader"
             style="@style/TextAppearance.AppCompat.Subhead"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -44,12 +44,12 @@
             android:layout_marginRight="50dp"
             android:layout_marginStart="50dp"
             android:layout_marginTop="40dp"
-            android:text="@string/login_intro_subheader"
+            android:text="@string/setup_intro_subheader"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/login_intro_header_app_name" />
+            app:layout_constraintTop_toBottomOf="@+id/setup_intro_header_app_name" />
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/constraintLayout"
@@ -61,10 +61,10 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/login_intro_subheader">
+            app:layout_constraintTop_toBottomOf="@+id/setup_intro_subheader">
 
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/login_intro_bullet_first_container"
+                android:id="@+id/setup_intro_bullet_first_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -72,7 +72,7 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_first"
+                    android:id="@+id/setup_intro_bullet_first"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -83,29 +83,29 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_first_text"
+                    android:id="@+id/setup_intro_bullet_first_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:paddingTop="14dp"
-                    android:text="@string/login_intro_benefit_notification"
+                    android:text="@string/setup_intro_benefit_notification"
                     android:textColor="@android:color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/login_intro_bullet_first"
+                    app:layout_constraintLeft_toRightOf="@id/setup_intro_bullet_first"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </android.support.constraint.ConstraintLayout>
 
             <android.support.constraint.ConstraintLayout
-                android:id="@+id/login_intro_bullet_seconder_container"
+                android:id="@+id/setup_intro_bullet_seconder_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/login_intro_bullet_first_container">
+                app:layout_constraintTop_toBottomOf="@+id/setup_intro_bullet_first_container">
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_second"
+                    android:id="@+id/setup_intro_bullet_second"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -116,15 +116,15 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_second_text"
+                    android:id="@+id/setup_intro_bullet_second_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:paddingTop="14dp"
-                    android:text="@string/login_intro_benefit_backlog"
+                    android:text="@string/setup_intro_benefit_backlog"
                     android:textColor="@android:color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/login_intro_bullet_second"
+                    app:layout_constraintLeft_toRightOf="@id/setup_intro_bullet_second"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -135,10 +135,10 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/login_intro_bullet_seconder_container">
+                app:layout_constraintTop_toBottomOf="@+id/setup_intro_bullet_seconder_container">
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_third"
+                    android:id="@+id/setup_intro_bullet_third"
                     style="@style/TextAppearance.AppCompat.Headline"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -149,15 +149,15 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/login_intro_bullet_third_text"
+                    android:id="@+id/setup_intro_bullet_third_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="4dp"
                     android:paddingTop="14dp"
-                    android:text="@string/login_intro_benefit_browser"
+                    android:text="@string/setup_intro_benefit_browser"
                     android:textColor="@android:color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/login_intro_bullet_third"
+                    app:layout_constraintLeft_toRightOf="@id/setup_intro_bullet_third"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -165,13 +165,13 @@
         </android.support.constraint.ConstraintLayout>
 
         <TextView
-            android:id="@+id/login_intro_swipe_left"
+            android:id="@+id/setup_intro_swipe_left"
             style="@style/TextAppearance.AppCompat.Body1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/login_intro_swipe_left"
+            android:text="@string/setup_intro_swipe_left"
             android:textAlignment="center"
-            android:textColor="@color/login_swipe_hint"
+            android:textColor="@color/setup_swipe_hint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

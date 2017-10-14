@@ -25,6 +25,12 @@ android {
         enabled = true
     }
 
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xmaxerrs" << "500"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -35,6 +41,16 @@ dependencies {
     compile "com.android.support:appcompat-v7:$rootProject.ext.androidSupportLibrary"
     compile "com.nightlynexus.viewstatepageradapter:viewstatepageradapter:$rootProject.ext.viewStatePagerAdapter"
     compile "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayout"
+    compile "com.google.dagger:dagger:$rootProject.ext.dagger"
+    annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
+
+    compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit"
+    compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit"
+    compile "com.google.code.gson:gson:$rootProject.ext.gson"
+
+    compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava"
+    compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid"
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'

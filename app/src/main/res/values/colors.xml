@@ -3,5 +3,5 @@
     <color name="colorPrimary">#2196F3</color>
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorAccent">#FFC107</color>
-    <color name="login_swipe_hint">#B3FFFFFF</color>
+    <color name="setup_swipe_hint">#B3FFFFFF</color>
 </resources>
