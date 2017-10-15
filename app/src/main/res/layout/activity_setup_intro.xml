@@ -75,6 +75,7 @@
                 app:layout_constraintBaseline_toBaselineOf="@+id/setup_intro_bullet_first_text"
                 app:layout_constraintLeft_toLeftOf="parent" />
 
+            <!-- TODO: Fix bullet text getting cut off early -->
             <TextView
                 android:id="@+id/setup_intro_bullet_first_text"
                 style="@style/TextAppearance.AppCompat.Subhead"
