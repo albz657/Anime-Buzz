@@ -36,6 +36,7 @@ public class NetModule {
     @Provides
     @Singleton
     Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient){
+        // TODO: Figure out how to config base URL for different APIs
         return new Retrofit.Builder()
                 .baseUrl("http://jikan.me/api/")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())

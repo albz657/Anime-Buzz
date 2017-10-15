@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Anime Buzz</string>
-    <string name="bullet">&#8226;</string>
 
     <!-- Setup flow -->
     <string name="setup_intro_header">Welcome to</string>
