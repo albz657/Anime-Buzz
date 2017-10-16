@@ -38,17 +38,26 @@ android {
 }
 
 dependencies {
+    // Android support libraries
     compile "com.android.support:appcompat-v7:$rootProject.ext.androidSupportLibrary"
-    compile "com.nightlynexus.viewstatepageradapter:viewstatepageradapter:$rootProject.ext.viewStatePagerAdapter"
     compile "com.android.support.constraint:constraint-layout:$rootProject.ext.constraintLayout"
+    compile "com.android.support:design:$rootProject.ext.androidSupportLibrary"
+
+    compile "com.nightlynexus.viewstatepageradapter:viewstatepageradapter:$rootProject.ext.viewStatePagerAdapter"
+
+    // Dagger
     compile "com.google.dagger:dagger:$rootProject.ext.dagger"
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.ext.dagger"
-    compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
 
+    //Retrofit
     compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit"
     compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit"
+    compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
+
+    // Gson
     compile "com.google.code.gson:gson:$rootProject.ext.gson"
 
+    // RxJava2
     compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava"
     compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid"
 

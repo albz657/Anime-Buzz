@@ -1,12 +1,12 @@
 package me.jakemoritz.animebuzz.activities;
 
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +15,11 @@ import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import javax.inject.Inject;
 
-import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupIntroBinding;
+import me.jakemoritz.animebuzz.databinding.ActivitySetupMalLoginBinding;
 import me.jakemoritz.animebuzz.services.JikanFacade;
 
 
@@ -41,24 +41,41 @@ public class SetupActivity extends AppCompatActivity {
         ActivitySetupBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_setup);
 
         ViewPager viewPager = binding.setupViewpager;
-        viewPager.setOffscreenPageLimit(1);
-        PagerAdapter pagerAdapter = new SetupPagerAdapter();
+        viewPager.setOffscreenPageLimit(2);
+        PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
 
-        jikanFacade.getAnime(21).toObservable().subscribeOn(Schedulers.io()).subscribe(jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
-                Throwable::printStackTrace);
+/*        jikanFacade.getAnime(21).toObservable().subscribeOn(Schedulers.io()).subscribe(jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
+                Throwable::printStackTrace);*/
     }
 
     private class SetupPagerAdapter extends ViewStatePagerAdapter {
 
+        private Context context;
+
+        SetupPagerAdapter(Context context){
+            this.context = context;
+        }
+
         @Override
         protected View createView(ViewGroup container, int position) {
-            SetupPage currentPage = SetupPage.values()[position];
-            LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
+            LayoutInflater layoutInflater = LayoutInflater.from(context);
 
-            ActivitySetupIntroBinding setupIntroBinding = ActivitySetupIntroBinding.inflate(layoutInflater);
-            return setupIntroBinding.getRoot();
+            View currentPageView = null;
+            switch (position){
+                case 0:
+                    ActivitySetupIntroBinding setupIntroBinding = ActivitySetupIntroBinding.inflate(layoutInflater);
+                    currentPageView = setupIntroBinding.getRoot();
+                    break;
+                case 1:
+                    ActivitySetupMalLoginBinding malLoginBinding = ActivitySetupMalLoginBinding.inflate(layoutInflater);
+                    currentPageView = malLoginBinding.getRoot();
+                    break;
+
+            }
+
+            return currentPageView;
         }
 
         @Override
@@ -69,7 +86,8 @@ public class SetupActivity extends AppCompatActivity {
 
     private enum SetupPage {
 
-        INTRO(R.layout.activity_setup_intro);
+        INTRO(R.layout.activity_setup_intro),
+        LOGIN(R.layout.activity_setup_mal_login);
 
         private int layoutId;
 

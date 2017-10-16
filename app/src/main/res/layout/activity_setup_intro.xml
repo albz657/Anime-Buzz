@@ -148,11 +148,12 @@
             android:layout_height="wrap_content"
             android:text="@string/setup_intro_swipe_left"
             android:textAlignment="center"
-            android:textColor="@color/setup_swipe_hint"
+            android:textColor="@color/setup_transparent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/bullet_holder"
-            app:layout_constraintVertical_bias="0.85" />
+            app:layout_constraintVertical_bias="1.00"
+            android:layout_marginBottom="30dp"/>
     </android.support.constraint.ConstraintLayout>
 </layout>
