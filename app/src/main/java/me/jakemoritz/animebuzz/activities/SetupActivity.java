@@ -21,6 +21,7 @@ import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupIntroBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupMalLoginBinding;
+import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
 import me.jakemoritz.animebuzz.services.JikanFacade;
 
 /**
@@ -58,7 +59,7 @@ public class SetupActivity extends AppCompatActivity {
         ActivitySetupBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_setup);
 
         ViewPager viewPager = binding.setupViewpager;
-        viewPager.setOffscreenPageLimit(2);
+        viewPager.setOffscreenPageLimit(3);
         PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
@@ -94,6 +95,11 @@ public class SetupActivity extends AppCompatActivity {
                     ActivitySetupMalLoginBinding malLoginBinding = ActivitySetupMalLoginBinding.inflate(layoutInflater);
                     currentPageView = malLoginBinding.getRoot();
                     break;
+                case 2:
+                    // Settings screen
+                    ActivitySetupSettingsBinding settingsBinding = ActivitySetupSettingsBinding.inflate(layoutInflater);
+                    currentPageView = settingsBinding.getRoot();
+                    break;
             }
 
             return currentPageView;
@@ -111,7 +117,8 @@ public class SetupActivity extends AppCompatActivity {
     private enum SetupPage {
 
         INTRO(R.layout.activity_setup_intro),
-        LOGIN(R.layout.activity_setup_mal_login);
+        LOGIN(R.layout.activity_setup_mal_login),
+        SETTINGS(R.layout.activity_setup_settings);
 
         private int layoutId;
 
