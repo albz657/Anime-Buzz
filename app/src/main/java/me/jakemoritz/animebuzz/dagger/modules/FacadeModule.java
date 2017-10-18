@@ -6,6 +6,8 @@ import dagger.Module;
 import dagger.Provides;
 import me.jakemoritz.animebuzz.services.JikanFacade;
 import me.jakemoritz.animebuzz.services.JikanService;
+import me.jakemoritz.animebuzz.services.SenpaiFacade;
+import me.jakemoritz.animebuzz.services.SenpaiService;
 
 @Module
 public class FacadeModule {
@@ -14,6 +16,12 @@ public class FacadeModule {
     @Singleton
     JikanFacade provideJikanFacade(JikanService jikanService){
         return new JikanFacade(jikanService);
+    }
+
+    @Provides
+    @Singleton
+    SenpaiFacade provideSenpaiFacade(SenpaiService senpaiService){
+        return new SenpaiFacade(senpaiService);
     }
 
 }

@@ -8,6 +8,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import me.jakemoritz.animebuzz.services.JikanService;
+import me.jakemoritz.animebuzz.services.SenpaiService;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -38,7 +39,7 @@ public class NetModule {
     Retrofit provideRetrofit(Gson gson, OkHttpClient okHttpClient){
         // TODO: Figure out how to config base URL for different APIs
         return new Retrofit.Builder()
-                .baseUrl("http://jikan.me/api/")
+                .baseUrl("http://www.senpai.moe/")
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
@@ -49,5 +50,11 @@ public class NetModule {
     @Singleton
     JikanService provideJikanService(Retrofit retrofit){
         return retrofit.create(JikanService.class);
+    }
+
+    @Provides
+    @Singleton
+    SenpaiService provideSenpaiService(Retrofit retrofit){
+        return retrofit.create(SenpaiService.class);
     }
 }

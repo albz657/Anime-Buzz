@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import javax.inject.Inject;
 
+import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
@@ -25,6 +27,7 @@ import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
 import me.jakemoritz.animebuzz.presenters.SetupListener;
 import me.jakemoritz.animebuzz.presenters.SetupPresenter;
 import me.jakemoritz.animebuzz.services.JikanFacade;
+import me.jakemoritz.animebuzz.services.SenpaiFacade;
 
 /**
  * This Activity manages the setup flow. It allows the user to sign in to their MyAnimeList account
@@ -36,6 +39,9 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     @Inject
     JikanFacade jikanFacade;
+
+    @Inject
+    SenpaiFacade senpaiFacade;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,7 +78,12 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     @Override
     public void finishSetup() {
-
+        senpaiFacade.getCurrentSeason().subscribeOn(Schedulers.io()).subscribe(
+                senpaiSeasonWrapper -> {
+                    Log.d(TAG, senpaiSeasonWrapper.toString());
+                },
+                Throwable::printStackTrace
+        );
     }
 
     @Override
@@ -112,6 +123,7 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
                 case 2:
                     // Settings screen
                     ActivitySetupSettingsBinding settingsBinding = ActivitySetupSettingsBinding.inflate(layoutInflater);
+                    settingsBinding.setPresenter(setupPresenter);
 
                     currentPageView = settingsBinding.getRoot();
                     break;

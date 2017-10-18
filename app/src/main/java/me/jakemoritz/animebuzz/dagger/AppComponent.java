@@ -17,4 +17,5 @@ public interface AppComponent {
 
     void inject(JikanFacade jikanFacade);
 
+
 }
