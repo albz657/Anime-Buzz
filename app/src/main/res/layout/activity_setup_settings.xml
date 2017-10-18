@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="presenter"
+            type="me.jakemoritz.animebuzz.presenters.SetupPresenter" />
+    </data>
+
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,7 +29,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.ConstraintLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/setup_settings_switch_holder"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="60dp"
@@ -101,22 +108,21 @@
         </android.support.constraint.ConstraintLayout>
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/setup_settings_button_start"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/setup_settings_button_start"
-            app:layout_constraintBottom_toTopOf="@+id/textView2"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintBottom_toTopOf="@+id/setup_settings_change_later"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-            app:layout_constraintVertical_bias="0.88" />
+            app:layout_constraintTop_toBottomOf="@+id/setup_settings_switch_holder"
+            app:layout_constraintVertical_bias="0.88"
+            android:onClick="@{() -> presenter.finishSetup()}"/>
 
         <TextView
-            android:id="@+id/textView2"
+            android:id="@+id/setup_settings_change_later"
             android:layout_width="0dp"
-
             android:layout_height="wrap_content"
             android:layout_marginBottom="30dp"
             android:text="@string/setup_settings_change_later"

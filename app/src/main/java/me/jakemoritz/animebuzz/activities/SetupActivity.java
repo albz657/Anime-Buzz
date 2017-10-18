@@ -22,13 +22,15 @@ import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupIntroBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupMalLoginBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
+import me.jakemoritz.animebuzz.presenters.SetupListener;
+import me.jakemoritz.animebuzz.presenters.SetupPresenter;
 import me.jakemoritz.animebuzz.services.JikanFacade;
 
 /**
  * This Activity manages the setup flow. It allows the user to sign in to their MyAnimeList account
  * and set initial settings.
  */
-public class SetupActivity extends AppCompatActivity {
+public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     private static final String TAG = SetupActivity.class.getName();
 
@@ -60,12 +62,22 @@ public class SetupActivity extends AppCompatActivity {
 
         ViewPager viewPager = binding.setupViewpager;
         viewPager.setOffscreenPageLimit(3);
-        PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
+        PagerAdapter pagerAdapter = new SetupPagerAdapter(this, new SetupPresenter(this));
 
         viewPager.setAdapter(pagerAdapter);
 
 /*        jikanFacade.getAnime(21).toObservable().subscribeOn(Schedulers.io()).subscribe(jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
                 Throwable::printStackTrace);*/
+    }
+
+    @Override
+    public void finishSetup() {
+
+    }
+
+    @Override
+    public void logInToMal() {
+
     }
 
     /**
@@ -74,9 +86,11 @@ public class SetupActivity extends AppCompatActivity {
     private class SetupPagerAdapter extends ViewStatePagerAdapter {
 
         private Context context;
+        private SetupPresenter setupPresenter;
 
-        SetupPagerAdapter(Context context) {
+        SetupPagerAdapter(Context context, SetupPresenter setupPresenter) {
             this.context = context;
+            this.setupPresenter = setupPresenter;
         }
 
         @Override
@@ -98,6 +112,7 @@ public class SetupActivity extends AppCompatActivity {
                 case 2:
                     // Settings screen
                     ActivitySetupSettingsBinding settingsBinding = ActivitySetupSettingsBinding.inflate(layoutInflater);
+
                     currentPageView = settingsBinding.getRoot();
                     break;
             }
