@@ -35,4 +35,6 @@ ext {
     gson = '2.8.2'
     rxjava = '2.1.5'
     rxandroid = '2.0.1'
+    rxlint = '1.6'
+    okhttpLogging = '3.9.0'
 }

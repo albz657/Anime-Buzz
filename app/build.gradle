@@ -52,13 +52,15 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit"
     compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit"
     compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
+    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttpLogging"
 
     // Gson
     compile "com.google.code.gson:gson:$rootProject.ext.gson"
 
-    // RxJava2
+    // RxJava
     compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava"
     compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid"
+    compile "nl.littlerobots.rxlint:rxlint:$rootProject.ext.rxlint"
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'

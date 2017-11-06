@@ -7,8 +7,10 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import me.jakemoritz.animebuzz.BuildConfig;
 import me.jakemoritz.animebuzz.services.JikanService;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -29,7 +31,10 @@ public class NetModule {
     @Provides
     @Singleton
     OkHttpClient provideOkHttpClient(){
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.addInterceptor(loggingInterceptor);
         return builder.build();
     }
 

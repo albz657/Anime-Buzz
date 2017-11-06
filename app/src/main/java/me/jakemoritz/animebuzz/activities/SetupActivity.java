@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,9 @@ import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
@@ -23,6 +27,7 @@ import me.jakemoritz.animebuzz.databinding.ActivitySetupIntroBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupMalLoginBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
 import me.jakemoritz.animebuzz.services.JikanFacade;
+import me.jakemoritz.animebuzz.utils.RxUtils;
 
 /**
  * This Activity manages the setup flow. It allows the user to sign in to their MyAnimeList account
@@ -35,12 +40,7 @@ public class SetupActivity extends AppCompatActivity {
     @Inject
     JikanFacade jikanFacade;
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        App.getInstance().getAppComponent().inject(this);
-        initializeView();
-    }
+    private CompositeDisposable disposables;
 
     /**
      * This creates an {@link Intent} to start this Activity
@@ -50,6 +50,37 @@ public class SetupActivity extends AppCompatActivity {
      */
     public static Intent newIntent(Context context) {
         return new Intent(context, SetupActivity.class);
+    }
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.getInstance().getAppComponent().inject(this);
+        initializeView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (disposables == null || disposables.isDisposed()) {
+            disposables = new CompositeDisposable();
+        }
+
+        disposables.add(jikanFacade.getAnime(21)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
+                        Throwable::printStackTrace)
+        );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        RxUtils.disposeOf(disposables);
     }
 
     /**
@@ -63,9 +94,6 @@ public class SetupActivity extends AppCompatActivity {
         PagerAdapter pagerAdapter = new SetupPagerAdapter(this);
 
         viewPager.setAdapter(pagerAdapter);
-
-/*        jikanFacade.getAnime(21).toObservable().subscribeOn(Schedulers.io()).subscribe(jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
-                Throwable::printStackTrace);*/
     }
 
     /**
