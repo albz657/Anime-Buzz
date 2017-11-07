@@ -2,5 +2,5 @@ package me.jakemoritz.animebuzz.presenters;
 
 public interface SetupListener {
     void finishSetup();
-    void logInToMal();
+    void logInToMal(String username, String password);
 }

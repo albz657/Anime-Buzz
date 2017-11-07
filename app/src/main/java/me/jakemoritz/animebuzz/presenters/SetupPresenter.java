@@ -14,7 +14,7 @@ public class SetupPresenter implements SetupListener {
     }
 
     @Override
-    public void logInToMal() {
-        setupListener.logInToMal();
+    public void logInToMal(String username, String password) {
+        setupListener.logInToMal(username, password);
     }
 }
