@@ -99,7 +99,7 @@
                 android:layout_gravity="end"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="30dp"
-                android:text="@string/pref_english_title"
+                android:text="@string/pref_english_titles_title"
                 android:textAlignment="textEnd"
                 android:textColor="@android:color/white"
                 app:layout_constraintLeft_toLeftOf="parent"

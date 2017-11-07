@@ -10,13 +10,13 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.f2prateek.rx.preferences2.Preference;
 import com.f2prateek.rx.preferences2.RxSharedPreferences;
+import com.jakewharton.rxbinding2.widget.RxCompoundButton;
 import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import javax.inject.Inject;
@@ -49,6 +49,8 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     private CompositeDisposable disposables;
     private boolean loggedIn = false;
+    private SharedPreferences sharedPreferences;
+    private RxSharedPreferences rxPrefs;
 
     /**
      * This creates an {@link Intent} to start this Activity
@@ -64,6 +66,11 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         App.getInstance().getAppComponent().inject(this);
+
+        // Set up SharedPreferences
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        rxPrefs = RxSharedPreferences.create(sharedPreferences);
+
         initializeView();
     }
 
@@ -103,13 +110,8 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     @Override
     public void finishSetup() {
         // TODO: Save credentials, save login state
-        if (loggedIn){
-            SharedPreferences sharedPreferences =
-                    PreferenceManager.getDefaultSharedPreferences(this);
-            RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
-
-            Preference<Boolean> loggedIn =
-                    rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
+        if (loggedIn) {
+            Preference<Boolean> loggedIn = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
             loggedIn.set(true);
         }
 
@@ -126,8 +128,8 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     @Override
     public void logInToMal(String username, String password) {
         // TODO: Replace with provided username and password
-        MalHeader.getInstance().setUsername(getString(R.string.MAL_API_TEST_LOGIN));
-        MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
+        MalHeader.getInstance().setUsername(username);
+        MalHeader.getInstance().setPassword(password);
         disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
                 malVerifyCredentialsWrapper -> {
                     // TODO: Save user credentials
@@ -175,6 +177,24 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
                     // Settings screen
                     ActivitySetupSettingsBinding settingsBinding = ActivitySetupSettingsBinding.inflate(layoutInflater);
                     settingsBinding.setPresenter(setupPresenter);
+
+                    Preference<Boolean> englishTitlesPref = rxPrefs.getBoolean(Constants.PREF_KEY_ENGLISH_TITLES_KEY);
+                    disposables.add(RxCompoundButton.checkedChanges(settingsBinding.setupSettingsEnglishTitleSwitch)
+                            .subscribe(
+                                    englishTitlesPref::set
+                            ));
+
+                    Preference<Boolean> simulcastPref = rxPrefs.getBoolean(Constants.PREF_KEY_SIMULCAST_KEY);
+                    disposables.add(RxCompoundButton.checkedChanges(settingsBinding.setupSettingsSimulcastSwitch)
+                            .subscribe(
+                                    simulcastPref::set
+                            ));
+
+                    Preference<Boolean> timeFormatPref = rxPrefs.getBoolean(Constants.PREF_KEY_TIME_FORMAT_KEY);
+                    disposables.add(RxCompoundButton.checkedChanges(settingsBinding.setupSettingsTimeFormatSwitch)
+                            .subscribe(
+                                    timeFormatPref::set
+                            ));
 
                     currentPageView = settingsBinding.getRoot();
                     break;
