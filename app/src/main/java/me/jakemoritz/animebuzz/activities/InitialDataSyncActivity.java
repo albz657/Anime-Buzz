@@ -16,6 +16,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
@@ -97,8 +98,10 @@ public class InitialDataSyncActivity extends AppCompatActivity {
     }
 
     // TODO: Save season data
+
     /**
      * This method retrieves additional anime data from the Jikan API
+     *
      * @param senpaiSeasonWrapper contains the list of anime that we are getting more data for
      */
     private void getJikanData(SenpaiSeasonWrapper senpaiSeasonWrapper) {
@@ -124,7 +127,7 @@ public class InitialDataSyncActivity extends AppCompatActivity {
         // Wait for all Jikan API calls to complete
         disposables.add(Single.zip(
                 singleList, objects -> objects)
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         objects -> {
@@ -138,8 +141,18 @@ public class InitialDataSyncActivity extends AppCompatActivity {
                             }
 
                             // Save Anime data to Realm
-                            App.getInstance().getRealm().executeTransaction(
-                                    realm -> realm.copyToRealmOrUpdate(newAnimeList)
+                            App.getInstance().getRealm().executeTransactionAsync(
+                                    realm -> realm.copyToRealmOrUpdate(newAnimeList),
+                                    () -> {
+                                        // Data write succeeded, start main app
+                                        finish();
+                                        startActivity(MainActivity.newIntent(this));
+                                    },
+                                    error -> {
+                                        // Data write failed
+                                        // TODO: Handle failed data write
+                                        error.printStackTrace();
+                                    }
                             );
                         },
                         this::handleError
