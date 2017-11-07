@@ -44,12 +44,6 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     private static final String TAG = SetupActivity.class.getName();
 
     @Inject
-    JikanFacade jikanFacade;
-
-    @Inject
-    SenpaiFacade senpaiFacade;
-
-    @Inject
     MalFacade malFacade;
 
     private CompositeDisposable disposables;
@@ -93,6 +87,7 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     private void initializeView() {
         ActivitySetupBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_setup);
 
+        // Initialize ViewPagerAdapter with setup flow screens
         ViewPager viewPager = binding.setupViewpager;
         viewPager.setOffscreenPageLimit(3);
         PagerAdapter pagerAdapter = new SetupPagerAdapter(this, new SetupPresenter(this));
@@ -100,29 +95,33 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
         viewPager.setAdapter(pagerAdapter);
     }
 
+    /**
+     * Exit setup flow, enter main app
+     */
     @Override
     public void finishSetup() {
         finish();
         startActivity(MainActivity.newIntent(this));
-/*        senpaiFacade.getCurrentSeason().subscribeOn(Schedulers.io()).subscribe(
-                senpaiSeasonWrapper -> {
-                    Log.d(TAG, senpaiSeasonWrapper.toString());
-                },
-                Throwable::printStackTrace
-        );*/
     }
 
+    /**
+     * Attempt to login user in to MyAnimeList with the provided credentials
+     *
+     * @param username is the MyAnimeList account username entered by the user
+     * @param password is the MyAnimeList account password entered by the user
+     */
     @Override
     public void logInToMal(String username, String password) {
-        Log.d(TAG, username + " : " + password);
         // TODO: Replace with provided username and password
         MalHeader.getInstance().setUsername(getString(R.string.MAL_API_TEST_LOGIN));
         MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
         disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
                 malVerifyCredentialsWrapper -> {
+                    // TODO: Save user credentials, save login state
                     Log.d(TAG, malVerifyCredentialsWrapper.toString());
                 },
                 throwable -> {
+                    // TODO: Display failed verification UI
                     throwable.printStackTrace();
                 }
         ));

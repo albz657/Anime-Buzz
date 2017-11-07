@@ -39,7 +39,9 @@ public class NetModule {
     @Singleton
     OkHttpClient provideOkHttpClient(){
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-        loggingInterceptor.setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ?
+                HttpLoggingInterceptor.Level.BODY :
+                HttpLoggingInterceptor.Level.NONE);
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.addInterceptor(loggingInterceptor);
         return builder.build();
@@ -78,6 +80,11 @@ public class NetModule {
     @Singleton
     MalService provideMalService() {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(BuildConfig.DEBUG ?
+                HttpLoggingInterceptor.Level.BODY :
+                HttpLoggingInterceptor.Level.NONE);
+        httpClientBuilder.addInterceptor(loggingInterceptor);
         httpClientBuilder.addInterceptor(MalHeader.getInstance());
         OkHttpClient client = httpClientBuilder.build();
 
