@@ -61,7 +61,7 @@ dependencies {
         exclude group: 'xpp3', module: 'xpp3'
     }
     compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
-    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttpLogging"
+    compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okHttpLogging"
 
     // Gson
     compile "com.google.code.gson:gson:$rootProject.ext.gson"
@@ -70,6 +70,8 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:$rootProject.ext.rxjava"
     compile "io.reactivex.rxjava2:rxandroid:$rootProject.ext.rxandroid"
     compile "nl.littlerobots.rxlint:rxlint:$rootProject.ext.rxlint"
+    compile "com.f2prateek.rx.preferences2:rx-preferences:$rootProject.ext.rxpreferences"
+    compile "com.jakewharton.rxbinding2:rxbinding:$rootProject.ext.rxbinding"
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'

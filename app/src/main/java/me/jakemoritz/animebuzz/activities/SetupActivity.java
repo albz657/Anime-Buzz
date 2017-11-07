@@ -2,8 +2,10 @@ package me.jakemoritz.animebuzz.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -13,12 +15,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.f2prateek.rx.preferences2.Preference;
+import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.nightlynexus.viewstatepageradapter.ViewStatePagerAdapter;
 
 import javax.inject.Inject;
 
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
@@ -30,9 +32,8 @@ import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
 import me.jakemoritz.animebuzz.network.MalHeader;
 import me.jakemoritz.animebuzz.presenters.SetupListener;
 import me.jakemoritz.animebuzz.presenters.SetupPresenter;
-import me.jakemoritz.animebuzz.services.JikanFacade;
 import me.jakemoritz.animebuzz.services.MalFacade;
-import me.jakemoritz.animebuzz.services.SenpaiFacade;
+import me.jakemoritz.animebuzz.utils.Constants;
 import me.jakemoritz.animebuzz.utils.RxUtils;
 
 /**
@@ -47,6 +48,7 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     MalFacade malFacade;
 
     private CompositeDisposable disposables;
+    private boolean loggedIn = false;
 
     /**
      * This creates an {@link Intent} to start this Activity
@@ -100,6 +102,17 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
      */
     @Override
     public void finishSetup() {
+        // TODO: Save credentials, save login state
+        if (loggedIn){
+            SharedPreferences sharedPreferences =
+                    PreferenceManager.getDefaultSharedPreferences(this);
+            RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
+
+            Preference<Boolean> loggedIn =
+                    rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
+            loggedIn.set(true);
+        }
+
         finish();
         startActivity(MainActivity.newIntent(this));
     }
@@ -117,8 +130,8 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
         MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
         disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
                 malVerifyCredentialsWrapper -> {
-                    // TODO: Save user credentials, save login state
-                    Log.d(TAG, malVerifyCredentialsWrapper.toString());
+                    // TODO: Save user credentials
+                    loggedIn = true;
                 },
                 throwable -> {
                     // TODO: Display failed verification UI
