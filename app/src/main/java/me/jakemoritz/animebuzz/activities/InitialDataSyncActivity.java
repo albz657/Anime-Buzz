@@ -89,8 +89,8 @@ public class InitialDataSyncActivity extends AppCompatActivity {
      */
     private void getInitialData() {
         disposables.add(senpaiFacade.getCurrentSeason()
-                .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
                 .subscribe(
                         this::getJikanData,
                         this::handleError
@@ -127,19 +127,23 @@ public class InitialDataSyncActivity extends AppCompatActivity {
         // Wait for all Jikan API calls to complete
         disposables.add(Single.zip(
                 singleList, objects -> objects)
+                .subscribeOn(Schedulers.computation())
+                .map(objects -> {
+                    // Transform Jikan data to list of Anime objects
+                    JikanAnime[] jikanAnimeArray = Arrays.copyOf(objects, objects.length, JikanAnime[].class);
+                    List<Anime> newAnimeList = new ArrayList<>();
+
+                    // Combine Jikan and Senpai data into on Anime object
+                    for (JikanAnime jikanAnime : jikanAnimeArray) {
+                        Anime anime = new Anime(senpaiAnimeMap.get(jikanAnime.getMalId()), jikanAnime);
+                        newAnimeList.add(anime);
+                    }
+
+                    return newAnimeList;
+                })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
                 .subscribe(
-                        objects -> {
-                            JikanAnime[] jikanAnimeArray = Arrays.copyOf(objects, objects.length, JikanAnime[].class);
-                            List<Anime> newAnimeList = new ArrayList<>();
-
-                            // Combine Jikan and Senpai data into on Anime object
-                            for (JikanAnime jikanAnime : jikanAnimeArray) {
-                                Anime anime = new Anime(senpaiAnimeMap.get(jikanAnime.getMalId()), jikanAnime);
-                                newAnimeList.add(anime);
-                            }
-
+                        newAnimeList -> {
                             // Save Anime data to Realm
                             App.getInstance().getRealm().executeTransactionAsync(
                                     realm -> realm.copyToRealmOrUpdate(newAnimeList),
@@ -148,11 +152,7 @@ public class InitialDataSyncActivity extends AppCompatActivity {
                                         finish();
                                         startActivity(MainActivity.newIntent(this));
                                     },
-                                    error -> {
-                                        // Data write failed
-                                        // TODO: Handle failed data write
-                                        error.printStackTrace();
-                                    }
+                                    this::handleError
                             );
                         },
                         this::handleError

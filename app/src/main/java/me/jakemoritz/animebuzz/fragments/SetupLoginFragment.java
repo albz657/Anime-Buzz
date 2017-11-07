@@ -32,9 +32,9 @@ import me.jakemoritz.animebuzz.utils.RxUtils;
 /**
  * This Fragment allows the user log in to their MyAnimeList account in the setup flow
  */
-public class SetupLoginFragment extends Fragment implements MalLoginListener{
+public class SetupLoginFragment extends Fragment implements MalLoginListener {
 
-    public static SetupLoginFragment newInstance(){
+    public static SetupLoginFragment newInstance() {
         return new SetupLoginFragment();
     }
 
@@ -58,7 +58,7 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener{
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-         binding = DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
                 inflater,
                 R.layout.fragment_setup_mal_login,
                 container,
@@ -72,7 +72,7 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener{
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        if (disposables == null || disposables.isDisposed()){
+        if (disposables == null || disposables.isDisposed()) {
             disposables = new CompositeDisposable();
         }
     }
@@ -84,7 +84,7 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener{
         RxUtils.disposeOf(disposables);
     }
 
-    private void initializeView(){
+    private void initializeView() {
         binding.setPresenter(new MalLoginPresenter(this));
     }
 
@@ -99,16 +99,20 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener{
         // TODO: Replace with provided username and password
         MalHeader.getInstance().setUsername(username);
         MalHeader.getInstance().setPassword(password);
-        disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
-                malVerifyCredentialsWrapper -> {
-                    // TODO: Save user credentials
-                    Preference<Boolean> loggedInPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
-                    loggedInPref.set(true);
-                },
-                throwable -> {
-                    // TODO: Display failed verification UI
-                    throwable.printStackTrace();
-                }
-        ));
+
+        disposables.add(malFacade.verifyCredentials()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(
+                        malVerifyCredentialsWrapper -> {
+                            // TODO: Save user credentials
+                            Preference<Boolean> loggedInPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
+                            loggedInPref.set(true);
+                        },
+                        throwable -> {
+                            // TODO: Display failed verification UI
+                            throwable.printStackTrace();
+                        }
+                ));
     }
 }
