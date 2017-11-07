@@ -63,19 +63,25 @@ public class SetupActivity extends AppIntro {
     @Override
     public void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
-        onDonePressed(currentFragment);
+        finishSetup();
     }
 
     @Override
     public void onDonePressed(Fragment currentFragment) {
         super.onDonePressed(currentFragment);
+        finishSetup();
+    }
 
+    /**
+     * User has completed setup, launch main app
+     */
+    private void finishSetup(){
         // Save 'finished setup' state
         Preference<Boolean> finishedSetupPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_FINISHED_SETUP);
         finishedSetupPref.set(true);
 
         // Launch main app
         finish();
-        startActivity(MainActivity.newIntent(this));
+        startActivity(InitialDataSyncActivity.newIntent(this));
     }
 }

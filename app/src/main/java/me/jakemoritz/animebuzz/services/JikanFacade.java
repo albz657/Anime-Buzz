@@ -11,7 +11,7 @@ public class JikanFacade {
         this.jikanService = jikanService;
     }
 
-    public Single<JikanAnime> getAnime(int malId){
+    public Single<JikanAnime> getAnime(String malId){
         return jikanService.getAnime(malId);
     }
 

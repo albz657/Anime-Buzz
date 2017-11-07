@@ -8,6 +8,6 @@ import retrofit2.http.Path;
 public interface JikanService {
 
     @GET("anime/{malId}")
-    Single<JikanAnime> getAnime(@Path("malId") int malId);
+    Single<JikanAnime> getAnime(@Path("malId") String malId);
 
 }

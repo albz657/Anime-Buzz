@@ -6,12 +6,10 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import javax.inject.Inject;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.ActivityMainBinding;
@@ -54,18 +52,6 @@ public class MainActivity extends AppCompatActivity {
         if (disposables == null || disposables.isDisposed()) {
             disposables = new CompositeDisposable();
         }
-
-        disposables.add(senpaiFacade.getCurrentSeason()
-                .observeOn(Schedulers.io())
-                .subscribeOn(Schedulers.io())
-                .subscribe(
-                        senpaiSeasonWrapper -> {
-                            Log.d(TAG, senpaiSeasonWrapper.toString());
-                        },
-                        throwable -> {
-                            throwable.printStackTrace();
-                        }
-                ));
     }
 
     @Override
