@@ -157,6 +157,7 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
         @Override
         protected View createView(ViewGroup container, int position) {
+            // TODO: Use setup library with bottom bar
             LayoutInflater layoutInflater = LayoutInflater.from(context);
 
             View currentPageView = null;
