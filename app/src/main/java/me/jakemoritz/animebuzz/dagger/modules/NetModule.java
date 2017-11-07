@@ -1,7 +1,5 @@
 package me.jakemoritz.animebuzz.dagger.modules;
 
-import android.util.Base64;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -9,13 +7,12 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import me.jakemoritz.animebuzz.network.MalHeader;
 import me.jakemoritz.animebuzz.BuildConfig;
+import me.jakemoritz.animebuzz.network.MalHeader;
 import me.jakemoritz.animebuzz.services.JikanService;
 import me.jakemoritz.animebuzz.services.MalService;
 import me.jakemoritz.animebuzz.services.SenpaiService;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -79,21 +76,9 @@ public class NetModule {
 
     @Provides
     @Singleton
-    MalService provideMalService(MalHeader malHeader) {
-        String credentials = "***REMOVED***" + ":" + "***REMOVED***";
-        String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+    MalService provideMalService() {
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
-        httpClientBuilder.addInterceptor(chain -> {
-            Request original = chain.request();
-            Request.Builder requestBuilder = original.newBuilder()
-                    .header("Authorization", basic)
-                    .header("Accept", "application/xml")
-                    .method(original.method(), original.body());
-
-            Request request = requestBuilder.build();
-            return chain.proceed(request);
-        });
-
+        httpClientBuilder.addInterceptor(MalHeader.getInstance());
         OkHttpClient client = httpClientBuilder.build();
 
         Retrofit retrofit = new Retrofit.Builder()

@@ -1,5 +1,6 @@
 package me.jakemoritz.animebuzz.network;
 
+import android.support.annotation.NonNull;
 import android.util.Base64;
 
 import java.io.IOException;
@@ -24,8 +25,8 @@ public class MalHeader implements Interceptor {
     }
 
     @Override
-    public Response intercept(Chain chain) throws IOException {
-        String credentials = password + ":" + username;
+    public Response intercept(@NonNull Chain chain) throws IOException {
+        String credentials = username + ":" + password;
         String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
 
         Request original = chain.request();

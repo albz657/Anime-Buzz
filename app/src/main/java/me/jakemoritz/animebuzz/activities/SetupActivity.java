@@ -115,8 +115,9 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
     @Override
     public void logInToMal(String username, String password) {
         Log.d(TAG, username + " : " + password);
-        MalHeader.getInstance().setUsername(username);
-        MalHeader.getInstance().setPassword(password);
+        // TODO: Replace with provided username and password
+        MalHeader.getInstance().setUsername(getString(R.string.MAL_API_TEST_LOGIN));
+        MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
         disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
                 malVerifyCredentialsWrapper -> {
                     Log.d(TAG, malVerifyCredentialsWrapper.toString());
