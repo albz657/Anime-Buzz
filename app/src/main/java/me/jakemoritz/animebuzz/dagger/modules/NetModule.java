@@ -80,7 +80,7 @@ public class NetModule {
     @Provides
     @Singleton
     MalService provideMalService(MalHeader malHeader) {
-        String credentials = "Skyrocketing" + ":" + "udI1YQU$f5^E";
+        String credentials = "***REMOVED***" + ":" + "***REMOVED***";
         String basic = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
         OkHttpClient.Builder httpClientBuilder = new OkHttpClient.Builder();
         httpClientBuilder.addInterceptor(chain -> {
