@@ -27,9 +27,11 @@ import me.jakemoritz.animebuzz.databinding.ActivitySetupBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupIntroBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupMalLoginBinding;
 import me.jakemoritz.animebuzz.databinding.ActivitySetupSettingsBinding;
+import me.jakemoritz.animebuzz.network.MalHeader;
 import me.jakemoritz.animebuzz.presenters.SetupListener;
 import me.jakemoritz.animebuzz.presenters.SetupPresenter;
 import me.jakemoritz.animebuzz.services.JikanFacade;
+import me.jakemoritz.animebuzz.services.MalFacade;
 import me.jakemoritz.animebuzz.services.SenpaiFacade;
 import me.jakemoritz.animebuzz.utils.RxUtils;
 
@@ -46,6 +48,9 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     @Inject
     SenpaiFacade senpaiFacade;
+
+    @Inject
+    MalFacade malFacade;
 
     private CompositeDisposable disposables;
 
@@ -73,14 +78,6 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
         if (disposables == null || disposables.isDisposed()) {
             disposables = new CompositeDisposable();
         }
-
-        disposables.add(jikanFacade.getAnime(21)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        jikanAnime -> Log.d(TAG, jikanAnime.getTitle()),
-                        Throwable::printStackTrace)
-        );
     }
 
     @Override
@@ -105,17 +102,29 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
 
     @Override
     public void finishSetup() {
-        senpaiFacade.getCurrentSeason().subscribeOn(Schedulers.io()).subscribe(
+        finish();
+        startActivity(MainActivity.newIntent(this));
+/*        senpaiFacade.getCurrentSeason().subscribeOn(Schedulers.io()).subscribe(
                 senpaiSeasonWrapper -> {
                     Log.d(TAG, senpaiSeasonWrapper.toString());
                 },
                 Throwable::printStackTrace
-        );
+        );*/
     }
 
     @Override
-    public void logInToMal() {
-
+    public void logInToMal(String username, String password) {
+        Log.d(TAG, username + " : " + password);
+        MalHeader.getInstance().setUsername(username);
+        MalHeader.getInstance().setPassword(password);
+        disposables.add(malFacade.verifyCredentials().subscribeOn(Schedulers.io()).subscribe(
+                malVerifyCredentialsWrapper -> {
+                    Log.d(TAG, malVerifyCredentialsWrapper.toString());
+                },
+                throwable -> {
+                    throwable.printStackTrace();
+                }
+        ));
     }
 
     /**
@@ -145,6 +154,8 @@ public class SetupActivity extends AppCompatActivity implements SetupListener {
                 case 1:
                     // MyAnimeList login screen
                     ActivitySetupMalLoginBinding malLoginBinding = ActivitySetupMalLoginBinding.inflate(layoutInflater);
+                    malLoginBinding.setPresenter(setupPresenter);
+
                     currentPageView = malLoginBinding.getRoot();
                     break;
                 case 2:

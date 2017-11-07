@@ -2,6 +2,7 @@ package me.jakemoritz.animebuzz.app;
 
 import android.app.Application;
 
+import io.realm.Realm;
 import me.jakemoritz.animebuzz.dagger.AppComponent;
 import me.jakemoritz.animebuzz.dagger.DaggerAppComponent;
 import me.jakemoritz.animebuzz.dagger.modules.AppModule;
@@ -16,6 +17,7 @@ public class App extends Application {
     private static App instance;
 
     private AppComponent appComponent;
+    private Realm realm;
 
     public static synchronized App getInstance(){
         return instance;
@@ -26,6 +28,7 @@ public class App extends Application {
         super.onCreate();
 
         instance = this;
+        Realm.init(this);
 
         appComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
@@ -36,5 +39,13 @@ public class App extends Application {
 
     public AppComponent getAppComponent() {
         return appComponent;
+    }
+
+    public Realm getRealm(){
+        if (realm == null || realm.isClosed()){
+            realm = Realm.getDefaultInstance();
+        }
+
+        return realm;
     }
 }

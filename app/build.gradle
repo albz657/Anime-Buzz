@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 27
@@ -34,6 +35,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
+    }
 }
 
 dependencies {
@@ -51,6 +56,10 @@ dependencies {
     //Retrofit
     compile "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofit"
     compile "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofit"
+    compile ("com.squareup.retrofit2:converter-simplexml:$rootProject.ext.retrofit"){
+        exclude group: 'stax', module: 'stax-api'
+        exclude group: 'xpp3', module: 'xpp3'
+    }
     compile "com.squareup.retrofit2:adapter-rxjava2:$rootProject.ext.retrofit"
     compile "com.squareup.okhttp3:logging-interceptor:$rootProject.ext.okhttpLogging"
 

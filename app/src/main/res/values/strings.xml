@@ -30,4 +30,6 @@
     <string name="pref_time_format_title">Display time in 24-hour format</string>
     <string name="pref_english_title">Display English titles</string>
 
+    <!-- Fragment titles -->3
+    <string name="fragment_watching_list">Watching</string>
 </resources>

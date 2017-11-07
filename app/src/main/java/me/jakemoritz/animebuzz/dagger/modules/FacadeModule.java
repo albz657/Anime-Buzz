@@ -6,6 +6,8 @@ import dagger.Module;
 import dagger.Provides;
 import me.jakemoritz.animebuzz.services.JikanFacade;
 import me.jakemoritz.animebuzz.services.JikanService;
+import me.jakemoritz.animebuzz.services.MalFacade;
+import me.jakemoritz.animebuzz.services.MalService;
 import me.jakemoritz.animebuzz.services.SenpaiFacade;
 import me.jakemoritz.animebuzz.services.SenpaiService;
 
@@ -24,4 +26,9 @@ public class FacadeModule {
         return new SenpaiFacade(senpaiService);
     }
 
+    @Provides
+    @Singleton
+    MalFacade provideMalFacade(MalService malService){
+        return new MalFacade(malService);
+    }
 }
