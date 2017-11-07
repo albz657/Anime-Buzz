@@ -26,6 +26,7 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 public class NetModule {
 
     private static final String MAL_ENDPOINT = "https://myanimelist.net/api/";
+    private static final String JIKAN_ENDPOINT = "http://www.senpai.moe/";
 
     public NetModule() {
     }
@@ -51,7 +52,7 @@ public class NetModule {
     @Singleton
     Retrofit provideRetrofitForJikan(Gson gson, OkHttpClient okHttpClient){
         return new Retrofit.Builder()
-                .baseUrl("http://www.senpai.moe/")
+                .baseUrl(JIKAN_ENDPOINT)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(okHttpClient)
