@@ -3,7 +3,7 @@
 buildscript {
     repositories {
         jcenter()
-    }
+}
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0'
         classpath "io.realm:realm-gradle-plugin:4.0.0"
@@ -18,6 +18,9 @@ allprojects {
         maven {
             url "https://maven.google.com"
         }
+        maven {
+            url 'https://jitpack.io'
+        }
     }
 }
 
@@ -29,7 +32,6 @@ ext {
     androidSupportLibrary = '27.0.0'
     espresso = '3.0.1'
     junit = '4.12'
-    viewStatePagerAdapter = '1.0.4'
     constraintLayout = '1.0.2'
     dagger = '2.12'
     retrofit = '2.3.0'
@@ -40,4 +42,5 @@ ext {
     okHttpLogging = '3.9.0'
     rxpreferences = '2.0.0-RC3'
     rxbinding = '2.0.0'
+    appintro = 'v4.2.2'
 }

@@ -12,9 +12,4 @@ public class SetupPresenter implements SetupListener {
     public void finishSetup() {
         setupListener.finishSetup();
     }
-
-    @Override
-    public void logInToMal(String username, String password) {
-        setupListener.logInToMal(username, password);
-    }
 }

@@ -6,7 +6,7 @@
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:background="@color/colorPrimary">
+        android:background="@color/colorPrimary">
 
         <TextView
             android:id="@+id/setup_intro_header"
@@ -140,20 +140,5 @@
                 app:layout_constraintTop_toBottomOf="@+id/setup_intro_bullet_second_text" />
 
         </android.support.constraint.ConstraintLayout>
-
-        <TextView
-            android:id="@+id/setup_intro_swipe_left"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/setup_intro_swipe_left"
-            android:textAlignment="center"
-            android:textColor="@color/setup_transparent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/bullet_holder"
-            app:layout_constraintVertical_bias="1.00"
-            android:layout_marginBottom="30dp"/>
     </android.support.constraint.ConstraintLayout>
 </layout>

@@ -90,5 +90,8 @@ public class MainActivity extends AppCompatActivity {
         // TODO: 'Following' instead of 'Watching'
         // TODO: Helper text for 'swipe to remove' in backlog
         // TODO: Use DiffTools for list
+        // TODO: Details screen for anime
+        // TODO: Scrolling between details screens
+        // TODO: Swipe animation for backlog
     }
 }
