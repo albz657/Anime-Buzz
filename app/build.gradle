@@ -72,6 +72,7 @@ dependencies {
     compile "com.jakewharton.rxbinding2:rxbinding:$rootProject.ext.rxbinding"
 
     compile "com.github.apl-devs:appintro:$rootProject.ext.appintro"
+    compile "com.aurelhubert:ahbottomnavigation:$rootProject.ext.ahBottomNavigation"
 
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'

@@ -43,4 +43,5 @@ ext {
     rxpreferences = '2.0.0-RC3'
     rxbinding = '2.0.0'
     appintro = 'v4.2.2'
+    ahBottomNavigation = '2.1.0'
 }

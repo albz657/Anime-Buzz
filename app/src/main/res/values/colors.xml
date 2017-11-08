@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#1976D2</color>
     <color name="colorAccent">#ffc107</color>
     <color name="setup_transparent">#B3FFFFFF</color>
+    <color name="bottom_nav_inactive">#8CFFFFFF</color>
+
+    <array name="bottom_nav_tab_colors">
+        <item>@color/colorPrimary</item>
+    </array>
 </resources>
