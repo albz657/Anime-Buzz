@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'realm-android'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 27
@@ -74,9 +75,17 @@ dependencies {
     compile "com.github.apl-devs:appintro:$rootProject.ext.appintro"
     compile "com.aurelhubert:ahbottomnavigation:$rootProject.ext.ahBottomNavigation"
 
+    // Firebase
+    compile("com.crashlytics.sdk.android:crashlytics:$rootProject.ext.crashlytics") {
+        transitive = true
+    }
+    compile "com.google.firebase:firebase-core:$rootProject.ext.firebase"
+
     androidTestCompile("com.android.support.test.espresso:espresso-core:$rootProject.ext.espresso", {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
     testCompile "junit:junit:$rootProject.ext.junit"
 }
+
+apply plugin: 'com.google.gms.google-services'

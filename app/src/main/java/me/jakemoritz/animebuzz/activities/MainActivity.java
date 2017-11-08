@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Scrolling between details screens
         // TODO: Swipe animation for backlog
         // TODO: Transition between Activity/Fragment
+        // TODO: Link to external services (CR, KA, Fun, etc)
     }
 
     /**
