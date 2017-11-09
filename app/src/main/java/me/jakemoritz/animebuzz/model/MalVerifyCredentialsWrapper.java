@@ -1,4 +1,4 @@
-package me.jakemoritz.animebuzz.dagger.modules;
+package me.jakemoritz.animebuzz.model;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;

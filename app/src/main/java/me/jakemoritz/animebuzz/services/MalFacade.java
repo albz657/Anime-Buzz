@@ -9,17 +9,19 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.oussaki.rxfilesdownloader.FileContainer;
 import com.oussaki.rxfilesdownloader.RxDownloader;
 
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Single;
 import me.jakemoritz.animebuzz.app.App;
-import me.jakemoritz.animebuzz.dagger.modules.MalVerifyCredentialsWrapper;
+import me.jakemoritz.animebuzz.model.MalAnime;
+import me.jakemoritz.animebuzz.model.MalVerifyCredentialsWrapper;
 import me.jakemoritz.animebuzz.utils.Constants;
 import okhttp3.OkHttpClient;
 
-public class MalFacade implements MalService {
+public class MalFacade {
 
     @Inject
     OkHttpClient okHttpClient;
@@ -29,6 +31,9 @@ public class MalFacade implements MalService {
     private static final String[] IMAGE_URL_PATH = new String[]{"images", "userimages"};
     private static final String IMAGE_FILE_TYPE = ".jpg";
 
+    private static final String ENTRY_STATUS = "all";
+    private static final String LIST_TYPE_ANIME = "anime";
+
     private MalService malService;
 
     public MalFacade(MalService malService) {
@@ -36,12 +41,10 @@ public class MalFacade implements MalService {
         App.getInstance().getAppComponent().inject(this);
     }
 
-    @Override
     public Single<MalVerifyCredentialsWrapper> verifyCredentials() {
         return malService.verifyCredentials();
     }
 
-    @Override
     public Single<List<FileContainer>> getUserAvatar() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
@@ -62,5 +65,25 @@ public class MalFacade implements MalService {
                 .build();
 
         return rxDownloader.asList();
+    }
+
+    public Single<List<MalAnime>> getUserAnimeList() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
+        RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
+
+        Preference<String> malUsernamePref = rxPrefs.getString(Constants.SHARED_PREF_KEY_MAL_USERNAME, "");
+
+        return malService.getUserAnimeList(malUsernamePref.get(), ENTRY_STATUS, LIST_TYPE_ANIME)
+                .map(malUserObject -> {
+                    // Filter only shows that the user is currently watching
+                    for (Iterator<MalAnime> iterator = malUserObject.getUserAnimeList().iterator(); iterator.hasNext();){
+                        MalAnime malAnime = iterator.next();
+                        if (malAnime.getEntryWatchingStatus() != Constants.MAL_ENTRY_STATUS_WATCHING){
+                            iterator.remove();
+                        }
+                    }
+
+                    return malUserObject.getUserAnimeList();
+                });
     }
 }

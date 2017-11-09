@@ -110,6 +110,9 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                             Preference<Boolean> loggedInPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
                             loggedInPref.set(true);
 
+                            Preference<String> malUsernamePref = rxPrefs.getString(Constants.SHARED_PREF_KEY_MAL_USERNAME, "");
+                            malUsernamePref.set(malVerifyCredentialsWrapper.getUsername());
+
                             Preference<String> malUserIdPref = rxPrefs.getString(Constants.SHARED_PREF_KEY_MAL_USER_ID, "");
                             malUserIdPref.set(malVerifyCredentialsWrapper.getUserID());
 
@@ -119,7 +122,7 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
                                             (fileContainers, throwable) -> {
-                                                if (throwable != null){
+                                                if (throwable != null) {
                                                     throwable.printStackTrace();
                                                 }
                                             }

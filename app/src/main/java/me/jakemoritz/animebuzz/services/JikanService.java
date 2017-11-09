@@ -9,5 +9,4 @@ public interface JikanService {
 
     @GET("anime/{malId}")
     Single<JikanAnime> getAnime(@Path("malId") String malId);
-
 }

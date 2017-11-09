@@ -110,15 +110,7 @@ public class InitialDataSyncActivity extends AppCompatActivity {
 
         // Build list of RxJava Singles of calls to the Jikan API
         for (SenpaiAnime senpaiAnime : senpaiSeasonWrapper.getSenpaiAnimeList()) {
-            singleList.add(jikanFacade.getAnime(senpaiAnime.getMalId())
-                    .map(jikanAnime -> {
-                        /*
-                         Save MAL id to JikanAnime object in order to retrieve its respective
-                         SenpaiAnime counterpart
-                          */
-                        jikanAnime.setMalId(senpaiAnime.getMalId());
-                        return jikanAnime;
-                    }));
+            singleList.add(jikanFacade.getAnime(senpaiAnime.getMalId()));
 
             // Build Map of SenpaiAnime to retrieve from later
             senpaiAnimeMap.put(senpaiAnime.getMalId(), senpaiAnime);

@@ -23,7 +23,7 @@ import retrofit2.converter.simplexml.SimpleXmlConverterFactory;
 @Module
 public class NetModule {
 
-    private static final String MAL_ENDPOINT = "https://myanimelist.net/api/";
+    private static final String MAL_ENDPOINT = "https://myanimelist.net/";
     private static final String JIKAN_ENDPOINT = "https://jikan.me/api/";
     private static final String SENPAI_ENDPOINT = "http://www.senpai.moe/";
 
