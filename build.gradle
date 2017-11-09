@@ -54,4 +54,6 @@ ext {
     ahBottomNavigation = '2.1.0'
     firebase = '11.6.0'
     crashlytics = '2.7.1@aar'
+    picasso = '2.5.2'
+    rxdownloader = '0.3'
 }

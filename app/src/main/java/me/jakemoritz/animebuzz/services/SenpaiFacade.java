@@ -3,7 +3,7 @@ package me.jakemoritz.animebuzz.services;
 import io.reactivex.Single;
 import me.jakemoritz.animebuzz.model.SenpaiSeasonWrapper;
 
-public class SenpaiFacade {
+public class SenpaiFacade implements SenpaiService{
 
     private static final String FORMAT_JSON = "json";
     private static final String CURRENT_SEASON = "raw";
@@ -22,4 +22,8 @@ public class SenpaiFacade {
         return senpaiService.getSeason(FORMAT_JSON, CURRENT_SEASON);
     }
 
+    @Override
+    public Single<SenpaiSeasonWrapper> getSeason(String responseFormat, String season) {
+        return null;
+    }
 }

@@ -9,6 +9,7 @@ import me.jakemoritz.animebuzz.dagger.modules.AppModule;
 import me.jakemoritz.animebuzz.dagger.modules.FacadeModule;
 import me.jakemoritz.animebuzz.dagger.modules.NetModule;
 import me.jakemoritz.animebuzz.fragments.SetupLoginFragment;
+import me.jakemoritz.animebuzz.services.MalFacade;
 
 @Singleton
 @Component(modules = {AppModule.class, FacadeModule.class, NetModule.class})
@@ -23,5 +24,9 @@ public interface AppComponent {
     // Fragments
 
     void inject(SetupLoginFragment setupLoginFragment);
+
+    // Misc
+
+    void inject(MalFacade malFacade);
 
 }

@@ -74,6 +74,8 @@ dependencies {
 
     compile "com.github.apl-devs:appintro:$rootProject.ext.appintro"
     compile "com.aurelhubert:ahbottomnavigation:$rootProject.ext.ahBottomNavigation"
+    compile "com.squareup.picasso:picasso:$rootProject.ext.picasso"
+    compile "com.github.oussaki:RxDownloader:$rootProject.ext.rxdownloader"
 
     // Firebase
     compile("com.crashlytics.sdk.android:crashlytics:$rootProject.ext.crashlytics") {

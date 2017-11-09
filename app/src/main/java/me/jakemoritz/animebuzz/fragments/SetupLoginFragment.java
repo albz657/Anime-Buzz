@@ -17,6 +17,7 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences;
 
 import javax.inject.Inject;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
@@ -97,8 +98,8 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
     @Override
     public void logInToMal(String username, String password) {
         // TODO: Replace with provided username and password
-        MalHeader.getInstance().setUsername(username);
-        MalHeader.getInstance().setPassword(password);
+        MalHeader.getInstance().setUsername(getString(R.string.MAL_API_TEST_LOGIN));
+        MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
 
         disposables.add(malFacade.verifyCredentials()
                 .subscribeOn(Schedulers.io())
@@ -108,6 +109,21 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                             // TODO: Save user credentials
                             Preference<Boolean> loggedInPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
                             loggedInPref.set(true);
+
+                            Preference<String> malUserIdPref = rxPrefs.getString(Constants.SHARED_PREF_KEY_MAL_USER_ID, "");
+                            malUserIdPref.set(malVerifyCredentialsWrapper.getUserID());
+
+                            // Download user's MyAnimeList avatar
+                            disposables.add(malFacade.getUserAvatar()
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(
+                                            (fileContainers, throwable) -> {
+                                                if (throwable != null){
+                                                    throwable.printStackTrace();
+                                                }
+                                            }
+                                    ));
                         },
                         throwable -> {
                             // TODO: Display failed verification UI

@@ -5,6 +5,7 @@ public class Constants {
     // SharedPreferences
     public static final String SHARED_PREF_KEY_MAL_LOGGED_IN = "MAL_LOGGED_IN";
     public static final String SHARED_PREF_KEY_FINISHED_SETUP = "FINISHED_SETUP";
+    public static final String SHARED_PREF_KEY_MAL_USER_ID = "MAL_USER_ID";
 
     // Settings
     public static final String PREF_KEY_ENGLISH_TITLES_KEY = "ENGLISH_TITLES";
