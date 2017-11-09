@@ -8,6 +8,7 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import me.jakemoritz.animebuzz.model.MalUserObject;
 import me.jakemoritz.animebuzz.model.MalVerifyCredentialsWrapper;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -30,6 +31,9 @@ public interface MalService {
     @FormUrlEncoded
     @POST("api/animelist/update/{malId}.xml")
     Completable updateAnimeInList(@Path("malId") String malId, @Field("data") String malAnimeValues);
+
+    @DELETE("api/animelist/delete/{malId}.xml")
+    Completable deleteAnimeFromList(@Path("malId") String malId);
 
     Single<List<FileContainer>> getUserAvatar();
 

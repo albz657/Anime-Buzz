@@ -97,6 +97,12 @@ public class MalFacade {
                 .observeOn(Schedulers.io());
     }
 
+    public Completable deleteAnimeFromList(String malId) {
+        return malService.deleteAnimeFromList(malId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
+    }
+
     public Single<List<MalUserAnime>> getUserAnimeList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
