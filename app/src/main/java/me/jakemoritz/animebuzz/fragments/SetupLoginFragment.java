@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,7 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences;
 
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.R;
 import me.jakemoritz.animebuzz.app.App;
 import me.jakemoritz.animebuzz.databinding.FragmentSetupMalLoginBinding;
@@ -102,8 +101,6 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
         MalHeader.getInstance().setPassword(getString(R.string.MAL_API_TEST_PASS));
 
         disposables.add(malFacade.verifyCredentials()
-                .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
                 .subscribe(
                         malVerifyCredentialsWrapper -> {
                             // TODO: Save user credentials
@@ -118,8 +115,6 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
 
                             // Download user's MyAnimeList avatar
                             disposables.add(malFacade.getUserAvatar()
-                                    .subscribeOn(Schedulers.io())
-                                    .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe(
                                             (fileContainers, throwable) -> {
                                                 if (throwable != null) {
@@ -130,6 +125,16 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                         },
                         throwable -> {
                             // TODO: Display failed verification UI
+                            throwable.printStackTrace();
+                        }
+                ));
+
+        disposables.add(malFacade.addAnimeToList("21")
+                .subscribe(
+                        () -> {
+                            Log.d("s", "s");
+                        },
+                        throwable -> {
                             throwable.printStackTrace();
                         }
                 ));

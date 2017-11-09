@@ -9,9 +9,9 @@ import java.util.List;
 public class MalUserObject {
 
     @ElementList(inline=true, required=false, empty=false)
-    private List<MalAnime> userAnimeList;
+    private List<MalUserAnime> userAnimeList;
 
-    public List<MalAnime> getUserAnimeList() {
+    public List<MalUserAnime> getUserAnimeList() {
         return userAnimeList;
     }
 }

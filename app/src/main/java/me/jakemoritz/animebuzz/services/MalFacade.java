@@ -9,14 +9,19 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.oussaki.rxfilesdownloader.FileContainer;
 import com.oussaki.rxfilesdownloader.RxDownloader;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 import me.jakemoritz.animebuzz.app.App;
-import me.jakemoritz.animebuzz.model.MalAnime;
+import me.jakemoritz.animebuzz.model.MalAnimeValues;
+import me.jakemoritz.animebuzz.model.MalUserAnime;
 import me.jakemoritz.animebuzz.model.MalVerifyCredentialsWrapper;
 import me.jakemoritz.animebuzz.utils.Constants;
 import okhttp3.OkHttpClient;
@@ -42,7 +47,9 @@ public class MalFacade {
     }
 
     public Single<MalVerifyCredentialsWrapper> verifyCredentials() {
-        return malService.verifyCredentials();
+        return malService.verifyCredentials()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
     }
 
     public Single<List<FileContainer>> getUserAvatar() {
@@ -64,10 +71,21 @@ public class MalFacade {
                 .addFile(URL)
                 .build();
 
-        return rxDownloader.asList();
+        return rxDownloader.asList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Single<List<MalAnime>> getUserAnimeList() {
+    public Completable addAnimeToList(String malId) {
+        HashMap<String, String> animeValues = new HashMap<>();
+        MalUserAnime malUserAnime = new MalUserAnime(malId);
+        MalAnimeValues malAnimeValues = new MalAnimeValues();
+        return malService.addAnimeToList(malId, malAnimeValues)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
+    }
+
+    public Single<List<MalUserAnime>> getUserAnimeList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
 
@@ -76,14 +94,16 @@ public class MalFacade {
         return malService.getUserAnimeList(malUsernamePref.get(), ENTRY_STATUS, LIST_TYPE_ANIME)
                 .map(malUserObject -> {
                     // Filter only shows that the user is currently watching
-                    for (Iterator<MalAnime> iterator = malUserObject.getUserAnimeList().iterator(); iterator.hasNext();){
-                        MalAnime malAnime = iterator.next();
-                        if (malAnime.getEntryWatchingStatus() != Constants.MAL_ENTRY_STATUS_WATCHING){
+                    for (Iterator<MalUserAnime> iterator = malUserObject.getUserAnimeList().iterator(); iterator.hasNext(); ) {
+                        MalUserAnime malUserAnime = iterator.next();
+                        if (malUserAnime.getEntryWatchingStatus() != Constants.MAL_ENTRY_STATUS_WATCHING) {
                             iterator.remove();
                         }
                     }
 
                     return malUserObject.getUserAnimeList();
-                });
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
     }
 }

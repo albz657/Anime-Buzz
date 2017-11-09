@@ -99,8 +99,8 @@ public class NetModule {
         loggingInterceptor.setLevel(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY :
                 HttpLoggingInterceptor.Level.NONE);
-        httpClientBuilder.addInterceptor(loggingInterceptor);
         httpClientBuilder.addInterceptor(MalHeader.getInstance());
+        httpClientBuilder.addInterceptor(loggingInterceptor);
         OkHttpClient client = httpClientBuilder.build();
 
         Retrofit retrofit = new Retrofit.Builder()

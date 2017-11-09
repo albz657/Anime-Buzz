@@ -4,7 +4,7 @@ import org.simpleframework.xml.Element;
 import org.simpleframework.xml.Root;
 
 @Root(name="anime", strict=false)
-public class MalAnime {
+public class MalUserAnime {
 
     @Element(name="series_animedb_id")
     private String MALID;
@@ -14,6 +14,10 @@ public class MalAnime {
 
     @Element(name="my_watched_episodes")
     private int watchedEpisodeCount;
+
+    public MalUserAnime(String MALID) {
+        this.MALID = MALID;
+    }
 
     public String getMALID() {
         return MALID;
