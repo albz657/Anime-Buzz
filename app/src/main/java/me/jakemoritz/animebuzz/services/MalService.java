@@ -27,6 +27,10 @@ public interface MalService {
     @POST("api/animelist/add/{malId}.xml")
     Completable addAnimeToList(@Path("malId") String malId, @Field("data") String malAnimeValues);
 
+    @FormUrlEncoded
+    @POST("api/animelist/update/{malId}.xml")
+    Completable updateAnimeInList(@Path("malId") String malId, @Field("data") String malAnimeValues);
+
     Single<List<FileContainer>> getUserAvatar();
 
 }

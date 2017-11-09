@@ -80,9 +80,19 @@ public class MalFacade {
     }
 
     public Completable addAnimeToList(String malId) {
+        // TODO: Populate with values from anime in db
         MalAnimeValues malAnimeValues = new MalAnimeValues();
 
         return malService.addAnimeToList(malId, getXmlStringFromObject(malAnimeValues))
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io());
+    }
+
+    public Completable updateAnimeInList(String malId) {
+        // TODO: Populate with values from anime in db
+        MalAnimeValues malAnimeValues = new MalAnimeValues();
+
+        return malService.updateAnimeInList(malId, getXmlStringFromObject(malAnimeValues))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
@@ -111,6 +121,7 @@ public class MalFacade {
 
     /**
      * This method serializes an Object into XML and returns the String representation
+     *
      * @return the XML string
      */
     private String getXmlStringFromObject(Object object) {

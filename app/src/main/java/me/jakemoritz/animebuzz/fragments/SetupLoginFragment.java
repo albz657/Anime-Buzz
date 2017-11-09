@@ -8,7 +8,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,16 +124,6 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                         },
                         throwable -> {
                             // TODO: Display failed verification UI
-                            throwable.printStackTrace();
-                        }
-                ));
-
-        disposables.add(malFacade.addAnimeToList("21")
-                .subscribe(
-                        () -> {
-                            Log.d("s", "s");
-                        },
-                        throwable -> {
                             throwable.printStackTrace();
                         }
                 ));
