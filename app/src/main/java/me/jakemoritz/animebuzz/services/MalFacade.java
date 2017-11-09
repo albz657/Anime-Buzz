@@ -9,7 +9,10 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences;
 import com.oussaki.rxfilesdownloader.FileContainer;
 import com.oussaki.rxfilesdownloader.RxDownloader;
 
-import java.util.HashMap;
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
+
+import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -77,10 +80,9 @@ public class MalFacade {
     }
 
     public Completable addAnimeToList(String malId) {
-        HashMap<String, String> animeValues = new HashMap<>();
-        MalUserAnime malUserAnime = new MalUserAnime(malId);
         MalAnimeValues malAnimeValues = new MalAnimeValues();
-        return malService.addAnimeToList(malId, malAnimeValues)
+
+        return malService.addAnimeToList(malId, getXmlStringFromObject(malAnimeValues))
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
@@ -105,5 +107,25 @@ public class MalFacade {
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
+    }
+
+    /**
+     * This method serializes an Object into XML and returns the String representation
+     * @return the XML string
+     */
+    private String getXmlStringFromObject(Object object) {
+        Serializer serializer = new Persister();
+        String xmlString;
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            serializer.write(object, baos);
+            xmlString = baos.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            xmlString = "";
+        }
+
+        return xmlString;
     }
 }

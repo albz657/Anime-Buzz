@@ -6,7 +6,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Single;
-import me.jakemoritz.animebuzz.model.MalAnimeValues;
 import me.jakemoritz.animebuzz.model.MalUserObject;
 import me.jakemoritz.animebuzz.model.MalVerifyCredentialsWrapper;
 import retrofit2.http.Field;
@@ -26,7 +25,7 @@ public interface MalService {
 
     @FormUrlEncoded
     @POST("api/animelist/add/{malId}.xml")
-    Completable addAnimeToList(@Path("malId") String malId, @Field("data") MalAnimeValues malAnimeValues);
+    Completable addAnimeToList(@Path("malId") String malId, @Field("data") String malAnimeValues);
 
     Single<List<FileContainer>> getUserAvatar();
 
