@@ -29,6 +29,9 @@ import me.jakemoritz.animebuzz.model.MalVerifyCredentialsWrapper;
 import me.jakemoritz.animebuzz.utils.Constants;
 import okhttp3.OkHttpClient;
 
+/**
+ * This class contains methods for interacting with the MyAnimeList API
+ */
 public class MalFacade {
 
     @Inject
@@ -49,12 +52,24 @@ public class MalFacade {
         App.getInstance().getAppComponent().inject(this);
     }
 
+    /**
+     * This method is used to verify the user's MyAnimeList credentials
+     *
+     * @return an object containing the user's MyAnimeList username and user id
+     */
     public Single<MalVerifyCredentialsWrapper> verifyCredentials() {
         return malService.verifyCredentials()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
 
+    /**
+     * This method downloads the user's MyAnimeList avatar using their user id
+     *
+     * @return a list of {@link FileContainer} representing the files downloaded
+     * <p>
+     * Only one file will be downloaded here, so it will be the first in the List
+     */
     public Single<List<FileContainer>> getUserAvatar() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);
@@ -79,6 +94,12 @@ public class MalFacade {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
+    /**
+     * This method adds an anime entry to the user's MyAnimeList list
+     *
+     * @param malId is the unique id of the anime entry on MyAnimeList
+     * @return a {@link Completable} representing the success state of the call
+     */
     public Completable addAnimeToList(String malId) {
         // TODO: Populate with values from anime in db
         MalAnimeValues malAnimeValues = new MalAnimeValues();
@@ -88,6 +109,12 @@ public class MalFacade {
                 .observeOn(Schedulers.io());
     }
 
+    /**
+     * This method updates an anime entry in the user's MyAnimeList list
+     *
+     * @param malId is the unique id of the anime entry on MyAnimeList
+     * @return a {@link Completable} representing the success state of the call
+     */
     public Completable updateAnimeInList(String malId) {
         // TODO: Populate with values from anime in db
         MalAnimeValues malAnimeValues = new MalAnimeValues();
@@ -97,12 +124,23 @@ public class MalFacade {
                 .observeOn(Schedulers.io());
     }
 
+    /**
+     * This method deletes an anime entry from the user's MyAnimeList list
+     *
+     * @param malId is the unique id of the anime entry on MyAnimeList
+     * @return a {@link Completable} representing the success state of the call
+     */
     public Completable deleteAnimeFromList(String malId) {
         return malService.deleteAnimeFromList(malId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io());
     }
 
+    /**
+     * This method gets a user's MyAnimeList anime watching list
+     *
+     * @return the user's MyAnimeList anime watching list
+     */
     public Single<List<MalUserAnime>> getUserAnimeList() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(App.getInstance());
         RxSharedPreferences rxPrefs = RxSharedPreferences.create(sharedPreferences);

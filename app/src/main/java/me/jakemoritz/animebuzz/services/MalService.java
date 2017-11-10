@@ -16,6 +16,11 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
+/**
+ * This interface defines the endpoints to connect to the MyAnimeList API
+ *
+ * Documentation: https://myanimelist.net/modules.php?go=api
+ */
 public interface MalService {
 
     @GET("api/account/verify_credentials.xml")
