@@ -25,6 +25,7 @@ import me.jakemoritz.animebuzz.network.MalHeader;
 import me.jakemoritz.animebuzz.presenters.MalLoginListener;
 import me.jakemoritz.animebuzz.presenters.MalLoginPresenter;
 import me.jakemoritz.animebuzz.services.MalFacade;
+import me.jakemoritz.animebuzz.utils.AuthUtils;
 import me.jakemoritz.animebuzz.utils.Constants;
 import me.jakemoritz.animebuzz.utils.RxUtils;
 
@@ -103,6 +104,8 @@ public class SetupLoginFragment extends Fragment implements MalLoginListener {
                 .subscribe(
                         malVerifyCredentialsWrapper -> {
                             // TODO: Save user credentials
+                            AuthUtils.getInstance().createNewUser(getString(R.string.MAL_API_TEST_LOGIN), getString(R.string.MAL_API_TEST_PASS));
+
                             Preference<Boolean> loggedInPref = rxPrefs.getBoolean(Constants.SHARED_PREF_KEY_MAL_LOGGED_IN);
                             loggedInPref.set(true);
 
